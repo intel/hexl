@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="dir_8cfc4ed6d3ecc3c5762eb1b8347d82fa" kind="dir">
+    <compoundname>/Users/fboemer/repos/DBIO/intel-hexl/intel-hexl/include</compoundname>
+    <innerdir refid="dir_7759c3a881395f02ed4947f5a1aa5b9c">/Users/fboemer/repos/DBIO/intel-hexl/intel-hexl/include/intel-hexl</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/intel-hexl/include/"/>
+  </compounddef>
+</doxygen>

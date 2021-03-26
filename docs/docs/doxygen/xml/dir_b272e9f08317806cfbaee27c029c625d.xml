@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="dir_b272e9f08317806cfbaee27c029c625d" kind="dir">
+    <compoundname>/Users/fboemer/repos/DBIO/intel-hexl/intel-hexl/include/intel-hexl/ntt</compoundname>
+    <innerfile refid="ntt_8hpp">ntt.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/intel-hexl/include/intel-hexl/ntt/"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,18 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+cmake_minimum_required(VERSION 3.5.1)
+
+project(google-benchmark-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(gbenchmark
+  GIT_REPOSITORY    https://github.com/google/benchmark.git
+  GIT_TAG           master
+  SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/gbenchmark-src"
+  BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/gbenchmark-build"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)

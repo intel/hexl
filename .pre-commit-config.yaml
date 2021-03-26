@@ -1,0 +1,28 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v2.5.0
+      hooks:
+        - id: trailing-whitespace
+        - id: end-of-file-fixer
+        - id: check-merge-conflict
+        - id: mixed-line-ending
+        - id: check-byte-order-marker
+        - id: check-yaml
+    - repo: local
+      hooks:
+        - id: clang-format-9
+          name: clang-format-9
+          entry: clang-format-9
+          language: system
+          files: \.(c|cc|cxx|cpp|h|hpp|hxx|js|proto)$
+          args: ["-i"]
+        - id: cpplint
+          name: cpplint
+          entry: cpplint
+          language: system
+          files: \.(c|cc|cxx|cpp|h|hpp|hxx)$
+          args:
+            - --recursive

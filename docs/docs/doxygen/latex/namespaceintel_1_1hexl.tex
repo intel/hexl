@@ -1,0 +1,259 @@
+\hypertarget{namespaceintel_1_1hexl}{}\doxysection{intel\+::hexl Namespace Reference}
+\label{namespaceintel_1_1hexl}\index{intel::hexl@{intel::hexl}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classintel_1_1hexl_1_1_n_t_t}{N\+TT}}
+\begin{DoxyCompactList}\small\item\em Performs negacyclic forward and inverse number-\/theoretic transform (\mbox{\hyperlink{classintel_1_1hexl_1_1_n_t_t}{N\+TT}}), commonly used in R\+L\+WE cryptography. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}} \{ \newline
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47}{C\+M\+P\+I\+N\+T\+::\+EQ}} = 0, 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b}{C\+M\+P\+I\+N\+T\+::\+LT}} = 1, 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6}{C\+M\+P\+I\+N\+T\+::\+LE}} = 2, 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc}{C\+M\+P\+I\+N\+T\+::\+F\+A\+L\+SE}} = 3, 
+\newline
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0}{C\+M\+P\+I\+N\+T\+::\+NE}} = 4, 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8}{C\+M\+P\+I\+N\+T\+::\+N\+LT}} = 5, 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57}{C\+M\+P\+I\+N\+T\+::\+N\+LE}} = 6, 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61}{C\+M\+P\+I\+N\+T\+::\+T\+R\+UE}} = 7
+ \}
+\begin{DoxyCompactList}\small\item\em Represents binary operations between two boolean values. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespaceintel_1_1hexl_a319244a133f57825ba7e593ad5c71709}{Eltwise\+Add\+Mod}} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand1, const uint64\+\_\+t $\ast$operand2, uint64\+\_\+t n, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Adds two vectors elementwise with modular reduction. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceintel_1_1hexl_ad09f0d71efdfbde79c2a8ed92d7da811}{Eltwise\+Cmp\+Add}} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand1, \mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}} cmp, uint64\+\_\+t bound, uint64\+\_\+t diff, uint64\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Computes element-\/wise conditional addition. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceintel_1_1hexl_aa06f039b71cf61990911e753595f1f78}{Eltwise\+Cmp\+Sub\+Mod}} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand1, \mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}} cmp, uint64\+\_\+t bound, uint64\+\_\+t diff, uint64\+\_\+t modulus, uint64\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Computes element-\/wise conditional modular subtraction. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceintel_1_1hexl_a5b65d563391b4a1a5041633aeb118aa5}{Eltwise\+F\+M\+A\+Mod}} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$arg1, uint64\+\_\+t arg2, const uint64\+\_\+t $\ast$arg3, uint64\+\_\+t n, uint64\+\_\+t modulus, uint64\+\_\+t input\+\_\+mod\+\_\+factor)
+\begin{DoxyCompactList}\small\item\em Computes fused multiply-\/add ({\ttfamily arg1} $\ast$ {\ttfamily arg2} + {\ttfamily arg3}) mod {\ttfamily modulus} element-\/wise, broadcasting scalars to vectors. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceintel_1_1hexl_a705bc0321d937ae4d1f8d50279e3cff1}{Eltwise\+Mult\+Mod}} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand1, const uint64\+\_\+t $\ast$operand2, uint64\+\_\+t n, uint64\+\_\+t modulus, uint64\+\_\+t input\+\_\+mod\+\_\+factor)
+\begin{DoxyCompactList}\small\item\em Multiplies two vectors elementwise with modular reduction. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceintel_1_1hexl_af7e59b130824f9cd4ad0aa54c52ad50c}{Eltwise\+Reduce\+Mod}} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand, uint64\+\_\+t modulus, uint64\+\_\+t n, uint64\+\_\+t input\+\_\+mod\+\_\+factor, uint64\+\_\+t output\+\_\+mod\+\_\+factor)
+\begin{DoxyCompactList}\small\item\em Performs elementwise modular reduction. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}} \mbox{\hyperlink{namespaceintel_1_1hexl_a8c654502a5e7fe2cfdd198f0fd920f2a}{Not}} (\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}} cmp)
+\begin{DoxyCompactList}\small\item\em Returns the logical negation of a binary operation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}} 
+\index{intel::hexl@{intel::hexl}!CMPINT@{CMPINT}}
+\index{CMPINT@{CMPINT}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{CMPINT}{CMPINT}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{intel\+::hexl\+::\+C\+M\+P\+I\+NT}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+Represents binary operations between two boolean values. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EQ@{EQ}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!EQ@{EQ}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47}} 
+EQ&Equal. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LT@{LT}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!LT@{LT}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b}} 
+LT&Less than. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LE@{LE}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!LE@{LE}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6}} 
+LE&Less than or equal. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FALSE@{FALSE}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!FALSE@{FALSE}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc}} 
+F\+A\+L\+SE&False. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NE@{NE}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!NE@{NE}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0}} 
+NE&Not equal. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NLT@{NLT}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!NLT@{NLT}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8}} 
+N\+LT&Not less than. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NLE@{NLE}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!NLE@{NLE}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57}} 
+N\+LE&Not less than or equal. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TRUE@{TRUE}!intel::hexl@{intel::hexl}}\index{intel::hexl@{intel::hexl}!TRUE@{TRUE}}}\mbox{\Hypertarget{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61}\label{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61}} 
+T\+R\+UE&True. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespaceintel_1_1hexl_a319244a133f57825ba7e593ad5c71709}\label{namespaceintel_1_1hexl_a319244a133f57825ba7e593ad5c71709}} 
+\index{intel::hexl@{intel::hexl}!EltwiseAddMod@{EltwiseAddMod}}
+\index{EltwiseAddMod@{EltwiseAddMod}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{EltwiseAddMod()}{EltwiseAddMod()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Eltwise\+Add\+Mod (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand1,  }\item[{const uint64\+\_\+t $\ast$}]{operand2,  }\item[{uint64\+\_\+t}]{n,  }\item[{uint64\+\_\+t}]{modulus }\end{DoxyParamCaption})}
+
+
+
+Adds two vectors elementwise with modular reduction. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em result} & Stores result \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand1} & Vector of elements to add. Each element must be less than the modulus \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand2} & Vector of elements to add. Each element must be less than the modulus \\
+\hline
+\mbox{\texttt{ in}}  & {\em n} & Number of elements in each vector \\
+\hline
+\mbox{\texttt{ in}}  & {\em modulus} & Modulus with which to perform modular reduction. Must be in the range $[2, 2^{63} - 1]$\\
+\hline
+\end{DoxyParams}
+Computes $ operand1[i] = (operand1[i] + operand2[i]) \mod modulus $ for $ i=0, ..., n-1$. \mbox{\Hypertarget{namespaceintel_1_1hexl_ad09f0d71efdfbde79c2a8ed92d7da811}\label{namespaceintel_1_1hexl_ad09f0d71efdfbde79c2a8ed92d7da811}} 
+\index{intel::hexl@{intel::hexl}!EltwiseCmpAdd@{EltwiseCmpAdd}}
+\index{EltwiseCmpAdd@{EltwiseCmpAdd}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{EltwiseCmpAdd()}{EltwiseCmpAdd()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Eltwise\+Cmp\+Add (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand1,  }\item[{\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}}}]{cmp,  }\item[{uint64\+\_\+t}]{bound,  }\item[{uint64\+\_\+t}]{diff,  }\item[{uint64\+\_\+t}]{n }\end{DoxyParamCaption})}
+
+
+
+Computes element-\/wise conditional addition. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em result} & Stores the result \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand1} & Vector of elements to compare; stores result \\
+\hline
+\mbox{\texttt{ in}}  & {\em cmp} & Comparison operation \\
+\hline
+\mbox{\texttt{ in}}  & {\em bound} & Scalar to compare against \\
+\hline
+\mbox{\texttt{ in}}  & {\em diff} & Scalar to conditionally add \\
+\hline
+\mbox{\texttt{ in}}  & {\em n} & Number of elements in {\ttfamily operand1} \\
+\hline
+\end{DoxyParams}
+Computes result\mbox{[}i\mbox{]} = cmp(operand1\mbox{[}i\mbox{]}, bound) ? operand1\mbox{[}i\mbox{]} + diff \+: operand1\mbox{[}i\mbox{]} for all $i=0, ..., n-1$. \mbox{\Hypertarget{namespaceintel_1_1hexl_aa06f039b71cf61990911e753595f1f78}\label{namespaceintel_1_1hexl_aa06f039b71cf61990911e753595f1f78}} 
+\index{intel::hexl@{intel::hexl}!EltwiseCmpSubMod@{EltwiseCmpSubMod}}
+\index{EltwiseCmpSubMod@{EltwiseCmpSubMod}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{EltwiseCmpSubMod()}{EltwiseCmpSubMod()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Eltwise\+Cmp\+Sub\+Mod (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand1,  }\item[{\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}}}]{cmp,  }\item[{uint64\+\_\+t}]{bound,  }\item[{uint64\+\_\+t}]{diff,  }\item[{uint64\+\_\+t}]{modulus,  }\item[{uint64\+\_\+t}]{n }\end{DoxyParamCaption})}
+
+
+
+Computes element-\/wise conditional modular subtraction. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em result} & Stores the result \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand1} & Vector of elements to compare \\
+\hline
+\mbox{\texttt{ in}}  & {\em cmp} & Comparison function \\
+\hline
+\mbox{\texttt{ in}}  & {\em bound} & Scalar to compare against \\
+\hline
+\mbox{\texttt{ in}}  & {\em diff} & Scalar to subtract by \\
+\hline
+\mbox{\texttt{ in}}  & {\em modulus} & Modulus to reduce by \\
+\hline
+\mbox{\texttt{ in}}  & {\em n} & Number of elements in {\ttfamily operand1} \\
+\hline
+\end{DoxyParams}
+Computes {\ttfamily operand1}\mbox{[}i\mbox{]} = ({\ttfamily cmp}({\ttfamily operand1}, {\ttfamily bound})) ? ({\ttfamily operand1} -\/ {\ttfamily diff}) mod {\ttfamily modulus} \+: {\ttfamily operand1} for all i=0, ..., n-\/1 \mbox{\Hypertarget{namespaceintel_1_1hexl_a5b65d563391b4a1a5041633aeb118aa5}\label{namespaceintel_1_1hexl_a5b65d563391b4a1a5041633aeb118aa5}} 
+\index{intel::hexl@{intel::hexl}!EltwiseFMAMod@{EltwiseFMAMod}}
+\index{EltwiseFMAMod@{EltwiseFMAMod}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{EltwiseFMAMod()}{EltwiseFMAMod()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Eltwise\+F\+M\+A\+Mod (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{arg1,  }\item[{uint64\+\_\+t}]{arg2,  }\item[{const uint64\+\_\+t $\ast$}]{arg3,  }\item[{uint64\+\_\+t}]{n,  }\item[{uint64\+\_\+t}]{modulus,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+
+
+Computes fused multiply-\/add ({\ttfamily arg1} $\ast$ {\ttfamily arg2} + {\ttfamily arg3}) mod {\ttfamily modulus} element-\/wise, broadcasting scalars to vectors. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em result} & Stores the result \\
+\hline
+\mbox{\texttt{ in}}  & {\em arg1} & Vector to multiply \\
+\hline
+\mbox{\texttt{ in}}  & {\em arg2} & Scalar to multiply \\
+\hline
+\mbox{\texttt{ in}}  & {\em arg3} & Vector to add. Will not add if {\ttfamily arg3} == nullptr \\
+\hline
+\mbox{\texttt{ in}}  & {\em n} & Number of elements in each vector \\
+\hline
+\mbox{\texttt{ in}}  & {\em modulus} & Modulus with which to perform modular reduction. Must be in the range $ [2, 2^{61} - 1]$ \\
+\hline
+\mbox{\texttt{ in}}  & {\em input\+\_\+mod\+\_\+factor} & Assumes input elements are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ p). Must be 1, 2, 4, or 8. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{namespaceintel_1_1hexl_a705bc0321d937ae4d1f8d50279e3cff1}\label{namespaceintel_1_1hexl_a705bc0321d937ae4d1f8d50279e3cff1}} 
+\index{intel::hexl@{intel::hexl}!EltwiseMultMod@{EltwiseMultMod}}
+\index{EltwiseMultMod@{EltwiseMultMod}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{EltwiseMultMod()}{EltwiseMultMod()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Eltwise\+Mult\+Mod (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand1,  }\item[{const uint64\+\_\+t $\ast$}]{operand2,  }\item[{uint64\+\_\+t}]{n,  }\item[{uint64\+\_\+t}]{modulus,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+
+
+Multiplies two vectors elementwise with modular reduction. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em result} & Result of element-\/wise multiplication \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand1} & Vector of elements to multiply. Each element must be less than the modulus. \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand2} & Vector of elements to multiply. Each element must be less than the modulus. \\
+\hline
+\mbox{\texttt{ in}}  & {\em n} & Number of elements in each vector \\
+\hline
+\mbox{\texttt{ in}}  & {\em modulus} & Modulus with which to perform modular reduction \\
+\hline
+\mbox{\texttt{ in}}  & {\em input\+\_\+mod\+\_\+factor} & Assumes input elements are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ p) Must be 1, 2 or 4.\\
+\hline
+\end{DoxyParams}
+Computes {\ttfamily result}\mbox{[}i\mbox{]} = ({\ttfamily operand1}\mbox{[}i\mbox{]} $\ast$ {\ttfamily operand2}\mbox{[}i\mbox{]}) mod {\ttfamily modulus} for i=0, ..., {\ttfamily n} -\/ 1 \mbox{\Hypertarget{namespaceintel_1_1hexl_af7e59b130824f9cd4ad0aa54c52ad50c}\label{namespaceintel_1_1hexl_af7e59b130824f9cd4ad0aa54c52ad50c}} 
+\index{intel::hexl@{intel::hexl}!EltwiseReduceMod@{EltwiseReduceMod}}
+\index{EltwiseReduceMod@{EltwiseReduceMod}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{EltwiseReduceMod()}{EltwiseReduceMod()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Eltwise\+Reduce\+Mod (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand,  }\item[{uint64\+\_\+t}]{modulus,  }\item[{uint64\+\_\+t}]{n,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor,  }\item[{uint64\+\_\+t}]{output\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+
+
+Performs elementwise modular reduction. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em result} & Stores the result \\
+\hline
+\mbox{\texttt{ in}}  & {\em operand} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em n} & Number of elements in operand \\
+\hline
+\mbox{\texttt{ in}}  & {\em modulus} & Modulus with which to perform modular reduction \\
+\hline
+\mbox{\texttt{ in}}  & {\em input\+\_\+mod\+\_\+factor} & Assumes input elements are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ p) Must be 0, 1, 2 or 4. input\+\_\+mod\+\_\+factor=0 means, no knowledge of input range. Barrett reduction will be used in this case. input\+\_\+mod\+\_\+factor $>$= output\+\_\+mod\+\_\+factor unless input\+\_\+mod\+\_\+factor == 0 \\
+\hline
+\mbox{\texttt{ in}}  & {\em output\+\_\+mod\+\_\+factor} & output elements will be in \mbox{[}0, output\+\_\+mod\+\_\+factor
+\begin{DoxyItemize}
+\item p) Must be 1 or 2. for input\+\_\+mod\+\_\+factor=0, output\+\_\+mod\+\_\+factor will be set to 1. 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{namespaceintel_1_1hexl_a8c654502a5e7fe2cfdd198f0fd920f2a}\label{namespaceintel_1_1hexl_a8c654502a5e7fe2cfdd198f0fd920f2a}} 
+\index{intel::hexl@{intel::hexl}!Not@{Not}}
+\index{Not@{Not}!intel::hexl@{intel::hexl}}
+\doxysubsubsection{\texorpdfstring{Not()}{Not()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}} intel\+::hexl\+::\+Not (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceintel_1_1hexl_abdcc9d2d5bb10fa95d5f143874508006}{C\+M\+P\+I\+NT}}}]{cmp }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the logical negation of a binary operation. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cmp} & The binary operation to negate \\
+\hline
+\end{DoxyParams}

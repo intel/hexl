@@ -1,0 +1,155 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+image: ubuntu:18.04
+
+variables:
+  http_proxy: http://10.7.211.16:911
+  https_proxy: http://10.7.211.16:912
+  DEFAULT_COMPILER_FLAGS: "-DCMAKE_CXX_COMPILER=clang++-10
+      -DCMAKE_C_COMPILER=clang-10
+      -DHEXL_BENCHMARK=ON
+      -DHEXL_TESTING=ON
+      -DHEXL_COVERAGE=OFF
+      -DHEXL_EXPORT=ON
+      -DCMAKE_INSTALL_PREFIX=../"
+  DEBUG_COMPILER_FLAGS: "-DCMAKE_BUILD_TYPE=RelWithDebInfo
+      -DCMAKE_CXX_COMPILER=g++-9
+      -DCMAKE_C_COMPILER=gcc-9
+      -DHEXL_DEBUG=ON
+      -DHEXL_BENCHMARK=ON
+      -DHEXL_TESTING=ON
+      -DHEXL_COVERAGE=ON
+      -DHEXL_EXPORT=OFF
+      -DHEXL_DOCS=ON
+      -DHEXL_ENABLE_ADDRESS_SANITIZER=ON
+      -DCMAKE_INSTALL_PREFIX=../"
+
+  GCOV_BIN: "/usr/bin/gcov-7"
+  DEFAULT_EXAMPLE_FLAGS: "-DINTEL_HEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/"
+
+stages:
+  - format
+  - build
+  - test
+  - example
+  - benchmark
+
+.only-default:
+  only:
+    refs:
+      - merge_requests
+      - master
+
+.build:
+  extends: .only-default
+  before_script:
+    - whoami
+    - echo "Testing from branch:"
+    - echo $CI_COMMIT_REF_NAME
+    - cmake --version
+    - pwd
+    - ls
+
+format:
+  extends: .only-default
+  stage: format
+  script:
+    # Run formatting
+    - pre-commit run --all-files
+
+default_build:
+  stage: build
+  extends: .build
+  script:
+    # Build library
+    - mkdir -p build
+    - cd build
+    - cmake .. ${DEFAULT_COMPILER_FLAGS}
+    - make -j
+    - make -j install
+    # Build example
+    - cd ../example
+    - mkdir -p build
+    - cd build
+    - cmake .. ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_EXAMPLE_FLAGS}
+    - make -j
+  artifacts:
+    paths:
+        - build/
+        - lib/
+        - include/
+        - example/build
+    expire_in: 1 day
+
+debug_build:
+  stage: build
+  extends: .build
+  script:
+    # Build repo
+    - mkdir -p build
+    - cd build
+    - cmake .. ${DEBUG_COMPILER_FLAGS}
+    - make -j
+    - make -j docs
+    - make -j install
+    - cd ../
+
+    # Avoid putting debug_test in separate stage, since uploading/downloading artifacts takes a long time
+    - pwd
+    - ls
+    - echo ${CI_PROJECT_DIR}
+    # Generate initial baseline
+    - /usr/local/bin/lcov --capture --initial --directory build/ --output-file cov_base.info
+    # - /usr/local/bin/lcov --list cov_base.info
+    - build/test/unit-test --v=3
+    # Run lcov again
+    - /usr/local/bin/lcov --capture --directory build/ --output-file cov_test.info
+    # - /usr/local/bin/lcov --list cov_test.info
+    # Combine two trace files
+    - /usr/local/bin/lcov --add-tracefile  cov_base.info --add-tracefile cov_test.info --output-file cov_total.info
+    # - /usr/local/bin/lcov --list cov_total.info
+     # Remove unwanted directories
+    - /usr/local/bin/lcov --remove cov_total.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_filter.info
+    # report overall summary to be parsed by gitlab CI
+    - /usr/local/bin/lcov --list cov_filter.info
+    # Generate coverage html
+    - genhtml --branch-coverage cov_filter.info --output-directory coverage
+
+  artifacts:
+    paths:
+        - coverage/
+    expire_in: 1 day
+
+default_example:
+  stage: example
+  extends: .only-default
+  script:
+    - example/build/example
+  artifacts:
+    paths:
+        - example/build
+    expire_in: 1 day
+  dependencies:
+    - default_build
+
+test:
+  stage: test
+  extends: .only-default
+  script:
+    - build/test/unit-test
+    - example/build/example
+  dependencies:
+    - default_build
+
+benchmark:
+  stage: benchmark
+  extends: .only-default
+  script:
+    - build/benchmark/bench_hexl --benchmark_out="${CI_JOB_NAME}_${CI_COMMIT_SHA}" --benchmark_out_format=csv
+  dependencies:
+  - default_build
+  artifacts:
+    paths:
+      - "${CI_JOB_NAME}_${CI_COMMIT_SHA}"
+    expire_in: 5 yr

@@ -1,0 +1,33 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import sphinx_rtd_theme
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode',
+    'sphinx_rtd_theme,
+    'breathe',
+    'm2r2'
+    ]
+
+# General information about the project.
+project = u'Intel HEXL'
+copyright = '2020-2021, Intel Corporation'
+author = 'Intel Corporation'
+
+breathe_projects = {"IntelHEXL": "@CMAKE_CURRENT_BINARY_DIR@/xml/"}
+
+# Breathe Configuration
+breathe_default_project = "IntelHEXL"
+
+breathe_default_members = ('members', 'undoc-members')
+
+html_theme = 'sphinx_rtd_theme'
+source_suffix = ['.rst', '.md']

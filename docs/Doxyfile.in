@@ -1,0 +1,29 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+PROJECT_NAME           = "Intel HEXL"
+PROJECT_BRIEF          = "Intel Homomorphic Encryption Acceleration Library, accelerating the modular arithmetic operations used in homomorphic encryption."
+
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/doxygen
+INPUT                  = @CMAKE_SOURCE_DIR@/intel-hexl/include \
+                         @CMAKE_SOURCE_DIR@/README.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+USE_MATHJAX            = YES
+
+GENERATE_XML           = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+SHOW_NAMESPACES        = YES
+GENERATE_LATEX         = YES
+
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_AS_ERROR          = YES
+
+QUIET                  = NO
+
+SEARCHENGINE           = YES
+SERVER_BASED_SEARCH    = NO
