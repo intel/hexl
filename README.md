@@ -13,10 +13,10 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Benchmarking Intel HEXL](#benchmarking-intel-hexl)
   - [Using Intel HEXL](#using-intel-hexl)
   - [Debugging](#debugging)
-  - [Thread-safety](#thread-safety)
+  - [Threading](#threading)
 - [Documentation](#documentation)
-    - [Doxygen](#doxygen)
-    - [Sphinx](#sphinx)
+  - [Doxygen](#doxygen)
+  - [Sphinx](#sphinx)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
 
@@ -118,7 +118,7 @@ The `example` folder has an example of using Intel HEXL in a third-party project
 For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DHEXL_DEBUG=ON` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libintel_hexl_debug.a`, that can be used to debug the execution.
 
 **Note**, enabling `HEXL_DEBUG=ON` will result in a significant runtime overhead.
-## Thread-safety
+## Threading
 Intel HEXL is single-threaded and thread-safe.
 
 # Documentation
@@ -130,14 +130,14 @@ To build documentation, first install `doxygen` and `graphviz`, e.g.
 sudo apt-get install doxygen graphviz
 ```
 Then, configure Intel HEXL with `-DHEXL_DOCS=ON` (see [Compile-time options](#compile-time-options)).
-### Doxygen
+## Doxygen
  To build Doxygen documentation, after configuring Intel HEXL with `-DHEXL_DOCS=ON`, run
 ```
 cmake --build build --target doxygen
 ```
 To view the generated Doxygen documentation, open the generated `build/docs/doxygen/html/index.html` file in a web browser.
 
-### Sphinx
+## Sphinx
 To build the sphinx documentation, install `sphinx` and required dependencies `breathe, m2r2`, e.g.
 ```bash
 sudo apt-get install python3-sphinx

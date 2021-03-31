@@ -12,7 +12,11 @@ variables:
       -DHEXL_TESTING=ON
       -DHEXL_COVERAGE=OFF
       -DHEXL_EXPORT=ON
-      -DCMAKE_INSTALL_PREFIX=../"
+      -DCMAKE_INSTALL_PREFIX=./"
+  SHARED_LIB_COMPILER_FLAGS: "-DHEXL_SHARED_LIB=ON
+      -DHEXL_TESTING=ON
+      -DHEXL_BENCHMARK=ON
+      -DCMAKE_INSTALL_PREFIX=./"
   DEBUG_COMPILER_FLAGS: "-DCMAKE_BUILD_TYPE=RelWithDebInfo
       -DCMAKE_CXX_COMPILER=g++-9
       -DCMAKE_C_COMPILER=gcc-9
@@ -24,7 +28,7 @@ variables:
       -DHEXL_DOCS=ON
       -DHEXL_ENABLE_ADDRESS_SANITIZER=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=../"
+      -DCMAKE_INSTALL_PREFIX=./"
 
   GCOV_BIN: "/usr/bin/gcov-7"
   DEFAULT_EXAMPLE_FLAGS: "-DINTEL_HEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/"
@@ -64,17 +68,32 @@ default_build:
   extends: .build
   script:
     # Build library
-    - mkdir -p build
-    - cd build
-    - cmake .. ${DEFAULT_COMPILER_FLAGS}
-    - make -j
-    - make -j install
+    - cmake -S . -B build ${DEFAULT_COMPILER_FLAGS}
+    - cmake --build build -j
+    - cmake --install build
     # Build example
-    - cd ../example
-    - mkdir -p build
-    - cd build
-    - cmake .. ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_EXAMPLE_FLAGS}
-    - make -j
+    - cd example
+    - cmake -S . -B build ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_EXAMPLE_FLAGS}
+    - cmake --build build -j
+  artifacts:
+    paths:
+        - build/
+        - lib/
+        - include/
+        - example/build
+    expire_in: 1 day
+
+shared_build:
+  stage: build
+  extends: .build
+  script:
+    # Build library
+    - cmake -S . -B build ${SHARED_LIB_COMPILER_FLAGS}
+    - cmake --build build -j
+    - cmake --install build
+    # Build example
+    - cmake -S . -B build ${SHARED_LIB_COMPILER_FLAGS} ${DEFAULT_EXAMPLE_FLAGS}
+    - cmake --build build -j
   artifacts:
     paths:
         - build/
@@ -88,34 +107,23 @@ debug_build:
   extends: .build
   script:
     # Build repo
-    - mkdir -p build
-    - cd build
-    - cmake .. ${DEBUG_COMPILER_FLAGS}
-    - make -j
-    - make -j doxygen docs
-    - make -j install
-    - cd ../
+    - cmake -S . -B build ${DEBUG_COMPILER_FLAGS}
+    - cmake --build build -j
+    - cmake --build build -j --target doxygen docs
+    - cmake --install build
 
-    # Avoid putting debug_test in separate stage, since uploading/downloading artifacts takes a long time
+    # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
     - pwd
     - ls
     - echo ${CI_PROJECT_DIR}
-    # Generate initial baseline
-    - /usr/local/bin/lcov --capture --initial --directory build/ --output-file cov_base.info
-    # - /usr/local/bin/lcov --list cov_base.info
-    - build/test/unit-test --v=3
-    # Run lcov again
-    - /usr/local/bin/lcov --capture --directory build/ --output-file cov_test.info
-    # - /usr/local/bin/lcov --list cov_test.info
-    # Combine two trace files
-    - /usr/local/bin/lcov --add-tracefile  cov_base.info --add-tracefile cov_test.info --output-file cov_total.info
-    # - /usr/local/bin/lcov --list cov_total.info
-     # Remove unwanted directories
-    - /usr/local/bin/lcov --remove cov_total.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_filter.info
-    # report overall summary to be parsed by gitlab CI
-    - /usr/local/bin/lcov --list cov_filter.info
+    - build/test/unit-test
+    - lcov --capture --directory build/intel-hexl --directory build/test/ --output-file cov_test.info
+    # Remove unwanted directories
+    - lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+    # Report overall summary to be parsed by gitlab CI
+    - lcov --list cov_test.info
     # Generate coverage html
-    - genhtml --branch-coverage cov_filter.info --output-directory coverage
+    - genhtml --branch-coverage cov_test.info --output-directory coverage
 
   artifacts:
     paths:

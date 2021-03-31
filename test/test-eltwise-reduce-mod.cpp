@@ -141,39 +141,33 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  for (size_t log2N = 13; log2N <= 15; ++log2N) {
-    size_t length = 1 << log2N;
+  size_t length = 1024;
 
-    for (size_t bits = 50; bits <= 62; ++bits) {
-      uint64_t prime = GeneratePrimes(1, bits, 1024)[0];
-      std::uniform_int_distribution<uint64_t> distrib(0, prime - 1);
+  for (size_t bits = 50; bits <= 62; ++bits) {
+    uint64_t prime = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, prime - 1);
 
 #ifdef HEXL_DEBUG
-      size_t num_trials = 10;
+    size_t num_trials = 10;
 #else
-      size_t num_trials = 100;
+    size_t num_trials = 100;
 #endif
-      for (size_t trial = 0; trial < num_trials; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-        }
-        std::vector<uint64_t> result1(length, 0);
-        std::vector<uint64_t> result2(length, 0);
-        std::vector<uint64_t> result3(length, 0);
-        auto op2 = op1;
-        auto op3 = op1;
-
-        EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 0,
-                               1);
-        EltwiseReduceModNative(result2.data(), op2.data(), prime, op1.size(), 0,
-                               1);
-        EltwiseReduceModAVX512(result3.data(), op3.data(), prime, op2.size(), 0,
-                               1);
-
-        ASSERT_EQ(result1, result2);
-        ASSERT_EQ(result1, result3);
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      std::vector<uint64_t> op1(length, 0);
+      for (size_t i = 0; i < length; ++i) {
+        op1[i] = distrib(gen);
       }
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+      auto op2 = op1;
+
+      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 0,
+                             1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 0,
+                             1);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
     }
   }
 }
@@ -182,39 +176,33 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  for (size_t log2N = 13; log2N <= 15; ++log2N) {
-    size_t length = 1 << log2N;
+  size_t length = 1024;
 
-    for (size_t bits = 50; bits <= 62; ++bits) {
-      uint64_t prime = GeneratePrimes(1, bits, 1024)[0];
-      std::uniform_int_distribution<uint64_t> distrib(0, (4 * prime) - 1);
+  for (size_t bits = 50; bits <= 62; ++bits) {
+    uint64_t prime = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, (4 * prime) - 1);
 
 #ifdef HEXL_DEBUG
-      size_t num_trials = 10;
+    size_t num_trials = 10;
 #else
-      size_t num_trials = 100;
+    size_t num_trials = 100;
 #endif
-      for (size_t trial = 0; trial < num_trials; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-        }
-        std::vector<uint64_t> result1(length, 0);
-        std::vector<uint64_t> result2(length, 0);
-        std::vector<uint64_t> result3(length, 0);
-        auto op2 = op1;
-        auto op3 = op1;
-
-        EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
-                               1);
-        EltwiseReduceModNative(result2.data(), op2.data(), prime, op1.size(), 4,
-                               1);
-        EltwiseReduceModAVX512(result3.data(), op3.data(), prime, op2.size(), 4,
-                               1);
-
-        ASSERT_EQ(result1, result2);
-        ASSERT_EQ(result1, result3);
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      std::vector<uint64_t> op1(length, 0);
+      for (size_t i = 0; i < length; ++i) {
+        op1[i] = distrib(gen);
       }
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+      auto op2 = op1;
+
+      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
+                             1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 4,
+                             1);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
     }
   }
 }
@@ -223,38 +211,33 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  for (size_t log2N = 13; log2N <= 15; ++log2N) {
-    size_t length = 1 << log2N;
+  size_t length = 1024;
 
-    for (size_t bits = 50; bits <= 62; ++bits) {
-      uint64_t prime = GeneratePrimes(1, bits, 1024)[0];
-      std::uniform_int_distribution<uint64_t> distrib(0, (4 * prime) - 1);
+  for (size_t bits = 50; bits <= 62; ++bits) {
+    uint64_t prime = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, (4 * prime) - 1);
 
 #ifdef HEXL_DEBUG
-      size_t num_trials = 10;
+    size_t num_trials = 10;
 #else
-      size_t num_trials = 100;
+    size_t num_trials = 100;
 #endif
-      for (size_t trial = 0; trial < num_trials; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-        }
-        std::vector<uint64_t> result1(length, 0);
-        std::vector<uint64_t> result2(length, 0);
-        std::vector<uint64_t> result3(length, 0);
-        auto op2 = op1;
-        auto op3 = op1;
-        EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
-                               2);
-        EltwiseReduceModNative(result2.data(), op2.data(), prime, op1.size(), 4,
-                               2);
-        EltwiseReduceModAVX512(result3.data(), op3.data(), prime, op2.size(), 4,
-                               2);
-
-        ASSERT_EQ(result1, result2);
-        ASSERT_EQ(result1, result3);
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      std::vector<uint64_t> op1(length, 0);
+      for (size_t i = 0; i < length; ++i) {
+        op1[i] = distrib(gen);
       }
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+      auto op2 = op1;
+
+      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
+                             2);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 4,
+                             2);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
     }
   }
 }
@@ -263,38 +246,33 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  for (size_t log2N = 13; log2N <= 15; ++log2N) {
-    size_t length = 1 << log2N;
+  size_t length = 1024;
 
-    for (size_t bits = 50; bits <= 62; ++bits) {
-      uint64_t prime = GeneratePrimes(1, bits, 1024)[0];
-      std::uniform_int_distribution<uint64_t> distrib(0, (2 * prime) - 1);
+  for (size_t bits = 50; bits <= 62; ++bits) {
+    uint64_t prime = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, (2 * prime) - 1);
 
 #ifdef HEXL_DEBUG
-      size_t num_trials = 10;
+    size_t num_trials = 10;
 #else
-      size_t num_trials = 100;
+    size_t num_trials = 100;
 #endif
-      for (size_t trial = 0; trial < num_trials; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-        }
-        std::vector<uint64_t> result1(length, 0);
-        std::vector<uint64_t> result2(length, 0);
-        std::vector<uint64_t> result3(length, 0);
-        auto op2 = op1;
-        auto op3 = op1;
-        EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 2,
-                               1);
-        EltwiseReduceModNative(result2.data(), op2.data(), prime, op1.size(), 2,
-                               1);
-        EltwiseReduceModAVX512(result3.data(), op3.data(), prime, op2.size(), 2,
-                               1);
-
-        ASSERT_EQ(result1, result2);
-        ASSERT_EQ(result1, result3);
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      std::vector<uint64_t> op1(length, 0);
+      for (size_t i = 0; i < length; ++i) {
+        op1[i] = distrib(gen);
       }
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+      auto op2 = op1;
+
+      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
+                             1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 4,
+                             1);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
     }
   }
 }

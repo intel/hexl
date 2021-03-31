@@ -41,7 +41,7 @@ static void BM_EltwiseCmpAddNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseCmpAddNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(3.0)
+    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -73,7 +73,7 @@ static void BM_EltwiseCmpAddAVX512(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseCmpAddAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(3.0)
+    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
