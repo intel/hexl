@@ -148,7 +148,6 @@ message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 #------------------------------------------------------------------------------
 check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
 check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
-# TODO:just for testing; remove
 check_compile_flag("${CMAKE_MODULE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
 
 # ------------------------------------------------------------------------------
@@ -217,11 +216,9 @@ if (HEXL_DOCS)
   add_subdirectory(docs)
 endif()
 
-
 #------------------------------------------------------------------------------
 # Config export...
 #------------------------------------------------------------------------------
-
 if (HEXL_EXPORT)
   if (HEXL_SHARED_LIB OR HEXL_DEBUG)
     message(FATAL_ERROR "HEXL_EXPORT=ON only valid when

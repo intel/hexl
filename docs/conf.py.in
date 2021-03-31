@@ -12,7 +12,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'sphinx_rtd_theme,
+    'sphinx_rtd_theme',
     'breathe',
     'm2r2'
     ]
@@ -22,7 +22,7 @@ project = u'Intel HEXL'
 copyright = '2020-2021, Intel Corporation'
 author = 'Intel Corporation'
 
-breathe_projects = {"IntelHEXL": "@CMAKE_CURRENT_BINARY_DIR@/xml/"}
+breathe_projects = {"IntelHEXL": "@CMAKE_SOURCE_BINARY_DIR@/xml/"}
 
 # Breathe Configuration
 breathe_default_project = "IntelHEXL"

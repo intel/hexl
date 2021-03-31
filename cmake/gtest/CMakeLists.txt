@@ -18,10 +18,11 @@ if(result)
 endif()
 
 # Add gtest directly to our build. This defines the gtest target.
-# Add option to override option of same name in gtest
-option (gtest_force_shared_crt "" OFF)
-# Turn on said option
-set(gtest_force_shared_crt ON)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gtest-src
                  ${CMAKE_CURRENT_BINARY_DIR}/gtest-build
                  EXCLUDE_FROM_ALL)
+
+# Prevent variables from leaking
+unset(gtest_force_shared_crt CACHE)

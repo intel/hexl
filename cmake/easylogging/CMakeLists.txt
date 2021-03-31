@@ -18,14 +18,15 @@ if(result)
 endif()
 
 # Add easylogging directly to our build. This defines the easylogging target.
-# Add option to override option of same name in easylogging
-option(build_static_lib "" OFF)
-# Turn on said option
-set(build_static_lib ON)
+# Cache needed to override option in easylogging
+set(build_static_lib ON CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/easylogging-src
                  ${CMAKE_CURRENT_BINARY_DIR}/easylogging-build
                  EXCLUDE_FROM_ALL)
+
+# Prevent variables from leaking
+unset(build_static_lib CACHE)
 
 set_target_properties(easyloggingpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_BINARY_DIR}/easylogging-src/src)

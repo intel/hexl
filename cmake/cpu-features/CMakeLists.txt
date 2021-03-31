@@ -17,15 +17,16 @@ if(result)
 endif()
 
 # Add cpu-features directly to our build. This defines the cpu_features target.
-# Add option to override option of same name in cpu-features
-option(BUILD_PIC "" OFF)
-# Turn ON said option
-set(BUILD_PIC ON)
-
-option(BUILD_SHARED_LIBS "" OFF)
-# Turn OFF said option
-set(BUILD_SHARED_LIBS OFF)
+# Cache needed to override option in cpu-features
+set(BUILD_PIC ON CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/cpu-features-src
                  ${CMAKE_CURRENT_BINARY_DIR}/cpu-features-build
                  EXCLUDE_FROM_ALL)
+
+# Prevent variables from leaking
+unset(BUILD_PIC CACHE)
+unset(BUILD_SHARED_LIBS CACHE)
+unset(BUILD_TESTING CACHE)

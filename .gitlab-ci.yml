@@ -91,7 +91,7 @@ debug_build:
     - cd build
     - cmake .. ${DEBUG_COMPILER_FLAGS}
     - make -j
-    - make -j docs
+    - make -j doxygen docs
     - make -j install
     - cd ../
 

@@ -18,10 +18,12 @@ if(result)
 endif()
 
 # Add gbenchmark directly to our build. This defines the gbenchmark target.
-# Add option to override option of same name in gbenchmark
-option(BENCHMARK_ENABLE_TESTING "" ON)
-# Turn off said option
-set(BENCHMARK_ENABLE_TESTING OFF)
+# Cache needed to override option in gbenchmark
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gbenchmark-src
                  ${CMAKE_CURRENT_BINARY_DIR}/gbenchmark-build
                  EXCLUDE_FROM_ALL)
+
+# Prevent variables from leaking
+unset(BENCHMARK_ENABLE_TESTING CACHE)
