@@ -65,9 +65,10 @@ For convenience, they are listed below:
 | HEXL_ENABLE_ADDRESS_SANITIZER | ON / OFF (default OFF) | Set to ON to enable building with address sanitizer (ASan)               |
 | HEXL_ENABLE_THREAD_SANITIZER  | ON / OFF (default OFF) | Set to ON to enable building with thread sanitizer (TSan)                |
 | HEXL_ENABLE_UB_SANITIZER      | ON / OFF (default OFF) | Set to ON to enable building with undefined behavior sanitizer (UBSan)   |
-| HEXL_EXPORT                   | ON / OFF (default OFF) | Set to ON to enable export of Intel HEXL for use in 3rd-party project |
+| HEXL_EXPORT                   | ON / OFF (default OFF) | Set to ON to enable export of Intel HEXL for use in 3rd-party project    |
 | HEXL_SHARED_LIB               | ON / OFF (default OFF) | Set to ON to enable building shared library                              |
-| HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                                |
+| HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                               |
+| HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
 
 ### Compiling Intel HEXL
 The instructions to build Intel HEXL are common between Linux, MacOS, and Windows.
@@ -165,3 +166,20 @@ and make sure pre-commit checks and all unit tests pass.
 ## Repository layout
 Public headers reside in the `hexl/include` folder.
 Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.
+
+## Intel HEXL Publication
+Find published paper at https://arxiv.org/abs/2103.16400.
+
+## Citing Intel HEXL
+To cite Intel HEXL, please use the following BibTeX entry.
+
+### Version 1.0.0
+```tex
+    @misc{IntelHEXL,
+        title = {{I}ntel {HEXL} (release 1.0.0)},
+        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        month = mar,
+        year = 2021,
+        key = {Intel HEXL}
+    }
+```
