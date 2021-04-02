@@ -23,6 +23,7 @@ variables:
       -DHEXL_EXPORT=OFF
       -DHEXL_DOCS=ON
       -DHEXL_ENABLE_ADDRESS_SANITIZER=ON
+      -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=../"
 
   GCOV_BIN: "/usr/bin/gcov-7"

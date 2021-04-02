@@ -53,13 +53,13 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
                                    &four_times_modulus);
   uint64_t arg2_barr = MultiplyFactor(arg2, BitShift, modulus).BarrettFactor();
 
-  __m512i varg2_barr = _mm512_set1_epi64(arg2_barr);
+  __m512i varg2_barr = _mm512_set1_epi64(static_cast<int64_t>(arg2_barr));
 
-  __m512i vmodulus = _mm512_set1_epi64(modulus);
-  __m512i v2_modulus = _mm512_set1_epi64(2 * modulus);
-  __m512i v4_modulus = _mm512_set1_epi64(4 * modulus);
+  __m512i vmodulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v2_modulus = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
+  __m512i v4_modulus = _mm512_set1_epi64(static_cast<int64_t>(4 * modulus));
   const __m512i* vp_arg1 = reinterpret_cast<const __m512i*>(arg1);
-  __m512i varg2 = _mm512_set1_epi64(arg2);
+  __m512i varg2 = _mm512_set1_epi64(static_cast<int64_t>(arg2));
   varg2 = _mm512_hexl_small_mod_epu64<InputModFactor>(varg2, vmodulus,
                                                       &v2_modulus, &v4_modulus);
 

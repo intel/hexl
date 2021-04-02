@@ -41,7 +41,7 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
           result[i] = operand[i];
         }
       }
-      HEXL_CHECK_BOUNDS(result, n, modulus);
+      HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
       break;
 
     case 2:
@@ -52,7 +52,7 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
           result[i] = operand[i];
         }
       }
-      HEXL_CHECK_BOUNDS(result, n, modulus);
+      HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
       break;
 
     case 4:
@@ -67,7 +67,8 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
             result[i] -= modulus;
           }
         }
-        HEXL_CHECK_BOUNDS(result, n, modulus);
+        HEXL_CHECK_BOUNDS(result, n, modulus,
+                          "result exceeds bound " << modulus);
       }
       if (output_mod_factor == 2) {
         for (size_t i = 0; i < n; ++i) {
@@ -77,7 +78,8 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
             result[i] = operand[i];
           }
         }
-        HEXL_CHECK_BOUNDS(result, n, twice_mod);
+        HEXL_CHECK_BOUNDS(result, n, twice_mod,
+                          "result exceeds bound " << twice_mod);
       }
       break;
   }

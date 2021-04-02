@@ -77,12 +77,12 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
 
   const __m512i* v_op_ptr = reinterpret_cast<const __m512i*>(operand1);
   __m512i* v_result_ptr = reinterpret_cast<__m512i*>(result);
-  __m512i v_bound = _mm512_set1_epi64(bound);
-  __m512i v_diff = _mm512_set1_epi64(diff);
-  __m512i v_modulus = _mm512_set1_epi64(modulus);
+  __m512i v_bound = _mm512_set1_epi64(static_cast<int64_t>(bound));
+  __m512i v_diff = _mm512_set1_epi64(static_cast<int64_t>(diff));
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
 
   uint64_t mu = MultiplyFactor(1, 64, modulus).BarrettFactor();
-  __m512i v_mu = _mm512_set1_epi64(mu);
+  __m512i v_mu = _mm512_set1_epi64(static_cast<int64_t>(mu));
 
   for (size_t i = n / 8; i > 0; --i) {
     __m512i v_op = _mm512_loadu_si512(v_op_ptr);

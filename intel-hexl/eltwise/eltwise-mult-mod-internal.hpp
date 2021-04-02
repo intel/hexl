@@ -38,8 +38,10 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK(n != 0, "Require n != 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(modulus < (1ULL << 62), "Require modulus < (1ULL << 62)");
-  HEXL_CHECK_BOUNDS(operand1, n, InputModFactor * modulus);
-  HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus);
+  HEXL_CHECK_BOUNDS(operand1, n, InputModFactor * modulus,
+                    "operand1 exceeds bound " << (InputModFactor * modulus));
+  HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
+                    "operand2 exceeds bound " << (InputModFactor * modulus));
 
   const uint64_t logmod = uint64_t(floorl(std::log2l(modulus)) - 1);
   // modulus < 2**N

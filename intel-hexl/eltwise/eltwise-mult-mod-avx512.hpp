@@ -345,12 +345,10 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK(InputModFactor * modulus < (1ULL << 63),
              "Require InputModFactor * modulus < (1ULL << 63)");
   HEXL_CHECK(modulus < (1ULL << 62), "Require  modulus < (1ULL << 62)");
-  HEXL_CHECK_BOUNDS(
-      operand1, n, InputModFactor * modulus,
-      "pre-mult value in operand1 exceeds bound " << InputModFactor * modulus);
-  HEXL_CHECK_BOUNDS(
-      operand2, n, InputModFactor * modulus,
-      "Value in operand2 exceeds bound " << InputModFactor * modulus);
+  HEXL_CHECK_BOUNDS(operand1, n, InputModFactor * modulus,
+                    "operand1 exceeds bound " << (InputModFactor * modulus));
+  HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
+                    "operand2 exceeds bound " << (InputModFactor * modulus));
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
   uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
@@ -385,9 +383,9 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
   // correctness. This is less efficient, so we avoid it when possible.
   bool reduce_mod = 2 * log2_input_mod_factor + N >= 63;
 
-  __m512i vbarr_lo = _mm512_set1_epi64(barr_lo);
-  __m512i v_modulus = _mm512_set1_epi64(modulus);
-  __m512i v_twice_mod = _mm512_set1_epi64(2 * modulus);
+  __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
@@ -504,7 +502,8 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
           __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
           __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
 
-          __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi, N - 1);
+          __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
+                                               static_cast<int>(N - 1));
 
           // L - N + 1 == 64, so we only need high 64 bits
           __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
@@ -524,8 +523,7 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
       }
     }
   }
-  HEXL_CHECK_BOUNDS(result, n, modulus,
-                    "post-mult value in result exceeds bound " << modulus);
+  HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 
 // From Function 18, page 19 of https://arxiv.org/pdf/1407.3383.pdf
@@ -586,12 +584,10 @@ void EltwiseMultModAVX512Float(uint64_t* result, const uint64_t* operand1,
              " modulus " << modulus << " exceeds bound " << MaximumValue(50));
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
 
-  HEXL_CHECK_BOUNDS(
-      operand1, n, InputModFactor * modulus,
-      "pre-mult value in operand1 exceeds bound " << InputModFactor * modulus);
-  HEXL_CHECK_BOUNDS(
-      operand2, n, InputModFactor * modulus,
-      "Value in operand2 exceeds bound " << InputModFactor * modulus);
+  HEXL_CHECK_BOUNDS(operand1, n, InputModFactor * modulus,
+                    "operand1 exceeds bound " << (InputModFactor * modulus));
+  HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
+                    "operand2 exceeds bound " << (InputModFactor * modulus));
   uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
     EltwiseMultModNative<InputModFactor>(result, operand1, operand2, n_mod_8,
@@ -602,12 +598,13 @@ void EltwiseMultModAVX512Float(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
   __m512d p = _mm512_set1_pd(static_cast<double>(modulus));
-  __m512i v_modulus = _mm512_set1_epi64(modulus);
-  __m512i v_twice_mod = _mm512_set1_epi64(modulus * 2);
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(modulus * 2));
 
   // Add epsilon to ensure u * p >= 1.0
   // See Proposition 13 of https://arxiv.org/pdf/1407.3383.pdf
-  double ubar = (1.0 + std::numeric_limits<double>::epsilon()) / modulus;
+  double ubar = (1.0 + std::numeric_limits<double>::epsilon()) /
+                static_cast<double>(modulus);
   __m512d u = _mm512_set1_pd(ubar);
 
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
@@ -623,8 +620,7 @@ void EltwiseMultModAVX512Float(uint64_t* result, const uint64_t* operand1,
         vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod, n);
   }
 
-  HEXL_CHECK_BOUNDS(result, n, modulus,
-                    "post-mult value in operand1 exceeds bound " << modulus);
+  HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 
 #endif  // HEXL_HAS_AVX512DQ

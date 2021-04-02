@@ -36,8 +36,8 @@ inline void LoadFwdInterleavedT1(const uint64_t* arg, __m512i* out1,
   // 9, 8, 11, 10, 13, 12, 15, 14
   __m512i v2_perm = _mm512_permutexvar_epi64(perm_idx, v2);
 
-  *out1 = _mm512_mask_blend_epi64(0b10101010, v1, v2_perm);
-  *out2 = _mm512_mask_blend_epi64(0b10101010, v1_perm, v2);
+  *out1 = _mm512_mask_blend_epi64(0xaa, v1, v2_perm);
+  *out2 = _mm512_mask_blend_epi64(0xaa, v1_perm, v2);
 }
 
 // Given input: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -61,8 +61,8 @@ inline void LoadInvInterleavedT1(const uint64_t* arg, __m512i* out1,
   // 14, 12, 10, 8, 15, 13, 11, 9
   __m512i perm_hi = _mm512_permutexvar_epi64(vperm_hi_idx, v_15to8);
 
-  *out1 = _mm512_mask_blend_epi64(0b00001111, perm_hi, perm_lo);
-  *out2 = _mm512_mask_blend_epi64(0b11110000, perm_hi, perm_lo);
+  *out1 = _mm512_mask_blend_epi64(0x0f, perm_hi, perm_lo);
+  *out2 = _mm512_mask_blend_epi64(0xf0, perm_hi, perm_lo);
   *out2 = _mm512_permutexvar_epi64(vperm2_idx, *out2);
 }
 
@@ -84,8 +84,8 @@ inline void LoadFwdInterleavedT2(const uint64_t* arg, __m512i* out1,
   __m512i v1_perm = _mm512_permutexvar_epi64(v1_perm_idx, v1);
   __m512i v2_perm = _mm512_permutexvar_epi64(v1_perm_idx, v2);
 
-  *out1 = _mm512_mask_blend_epi64(0b11001100, v1, v2_perm);
-  *out2 = _mm512_mask_blend_epi64(0b11001100, v1_perm, v2);
+  *out1 = _mm512_mask_blend_epi64(0xcc, v1, v2_perm);
+  *out2 = _mm512_mask_blend_epi64(0xcc, v1_perm, v2);
 }
 
 // Given input: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -104,8 +104,8 @@ inline void LoadInvInterleavedT2(const uint64_t* arg, __m512i* out1,
   __m512i v1_perm = _mm512_permutexvar_epi64(v1_perm_idx, v1);
   __m512i v2_perm = _mm512_permutexvar_epi64(v1_perm_idx, v2);
 
-  *out1 = _mm512_mask_blend_epi64(0b10101010, v1, v2_perm);
-  *out2 = _mm512_mask_blend_epi64(0b10101010, v1_perm, v2);
+  *out1 = _mm512_mask_blend_epi64(0xaa, v1, v2_perm);
+  *out2 = _mm512_mask_blend_epi64(0xaa, v1_perm, v2);
 }
 
 // Returns
@@ -121,8 +121,8 @@ inline void LoadFwdInterleavedT4(const uint64_t* arg, __m512i* out1,
   __m512i v_7to0 = _mm512_loadu_si512(arg_512++);
   __m512i v_15to8 = _mm512_loadu_si512(arg_512);
   __m512i perm_hi = _mm512_permutexvar_epi64(vperm2_idx, v_15to8);
-  *out1 = _mm512_mask_blend_epi64(0b0001111, perm_hi, v_7to0);
-  *out2 = _mm512_mask_blend_epi64(0b11110000, perm_hi, v_7to0);
+  *out1 = _mm512_mask_blend_epi64(0x0f, perm_hi, v_7to0);
+  *out2 = _mm512_mask_blend_epi64(0xf0, perm_hi, v_7to0);
   *out2 = _mm512_permutexvar_epi64(vperm2_idx, *out2);
 }
 
@@ -141,8 +141,8 @@ inline void LoadInvInterleavedT4(const uint64_t* arg, __m512i* out1,
   // 9, 8, 11, 10, 13, 12, 15, 14
   __m512i v2_perm = _mm512_permutexvar_epi64(perm_idx, v2);
 
-  *out1 = _mm512_mask_blend_epi64(0b11001100, v1, v2_perm);
-  *out2 = _mm512_mask_blend_epi64(0b11001100, v1_perm, v2);
+  *out1 = _mm512_mask_blend_epi64(0xcc, v1, v2_perm);
+  *out2 = _mm512_mask_blend_epi64(0xcc, v1_perm, v2);
 }
 
 // Given inputs
@@ -158,10 +158,10 @@ inline void WriteFwdInterleavedT1(__m512i arg1, __m512i arg2, __m512i* out) {
   // v_Y => (4, 5, 6, 7, 0, 1, 2, 3)
   arg2 = _mm512_permutexvar_epi64(vperm2_idx, arg2);
   // 4, 5, 6, 7, 12, 13, 14, 15
-  __m512i perm_lo = _mm512_mask_blend_epi64(0b00001111, arg1, arg2);
+  __m512i perm_lo = _mm512_mask_blend_epi64(0x0f, arg1, arg2);
 
   // 8, 9, 10, 11, 0, 1, 2, 3
-  __m512i perm_hi = _mm512_mask_blend_epi64(0b11110000, arg1, arg2);
+  __m512i perm_hi = _mm512_mask_blend_epi64(0xf0, arg1, arg2);
 
   arg1 = _mm512_permutexvar_epi64(v_X_out_idx, perm_hi);
   arg2 = _mm512_permutexvar_epi64(v_Y_out_idx, perm_lo);

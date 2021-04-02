@@ -19,16 +19,16 @@ uint64_t InverseUIntMod(uint64_t input, uint64_t modulus) {
     return 0;
   }
 
-  int64_t m0 = modulus;
+  int64_t m0 = static_cast<int64_t>(modulus);
   int64_t y = 0;
   int64_t x = 1;
   while (a > 1) {
     // q is quotient
-    int64_t q = a / modulus;
+    int64_t q = static_cast<int64_t>(a / modulus);
 
-    int64_t t = modulus;
+    int64_t t = static_cast<int64_t>(modulus);
     modulus = a % modulus;
-    a = t;
+    a = static_cast<uint64_t>(t);
 
     // Update y and x
     t = y;

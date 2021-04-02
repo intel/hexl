@@ -23,7 +23,7 @@ inline uint64_t BarrettReduce128(uint64_t input_hi, uint64_t input_lo,
   uint128_t n = (static_cast<uint128_t>(input_hi) << 64) |
                 (static_cast<uint128_t>(input_lo));
 
-  return n % modulus;
+  return static_cast<uint64_t>(n % modulus);
   // TODO(fboemer): actually use barrett reduction if performance-critical
 }
 

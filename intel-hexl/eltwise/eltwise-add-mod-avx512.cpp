@@ -39,7 +39,7 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  __m512i v_modulus = _mm512_set1_epi64(modulus);
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);

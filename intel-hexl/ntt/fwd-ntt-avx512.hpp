@@ -152,8 +152,8 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     uint64_t* X = operand + j1;
     uint64_t* Y = X + t;
 
-    __m512i v_W_op = _mm512_set1_epi64(*W_op++);
-    __m512i v_W_precon = _mm512_set1_epi64(*W_precon++);
+    __m512i v_W_op = _mm512_set1_epi64(static_cast<int64_t>(*W_op++));
+    __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
     __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
     __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
@@ -199,9 +199,9 @@ void ForwardTransformToBitReverseAVX512(
 
   uint64_t twice_mod = mod << 1;
 
-  __m512i v_modulus = _mm512_set1_epi64(mod);
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(mod));
   __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(mod));
-  __m512i v_twice_mod = _mm512_set1_epi64(twice_mod);
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   HEXL_VLOG(5, "root_of_unity_powers " << std::vector<uint64_t>(
                    root_of_unity_powers, root_of_unity_powers + n))
@@ -263,7 +263,8 @@ void ForwardTransformToBitReverseAVX512(
       v_X = _mm512_hexl_small_mod_epu64(v_X, v_twice_mod);
       v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
 
-      HEXL_CHECK_BOUNDS(ExtractValues(v_X).data(), 8, mod);
+      HEXL_CHECK_BOUNDS(ExtractValues(v_X).data(), 8, mod,
+                        "v_X exceeds bound " << mod);
 
       _mm512_storeu_si512(v_X_pt, v_X);
 

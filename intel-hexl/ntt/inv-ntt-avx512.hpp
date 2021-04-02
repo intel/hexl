@@ -156,8 +156,8 @@ void InvT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     uint64_t* X = operand + j1;
     uint64_t* Y = X + t;
 
-    __m512i v_W_op = _mm512_set1_epi64(*W_op++);
-    __m512i v_W_precon = _mm512_set1_epi64(*W_precon++);
+    __m512i v_W_op = _mm512_set1_epi64(static_cast<int64_t>(*W_op++));
+    __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
     __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
     __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
@@ -187,7 +187,8 @@ void InverseTransformFromBitReverseAVX512(
   HEXL_CHECK(mod < MaximumValue(BitShift) / 2,
              "mod " << mod << " too large for BitShift " << BitShift
                     << " => maximum value " << MaximumValue(BitShift) / 2);
-  HEXL_CHECK_BOUNDS(precon_inv_root_of_unity_powers, n, MaximumValue(BitShift));
+  HEXL_CHECK_BOUNDS(precon_inv_root_of_unity_powers, n, MaximumValue(BitShift),
+                    "precon_inv_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");
   HEXL_CHECK_BOUNDS(operand, n, input_mod_factor * mod,
                     "operand larger than input_mod_factor * modulus ("
@@ -198,9 +199,9 @@ void InverseTransformFromBitReverseAVX512(
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
 
   uint64_t twice_mod = mod << 1;
-  __m512i v_modulus = _mm512_set1_epi64(mod);
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(mod));
   __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(mod));
-  __m512i v_twice_mod = _mm512_set1_epi64(twice_mod);
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   size_t t = 1;
   size_t root_index = 1;
@@ -266,10 +267,11 @@ void InverseTransformFromBitReverseAVX512(
   uint64_t* X = operand;
   uint64_t* Y = X + (n >> 1);
 
-  __m512i v_inv_n = _mm512_set1_epi64(inv_n);
-  __m512i v_inv_n_prime = _mm512_set1_epi64(inv_n_prime);
-  __m512i v_inv_n_w = _mm512_set1_epi64(inv_n_w);
-  __m512i v_inv_n_w_prime = _mm512_set1_epi64(inv_n_w_prime);
+  __m512i v_inv_n = _mm512_set1_epi64(static_cast<int64_t>(inv_n));
+  __m512i v_inv_n_prime = _mm512_set1_epi64(static_cast<int64_t>(inv_n_prime));
+  __m512i v_inv_n_w = _mm512_set1_epi64(static_cast<int64_t>(inv_n_w));
+  __m512i v_inv_n_w_prime =
+      _mm512_set1_epi64(static_cast<int64_t>(inv_n_w_prime));
 
   __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
   __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);

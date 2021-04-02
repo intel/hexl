@@ -35,7 +35,7 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 
   uint64_t n_tmp = n;
   uint64_t barrett_factor = MultiplyFactor(1, 64, modulus).BarrettFactor();
-  __m512i v_bf = _mm512_set1_epi64(barrett_factor);
+  __m512i v_bf = _mm512_set1_epi64(static_cast<int64_t>(barrett_factor));
 
   // Deals with n not divisible by 8
   uint64_t n_mod_8 = n_tmp % 8;
@@ -50,15 +50,16 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
   uint64_t twice_mod = modulus << 1;
   const __m512i* v_operand = reinterpret_cast<const __m512i*>(operand);
   __m512i* v_result = reinterpret_cast<__m512i*>(result);
-  __m512i v_modulus = _mm512_set1_epi64(modulus);
-  __m512i v_twice_mod = _mm512_set1_epi64(twice_mod);
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   switch (input_mod_factor) {
     case 0:
       for (size_t i = 0; i < n_tmp; i += 8) {
         __m512i v_op = _mm512_loadu_si512(v_operand);
         v_op = _mm512_hexl_barrett_reduce64(v_op, v_modulus, v_bf);
-        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus);
+        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                          "v_op exceeds bound " << modulus);
         _mm512_storeu_si512(v_result, v_op);
         ++v_operand;
         ++v_result;
@@ -69,7 +70,8 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
       for (size_t i = 0; i < n_tmp; i += 8) {
         __m512i v_op = _mm512_loadu_si512(v_operand);
         v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
-        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus);
+        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                          "v_op exceeds bound " << modulus);
         _mm512_storeu_si512(v_result, v_op);
         ++v_operand;
         ++v_result;
@@ -82,7 +84,8 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
           __m512i v_op = _mm512_loadu_si512(v_operand);
           v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
           v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
-          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus);
+          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                            "v_op exceeds bound " << modulus);
           _mm512_storeu_si512(v_result, v_op);
           ++v_operand;
           ++v_result;
@@ -92,7 +95,8 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
         for (size_t i = 0; i < n_tmp; i += 8) {
           __m512i v_op = _mm512_loadu_si512(v_operand);
           v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
-          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, twice_mod);
+          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, twice_mod,
+                            "v_op exceeds bound " << twice_mod);
           _mm512_storeu_si512(v_result, v_op);
           ++v_operand;
           ++v_result;

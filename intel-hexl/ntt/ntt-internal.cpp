@@ -138,7 +138,9 @@ void NTT::NTTImpl::ComputeForward(uint64_t* result, const uint64_t* operand,
                           << s_default_shift_bits);
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
-  HEXL_CHECK_BOUNDS(operand, m_degree, m_p * input_mod_factor);
+  HEXL_CHECK_BOUNDS(
+      operand, m_degree, m_p * input_mod_factor,
+      "value in operand exceeds bound " << m_p * input_mod_factor);
 
   if (result != operand) {
     std::memcpy(result, operand, m_degree * sizeof(uint64_t));
@@ -189,7 +191,8 @@ void NTT::NTTImpl::ComputeInverse(uint64_t* result, const uint64_t* operand,
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
 
-  HEXL_CHECK_BOUNDS(operand, m_degree, m_p * input_mod_factor);
+  HEXL_CHECK_BOUNDS(operand, m_degree, m_p * input_mod_factor,
+                    "operand exceeds bound " << m_p * input_mod_factor);
 
   if (operand != result) {
     std::memcpy(result, operand, m_degree * sizeof(uint64_t));
@@ -284,7 +287,8 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n, uint64_t mod,
                                     uint64_t input_mod_factor,
                                     uint64_t output_mod_factor) {
   HEXL_CHECK(CheckNTTArguments(n, mod), "");
-  HEXL_CHECK_BOUNDS(operand, n, mod * input_mod_factor);
+  HEXL_CHECK_BOUNDS(operand, n, mod * input_mod_factor,
+                    "operand exceeds bound " << mod * input_mod_factor);
   HEXL_CHECK(root_of_unity_powers != nullptr,
              "root_of_unity_powers == nullptr");
   HEXL_CHECK(precon_root_of_unity_powers != nullptr,

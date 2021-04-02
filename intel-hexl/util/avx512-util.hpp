@@ -167,8 +167,10 @@ inline __m512i _mm512_hexl_small_mod_epu64(__m512i x, __m512i p,
 // return x
 inline __m512i _mm512_hexl_small_add_mod_epi64(__m512i x, __m512i y,
                                                __m512i p) {
-  HEXL_CHECK_BOUNDS(ExtractValues(x).data(), 8, ExtractValues(p)[0]);
-  HEXL_CHECK_BOUNDS(ExtractValues(y).data(), 8, ExtractValues(p)[0]);
+  HEXL_CHECK_BOUNDS(ExtractValues(x).data(), 8, ExtractValues(p)[0],
+                    "x exceeds bound " << ExtractValues(p)[0]);
+  HEXL_CHECK_BOUNDS(ExtractValues(y).data(), 8, ExtractValues(p)[0],
+                    "y exceeds bound " << ExtractValues(p)[0]);
   return _mm512_hexl_small_mod_epu64(_mm512_add_epi64(x, y), p);
 
   // __m512i v_diff = _mm512_sub_epi64(y, p);
@@ -204,7 +206,8 @@ inline __mmask8 _mm512_hexl_cmp_epu64_mask(__m512i a, __m512i b, CMPINT cmp) {
 inline __m512i _mm512_hexl_cmp_epi64(__m512i a, __m512i b, CMPINT cmp,
                                      uint64_t match_value) {
   __mmask8 mask = _mm512_hexl_cmp_epu64_mask(a, b, cmp);
-  return _mm512_maskz_broadcastq_epi64(mask, _mm_set1_epi64x(match_value));
+  return _mm512_maskz_broadcastq_epi64(
+      mask, _mm_set1_epi64x(static_cast<int64_t>(match_value)));
 }
 
 // Returns c[i] = a[i] CMP b[i] ? match_value : 0

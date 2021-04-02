@@ -28,8 +28,10 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK(
       input_mod_factor == 1 || input_mod_factor == 2 || input_mod_factor == 4,
       "Require input_mod_factor = 1, 2, or 4")
-  HEXL_CHECK_BOUNDS(operand1, n, input_mod_factor * modulus)
-  HEXL_CHECK_BOUNDS(operand2, n, input_mod_factor * modulus)
+  HEXL_CHECK_BOUNDS(operand1, n, input_mod_factor * modulus,
+                    "operand1 exceeds bound " << (input_mod_factor * modulus))
+  HEXL_CHECK_BOUNDS(operand2, n, input_mod_factor * modulus,
+                    "operand2 exceeds bound " << (input_mod_factor * modulus))
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {

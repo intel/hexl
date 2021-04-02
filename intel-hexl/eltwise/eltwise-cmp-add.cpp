@@ -122,7 +122,7 @@ void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, CMPINT cmp,
     n -= n_mod_8;
   }
 
-  __m512i v_bound = _mm512_set1_epi64(bound);
+  __m512i v_bound = _mm512_set1_epi64(static_cast<int64_t>(bound));
   const __m512i* v_op_ptr = reinterpret_cast<const __m512i*>(operand1);
   __m512i* v_result_ptr = reinterpret_cast<__m512i*>(result);
   for (size_t i = n / 8; i > 0; --i) {
