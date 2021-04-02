@@ -33,7 +33,7 @@ Intel HEXL implements the following functions:
 
 For each function, the library implements one or several Intel(R) AVX-512 implementations, as well as a less performant, more readable native C++ implementation. Intel HEXL will automatically choose the best implementation for the given CPU Intel(R) AVX-512 feature set. In particular, when the modulus `p` is less than `2^{50}`, the AVX512IFMA instruction set available on Intel IceLake server and IceLake client will provide a more efficient implementation.
 
-For additional functionality, see the public headers, located in `include/intel-hexl`
+For additional functionality, see the public headers, located in `include/hexl`
 ## Building Intel HEXL
 
 ### Dependencies
@@ -49,7 +49,7 @@ Intel HEXL requires the following dependencies:
 | CMake       | >= 3.5.1                                     |
 | Compiler    | gcc >= 7.0, clang++ >= 5.0, MSVC >= 2019     |
 
-For best performance, we recommend using a processor with AVX512-IFMA52 support, and a recent compiler (gcc >= 8.0, clang++ >= 6.0). To determine if your process supports AVX512-IFMA52, simply look for `HEXL_HAS_AVX512IFMA` during the configure step (see [Compiling Intel HEXL](#compiling-intel-hexl)).
+For best performance, we recommend using a processor with AVX512-IFMA52 support, and a recent compiler (gcc >= 8.0, clang++ >= 6.0). To determine if your process supports AVX512-IFMA52, simply look for `HEXL_HAS_AVX512IFMA` during the configure step (see [Compiling Intel HEXL](#compiling-hexl)).
 
 
 ### Compile-time options
@@ -85,7 +85,7 @@ Then, to build Intel HEXL, call
 ```bash
 cmake --build build
 ```
-This will build the Intel HEXL library in the `build/intel-hexl/lib/` directory.
+This will build the Intel HEXL library in the `build/hexl/lib/` directory.
 
 To install Intel HEXL to the installation directory, run
 ```bash
@@ -115,7 +115,7 @@ The benchmark executable itself is located at `build/benchmark/bench_hexl`
 The `example` folder has an example of using Intel HEXL in a third-party project.
 
 ## Debugging
-For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DHEXL_DEBUG=ON` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libintel_hexl_debug.a`, that can be used to debug the execution.
+For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DHEXL_DEBUG=ON` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution.
 
 **Note**, enabling `HEXL_DEBUG=ON` will result in a significant runtime overhead.
 ## Threading
@@ -163,5 +163,5 @@ cmake --build build --target check unittest
 and make sure pre-commit checks and all unit tests pass.
 
 ## Repository layout
-Public headers reside in the `intel-hexl/include` folder.
+Public headers reside in the `hexl/include` folder.
 Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.

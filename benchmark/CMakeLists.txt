@@ -18,7 +18,7 @@ target_include_directories(bench_hexl PRIVATE
     ${HEXL_SRC_ROOT_DIR} # Private headers
     )
 
-target_link_libraries(bench_hexl PRIVATE intel_hexl benchmark::benchmark Threads::Threads)
+target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads)
 if (HEXL_DEBUG)
     target_link_libraries(bench_hexl PRIVATE easyloggingpp)
 endif()

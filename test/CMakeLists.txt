@@ -31,7 +31,7 @@ target_include_directories(unit-test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${HEXL_SRC_ROOT_DIR} # Private headers
 )
-target_link_libraries(unit-test PRIVATE intel_hexl gtest Threads::Threads)
+target_link_libraries(unit-test PRIVATE hexl gtest Threads::Threads)
 if (HEXL_DEBUG)
     target_link_libraries(unit-test PRIVATE easyloggingpp)
 endif()
@@ -39,5 +39,5 @@ endif()
 # Make sure that public include folder doesn't use private headers
 # and that public headers are self-contained
 add_executable(test-public-api test-public-api.cpp)
-add_dependencies(test-public-api intel_hexl)
+add_dependencies(test-public-api hexl)
 target_include_directories(test-public-api PRIVATE ${HEXL_INC_ROOT_DIR})

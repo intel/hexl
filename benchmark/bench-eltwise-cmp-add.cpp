@@ -8,7 +8,7 @@
 
 #include "eltwise/eltwise-cmp-add-avx512.hpp"
 #include "eltwise/eltwise-cmp-add-internal.hpp"
-#include "intel-hexl/eltwise/eltwise-cmp-add.hpp"
+#include "hexl/eltwise/eltwise-cmp-add.hpp"
 #include "logging/logging.hpp"
 #include "util/aligned-allocator.hpp"
 

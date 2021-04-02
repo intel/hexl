@@ -7,7 +7,7 @@
 
 #include "eltwise/eltwise-fma-mod-avx512.hpp"
 #include "eltwise/eltwise-fma-mod-internal.hpp"
-#include "intel-hexl/eltwise/eltwise-fma-mod.hpp"
+#include "hexl/eltwise/eltwise-fma-mod.hpp"
 #include "logging/logging.hpp"
 #include "number-theory/number-theory.hpp"
 #include "util/aligned-allocator.hpp"

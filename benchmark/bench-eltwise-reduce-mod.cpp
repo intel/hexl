@@ -7,7 +7,7 @@
 
 #include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "eltwise/eltwise-reduce-mod-internal.hpp"
-#include "intel-hexl/eltwise/eltwise-reduce-mod.hpp"
+#include "hexl/eltwise/eltwise-reduce-mod.hpp"
 #include "logging/logging.hpp"
 #include "number-theory/number-theory.hpp"
 #include "util/aligned-allocator.hpp"

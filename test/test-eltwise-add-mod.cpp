@@ -9,7 +9,7 @@
 
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
-#include "intel-hexl/eltwise/eltwise-add-mod.hpp"
+#include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "logging/logging.hpp"
 #include "number-theory/number-theory.hpp"
 #include "test-util.hpp"

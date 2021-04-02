@@ -5,7 +5,7 @@ PROJECT_NAME           = "Intel HEXL"
 PROJECT_BRIEF          = "Intel Homomorphic Encryption Acceleration Library, accelerating the modular arithmetic operations used in homomorphic encryption."
 
 OUTPUT_DIRECTORY       = @CMAKE_CURRENT_SOURCE_DIR@/doxygen
-INPUT                  = @CMAKE_SOURCE_DIR@/intel-hexl/include \
+INPUT                  = @CMAKE_SOURCE_DIR@/hexl/include \
                          @CMAKE_SOURCE_DIR@/README.md
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md

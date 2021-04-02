@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-#include "intel-hexl/intel-hexl.hpp"
+#include "hexl/hexl.hpp"
 
 bool CheckEqual(const std::vector<uint64_t>& x,
                 const std::vector<uint64_t>& y) {

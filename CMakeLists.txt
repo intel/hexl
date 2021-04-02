@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.5.1)
-project(INTEL_HEXL VERSION 1.0.0 LANGUAGES C CXX)
+project(HEXL VERSION 1.0.0 LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
@@ -56,7 +56,7 @@ option(HEXL_BENCHMARK "Enable benchmarking" ON)
 option(HEXL_COVERAGE "Enables coverage for unit tests" OFF)
 option(HEXL_DEBUG "Enable runtime debug checking; will yield much slower code " OFF)
 option(HEXL_DOCS "Enable documentation building" OFF)
-option(HEXL_EXPORT "Enables export of intel_hexl target" OFF)
+option(HEXL_EXPORT "Enables export of hexl target" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
@@ -115,7 +115,7 @@ if (HEXL_DEBUG)
   add_definitions(-DHEXL_DEBUG)
 endif()
 
-set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/intel-hexl)
+set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hexl)
 set(HEXL_INC_ROOT_DIR ${HEXL_SRC_ROOT_DIR}/include) # Public headers
 
 if(HEXL_ENABLE_ADDRESS_SANITIZER)
@@ -205,7 +205,7 @@ endif()
 #------------------------------------------------------------------------------
 # Subfolders...
 #------------------------------------------------------------------------------
-add_subdirectory(intel-hexl)
+add_subdirectory(hexl)
 
 if (HEXL_BENCHMARK)
   add_subdirectory(benchmark)
@@ -231,45 +231,46 @@ if (HEXL_EXPORT)
   endif()
 
   # Config
-  set(INTEL_HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/IntelHEXLTargets.cmake)
-  set(INTEL_HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/IntelHEXLConfig.cmake.in)
-  set(INTEL_HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/IntelHEXLConfig.cmake)
-  set(INETL_HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/IntelHEXLConfigVersion.cmake)
+  set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLTargets.cmake)
+  set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake.in)
+  set(HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake)
+  set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLConfigVersion.cmake)
 
-  set(INTEL_HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/)
+  set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/)
 
   # Create and install the CMake config and target file
   install(
-      EXPORT IntelHEXLTargets
-      DESTINATION ${INTEL_HEXL_CONFIG_INSTALL_DIR}
+      EXPORT HEXLTargets
+      NAMESPACE HEXL::
+      DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
   )
 
   # Export version
   write_basic_package_version_file(
-    ${INETL_HEXL_CONFIG_VERSION_FILENAME}
-    VERSION ${INTEL_HEXL_VERSION}
+    ${HEXL_CONFIG_VERSION_FILENAME}
+    VERSION ${HEXL_VERSION}
     COMPATIBILITY ExactVersion)
 
   include(CMakePackageConfigHelpers)
       configure_package_config_file(
-          ${INTEL_HEXL_CONFIG_IN_FILENAME} ${INTEL_HEXL_CONFIG_FILENAME}
-          INSTALL_DESTINATION ${INTEL_HEXL_CONFIG_INSTALL_DIR}
+          ${HEXL_CONFIG_IN_FILENAME} ${HEXL_CONFIG_FILENAME}
+          INSTALL_DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
       )
 
   install(
-      TARGETS intel_hexl
-      EXPORT IntelHEXLTargets
+      TARGETS hexl
+      EXPORT HEXLTargets
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       )
 
-  install(FILES ${INTEL_HEXL_CONFIG_FILENAME}
-                ${INETL_HEXL_CONFIG_VERSION_FILENAME}
-          DESTINATION ${INTEL_HEXL_CONFIG_INSTALL_DIR})
+  install(FILES ${HEXL_CONFIG_FILENAME}
+                ${HEXL_CONFIG_VERSION_FILENAME}
+          DESTINATION ${HEXL_CONFIG_INSTALL_DIR})
 
-  export(EXPORT IntelHEXLTargets
-         FILE ${INTEL_HEXL_TARGET_FILENAME})
+  export(EXPORT HEXLTargets
+         FILE ${HEXL_TARGET_FILENAME})
 
 endif()
 

@@ -31,7 +31,7 @@ variables:
       -DCMAKE_INSTALL_PREFIX=./"
 
   GCOV_BIN: "/usr/bin/gcov-7"
-  DEFAULT_EXAMPLE_FLAGS: "-DINTEL_HEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/"
+  DEFAULT_EXAMPLE_FLAGS: "-DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/"
 
 stages:
   - format
@@ -117,7 +117,7 @@ debug_build:
     - ls
     - echo ${CI_PROJECT_DIR}
     - build/test/unit-test
-    - lcov --capture --directory build/intel-hexl --directory build/test/ --output-file cov_test.info
+    - lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
     # Remove unwanted directories
     - lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
     # Report overall summary to be parsed by gitlab CI

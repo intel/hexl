@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "intel-hexl/ntt/ntt.hpp"
+#include "hexl/ntt/ntt.hpp"
 #include "logging/logging.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"

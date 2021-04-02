@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="classintel_1_1hexl_1_1_n_t_t" kind="class"><name>intel::hexl::NTT</name>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a2ddf6cf8973978de8d8a90998e5735c2" kind="variable"><name>m_impl</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" kind="function"><name>~NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a3f44d9ead9be66540b9732d5c98bb000" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a63eea17916855a9ec73a2cc8c57b2a63" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" kind="function"><name>ComputeForward</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" kind="function"><name>ComputeInverse</name></member>
+  </compound>
+  <compound refid="namespaceintel" kind="namespace"><name>intel</name>
+  </compound>
+  <compound refid="namespaceintel_1_1hexl" kind="namespace"><name>intel::hexl</name>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kind="enum"><name>CMPINT</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47" kind="enumvalue"><name>EQ</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b" kind="enumvalue"><name>LT</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6" kind="enumvalue"><name>LE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" kind="enumvalue"><name>FALSE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0" kind="enumvalue"><name>NE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8" kind="enumvalue"><name>NLT</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57" kind="enumvalue"><name>NLE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61" kind="enumvalue"><name>TRUE</name></member>
+    <member refid="namespaceintel_1_1hexl_1a319244a133f57825ba7e593ad5c71709" kind="function"><name>EltwiseAddMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1ad09f0d71efdfbde79c2a8ed92d7da811" kind="function"><name>EltwiseCmpAdd</name></member>
+    <member refid="namespaceintel_1_1hexl_1aa06f039b71cf61990911e753595f1f78" kind="function"><name>EltwiseCmpSubMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a5b65d563391b4a1a5041633aeb118aa5" kind="function"><name>EltwiseFMAMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a705bc0321d937ae4d1f8d50279e3cff1" kind="function"><name>EltwiseMultMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1af7e59b130824f9cd4ad0aa54c52ad50c" kind="function"><name>EltwiseReduceMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a8c654502a5e7fe2cfdd198f0fd920f2a" kind="function"><name>Not</name></member>
+  </compound>
+  <compound refid="eltwise-add-mod_8hpp" kind="file"><name>eltwise-add-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-cmp-add_8hpp" kind="file"><name>eltwise-cmp-add.hpp</name>
+  </compound>
+  <compound refid="eltwise-cmp-sub-mod_8hpp" kind="file"><name>eltwise-cmp-sub-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-fma-mod_8hpp" kind="file"><name>eltwise-fma-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-mult-mod_8hpp" kind="file"><name>eltwise-mult-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-reduce-mod_8hpp" kind="file"><name>eltwise-reduce-mod.hpp</name>
+  </compound>
+  <compound refid="hexl_8hpp" kind="file"><name>hexl.hpp</name>
+  </compound>
+  <compound refid="ntt_8hpp" kind="file"><name>ntt.hpp</name>
+  </compound>
+  <compound refid="util_8hpp" kind="file"><name>util.hpp</name>
+  </compound>
+  <compound refid="_r_e_a_d_m_e_8md" kind="file"><name>README.md</name>
+  </compound>
+  <compound refid="dir_39ccd546f6f66dfa0601ecdd2198d1cd" kind="dir"><name>/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise</name>
+  </compound>
+  <compound refid="dir_f48abe268b3ce85504fe013aef76ede2" kind="dir"><name>/Users/fboemer/repos/DBIO/intel-hexl/hexl</name>
+  </compound>
+  <compound refid="dir_138f48ea0e5a566a607c4eba361f369f" kind="dir"><name>/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl</name>
+  </compound>
+  <compound refid="dir_7a1502d4688b3add3c6a1790553dec66" kind="dir"><name>/Users/fboemer/repos/DBIO/intel-hexl/hexl/include</name>
+  </compound>
+  <compound refid="dir_b99b5b9111a7dc9d17666ca9627e721f" kind="dir"><name>/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt</name>
+  </compound>
+  <compound refid="dir_73c34c91767e4126fcbbc3b749cad3d8" kind="dir"><name>/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util</name>
+  </compound>
+  <compound refid="indexpage" kind="page"><name>index</name>
+  </compound>
+</doxygenindex>

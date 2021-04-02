@@ -12,3 +12,4 @@ build*/
 docs/conf.py
 cmake/IntelHEXLConfig.cmake
 *.log
+Doxyfile

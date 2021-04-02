@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="dir_39ccd546f6f66dfa0601ecdd2198d1cd" kind="dir">
+    <compoundname>/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise</compoundname>
+    <innerfile refid="eltwise-add-mod_8hpp">eltwise-add-mod.hpp</innerfile>
+    <innerfile refid="eltwise-cmp-add_8hpp">eltwise-cmp-add.hpp</innerfile>
+    <innerfile refid="eltwise-cmp-sub-mod_8hpp">eltwise-cmp-sub-mod.hpp</innerfile>
+    <innerfile refid="eltwise-fma-mod_8hpp">eltwise-fma-mod.hpp</innerfile>
+    <innerfile refid="eltwise-mult-mod_8hpp">eltwise-mult-mod.hpp</innerfile>
+    <innerfile refid="eltwise-reduce-mod_8hpp">eltwise-reduce-mod.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/"/>
+  </compounddef>
+</doxygen>

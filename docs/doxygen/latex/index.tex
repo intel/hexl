@@ -1,0 +1,188 @@
+Intel\+:registered\+: H\+E\+XL is an open-\/source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel H\+E\+XL targets integer arithmetic with word-\/sized primes, typically 40-\/60 bits. Intel H\+E\+XL provides an A\+PI for 64-\/bit unsigned integers and targets Intel C\+P\+Us.\hypertarget{index_autotoc_md1}{}\doxysection{Contents}\label{index_autotoc_md1}
+
+\begin{DoxyItemize}
+\item \href{\#intel-homomorphic-encryption-acceleration-library-hexl}{\texttt{ Intel Homomorphic Encryption Acceleration Library (H\+E\+XL)}}
+\begin{DoxyItemize}
+\item \href{\#contents}{\texttt{ Contents}}
+\item \href{\#introduction}{\texttt{ Introduction}}
+\item \href{\#building-intel-hexl}{\texttt{ Building Intel H\+E\+XL}}
+\begin{DoxyItemize}
+\item \href{\#dependencies}{\texttt{ Dependencies}}
+\item \href{\#compile-time-options}{\texttt{ Compile-\/time options}}
+\item \href{\#compiling-intel-hexl}{\texttt{ Compiling Intel H\+E\+XL}}
+\end{DoxyItemize}
+\item \href{\#testing-intel-hexl}{\texttt{ Testing Intel H\+E\+XL}}
+\item \href{\#benchmarking-intel-hexl}{\texttt{ Benchmarking Intel H\+E\+XL}}
+\item \href{\#using-intel-hexl}{\texttt{ Using Intel H\+E\+XL}}
+\item \href{\#debugging}{\texttt{ Debugging}}
+\item \href{\#thread-safety}{\texttt{ Thread-\/safety}}
+\end{DoxyItemize}
+\item \href{\#documentation}{\texttt{ Documentation}}
+\begin{DoxyItemize}
+\item \href{\#doxygen}{\texttt{ Doxygen}}
+\item \href{\#sphinx}{\texttt{ Sphinx}}
+\end{DoxyItemize}
+\item \href{\#contributing}{\texttt{ Contributing}}
+\begin{DoxyItemize}
+\item \href{\#repository-layout}{\texttt{ Repository layout}}
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{index_autotoc_md2}{}\doxysection{Introduction}\label{index_autotoc_md2}
+Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree {\ttfamily N} a power of two roughly in the range {\ttfamily N=\mbox{[}2$^\wedge$\{10\}, 2$^\wedge$\{17\}\mbox{]}}. The coefficients of these polynomials are in a finite field with a word-\/sized primes, {\ttfamily p}, up to {\ttfamily p}$\sim$62 bits. More precisely, the polynomials live in the ring {\ttfamily Z\+\_\+p\mbox{[}X\mbox{]}/(X$^\wedge$N + 1)}. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus {\ttfamily p}. When multiplying two polynomials, the resulting polynomials of degree {\ttfamily 2N} is additionally reduced by taking the remainder when dividing by {\ttfamily X$^\wedge$\+N+1}.
+
+The primary bottleneck in many HE applications is polynomial-\/polynomial multiplication in {\ttfamily Z\+\_\+p\mbox{[}X\mbox{]}/(X$^\wedge$N + 1)}. For efficient implementation, Intel H\+E\+XL implements the negacyclic number-\/theoretic transform (N\+TT). To multiply two polynomials, {\ttfamily p\+\_\+1(x), p\+\_\+2(x)} using the N\+TT, we perform the Fwd\+N\+TT on the two input polynomials, then perform an element-\/wise modular multiplication, and perform the Inv\+N\+TT on the result.
+
+Intel H\+E\+XL implements the following functions\+:
+\begin{DoxyItemize}
+\item The forward and inverse negacyclic number-\/theoretic transform (N\+TT)
+\item Element-\/wise vector-\/vector modular multiplication
+\item Element-\/wise vector-\/scalar modular multiplication with optional addition
+\item Element-\/wise modular multiplication
+\end{DoxyItemize}
+
+For each function, the library implements one or several Intel(\+R) A\+V\+X-\/512 implementations, as well as a less performant, more readable native C++ implementation. Intel H\+E\+XL will automatically choose the best implementation for the given C\+PU Intel(\+R) A\+V\+X-\/512 feature set. In particular, when the modulus {\ttfamily p} is less than {\ttfamily 2$^\wedge$\{50\}}, the A\+V\+X512\+I\+F\+MA instruction set available on Intel Ice\+Lake server and Ice\+Lake client will provide a more efficient implementation.
+
+For additional functionality, see the public headers, located in {\ttfamily include/hexl} \hypertarget{index_autotoc_md3}{}\doxysection{Building Intel H\+E\+XL}\label{index_autotoc_md3}
+\hypertarget{index_autotoc_md4}{}\doxysubsection{Dependencies}\label{index_autotoc_md4}
+We have tested Intel H\+E\+XL on the following operating systems\+:
+\begin{DoxyItemize}
+\item Ubuntu 18.\+04
+\item mac\+OS 10.\+15
+\item Microsoft Windows 10
+\end{DoxyItemize}
+
+Intel H\+E\+XL requires the following dependencies\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Dependency }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Version  }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Dependency }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Version  }\\\cline{1-2}
+\endhead
+C\+Make &$>$= 3.\+5.\+1  \\\cline{1-2}
+Compiler &gcc $>$= 7.\+0, clang++ $>$= 5.\+0, M\+S\+VC $>$= 2019  \\\cline{1-2}
+\end{longtabu}
+
+
+For best performance, we recommend using a processor with A\+V\+X512-\/\+I\+F\+M\+A52 support, and a recent compiler (gcc $>$= 8.\+0, clang++ $>$= 6.\+0). To determine if your process supports A\+V\+X512-\/\+I\+F\+M\+A52, simply look for {\ttfamily H\+E\+X\+L\+\_\+\+H\+A\+S\+\_\+\+A\+V\+X512\+I\+F\+MA} during the configure step (see \href{\#compiling-hexl}{\texttt{ Compiling Intel H\+E\+XL}}).\hypertarget{index_autotoc_md5}{}\doxysubsection{Compile-\/time options}\label{index_autotoc_md5}
+In addition to the standard C\+Make build options, Intel H\+E\+XL supports several compile-\/time flags to configure the build. For convenience, they are listed below\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ C\+Make option }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Values }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ C\+Make option }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Values }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }\\\cline{1-3}
+\endhead
+H\+E\+X\+L\+\_\+\+B\+E\+N\+C\+H\+M\+A\+RK &ON / O\+FF (default ON) &Set to ON to enable benchmark suite via Google benchmark  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+C\+O\+V\+E\+R\+A\+GE &ON / O\+FF (default O\+FF) &Set to ON to enable coverage report of unit-\/tests  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+D\+E\+B\+UG &ON / O\+FF (default O\+FF) &Set to ON to enable debugging at large runtime penalty  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+D\+O\+CS &ON / O\+FF (default O\+FF) &Set to ON to enable building of documentation  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+E\+N\+A\+B\+L\+E\+\_\+\+A\+D\+D\+R\+E\+S\+S\+\_\+\+S\+A\+N\+I\+T\+I\+Z\+ER &ON / O\+FF (default O\+FF) &Set to ON to enable building with address sanitizer (A\+San)  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+E\+N\+A\+B\+L\+E\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+A\+N\+I\+T\+I\+Z\+ER &ON / O\+FF (default O\+FF) &Set to ON to enable building with thread sanitizer (T\+San)  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+E\+N\+A\+B\+L\+E\+\_\+\+U\+B\+\_\+\+S\+A\+N\+I\+T\+I\+Z\+ER &ON / O\+FF (default O\+FF) &Set to ON to enable building with undefined behavior sanitizer (U\+B\+San)  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+E\+X\+P\+O\+RT &ON / O\+FF (default O\+FF) &Set to ON to enable export of Intel H\+E\+XL for use in 3rd-\/party project  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+S\+H\+A\+R\+E\+D\+\_\+\+L\+IB &ON / O\+FF (default O\+FF) &Set to ON to enable building shared library  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+T\+E\+S\+T\+I\+NG &ON / O\+FF (default ON) &Set to ON to enable building of unit-\/tests  \\\cline{1-3}
+\end{longtabu}
+\hypertarget{index_autotoc_md6}{}\doxysubsection{Compiling Intel H\+E\+XL}\label{index_autotoc_md6}
+The instructions to build Intel H\+E\+XL are common between Linux, Mac\+OS, and Windows.
+
+To compile Intel H\+E\+XL from source code, first clone the repository into your current directory. Then, to configure the build, call 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/S . -\/B build}
+\end{DoxyCode}
+
+
+adding the desired compile-\/time options with a {\ttfamily -\/D} flag. For instance, to build Intel H\+E\+XL with debugging capabilities, call 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/S . -\/B build -\/DHEXL\_DEBUG=ON}
+\end{DoxyCode}
+
+
+Then, to build Intel H\+E\+XL, call 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build}
+\end{DoxyCode}
+
+
+This will build the Intel H\+E\+XL library in the {\ttfamily build/hexl/lib/} directory.
+
+To install Intel H\+E\+XL to the installation directory, run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/install build}
+\end{DoxyCode}
+
+
+To use a non-\/standard installation directory, configure the build with 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/S . -\/B build -\/DCMAKE\_INSTALL\_PREFIX=/path/to/install}
+\end{DoxyCode}
+\hypertarget{index_autotoc_md7}{}\doxysection{Testing Intel H\+E\+XL}\label{index_autotoc_md7}
+To run a set of unit tests via Googletest, configure and build Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+T\+E\+S\+T\+I\+NG=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). Then, run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build -\/-\/target unittest}
+\end{DoxyCode}
+
+
+The unit-\/test executable itself is located at {\ttfamily build/test/unit-\/test} \hypertarget{index_autotoc_md8}{}\doxysection{Benchmarking Intel H\+E\+XL}\label{index_autotoc_md8}
+To run a set of benchmarks via Google benchmark, configure and build Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+B\+E\+N\+C\+H\+M\+A\+RK=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). Then, run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build -\/-\/target bench}
+\end{DoxyCode}
+
+
+The benchmark executable itself is located at {\ttfamily build/benchmark/bench\+\_\+hexl}\hypertarget{index_autotoc_md9}{}\doxysection{Using Intel H\+E\+XL}\label{index_autotoc_md9}
+The {\ttfamily example} folder has an example of using Intel H\+E\+XL in a third-\/party project.\hypertarget{index_autotoc_md10}{}\doxysection{Debugging}\label{index_autotoc_md10}
+For optimal performance, Intel H\+E\+XL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel H\+E\+XL, configure and build Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+E\+B\+UG=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). This will generate a debug version of the library, e.\+g. {\ttfamily libhexl\+\_\+debug.\+a}, that can be used to debug the execution.
+
+{\bfseries{Note}}, enabling {\ttfamily H\+E\+X\+L\+\_\+\+D\+E\+B\+UG=ON} will result in a significant runtime overhead. \hypertarget{index_autotoc_md11}{}\doxysection{Thread-\/safety}\label{index_autotoc_md11}
+Intel H\+E\+XL is single-\/threaded and thread-\/safe.\hypertarget{index_autotoc_md12}{}\doxysection{Documentation}\label{index_autotoc_md12}
+See \href{https://intel.github.io/hexl}{\texttt{ https\+://intel.\+github.\+io/hexl}} for Doxygen documentation.
+
+Intel H\+E\+XL supports documentation via Doxygen and sphinx. To build documentation, first install {\ttfamily doxygen} and {\ttfamily graphviz}, e.\+g. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install doxygen graphviz}
+\end{DoxyCode}
+
+
+Then, configure Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+O\+CS=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). \hypertarget{index_autotoc_md13}{}\doxysubsubsection{Doxygen}\label{index_autotoc_md13}
+To build Doxygen documentation, after configuring Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+O\+CS=ON}, run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build -\/-\/target doxygen}
+\end{DoxyCode}
+
+
+To view the generated Doxygen documentation, open the generated {\ttfamily build/docs/doxygen/html/index.\+html} file in a web browser.\hypertarget{index_autotoc_md14}{}\doxysubsubsection{Sphinx}\label{index_autotoc_md14}
+To build the sphinx documentation, install {\ttfamily sphinx} and required dependencies {\ttfamily breathe, m2r2}, e.\+g. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install python3-\/sphinx}
+\DoxyCodeLine{pip3 install breathe m2r2}
+\end{DoxyCode}
+
+
+Then, after configuring Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+O\+CS=ON}, run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build -\/-\/target docs}
+\end{DoxyCode}
+
+
+To view the generated Sphinx documentation, open the generated {\ttfamily build/docs/sphinx/html/index.\+html} file in a web browser.\hypertarget{index_autotoc_md15}{}\doxysection{Contributing}\label{index_autotoc_md15}
+At this time, Intel H\+E\+XL does not accept external contributions. We encourage feedback and suggestions via issues.
+
+For Intel developers, use \href{https://pre-commit.com/}{\texttt{ pre-\/commit}} to validate the formatting of the code.
+
+Before contributing, please run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build -\/-\/target check unittest}
+\end{DoxyCode}
+
+
+and make sure pre-\/commit checks and all unit tests pass.\hypertarget{index_autotoc_md16}{}\doxysubsection{Repository layout}\label{index_autotoc_md16}
+Public headers reside in the {\ttfamily hexl/include} folder. Private headers, e.\+g. those containing Intel(\+R) A\+V\+X-\/512 code should not be put in this folder. 
