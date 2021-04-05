@@ -23,7 +23,7 @@
 </listitem><listitem><para><ulink url="#benchmarking-intel-hexl">Benchmarking Intel HEXL</ulink></para>
 </listitem><listitem><para><ulink url="#using-intel-hexl">Using Intel HEXL</ulink></para>
 </listitem><listitem><para><ulink url="#debugging">Debugging</ulink></para>
-</listitem><listitem><para><ulink url="#thread-safety">Thread-safety</ulink></para>
+</listitem><listitem><para><ulink url="#threading">Threading</ulink></para>
 </listitem></itemizedlist>
 </para>
 </listitem><listitem><para><ulink url="#documentation">Documentation</ulink><itemizedlist>
@@ -33,6 +33,11 @@
 </para>
 </listitem><listitem><para><ulink url="#contributing">Contributing</ulink><itemizedlist>
 <listitem><para><ulink url="#repository-layout">Repository layout</ulink></para>
+</listitem><listitem><para><ulink url="#intel-hexl-publication">Intel HEXL Publication</ulink></para>
+</listitem><listitem><para><ulink url="#citing-intel-hexl">Citing Intel HEXL</ulink><itemizedlist>
+<listitem><para><ulink url="#version-10">Version 1.0</ulink></para>
+</listitem></itemizedlist>
+</para>
 </listitem></itemizedlist>
 </para>
 </listitem></itemizedlist>
@@ -82,7 +87,7 @@
 <sect2 id="index_1autotoc_md5">
 <title>Compile-time options</title>
 <para>In addition to the standard CMake build options, Intel HEXL supports several compile-time flags to configure the build. For convenience, they are listed below:</para>
-<para><table rows="11" cols="3"><row>
+<para><table rows="12" cols="3"><row>
 <entry thead="yes"><para>CMake option </para>
 </entry><entry thead="yes"><para>Values </para>
 </entry><entry thead="yes"><para></para>
@@ -137,6 +142,11 @@
 </entry><entry thead="no"><para>ON / OFF (default ON) </para>
 </entry><entry thead="no"><para>Set to ON to enable building of unit-tests  </para>
 </entry></row>
+<row>
+<entry thead="no"><para>HEXL_TREAT_WARNING_AS_ERROR </para>
+</entry><entry thead="no"><para>ON / OFF (default OFF) </para>
+</entry><entry thead="no"><para>Set to ON to treat all warnings as error  </para>
+</entry></row>
 </table>
 </para>
 </sect2>
@@ -178,7 +188,7 @@
 <para><bold>Note</bold>, enabling <computeroutput>HEXL_DEBUG=ON</computeroutput> will result in a significant runtime overhead. </para>
 </sect1>
 <sect1 id="index_1autotoc_md11">
-<title>Thread-safety</title>
+<title>Threading</title>
 <para>Intel HEXL is single-threaded and thread-safe.</para>
 </sect1>
 <sect1 id="index_1autotoc_md12">
@@ -187,13 +197,13 @@
 <para>Intel HEXL supports documentation via Doxygen and sphinx. To build documentation, first install <computeroutput>doxygen</computeroutput> and <computeroutput>graphviz</computeroutput>, e.g. <programlisting filename=".bash"><codeline><highlight class="normal">sudo<sp/>apt-get<sp/>install<sp/>doxygen<sp/>graphviz</highlight></codeline>
 </programlisting></para>
 <para>Then, configure Intel HEXL with <computeroutput>-DHEXL_DOCS=ON</computeroutput> (see <ulink url="#compile-time-options">Compile-time options</ulink>). </para>
-<sect3 id="index_1autotoc_md13">
+<sect2 id="index_1autotoc_md13">
 <title>Doxygen</title>
 <para>To build Doxygen documentation, after configuring Intel HEXL with <computeroutput>-DHEXL_DOCS=ON</computeroutput>, run <programlisting><codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>doxygen</highlight></codeline>
 </programlisting></para>
 <para>To view the generated Doxygen documentation, open the generated <computeroutput>build/docs/doxygen/html/index.html</computeroutput> file in a web browser.</para>
-</sect3>
-<sect3 id="index_1autotoc_md14">
+</sect2>
+<sect2 id="index_1autotoc_md14">
 <title>Sphinx</title>
 <para>To build the sphinx documentation, install <computeroutput>sphinx</computeroutput> and required dependencies <computeroutput>breathe, m2r2</computeroutput>, e.g. <programlisting filename=".bash"><codeline><highlight class="normal">sudo<sp/>apt-get<sp/>install<sp/>python3-sphinx</highlight></codeline>
 <codeline><highlight class="normal">pip3<sp/>install<sp/>breathe<sp/>m2r2</highlight></codeline>
@@ -201,7 +211,7 @@
 <para>Then, after configuring Intel HEXL with <computeroutput>-DHEXL_DOCS=ON</computeroutput>, run <programlisting filename=".bash"><codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>docs</highlight></codeline>
 </programlisting></para>
 <para>To view the generated Sphinx documentation, open the generated <computeroutput>build/docs/sphinx/html/index.html</computeroutput> file in a web browser.</para>
-</sect3>
+</sect2>
 </sect1>
 <sect1 id="index_1autotoc_md15">
 <title>Contributing</title>
@@ -212,7 +222,26 @@
 <para>and make sure pre-commit checks and all unit tests pass.</para>
 <sect2 id="index_1autotoc_md16">
 <title>Repository layout</title>
-<para>Public headers reside in the <computeroutput>hexl/include</computeroutput> folder. Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder. </para>
+<para>Public headers reside in the <computeroutput>hexl/include</computeroutput> folder. Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.</para>
+</sect2>
+<sect2 id="index_1autotoc_md17">
+<title>Intel HEXL Publication</title>
+<para>Find published paper at <ulink url="https://arxiv.org/abs/2103.16400">https://arxiv.org/abs/2103.16400</ulink>.</para>
+</sect2>
+<sect2 id="index_1autotoc_md18">
+<title>Citing Intel HEXL</title>
+<para>To cite Intel HEXL, please use the following BibTeX entry.</para>
+<sect3 id="index_1autotoc_md19">
+<title>Version 1.0</title>
+<para><programlisting filename=".tex"><codeline><highlight class="normal">@misc{IntelHEXL,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>title<sp/>=<sp/>{{I}ntel<sp/>{HEXL}<sp/>(release<sp/>1.0)},</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>howpublished<sp/>=<sp/>{\url{https://arxiv.org/abs/2103.16400}},</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>month<sp/>=<sp/>mar,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>year<sp/>=<sp/>2021,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>key<sp/>=<sp/>{Intel<sp/>HEXL}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> </para>
+</sect3>
 </sect2>
 </sect1>
     </detaileddescription>

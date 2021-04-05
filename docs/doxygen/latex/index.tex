@@ -15,7 +15,7 @@ Intel\+:registered\+: H\+E\+XL is an open-\/source library which provides effici
 \item \href{\#benchmarking-intel-hexl}{\texttt{ Benchmarking Intel H\+E\+XL}}
 \item \href{\#using-intel-hexl}{\texttt{ Using Intel H\+E\+XL}}
 \item \href{\#debugging}{\texttt{ Debugging}}
-\item \href{\#thread-safety}{\texttt{ Thread-\/safety}}
+\item \href{\#threading}{\texttt{ Threading}}
 \end{DoxyItemize}
 \item \href{\#documentation}{\texttt{ Documentation}}
 \begin{DoxyItemize}
@@ -25,6 +25,11 @@ Intel\+:registered\+: H\+E\+XL is an open-\/source library which provides effici
 \item \href{\#contributing}{\texttt{ Contributing}}
 \begin{DoxyItemize}
 \item \href{\#repository-layout}{\texttt{ Repository layout}}
+\item \href{\#intel-hexl-publication}{\texttt{ Intel H\+E\+XL Publication}}
+\item \href{\#citing-intel-hexl}{\texttt{ Citing Intel H\+E\+XL}}
+\begin{DoxyItemize}
+\item \href{\#version-10}{\texttt{ Version 1.\+0}}
+\end{DoxyItemize}
 \end{DoxyItemize}
 \end{DoxyItemize}\hypertarget{index_autotoc_md2}{}\doxysection{Introduction}\label{index_autotoc_md2}
 Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree {\ttfamily N} a power of two roughly in the range {\ttfamily N=\mbox{[}2$^\wedge$\{10\}, 2$^\wedge$\{17\}\mbox{]}}. The coefficients of these polynomials are in a finite field with a word-\/sized primes, {\ttfamily p}, up to {\ttfamily p}$\sim$62 bits. More precisely, the polynomials live in the ring {\ttfamily Z\+\_\+p\mbox{[}X\mbox{]}/(X$^\wedge$N + 1)}. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus {\ttfamily p}. When multiplying two polynomials, the resulting polynomials of degree {\ttfamily 2N} is additionally reduced by taking the remainder when dividing by {\ttfamily X$^\wedge$\+N+1}.
@@ -90,6 +95,7 @@ H\+E\+X\+L\+\_\+\+E\+N\+A\+B\+L\+E\+\_\+\+U\+B\+\_\+\+S\+A\+N\+I\+T\+I\+Z\+ER &O
 H\+E\+X\+L\+\_\+\+E\+X\+P\+O\+RT &ON / O\+FF (default O\+FF) &Set to ON to enable export of Intel H\+E\+XL for use in 3rd-\/party project  \\\cline{1-3}
 H\+E\+X\+L\+\_\+\+S\+H\+A\+R\+E\+D\+\_\+\+L\+IB &ON / O\+FF (default O\+FF) &Set to ON to enable building shared library  \\\cline{1-3}
 H\+E\+X\+L\+\_\+\+T\+E\+S\+T\+I\+NG &ON / O\+FF (default ON) &Set to ON to enable building of unit-\/tests  \\\cline{1-3}
+H\+E\+X\+L\+\_\+\+T\+R\+E\+A\+T\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+A\+S\+\_\+\+E\+R\+R\+OR &ON / O\+FF (default O\+FF) &Set to ON to treat all warnings as error  \\\cline{1-3}
 \end{longtabu}
 \hypertarget{index_autotoc_md6}{}\doxysubsection{Compiling Intel H\+E\+XL}\label{index_autotoc_md6}
 The instructions to build Intel H\+E\+XL are common between Linux, Mac\+OS, and Windows.
@@ -142,7 +148,7 @@ The benchmark executable itself is located at {\ttfamily build/benchmark/bench\+
 The {\ttfamily example} folder has an example of using Intel H\+E\+XL in a third-\/party project.\hypertarget{index_autotoc_md10}{}\doxysection{Debugging}\label{index_autotoc_md10}
 For optimal performance, Intel H\+E\+XL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel H\+E\+XL, configure and build Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+E\+B\+UG=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). This will generate a debug version of the library, e.\+g. {\ttfamily libhexl\+\_\+debug.\+a}, that can be used to debug the execution.
 
-{\bfseries{Note}}, enabling {\ttfamily H\+E\+X\+L\+\_\+\+D\+E\+B\+UG=ON} will result in a significant runtime overhead. \hypertarget{index_autotoc_md11}{}\doxysection{Thread-\/safety}\label{index_autotoc_md11}
+{\bfseries{Note}}, enabling {\ttfamily H\+E\+X\+L\+\_\+\+D\+E\+B\+UG=ON} will result in a significant runtime overhead. \hypertarget{index_autotoc_md11}{}\doxysection{Threading}\label{index_autotoc_md11}
 Intel H\+E\+XL is single-\/threaded and thread-\/safe.\hypertarget{index_autotoc_md12}{}\doxysection{Documentation}\label{index_autotoc_md12}
 See \href{https://intel.github.io/hexl}{\texttt{ https\+://intel.\+github.\+io/hexl}} for Doxygen documentation.
 
@@ -152,14 +158,14 @@ Intel H\+E\+XL supports documentation via Doxygen and sphinx. To build documenta
 \end{DoxyCode}
 
 
-Then, configure Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+O\+CS=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). \hypertarget{index_autotoc_md13}{}\doxysubsubsection{Doxygen}\label{index_autotoc_md13}
+Then, configure Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+O\+CS=ON} (see \href{\#compile-time-options}{\texttt{ Compile-\/time options}}). \hypertarget{index_autotoc_md13}{}\doxysubsection{Doxygen}\label{index_autotoc_md13}
 To build Doxygen documentation, after configuring Intel H\+E\+XL with {\ttfamily -\/D\+H\+E\+X\+L\+\_\+\+D\+O\+CS=ON}, run 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{cmake -\/-\/build build -\/-\/target doxygen}
 \end{DoxyCode}
 
 
-To view the generated Doxygen documentation, open the generated {\ttfamily build/docs/doxygen/html/index.\+html} file in a web browser.\hypertarget{index_autotoc_md14}{}\doxysubsubsection{Sphinx}\label{index_autotoc_md14}
+To view the generated Doxygen documentation, open the generated {\ttfamily build/docs/doxygen/html/index.\+html} file in a web browser.\hypertarget{index_autotoc_md14}{}\doxysubsection{Sphinx}\label{index_autotoc_md14}
 To build the sphinx documentation, install {\ttfamily sphinx} and required dependencies {\ttfamily breathe, m2r2}, e.\+g. 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{sudo apt-\/get install python3-\/sphinx}
@@ -185,4 +191,17 @@ Before contributing, please run
 
 
 and make sure pre-\/commit checks and all unit tests pass.\hypertarget{index_autotoc_md16}{}\doxysubsection{Repository layout}\label{index_autotoc_md16}
-Public headers reside in the {\ttfamily hexl/include} folder. Private headers, e.\+g. those containing Intel(\+R) A\+V\+X-\/512 code should not be put in this folder. 
+Public headers reside in the {\ttfamily hexl/include} folder. Private headers, e.\+g. those containing Intel(\+R) A\+V\+X-\/512 code should not be put in this folder.\hypertarget{index_autotoc_md17}{}\doxysubsection{Intel H\+E\+X\+L Publication}\label{index_autotoc_md17}
+Find published paper at \href{https://arxiv.org/abs/2103.16400}{\texttt{ https\+://arxiv.\+org/abs/2103.\+16400}}.\hypertarget{index_autotoc_md18}{}\doxysubsection{Citing Intel H\+E\+XL}\label{index_autotoc_md18}
+To cite Intel H\+E\+XL, please use the following Bib\+TeX entry.\hypertarget{index_autotoc_md19}{}\doxysubsubsection{Version 1.\+0}\label{index_autotoc_md19}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{@misc\{IntelHEXL,}
+\DoxyCodeLine{    title = \{\{I\}ntel \{HEXL\} (release 1.0)\},}
+\DoxyCodeLine{    howpublished = \{\(\backslash\)url\{https://arxiv.org/abs/2103.16400\}\},}
+\DoxyCodeLine{    month = mar,}
+\DoxyCodeLine{    year = 2021,}
+\DoxyCodeLine{    key = \{Intel HEXL\}}
+\DoxyCodeLine{\}}
+\end{DoxyCode}
+ 
