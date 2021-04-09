@@ -16,55 +16,8 @@ namespace intel {
 namespace hexl {
 
 // state[0] is the degree
-static void BM_EltwiseAddModInPlace(benchmark::State& state) {  //  NOLINT
-  size_t input_size = state.range(0);
-  uint64_t modulus = 0xffffffffffc0001ULL;
-
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  AlignedVector64<uint64_t> input2(input_size, 2);
-  AlignedVector64<uint64_t> output(input_size, 0);
-
-  for (auto _ : state) {
-    EltwiseAddMod(input1.data(), input1.data(), input2.data(), input_size,
-                  modulus);
-  }
-}
-
-BENCHMARK(BM_EltwiseAddModInPlace)
-    ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
-//=================================================================
-
-// state[0] is the degree
-static void BM_EltwiseAddModCopy(benchmark::State& state) {  //  NOLINT
-  size_t input_size = state.range(0);
-  uint64_t modulus = 0xffffffffffc0001ULL;
-
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  AlignedVector64<uint64_t> input2(input_size, 2);
-  AlignedVector64<uint64_t> output(input_size, 0);
-
-  for (auto _ : state) {
-    EltwiseAddMod(output.data(), input1.data(), input2.data(), input_size,
-                  modulus);
-  }
-}
-
-BENCHMARK(BM_EltwiseAddModCopy)
-    ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
-//=================================================================
-
-// state[0] is the degree
-static void BM_EltwiseAddModNative(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseVectorVectorAddModNative(
+    benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
@@ -78,7 +31,7 @@ static void BM_EltwiseAddModNative(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseAddModNative)
+BENCHMARK(BM_EltwiseVectorVectorAddModNative)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024})
@@ -89,7 +42,8 @@ BENCHMARK(BM_EltwiseAddModNative)
 
 #ifdef HEXL_HAS_AVX512DQ
 // state[0] is the degree
-static void BM_EltwiseAddModAVX512(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseVectorVectorAddModAVX512(
+    benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
@@ -103,7 +57,7 @@ static void BM_EltwiseAddModAVX512(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseAddModAVX512)
+BENCHMARK(BM_EltwiseVectorVectorAddModAVX512)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024})
@@ -112,6 +66,55 @@ BENCHMARK(BM_EltwiseAddModAVX512)
 #endif
 
 //=================================================================
+// state[0] is the degree
+static void BM_EltwiseVectorScalarAddModNative(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  uint64_t modulus = 0xffffffffffc0001ULL;
+
+  AlignedVector64<uint64_t> input1(input_size, 1);
+  uint64_t input2{2};
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseAddModNative(output.data(), input1.data(), input2, input_size,
+                        modulus);
+  }
+}
+
+BENCHMARK(BM_EltwiseVectorScalarAddModNative)
+    ->Unit(benchmark::kMicrosecond)
+    ->MinTime(1.0)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+//=================================================================
+
+#ifdef HEXL_HAS_AVX512DQ
+// state[0] is the degree
+static void BM_EltwiseVectorScalarAddModAVX512(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1152921504606877697;
+
+  AlignedVector64<uint64_t> input1(input_size, 1);
+  uint64_t input2{2};
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseAddModAVX512(output.data(), input1.data(), input2, input_size,
+                        modulus);
+  }
+}
+
+BENCHMARK(BM_EltwiseVectorScalarAddModAVX512)
+    ->Unit(benchmark::kMicrosecond)
+    ->MinTime(1.0)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+#endif
 
 }  // namespace hexl
 }  // namespace intel
