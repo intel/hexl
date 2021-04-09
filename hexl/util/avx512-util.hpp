@@ -134,6 +134,8 @@ inline __m512i _mm512_hexl_mullo_add_epi<64>(__m512i x, __m512i y, __m512i z) {
   return _mm512_add_epi64(x, prod);
 }
 
+// Returns x mod p across each 64-bit integer SIMD lanes
+// Assumes x < InputModFactor * p in all lanes
 template <int InputModFactor = 2>
 inline __m512i _mm512_hexl_small_mod_epu64(__m512i x, __m512i p,
                                            __m512i* p_times_2 = nullptr,
