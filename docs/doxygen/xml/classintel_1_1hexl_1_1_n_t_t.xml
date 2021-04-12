@@ -78,7 +78,7 @@
 <parametername direction="in">p</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>Prime modulus. Must satisfy <formula id="6">$ p == 1 \mod 2N $</formula> </para>
+<para>Prime modulus. Must satisfy <formula id="9">$ p == 1 \mod 2N $</formula> </para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -122,7 +122,7 @@
 <parametername direction="in">p</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>Prime modulus. Must satisfy <formula id="6">$ p == 1 \mod 2N $</formula> </para>
+<para>Prime modulus. Must satisfy <formula id="9">$ p == 1 \mod 2N $</formula> </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -130,7 +130,7 @@
 <parametername direction="in">root_of_unity</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>2N&apos;th root of unity in <formula id="7">$ \mathbb{Z_p} $</formula>.</para>
+<para>2N&apos;th root of unity in <formula id="10">$ \mathbb{Z_p} $</formula>.</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -272,7 +272,7 @@ Performs pre-computation necessary for forward and inverse transforms </para>
 <para>Performs negacyclic forward and inverse number-theoretic transform (<ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref>), commonly used in RLWE cryptography. </para>
     </briefdescription>
     <detaileddescription>
-<para>The number-theoretic transform (<ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref>) specializes the discrete Fourier transform (DFT) to the finite field <formula id="5">$ \mathbb{Z}_p / (X^N + 1) $</formula>. </para>
+<para>The number-theoretic transform (<ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref>) specializes the discrete Fourier transform (DFT) to the finite field <formula id="8">$ \mathbb{Z}_p / (X^N + 1) $</formula>. </para>
     </detaileddescription>
     <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="19" column="10" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="19" bodyend="69"/>
     <listofallmembers>

@@ -4,6 +4,7 @@
 set(SRC
     eltwise/eltwise-mult-mod.cpp
     eltwise/eltwise-reduce-mod.cpp
+    eltwise/eltwise-sub-mod.cpp
     eltwise/eltwise-add-mod.cpp
     eltwise/eltwise-fma-mod.cpp
     eltwise/eltwise-cmp-add.cpp
@@ -11,6 +12,7 @@ set(SRC
     eltwise/eltwise-mult-mod-avx512.cpp
     eltwise/eltwise-reduce-mod-avx512.cpp
     eltwise/eltwise-add-mod-avx512.cpp
+    eltwise/eltwise-sub-mod-avx512.cpp
     eltwise/eltwise-fma-mod-avx512.cpp
     ntt/fwd-ntt-avx512.cpp
     ntt/inv-ntt-avx512.cpp

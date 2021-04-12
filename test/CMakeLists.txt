@@ -12,6 +12,7 @@ set(SRC main.cpp
     test-eltwise-fma-mod.cpp
     test-eltwise-cmp-add.cpp
     test-eltwise-cmp-sub-mod.cpp
+    test-eltwise-sub-mod.cpp
 )
 
 add_executable(unit-test ${SRC})

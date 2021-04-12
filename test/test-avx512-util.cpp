@@ -46,7 +46,7 @@ TEST(AVX512, _mm512_hexl_mulhi_epi52) {
 
   __m512i z = _mm512_hexl_mulhi_epi<52>(w, y);
 
-  ASSERT_TRUE(Equals(z, expected));
+  CheckEqual(z, expected);
 }
 #endif
 
