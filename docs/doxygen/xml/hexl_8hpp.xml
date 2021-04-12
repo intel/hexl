@@ -8,6 +8,7 @@
     <includes refid="eltwise-fma-mod_8hpp" local="yes">hexl/eltwise/eltwise-fma-mod.hpp</includes>
     <includes refid="eltwise-mult-mod_8hpp" local="yes">hexl/eltwise/eltwise-mult-mod.hpp</includes>
     <includes refid="eltwise-reduce-mod_8hpp" local="yes">hexl/eltwise/eltwise-reduce-mod.hpp</includes>
+    <includes refid="eltwise-sub-mod_8hpp" local="yes">hexl/eltwise/eltwise-sub-mod.hpp</includes>
     <includes refid="ntt_8hpp" local="yes">hexl/ntt/ntt.hpp</includes>
     <includes refid="util_8hpp" local="yes">hexl/util/util.hpp</includes>
     <incdepgraph>
@@ -20,14 +21,14 @@
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="10">
+      <node id="11">
         <label>hexl/ntt/ntt.hpp</label>
         <link refid="ntt_8hpp"/>
         <childnode refid="3" relation="include">
         </childnode>
-        <childnode refid="11" relation="include">
-        </childnode>
         <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
         </childnode>
       </node>
       <node id="6">
@@ -63,6 +64,8 @@
         </childnode>
         <childnode refid="10" relation="include">
         </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
         <childnode refid="5" relation="include">
         </childnode>
       </node>
@@ -82,7 +85,7 @@
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="12">
+      <node id="13">
         <label>vector</label>
       </node>
       <node id="9">
@@ -91,8 +94,14 @@
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="11">
+      <node id="12">
         <label>memory</label>
+      </node>
+      <node id="10">
+        <label>hexl/eltwise/eltwise-sub-mod.hpp</label>
+        <link refid="eltwise-sub-mod_8hpp"/>
+        <childnode refid="3" relation="include">
+        </childnode>
       </node>
     </incdepgraph>
     <briefdescription>
@@ -111,8 +120,9 @@
 <codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="eltwise-fma-mod_8hpp" kindref="compound">hexl/eltwise/eltwise-fma-mod.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="eltwise-mult-mod_8hpp" kindref="compound">hexl/eltwise/eltwise-mult-mod.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="eltwise-reduce-mod_8hpp" kindref="compound">hexl/eltwise/eltwise-reduce-mod.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="ntt_8hpp" kindref="compound">hexl/ntt/ntt.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="util_8hpp" kindref="compound">hexl/util/util.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="eltwise-sub-mod_8hpp" kindref="compound">hexl/eltwise/eltwise-sub-mod.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="ntt_8hpp" kindref="compound">hexl/ntt/ntt.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="util_8hpp" kindref="compound">hexl/util/util.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/hexl.hpp"/>
   </compounddef>

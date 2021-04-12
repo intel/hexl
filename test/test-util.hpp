@@ -19,7 +19,7 @@ inline void CheckEqual(const std::vector<uint64_t>& x,
   EXPECT_EQ(x.size(), y.size());
   uint64_t N = x.size();
   for (size_t i = 0; i < N; ++i) {
-    EXPECT_EQ(x[i], y[i]);
+    EXPECT_EQ(x[i], y[i]) << "Mismatch at index " << i;
   }
 }
 
@@ -29,7 +29,7 @@ inline void AssertEqual(const std::vector<T>& x, const std::vector<T>& y) {
   ASSERT_EQ(x.size(), y.size());
   uint64_t N = x.size();
   for (size_t i = 0; i < N; ++i) {
-    ASSERT_EQ(x[i], y[i]);
+    ASSERT_EQ(x[i], y[i]) << "Mismatch at index " << i;
   }
 }
 
@@ -46,24 +46,6 @@ inline void AssertEqual(const __m512i a, const __m512i b) {
   AssertEqual(as, bs);
 }
 
-// Returns true iff a == b
-// Logs an error if a != b
-inline bool Equals(__m512i a, __m512i b) {
-  bool match = true;
-
-  std::vector<uint64_t> as = ExtractValues(a);
-  std::vector<uint64_t> bs = ExtractValues(b);
-
-  for (size_t i = 0; i < 8; ++i) {
-    if (as[i] != bs[i]) {
-      std::cerr << "Mismatch at index " << i << ": "
-                << "a[" << i << "] = " << as[i] << ", b[" << i
-                << "] = " << bs[i] << "\n";
-      match = false;
-    }
-  }
-  return match;
-}
 #endif
 
 }  // namespace hexl

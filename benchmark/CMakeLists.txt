@@ -8,6 +8,7 @@ set(SRC main.cpp
     bench-eltwise-cmp-sub-mod.cpp
     bench-eltwise-fma-mod.cpp
     bench-eltwise-mult-mod.cpp
+    bench-eltwise-sub-mod.cpp
     bench-eltwise-reduce-mod.cpp
     )
 

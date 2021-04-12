@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Intel HEXL: /Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise Directory Reference</title>
+<title>Intel HEXL: /Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,27 +73,32 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">eltwise Directory Reference</div>  </div>
+<div class="title">eltwise-sub-mod.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+</div>
+<p><a href="eltwise-sub-mod_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:eltwise-add-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-add-mod_8hpp.html">eltwise-add-mod.hpp</a> <a href="eltwise-add-mod_8hpp_source.html">[code]</a></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceintel"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceintel.html">intel</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-cmp-add_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-cmp-add_8hpp.html">eltwise-cmp-add.hpp</a> <a href="eltwise-cmp-add_8hpp_source.html">[code]</a></td></tr>
+<tr class="memitem:namespaceintel_1_1hexl"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceintel_1_1hexl.html">intel::hexl</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-cmp-sub-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-cmp-sub-mod_8hpp.html">eltwise-cmp-sub-mod.hpp</a> <a href="eltwise-cmp-sub-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-fma-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-fma-mod_8hpp.html">eltwise-fma-mod.hpp</a> <a href="eltwise-fma-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-mult-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-mult-mod_8hpp.html">eltwise-mult-mod.hpp</a> <a href="eltwise-mult-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-reduce-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-reduce-mod_8hpp.html">eltwise-reduce-mod.hpp</a> <a href="eltwise-reduce-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-sub-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-sub-mod_8hpp.html">eltwise-sub-mod.hpp</a> <a href="eltwise-sub-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a6a45c30bc21b9b1e1410b23fce5424c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceintel_1_1hexl.html#a6a45c30bc21b9b1e1410b23fce5424c8">intel::hexl::EltwiseSubMod</a> (uint64_t *result, const uint64_t *operand1, const uint64_t *operand2, uint64_t n, uint64_t modulus)</td></tr>
+<tr class="memdesc:a6a45c30bc21b9b1e1410b23fce5424c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subtracts two vectors elementwise with modular reduction.  <a href="namespaceintel_1_1hexl.html#a6a45c30bc21b9b1e1410b23fce5424c8">More...</a><br /></td></tr>
+<tr class="separator:a6a45c30bc21b9b1e1410b23fce5424c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc13b8f383d3af6471a5261ee2213b40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceintel_1_1hexl.html#abc13b8f383d3af6471a5261ee2213b40">intel::hexl::EltwiseSubMod</a> (uint64_t *result, const uint64_t *operand1, uint64_t operand2, uint64_t n, uint64_t modulus)</td></tr>
+<tr class="memdesc:abc13b8f383d3af6471a5261ee2213b40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subtracts a scalar from a vector elementwise with modular reduction.  <a href="namespaceintel_1_1hexl.html#abc13b8f383d3af6471a5261ee2213b40">More...</a><br /></td></tr>
+<tr class="separator:abc13b8f383d3af6471a5261ee2213b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

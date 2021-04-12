@@ -166,6 +166,82 @@ Computes <formula id="1">$ operand1[i] = (operand1[i] + operand2[i]) \mod modulu
         </inbodydescription>
         <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" line="22" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" declline="22" declcolumn="6"/>
       </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a8e0884463658eae11b6f1c6dfeb50b40" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseAddMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseAddMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Adds a vector and scalar elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to add. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to add. Must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" line="36" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" declline="36" declcolumn="6"/>
+      </memberdef>
       <memberdef kind="function" id="namespaceintel_1_1hexl_1ad09f0d71efdfbde79c2a8ed92d7da811" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>
         <definition>void intel::hexl::EltwiseCmpAdd</definition>
@@ -248,7 +324,7 @@ Computes <formula id="1">$ operand1[i] = (operand1[i] + operand2[i]) \mod modulu
 </parameterdescription>
 </parameteritem>
 </parameterlist>
-Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] for all <formula id="3">$i=0, ..., n-1$</formula>. </para>
+Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] for all <formula id="4">$i=0, ..., n-1$</formula>. </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
@@ -436,7 +512,7 @@ Computes <computeroutput>operand1</computeroutput>[i] = (<computeroutput>cmp</co
 <parametername direction="in">modulus</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>Modulus with which to perform modular reduction. Must be in the range <formula id="4">$ [2, 2^{61} - 1]$</formula> </para>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="5">$ [2, 2^{61} - 1]$</formula> </para>
 </parameterdescription>
 </parameteritem>
 <parameteritem>
@@ -632,6 +708,158 @@ Computes <computeroutput>result</computeroutput>[i] = (<computeroutput>operand1<
         <inbodydescription>
         </inbodydescription>
         <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" line="24" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" declline="24" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a6a45c30bc21b9b1e1410b23fce5424c8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseSubMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, const uint64_t *operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseSubMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Subtracts two vectors elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to subtract from. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to subtract. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="6">$ operand1[i] = (operand1[i] - operand2[i]) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" line="22" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" declline="22" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1abc13b8f383d3af6471a5261ee2213b40" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseSubMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseSubMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Subtracts a scalar from a vector elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to subtract from. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Elements to subtract. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="7">$ operand1[i] = (operand1[i] - operand2) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" line="36" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" declline="36" declcolumn="6"/>
       </memberdef>
       <memberdef kind="function" id="namespaceintel_1_1hexl_1a8c654502a5e7fe2cfdd198f0fd920f2a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>

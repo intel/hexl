@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Intel HEXL: /Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise Directory Reference</title>
+<title>Intel HEXL: /Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -74,28 +74,30 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">eltwise Directory Reference</div>  </div>
+<div class="title">eltwise-sub-mod.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:eltwise-add-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-add-mod_8hpp.html">eltwise-add-mod.hpp</a> <a href="eltwise-add-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-cmp-add_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-cmp-add_8hpp.html">eltwise-cmp-add.hpp</a> <a href="eltwise-cmp-add_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-cmp-sub-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-cmp-sub-mod_8hpp.html">eltwise-cmp-sub-mod.hpp</a> <a href="eltwise-cmp-sub-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-fma-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-fma-mod_8hpp.html">eltwise-fma-mod.hpp</a> <a href="eltwise-fma-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-mult-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-mult-mod_8hpp.html">eltwise-mult-mod.hpp</a> <a href="eltwise-mult-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-reduce-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-reduce-mod_8hpp.html">eltwise-reduce-mod.hpp</a> <a href="eltwise-reduce-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:eltwise-sub-mod_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eltwise-sub-mod_8hpp.html">eltwise-sub-mod.hpp</a> <a href="eltwise-sub-mod_8hpp_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-</div><!-- contents -->
+<a href="eltwise-sub-mod_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2020-2021 Intel Corporation</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// SPDX-License-Identifier: Apache-2.0</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceintel.html">intel</a> {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span>hexl {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceintel_1_1hexl.html#a6a45c30bc21b9b1e1410b23fce5424c8">EltwiseSubMod</a>(uint64_t* result, <span class="keyword">const</span> uint64_t* operand1,</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;                   <span class="keyword">const</span> uint64_t* operand2, uint64_t n, uint64_t modulus);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceintel_1_1hexl.html#a6a45c30bc21b9b1e1410b23fce5424c8">EltwiseSubMod</a>(uint64_t* result, <span class="keyword">const</span> uint64_t* operand1,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                   uint64_t operand2, uint64_t n, uint64_t modulus);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}  <span class="comment">// namespace hexl</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}  <span class="comment">// namespace intel</span></div>
+</div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="anamespaceintel_html"><div class="ttname"><a href="namespaceintel.html">intel</a></div><div class="ttdef"><b>Definition:</b> eltwise-add-mod.hpp:8</div></div>
+<div class="ttc" id="anamespaceintel_1_1hexl_html_a6a45c30bc21b9b1e1410b23fce5424c8"><div class="ttname"><a href="namespaceintel_1_1hexl.html#a6a45c30bc21b9b1e1410b23fce5424c8">intel::hexl::EltwiseSubMod</a></div><div class="ttdeci">void EltwiseSubMod(uint64_t *result, const uint64_t *operand1, const uint64_t *operand2, uint64_t n, uint64_t modulus)</div><div class="ttdoc">Subtracts two vectors elementwise with modular reduction.</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
