@@ -44,7 +44,7 @@ stages:
   only:
     refs:
       - merge_requests
-      - master
+      - development
 
 .build:
   extends: .only-default
