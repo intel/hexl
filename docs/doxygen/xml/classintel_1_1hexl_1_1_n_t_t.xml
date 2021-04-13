@@ -3,6 +3,7 @@
   <compounddef id="classintel_1_1hexl_1_1_n_t_t" kind="class" language="C++" prot="public">
     <compoundname>intel::hexl::NTT</compoundname>
     <includes refid="ntt_8hpp" local="no">ntt.hpp</includes>
+    <innerclass refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" prot="public">intel::hexl::NTT::allocator_adapter</innerclass>
       <sectiondef kind="private-attrib">
       <memberdef kind="variable" id="classintel_1_1hexl_1_1_n_t_t_1a2ddf6cf8973978de8d8a90998e5735c2" prot="private" static="no" mutable="no">
         <type>std::shared_ptr&lt; NTTImpl &gt;</type>
@@ -16,7 +17,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="68" column="19" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="65" bodyend="-1"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="107" column="19" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="104" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -32,7 +33,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="22" column="3"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="38" column="3"/>
       </memberdef>
       <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type></type>
@@ -46,12 +47,12 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="25" column="3"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="41" column="3"/>
       </memberdef>
-      <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a3f44d9ead9be66540b9732d5c98bb000" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+      <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a6989d7d77ade294c556525e80d0909de" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type></type>
         <definition>intel::hexl::NTT::NTT</definition>
-        <argsstring>(uint64_t degree, uint64_t p)</argsstring>
+        <argsstring>(uint64_t degree, uint64_t p, std::shared_ptr&lt; allocator_base &gt; alloc_ptr={})</argsstring>
         <name>NTT</name>
         <param>
           <type>uint64_t</type>
@@ -60,6 +61,11 @@
         <param>
           <type>uint64_t</type>
           <declname>p</declname>
+        </param>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="structintel_1_1hexl_1_1allocator__base" kindref="compound">allocator_base</ref> &gt;</type>
+          <declname>alloc_ptr</declname>
+          <defval>{}</defval>
         </param>
         <briefdescription>
 <para>Performs pre-computation necessary for forward and inverse transforms. </para>
@@ -81,17 +87,64 @@
 <para>Prime modulus. Must satisfy <formula id="9">$ p == 1 \mod 2N $</formula> </para>
 </parameterdescription>
 </parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">alloc_ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Custom memory allocator used for intermediate calculations </para>
+</parameterdescription>
+</parameteritem>
 </parameterlist>
 </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="33" column="3"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="51" column="3"/>
       </memberdef>
-      <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a63eea17916855a9ec73a2cc8c57b2a63" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+      <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1aba658b9cbb91754a6a1a111fa39b3b56" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Allocator</type>
+          </param>
+          <param>
+            <type>class...</type>
+            <declname>AllocatorArgs</declname>
+            <defname>AllocatorArgs</defname>
+          </param>
+        </templateparamlist>
         <type></type>
         <definition>intel::hexl::NTT::NTT</definition>
-        <argsstring>(uint64_t degree, uint64_t p, uint64_t root_of_unity)</argsstring>
+        <argsstring>(uint64_t degree, uint64_t p, Allocator &amp;&amp;a, AllocatorArgs &amp;&amp;... args)</argsstring>
+        <name>NTT</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>p</declname>
+        </param>
+        <param>
+          <type>Allocator &amp;&amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>AllocatorArgs &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="55" column="3" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="55" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a8577aba58e23fdd6b6865d019a9df3ee" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>(uint64_t degree, uint64_t p, uint64_t root_of_unity, std::shared_ptr&lt; allocator_base &gt; alloc_ptr={})</argsstring>
         <name>NTT</name>
         <param>
           <type>uint64_t</type>
@@ -104,6 +157,11 @@
         <param>
           <type>uint64_t</type>
           <declname>root_of_unity</declname>
+        </param>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="structintel_1_1hexl_1_1allocator__base" kindref="compound">allocator_base</ref> &gt;</type>
+          <declname>alloc_ptr</declname>
+          <defval>{}</defval>
         </param>
         <briefdescription>
 <para>Initializes an <ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref> object with degree <computeroutput>degree</computeroutput> and modulus <computeroutput>p</computeroutput>. </para>
@@ -130,7 +188,15 @@
 <parametername direction="in">root_of_unity</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>2N&apos;th root of unity in <formula id="10">$ \mathbb{Z_p} $</formula>.</para>
+<para>2N&apos;th root of unity in <formula id="10">$ \mathbb{Z_p} $</formula>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">alloc_ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Custom memory allocator used for intermediate calculations</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -138,7 +204,50 @@ Performs pre-computation necessary for forward and inverse transforms </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="43" column="3"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="72" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a4c529039fcafa8949a218e0e14bdede6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Allocator</type>
+          </param>
+          <param>
+            <type>class...</type>
+            <declname>AllocatorArgs</declname>
+            <defname>AllocatorArgs</defname>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>(uint64_t degree, uint64_t p, uint64_t root_of_unity, Allocator &amp;&amp;a, AllocatorArgs &amp;&amp;... args)</argsstring>
+        <name>NTT</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>p</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>root_of_unity</declname>
+        </param>
+        <param>
+          <type>Allocator &amp;&amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>AllocatorArgs &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="76" column="3" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="76" bodyend="82"/>
       </memberdef>
       <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>
@@ -202,7 +311,7 @@ Performs pre-computation necessary for forward and inverse transforms </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="52" column="8"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="91" column="8"/>
       </memberdef>
       <memberdef kind="function" id="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>
@@ -265,7 +374,7 @@ Performs pre-computation necessary for forward and inverse transforms </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="62" column="8"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="101" column="8"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -274,14 +383,16 @@ Performs pre-computation necessary for forward and inverse transforms </para>
     <detaileddescription>
 <para>The number-theoretic transform (<ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref>) specializes the discrete Fourier transform (DFT) to the finite field <formula id="8">$ \mathbb{Z}_p / (X^N + 1) $</formula>. </para>
     </detaileddescription>
-    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="19" column="10" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="19" bodyend="69"/>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="21" column="10" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="21" bodyend="108"/>
     <listofallmembers>
       <member refid="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>ComputeForward</name></member>
       <member refid="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>ComputeInverse</name></member>
       <member refid="classintel_1_1hexl_1_1_n_t_t_1a2ddf6cf8973978de8d8a90998e5735c2" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_impl</name></member>
       <member refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
-      <member refid="classintel_1_1hexl_1_1_n_t_t_1a3f44d9ead9be66540b9732d5c98bb000" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
-      <member refid="classintel_1_1hexl_1_1_n_t_t_1a63eea17916855a9ec73a2cc8c57b2a63" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1_n_t_t_1a6989d7d77ade294c556525e80d0909de" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1_n_t_t_1aba658b9cbb91754a6a1a111fa39b3b56" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1_n_t_t_1a8577aba58e23fdd6b6865d019a9df3ee" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1_n_t_t_1a4c529039fcafa8949a218e0e14bdede6" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
       <member refid="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>~NTT</name></member>
     </listofallmembers>
   </compounddef>

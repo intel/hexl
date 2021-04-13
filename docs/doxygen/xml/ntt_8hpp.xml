@@ -5,6 +5,7 @@
     <includes local="no">stdint.h</includes>
     <includes local="no">memory</includes>
     <includes local="no">vector</includes>
+    <includes refid="util_8hpp" local="yes">hexl/util/util.hpp</includes>
     <includedby refid="hexl_8hpp" local="yes">/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/hexl.hpp</includedby>
     <incdepgraph>
       <node id="2">
@@ -19,9 +20,20 @@
         </childnode>
         <childnode refid="4" relation="include">
         </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>hexl/util/util.hpp</label>
+        <link refid="util_8hpp"/>
+        <childnode refid="6" relation="include">
+        </childnode>
       </node>
       <node id="4">
         <label>vector</label>
+      </node>
+      <node id="6">
+        <label>cstddef</label>
       </node>
       <node id="3">
         <label>memory</label>
@@ -40,6 +52,7 @@
       </node>
     </invincdepgraph>
     <innerclass refid="classintel_1_1hexl_1_1_n_t_t" prot="public">intel::hexl::NTT</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" prot="public">intel::hexl::NTT::allocator_adapter</innerclass>
     <innernamespace refid="namespaceintel">intel</innernamespace>
     <innernamespace refid="namespaceintel_1_1hexl">intel::hexl</innernamespace>
     <briefdescription>
@@ -57,33 +70,68 @@
 <codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="10"><highlight class="normal"></highlight></codeline>
-<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceintel" kindref="compound">intel</ref><sp/>{</highlight></codeline>
-<codeline lineno="12"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">hexl<sp/>{</highlight></codeline>
-<codeline lineno="13"><highlight class="normal"></highlight></codeline>
-<codeline lineno="19" refid="classintel_1_1hexl_1_1_n_t_t" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref><sp/>{</highlight></codeline>
-<codeline lineno="20"><highlight class="normal"><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
-<codeline lineno="22"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kindref="member">NTT</ref>();</highlight></codeline>
-<codeline lineno="23"><highlight class="normal"></highlight></codeline>
-<codeline lineno="25"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" kindref="member">~NTT</ref>();</highlight></codeline>
-<codeline lineno="26"><highlight class="normal"></highlight></codeline>
-<codeline lineno="33"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>p);</highlight></codeline>
-<codeline lineno="34"><highlight class="normal"></highlight></codeline>
-<codeline lineno="43"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>p,<sp/>uint64_t<sp/>root_of_unity);</highlight></codeline>
-<codeline lineno="44"><highlight class="normal"></highlight></codeline>
-<codeline lineno="52"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" kindref="member">ComputeForward</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>operand,</highlight></codeline>
-<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor,<sp/>uint64_t<sp/>output_mod_factor);</highlight></codeline>
-<codeline lineno="54"><highlight class="normal"></highlight></codeline>
-<codeline lineno="62"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" kindref="member">ComputeInverse</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>operand,</highlight></codeline>
-<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor,<sp/>uint64_t<sp/>output_mod_factor);</highlight></codeline>
-<codeline lineno="64"><highlight class="normal"></highlight></codeline>
-<codeline lineno="65"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">NTTImpl;<sp/><sp/></highlight></codeline>
-<codeline lineno="66"><highlight class="normal"></highlight></codeline>
-<codeline lineno="67"><highlight class="normal"><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
-<codeline lineno="68"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;NTTImpl&gt;<sp/>m_impl;</highlight></codeline>
-<codeline lineno="69"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="70"><highlight class="normal"></highlight></codeline>
-<codeline lineno="71"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>hexl</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="72"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>intel</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="util_8hpp" kindref="compound">hexl/util/util.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceintel" kindref="compound">intel</ref><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">hexl<sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21" refid="classintel_1_1hexl_1_1_n_t_t" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref><sp/>{</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Adaptee,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>Args&gt;</highlight></codeline>
+<codeline lineno="24" refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" refkind="compound"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" kindref="compound">allocator_adapter</ref></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1allocator__interface" kindref="compound">allocator_interface</ref>&lt;allocator_adapter&lt;Adaptee,<sp/>Args...&gt;&gt;<sp/>{</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a03759f17cbc8473f3a7e1185c5332005" kindref="member">allocator_adapter</ref>(Adaptee&amp;&amp;<sp/>_a,<sp/>Args&amp;&amp;...<sp/>args);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a03759f17cbc8473f3a7e1185c5332005" kindref="member">allocator_adapter</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Adaptee&amp;<sp/>_a,<sp/>Args&amp;...<sp/>args);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>interface<sp/>implementation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a667e41aa49f383de99c6ebf7444800d7" kindref="member">allocate_impl</ref>(std::size_t<sp/>bytes_count);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1ab7c8f02c3d49f3f010bda942db2c1ee2" kindref="member">deallocate_impl</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>p,<sp/>std::size_t<sp/>n);</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/>Adaptee<sp/>alloc;</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/>};</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kindref="member">NTT</ref>();</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" kindref="member">~NTT</ref>();</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>p,</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::shared_ptr&lt;allocator_base&gt;<sp/>alloc_ptr<sp/>=<sp/>{});</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Allocator,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>AllocatorArgs&gt;</highlight></codeline>
+<codeline lineno="55" refid="classintel_1_1hexl_1_1_n_t_t_1aba658b9cbb91754a6a1a111fa39b3b56" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1aba658b9cbb91754a6a1a111fa39b3b56" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>p,<sp/>Allocator&amp;&amp;<sp/>a,<sp/>AllocatorArgs&amp;&amp;...<sp/>args)</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref>(degree,<sp/>p,</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::static_pointer_cast&lt;<ref refid="structintel_1_1hexl_1_1allocator__base" kindref="compound">allocator_base</ref>&gt;(</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::make_shared&lt;</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" kindref="compound">allocator_adapter</ref>&lt;Allocator,<sp/>AllocatorArgs...&gt;&gt;(</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::move(a),<sp/>std::forward&lt;AllocatorArgs&gt;(args)...)))<sp/>{}</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>p,<sp/>uint64_t<sp/>root_of_unity,</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::shared_ptr&lt;allocator_base&gt;<sp/>alloc_ptr<sp/>=<sp/>{});</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Allocator,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>AllocatorArgs&gt;</highlight></codeline>
+<codeline lineno="76" refid="classintel_1_1hexl_1_1_n_t_t_1a4c529039fcafa8949a218e0e14bdede6" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1a4c529039fcafa8949a218e0e14bdede6" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>p,<sp/>uint64_t<sp/>root_of_unity,<sp/>Allocator&amp;&amp;<sp/>a,</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>AllocatorArgs&amp;&amp;...<sp/>args)</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="classintel_1_1hexl_1_1_n_t_t" kindref="compound">NTT</ref>(degree,<sp/>p,<sp/>root_of_unity,</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::static_pointer_cast&lt;<ref refid="structintel_1_1hexl_1_1allocator__base" kindref="compound">allocator_base</ref>&gt;(</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::make_shared&lt;</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" kindref="compound">allocator_adapter</ref>&lt;Allocator,<sp/>AllocatorArgs...&gt;&gt;(</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::move(a),<sp/>std::forward&lt;AllocatorArgs&gt;(args)...)))<sp/>{}</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" kindref="member">ComputeForward</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>operand,</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor,<sp/>uint64_t<sp/>output_mod_factor);</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" kindref="member">ComputeInverse</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>operand,</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor,<sp/>uint64_t<sp/>output_mod_factor);</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"></highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">NTTImpl;<sp/><sp/></highlight></codeline>
+<codeline lineno="105"><highlight class="normal"></highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;NTTImpl&gt;<sp/>m_impl;</highlight></codeline>
+<codeline lineno="108"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"></highlight></codeline>
+<codeline lineno="110"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>hexl</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="111"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>intel</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp"/>
   </compounddef>

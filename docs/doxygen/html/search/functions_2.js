@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['not_58',['Not',['../namespaceintel_1_1hexl.html#a8c654502a5e7fe2cfdd198f0fd920f2a',1,'intel::hexl']]],
-  ['ntt_59',['NTT',['../classintel_1_1hexl_1_1_n_t_t.html#ade0447617b50232d2a076f99e672d15c',1,'intel::hexl::NTT::NTT()'],['../classintel_1_1hexl_1_1_n_t_t.html#a3f44d9ead9be66540b9732d5c98bb000',1,'intel::hexl::NTT::NTT(uint64_t degree, uint64_t p)'],['../classintel_1_1hexl_1_1_n_t_t.html#a63eea17916855a9ec73a2cc8c57b2a63',1,'intel::hexl::NTT::NTT(uint64_t degree, uint64_t p, uint64_t root_of_unity)']]]
+  ['deallocate_67',['deallocate',['../structintel_1_1hexl_1_1allocator__base.html#aaa72658a072f3c0867c3dff2207eae04',1,'intel::hexl::allocator_base::deallocate()'],['../structintel_1_1hexl_1_1allocator__interface.html#ad9c0c9e822693d68551078ac3629babb',1,'intel::hexl::allocator_interface::deallocate()']]],
+  ['deallocate_5fimpl_68',['deallocate_impl',['../structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter.html#ab7c8f02c3d49f3f010bda942db2c1ee2',1,'intel::hexl::NTT::allocator_adapter']]]
 ];

@@ -2,6 +2,8 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
   <compounddef id="namespaceintel_1_1hexl" kind="namespace" language="C++">
     <compoundname>intel::hexl</compoundname>
+    <innerclass refid="structintel_1_1hexl_1_1allocator__base" prot="public">intel::hexl::allocator_base</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1allocator__interface" prot="public">intel::hexl::allocator_interface</innerclass>
     <innerclass refid="classintel_1_1hexl_1_1_n_t_t" prot="public">intel::hexl::NTT</innerclass>
       <sectiondef kind="enum">
       <memberdef kind="enum" id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" prot="public" static="no" strong="yes">
@@ -86,7 +88,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" line="14" column="18" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" bodystart="14" bodyend="23"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" line="16" column="18" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" bodystart="16" bodyend="25"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="func">
@@ -887,7 +889,7 @@ Computes <formula id="7">$ operand1[i] = (operand1[i] - operand2) \mod modulus $
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" line="27" column="15" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" bodystart="27" bodyend="48"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" line="29" column="15" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" bodystart="29" bodyend="50"/>
       </memberdef>
       </sectiondef>
     <briefdescription>

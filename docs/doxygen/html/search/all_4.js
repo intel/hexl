@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['hexl_20',['hexl',['../namespaceintel_1_1hexl.html',1,'intel']]],
-  ['intel_20homomorphic_20encryption_20acceleration_20library_20_28hexl_29_21',['Intel Homomorphic Encryption Acceleration Library (HEXL)',['../index.html',1,'']]],
-  ['intel_22',['intel',['../namespaceintel.html',1,'']]]
+  ['false_26',['FALSE',['../namespaceintel_1_1hexl.html#abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc',1,'intel::hexl']]]
 ];
