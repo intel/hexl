@@ -115,6 +115,96 @@ TEST(NTT, Powers) {
   }
 }
 
+namespace allocators {
+// template <class T>
+struct custom_allocator {
+  using T = int;
+  T* invoke_allocation(int size) {
+    number_allocations++;
+    return new T[size];
+  }
+
+  void lets_deallocate(T* ptr) {
+    number_deallocations++;
+    delete[] ptr;
+  }
+  static size_t number_allocations;
+  static size_t number_deallocations;
+};
+
+size_t custom_allocator::number_allocations = 0;
+size_t custom_allocator::number_deallocations = 0;
+}  // namespace allocators
+
+template <>
+struct NTT::allocator_adapter<allocators::custom_allocator>
+    : public allocator_interface<
+          NTT::allocator_adapter<allocators::custom_allocator>> {
+  explicit allocator_adapter(allocators::custom_allocator&& a_)
+      : a(std::move(a_)) {}
+
+  // interface implementations
+  void* allocate_impl(std::size_t bytes_count) {
+    return a.invoke_allocation(bytes_count);
+  }
+  void deallocate_impl(void* p, std::size_t n) {
+    (void)n;
+    a.lets_deallocate(static_cast<allocators::custom_allocator::T*>(p));
+  }
+
+  allocators::custom_allocator a;
+};
+
+template <class T>
+struct NTT::allocator_adapter<std::allocator<T>>
+    : public allocator_interface<NTT::allocator_adapter<std::allocator<T>>> {
+  explicit allocator_adapter(std::allocator<T>&& a_) : a(std::move(a_)) {}
+
+  // interface implementations
+  void* allocate_impl(std::size_t bytes_count) {
+    return a.allocate(bytes_count);
+  }
+  void deallocate_impl(void* p, std::size_t n) {
+    a.deallocate(static_cast<T*>(p), n);
+  }
+
+  std::allocator<T> a;
+};
+
+TEST(NTT, root_of_unity_with_allocator) {
+  uint64_t p = 769;
+  uint64_t N = 8;
+  std::vector<uint64_t> input{1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint64_t> input2 = input;
+  std::vector<uint64_t> input3 = input;
+  std::vector<uint64_t> input4 = input;
+
+  uint64_t root_of_unity = MinimalPrimitiveRoot(2 * N, p);
+
+  {
+    allocators::custom_allocator a;
+    NTT ntt1(N, p);
+    NTT ntt2(N, p, std::move(a));
+    NTT ntt3(N, p, root_of_unity);
+
+    std::allocator<int> s;
+    NTT ntt4(N, p, root_of_unity, std::move(s));
+
+    ntt1.ComputeForward(input.data(), input.data(), 1, 1);
+    ntt2.ComputeForward(input2.data(), input2.data(), 1, 1);
+
+    ASSERT_NE(allocators::custom_allocator::number_allocations, 0);
+
+    ntt3.ComputeForward(input3.data(), input3.data(), 1, 1);
+    ntt3.ComputeForward(input4.data(), input4.data(), 1, 1);
+  }
+
+  ASSERT_NE(allocators::custom_allocator::number_deallocations, 0);
+  AssertEqual(input, input2);
+  AssertEqual(input, input3);
+  AssertEqual(input, input4);
+}
+
 TEST(NTT, root_of_unity) {
   uint64_t p = 769;
   uint64_t N = 8;

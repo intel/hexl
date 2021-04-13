@@ -7,22 +7,60 @@
 #include <memory>
 #include <vector>
 
+#include "hexl/util/util.hpp"
 #include "number-theory/number-theory.hpp"
 
 namespace intel {
 namespace hexl {
+
+namespace details {
+struct MallocStrategy : allocator_base {
+  void* allocate(std::size_t bytes_count) final {
+    return std::malloc(bytes_count);
+  }
+
+  void deallocate(void* p, std::size_t n) final {
+    (void)n;
+    std::free(p);
+  }
+};
+
+struct CustomAllocStrategy {
+  explicit CustomAllocStrategy(std::shared_ptr<allocator_base> impl)
+      : p_impl(impl) {
+    if (!impl) {
+      throw std::runtime_error(
+          "Cannot create 'CustomAllocStrategy' without `impl`");
+    }
+  }
+
+  void* allocate_memory(std::size_t bytes_count) {
+    return p_impl->allocate(bytes_count);
+  }
+
+  void deallocate_memory(void* p, std::size_t n) { p_impl->deallocate(p, n); }
+
+ private:
+  std::shared_ptr<allocator_base> p_impl;
+};
+}  // namespace details
+
+using allocator_strategy_ptr = std::shared_ptr<allocator_base>;
+extern allocator_strategy_ptr mallocStrategy;
 
 template <typename T, uint64_t Alignment>
 class AlignedAllocator {
  public:
   using value_type = T;
 
-  AlignedAllocator() noexcept {}
+  AlignedAllocator(allocator_strategy_ptr strategy = {}) noexcept  // NOLINT
+      : alloc_impl(strategy ? strategy : mallocStrategy) {}
 
-  AlignedAllocator(const AlignedAllocator&) {}
+  AlignedAllocator(const AlignedAllocator& src) : alloc_impl(src.alloc_impl) {}
 
   template <typename U>
-  AlignedAllocator(const AlignedAllocator<U, Alignment>&) {}
+  AlignedAllocator(const AlignedAllocator<U, Alignment>& src)
+      : alloc_impl(src.alloc_impl) {}
 
   ~AlignedAllocator() {}
 
@@ -44,7 +82,7 @@ class AlignedAllocator {
     // Additionally, allocate a prefix to store the memory location of the
     // unaligned buffer
     size_t alloc_size = buffer_size + sizeof(void*);
-    void* buffer = std::malloc(alloc_size);
+    void* buffer = alloc_impl->allocate(alloc_size);
     if (!buffer) {
       return nullptr;
     }
@@ -70,9 +108,11 @@ class AlignedAllocator {
     }
     void* store_buffer_addr = (reinterpret_cast<char*>(p) - sizeof(void*));
     void* free_address = *(static_cast<void**>(store_buffer_addr));
-    (void)n;  // Avoid unused variable
-    std::free(free_address);
+    alloc_impl->deallocate(free_address, n);
   }
+
+ private:
+  allocator_strategy_ptr alloc_impl;
 };
 
 template <typename T>

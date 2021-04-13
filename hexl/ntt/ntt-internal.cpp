@@ -19,8 +19,23 @@
 namespace intel {
 namespace hexl {
 
-NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t p, uint64_t root_of_unity)
-    : m_degree(degree), m_p(p), m_w(root_of_unity) {
+allocator_strategy_ptr mallocStrategy =
+    allocator_strategy_ptr(new details::MallocStrategy);
+
+NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t p, uint64_t root_of_unity,
+                      std::shared_ptr<allocator_base> alloc_ptr)
+    : m_degree(degree),
+      m_p(p),
+      m_w(root_of_unity),
+      alloc(alloc_ptr),
+      m_precon52_root_of_unity_powers(alloc),
+      m_precon64_root_of_unity_powers(alloc),
+      m_root_of_unity_powers(alloc),
+      m_precon52_inv_root_of_unity_powers(alloc),
+      m_precon64_inv_root_of_unity_powers(alloc),
+      m_inv_root_of_unity_powers(alloc) {
+  alloc = alloc_ptr;
+
   HEXL_CHECK(CheckNTTArguments(degree, p), "");
   HEXL_CHECK(IsPrimitiveRoot(m_w, 2 * degree, p),
              m_w << " is not a primitive 2*" << degree << "'th root of unity");
@@ -41,14 +56,15 @@ NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t p, uint64_t root_of_unity)
   ComputeRootOfUnityPowers();
 }
 
-NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t p)
-    : NTTImpl(degree, p, MinimalPrimitiveRoot(2 * degree, p)) {}
+NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t p,
+                      std::shared_ptr<allocator_base> alloc_ptr)
+    : NTTImpl(degree, p, MinimalPrimitiveRoot(2 * degree, p), alloc_ptr) {}
 
 NTT::NTTImpl::~NTTImpl() = default;
 
 void NTT::NTTImpl::ComputeRootOfUnityPowers() {
-  AlignedVector64<uint64_t> root_of_unity_powers(m_degree);
-  AlignedVector64<uint64_t> inv_root_of_unity_powers(m_degree);
+  AlignedVector64<uint64_t> root_of_unity_powers(m_degree, alloc);
+  AlignedVector64<uint64_t> inv_root_of_unity_powers(m_degree, alloc);
 
   // 64-bit  precon
   root_of_unity_powers[0] = 1;
@@ -67,7 +83,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
   }
 
   // Reordering inv_root_of_powers
-  AlignedVector64<uint64_t> temp(m_degree);
+  AlignedVector64<uint64_t> temp(m_degree, alloc);
   temp[0] = inv_root_of_unity_powers[0];
   idx = 1;
 
@@ -80,7 +96,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
   inv_root_of_unity_powers = temp;
 
   // 64-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon64_root_of_unity_powers;
+  AlignedVector64<uint64_t> precon64_root_of_unity_powers(alloc);
   precon64_root_of_unity_powers.reserve(m_degree);
   for (uint64_t root_of_unity : root_of_unity_powers) {
     MultiplyFactor mf(root_of_unity, 64, m_p);
@@ -91,7 +107,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
       std::move(precon64_root_of_unity_powers);
 
   // 52-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon52_root_of_unity_powers;
+  AlignedVector64<uint64_t> precon52_root_of_unity_powers(alloc);
   precon52_root_of_unity_powers.reserve(m_degree);
   for (uint64_t root_of_unity : root_of_unity_powers) {
     MultiplyFactor mf(root_of_unity, 52, m_p);
@@ -104,7 +120,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
   NTT::NTTImpl::GetRootOfUnityPowers() = std::move(root_of_unity_powers);
 
   // 64-bit preconditioned inverse root of unity powers
-  AlignedVector64<uint64_t> precon64_inv_root_of_unity_powers;
+  AlignedVector64<uint64_t> precon64_inv_root_of_unity_powers(alloc);
   precon64_inv_root_of_unity_powers.reserve(m_degree);
   for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
     MultiplyFactor mf(inv_root_of_unity, 64, m_p);
@@ -115,7 +131,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
       std::move(precon64_inv_root_of_unity_powers);
 
   // 52-bit preconditioned inverse root of unity powers
-  AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers;
+  AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(alloc);
   precon52_inv_root_of_unity_powers.reserve(m_degree);
   for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
     MultiplyFactor mf(inv_root_of_unity, 52, m_p);
@@ -244,11 +260,14 @@ void NTT::NTTImpl::ComputeInverse(uint64_t* result, const uint64_t* operand,
 // NTT API
 NTT::NTT() = default;
 
-NTT::NTT(uint64_t degree, uint64_t p)
-    : m_impl(std::make_shared<NTT::NTTImpl>(degree, p)) {}
+NTT::NTT(uint64_t degree, uint64_t p,
+         std::shared_ptr<allocator_base> alloc_ptr /* = {}*/)
+    : m_impl(std::make_shared<NTT::NTTImpl>(degree, p, alloc_ptr)) {}
 
-NTT::NTT(uint64_t degree, uint64_t p, uint64_t root_of_unity)
-    : m_impl(std::make_shared<NTT::NTTImpl>(degree, p, root_of_unity)) {}
+NTT::NTT(uint64_t degree, uint64_t p, uint64_t root_of_unity,
+         std::shared_ptr<allocator_base> alloc_ptr /* = {}*/)
+    : m_impl(std::make_shared<NTT::NTTImpl>(degree, p, root_of_unity,
+                                            alloc_ptr)) {}
 
 NTT::~NTT() = default;
 

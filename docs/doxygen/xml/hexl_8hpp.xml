@@ -15,23 +15,25 @@
       <node id="3">
         <label>stdint.h</label>
       </node>
-      <node id="7">
+      <node id="8">
         <label>hexl/eltwise/eltwise-fma-mod.hpp</label>
         <link refid="eltwise-fma-mod_8hpp"/>
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="11">
+      <node id="12">
         <label>hexl/ntt/ntt.hpp</label>
         <link refid="ntt_8hpp"/>
         <childnode refid="3" relation="include">
         </childnode>
-        <childnode refid="12" relation="include">
-        </childnode>
         <childnode refid="13" relation="include">
         </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
       </node>
-      <node id="6">
+      <node id="7">
         <label>hexl/eltwise/eltwise-cmp-sub-mod.hpp</label>
         <link refid="eltwise-cmp-sub-mod_8hpp"/>
         <childnode refid="3" relation="include">
@@ -54,8 +56,6 @@
         </childnode>
         <childnode refid="4" relation="include">
         </childnode>
-        <childnode refid="6" relation="include">
-        </childnode>
         <childnode refid="7" relation="include">
         </childnode>
         <childnode refid="8" relation="include">
@@ -66,12 +66,16 @@
         </childnode>
         <childnode refid="11" relation="include">
         </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
         <childnode refid="5" relation="include">
         </childnode>
       </node>
       <node id="5">
         <label>hexl/util/util.hpp</label>
         <link refid="util_8hpp"/>
+        <childnode refid="6" relation="include">
+        </childnode>
       </node>
       <node id="2">
         <label>hexl/eltwise/eltwise-add-mod.hpp</label>
@@ -79,25 +83,28 @@
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="8">
+      <node id="9">
         <label>hexl/eltwise/eltwise-mult-mod.hpp</label>
         <link refid="eltwise-mult-mod_8hpp"/>
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="13">
+      <node id="14">
         <label>vector</label>
       </node>
-      <node id="9">
+      <node id="6">
+        <label>cstddef</label>
+      </node>
+      <node id="10">
         <label>hexl/eltwise/eltwise-reduce-mod.hpp</label>
         <link refid="eltwise-reduce-mod_8hpp"/>
         <childnode refid="3" relation="include">
         </childnode>
       </node>
-      <node id="12">
+      <node id="13">
         <label>memory</label>
       </node>
-      <node id="10">
+      <node id="11">
         <label>hexl/eltwise/eltwise-sub-mod.hpp</label>
         <link refid="eltwise-sub-mod_8hpp"/>
         <childnode refid="3" relation="include">

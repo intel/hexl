@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" kind="struct" language="C++" prot="public">
+    <compoundname>intel::hexl::NTT::allocator_adapter</compoundname>
+    <basecompoundref refid="structintel_1_1hexl_1_1allocator__interface" prot="public" virt="non-virtual">intel::hexl::allocator_interface&lt; allocator_adapter&lt; Adaptee, Args... &gt; &gt;</basecompoundref>
+    <includes refid="ntt_8hpp" local="no">ntt.hpp</includes>
+    <templateparamlist>
+      <param>
+        <type>class Adaptee</type>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Args</declname>
+        <defname>Args</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1aeb018a1807aa9632cefb0df7056e0e90" prot="private" static="no" mutable="no">
+        <type>Adaptee</type>
+        <definition>Adaptee intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;::alloc</definition>
+        <argsstring></argsstring>
+        <name>alloc</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="34" column="13" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="34" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a03759f17cbc8473f3a7e1185c5332005" prot="public" static="no" const="no" explicit="yes" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;::allocator_adapter</definition>
+        <argsstring>(Adaptee &amp;&amp;_a, Args &amp;&amp;... args)</argsstring>
+        <name>allocator_adapter</name>
+        <param>
+          <type>Adaptee &amp;&amp;</type>
+          <declname>_a</declname>
+        </param>
+        <param>
+          <type>Args &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="26" column="14"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a1aa6ccd068164de1dbe8b764860082b0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;::allocator_adapter</definition>
+        <argsstring>(const Adaptee &amp;_a, Args &amp;... args)</argsstring>
+        <name>allocator_adapter</name>
+        <param>
+          <type>const Adaptee &amp;</type>
+          <declname>_a</declname>
+        </param>
+        <param>
+          <type>Args &amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="27" column="5"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a667e41aa49f383de99c6ebf7444800d7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void *</type>
+        <definition>void* intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;::allocate_impl</definition>
+        <argsstring>(std::size_t bytes_count)</argsstring>
+        <name>allocate_impl</name>
+        <param>
+          <type>std::size_t</type>
+          <declname>bytes_count</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="30" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1ab7c8f02c3d49f3f010bda942db2c1ee2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;::deallocate_impl</definition>
+        <argsstring>(void *p, std::size_t n)</argsstring>
+        <name>deallocate_impl</name>
+        <param>
+          <type>void *</type>
+          <declname>p</declname>
+        </param>
+        <param>
+          <type>std::size_t</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="31" column="10"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>intel::hexl::allocator_interface&lt; allocator_adapter&lt; Adaptee, Args... &gt; &gt;</label>
+        <link refid="structintel_1_1hexl_1_1allocator__interface"/>
+        <childnode refid="3" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>intel::hexl::allocator_base</label>
+        <link refid="structintel_1_1hexl_1_1allocator__base"/>
+      </node>
+      <node id="1">
+        <label>intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>intel::hexl::allocator_interface&lt; allocator_adapter&lt; Adaptee, Args... &gt; &gt;</label>
+        <link refid="structintel_1_1hexl_1_1allocator__interface"/>
+        <childnode refid="3" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>intel::hexl::allocator_base</label>
+        <link refid="structintel_1_1hexl_1_1allocator__base"/>
+      </node>
+      <node id="1">
+        <label>intel::hexl::NTT::allocator_adapter&lt; Adaptee, Args &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" line="25" column="31" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="24" bodyend="35"/>
+    <listofallmembers>
+      <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1aeb018a1807aa9632cefb0df7056e0e90" prot="private" virt="non-virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>alloc</name></member>
+      <member refid="structintel_1_1hexl_1_1allocator__interface_1a657a1a3c11b4f3f1011f4405b381ad5e" prot="public" virt="virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>allocate</name></member>
+      <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a667e41aa49f383de99c6ebf7444800d7" prot="public" virt="non-virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>allocate_impl</name></member>
+      <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a03759f17cbc8473f3a7e1185c5332005" prot="public" virt="non-virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>allocator_adapter</name></member>
+      <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a1aa6ccd068164de1dbe8b764860082b0" prot="public" virt="non-virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>allocator_adapter</name></member>
+      <member refid="structintel_1_1hexl_1_1allocator__interface_1ad9c0c9e822693d68551078ac3629babb" prot="public" virt="virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>deallocate</name></member>
+      <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1ab7c8f02c3d49f3f010bda942db2c1ee2" prot="public" virt="non-virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>deallocate_impl</name></member>
+      <member refid="structintel_1_1hexl_1_1allocator__base_1a758d2c1031ee962e03604bbec914f0b8" prot="public" virt="virtual"><scope>intel::hexl::NTT::allocator_adapter</scope><name>~allocator_base</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

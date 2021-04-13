@@ -1,11 +1,32 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter" kind="struct"><name>intel::hexl::NTT::allocator_adapter</name>
+    <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1aeb018a1807aa9632cefb0df7056e0e90" kind="variable"><name>alloc</name></member>
+    <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a03759f17cbc8473f3a7e1185c5332005" kind="function"><name>allocator_adapter</name></member>
+    <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a1aa6ccd068164de1dbe8b764860082b0" kind="function"><name>allocator_adapter</name></member>
+    <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1a667e41aa49f383de99c6ebf7444800d7" kind="function"><name>allocate_impl</name></member>
+    <member refid="structintel_1_1hexl_1_1_n_t_t_1_1allocator__adapter_1ab7c8f02c3d49f3f010bda942db2c1ee2" kind="function"><name>deallocate_impl</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1allocator__base" kind="struct"><name>intel::hexl::allocator_base</name>
+    <member refid="structintel_1_1hexl_1_1allocator__base_1a758d2c1031ee962e03604bbec914f0b8" kind="function"><name>~allocator_base</name></member>
+    <member refid="structintel_1_1hexl_1_1allocator__base_1aa5eee8cc5a6333613aa57bf5469f7f5b" kind="function"><name>allocate</name></member>
+    <member refid="structintel_1_1hexl_1_1allocator__base_1aaa72658a072f3c0867c3dff2207eae04" kind="function"><name>deallocate</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1allocator__interface" kind="struct"><name>intel::hexl::allocator_interface</name>
+    <member refid="structintel_1_1hexl_1_1allocator__interface_1a657a1a3c11b4f3f1011f4405b381ad5e" kind="function"><name>allocate</name></member>
+    <member refid="structintel_1_1hexl_1_1allocator__interface_1ad9c0c9e822693d68551078ac3629babb" kind="function"><name>deallocate</name></member>
+    <member refid="structintel_1_1hexl_1_1allocator__interface_1ad32531d987e88bfe3e9789033ebbb20e" kind="function"><name>allocate_impl</name></member>
+    <member refid="structintel_1_1hexl_1_1allocator__interface_1ab81d352852737e745b6a4fdb3cde6eac" kind="function"><name>deallocate_impl</name></member>
+    <member refid="structintel_1_1hexl_1_1allocator__interface_1a77b4f5864aae92b5f81a205f6d6c84bc" kind="function"><name>fail_message</name></member>
+  </compound>
   <compound refid="classintel_1_1hexl_1_1_n_t_t" kind="class"><name>intel::hexl::NTT</name>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1a2ddf6cf8973978de8d8a90998e5735c2" kind="variable"><name>m_impl</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kind="function"><name>NTT</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" kind="function"><name>~NTT</name></member>
-    <member refid="classintel_1_1hexl_1_1_n_t_t_1a3f44d9ead9be66540b9732d5c98bb000" kind="function"><name>NTT</name></member>
-    <member refid="classintel_1_1hexl_1_1_n_t_t_1a63eea17916855a9ec73a2cc8c57b2a63" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a6989d7d77ade294c556525e80d0909de" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1aba658b9cbb91754a6a1a111fa39b3b56" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a8577aba58e23fdd6b6865d019a9df3ee" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a4c529039fcafa8949a218e0e14bdede6" kind="function"><name>NTT</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" kind="function"><name>ComputeForward</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" kind="function"><name>ComputeInverse</name></member>
   </compound>

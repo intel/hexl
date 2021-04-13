@@ -19,8 +19,10 @@ namespace hexl {
 
 class NTT::NTTImpl {
  public:
-  NTTImpl(uint64_t degree, uint64_t p, uint64_t root_of_unity);
-  NTTImpl(uint64_t degree, uint64_t p);
+  NTTImpl(uint64_t degree, uint64_t p, uint64_t root_of_unity,
+          std::shared_ptr<allocator_base> alloc_ptr = {});
+  NTTImpl(uint64_t degree, uint64_t p,
+          std::shared_ptr<allocator_base> alloc_ptr = {});
 
   ~NTTImpl();
 
@@ -127,6 +129,8 @@ class NTT::NTTImpl {
 
   uint64_t m_winv;  // Inverse of minimal root of unity
   uint64_t m_w;     // A 2N'th root of unity
+
+  std::shared_ptr<allocator_base> alloc;
 
   // vector of floor(W * 2**52 / m_p), with W the root of unity powers
   AlignedVector64<uint64_t> m_precon52_root_of_unity_powers;
