@@ -35,8 +35,8 @@ static void BM_EltwiseCmpSubModNative(benchmark::State& state) {  //  NOLINT
   }
 
   for (auto _ : state) {
-    EltwiseCmpSubModNative(input1.data(), input1.data(), CMPINT::NLT, bound,
-                           diff, modulus, input_size);
+    EltwiseCmpSubModNative(input1.data(), input1.data(), input_size, modulus,
+                           CMPINT::NLT, bound, diff);
   }
 }
 
@@ -68,8 +68,8 @@ static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
   }
 
   for (auto _ : state) {
-    EltwiseCmpSubModAVX512(input1.data(), input1.data(), CMPINT::NLT, bound,
-                           diff, modulus, input_size);
+    EltwiseCmpSubModAVX512(input1.data(), input1.data(), input_size, modulus,
+                           CMPINT::NLT, bound, diff);
   }
 }
 

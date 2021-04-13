@@ -15,33 +15,34 @@
 namespace intel {
 namespace hexl {
 
-void EltwiseCmpSubMod(uint64_t* result, const uint64_t* operand1, CMPINT cmp,
-                      uint64_t bound, uint64_t diff, uint64_t modulus,
-                      uint64_t n) {
+void EltwiseCmpSubMod(uint64_t* result, const uint64_t* operand1, uint64_t n,
+                      uint64_t modulus, CMPINT cmp, uint64_t bound,
+                      uint64_t diff) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
-  HEXL_CHECK(diff != 0, "Require diff != 0");
-  HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(modulus > 1, "Require modulus > 1");
+  HEXL_CHECK(diff != 0, "Require diff != 0");
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
-    EltwiseCmpSubModAVX512(result, operand1, cmp, bound, diff, modulus, n);
+    EltwiseCmpSubModAVX512(result, operand1, n, modulus, cmp, bound, diff);
     return;
   }
 #endif
-  EltwiseCmpSubModNative(result, operand1, cmp, bound, diff, modulus, n);
+  EltwiseCmpSubModNative(result, operand1, n, modulus, cmp, bound, diff);
 }
 
 void EltwiseCmpSubModNative(uint64_t* result, const uint64_t* operand1,
-                            CMPINT cmp, uint64_t bound, uint64_t diff,
-                            uint64_t modulus, uint64_t n) {
+                            uint64_t n, uint64_t modulus, CMPINT cmp,
+                            uint64_t bound, uint64_t diff) {
+  HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
-  HEXL_CHECK(diff != 0, "Require diff != 0");
-  HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(n != 0, "Require n != 0")
-
+  HEXL_CHECK(modulus > 1, "Require modulus > 1");
+  HEXL_CHECK(diff != 0, "Require diff != 0");
   HEXL_CHECK(diff < modulus, "Diff " << diff << " >= modulus " << modulus);
+
   for (size_t i = 0; i < n; ++i) {
     uint64_t op = operand1[i];
 
@@ -57,18 +58,19 @@ void EltwiseCmpSubModNative(uint64_t* result, const uint64_t* operand1,
 
 #ifdef HEXL_HAS_AVX512DQ
 void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
-                            CMPINT cmp, uint64_t bound, uint64_t diff,
-                            uint64_t modulus, uint64_t n) {
+                            uint64_t n, uint64_t modulus, CMPINT cmp,
+                            uint64_t bound, uint64_t diff) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
-  HEXL_CHECK(diff != 0, "Require diff != 0");
-  HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(n != 0, "Require n != 0")
+  HEXL_CHECK(modulus > 1, "Require modulus > 1");
+  HEXL_CHECK(diff != 0, "Require diff != 0");
+  HEXL_CHECK(diff < modulus, "Diff " << diff << " >= modulus " << modulus);
 
   uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
-    EltwiseCmpSubModNative(result, operand1, cmp, bound, diff, modulus,
-                           n_mod_8);
+    EltwiseCmpSubModNative(result, operand1, n_mod_8, modulus, cmp, bound,
+                           diff);
     operand1 += n_mod_8;
     result += n_mod_8;
     n -= n_mod_8;

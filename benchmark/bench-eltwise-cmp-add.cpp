@@ -34,8 +34,8 @@ static void BM_EltwiseCmpAddNative(benchmark::State& state) {  //  NOLINT
   }
 
   for (auto _ : state) {
-    EltwiseCmpAddNative(input1.data(), input1.data(), CMPINT::NLT, bound, diff,
-                        input_size);
+    EltwiseCmpAddNative(input1.data(), input1.data(), input_size, CMPINT::NLT,
+                        bound, diff);
   }
 }
 
@@ -66,8 +66,8 @@ static void BM_EltwiseCmpAddAVX512(benchmark::State& state) {  //  NOLINT
   }
 
   for (auto _ : state) {
-    EltwiseCmpAddAVX512(input1.data(), input1.data(), CMPINT::NLT, bound, diff,
-                        input_size);
+    EltwiseCmpAddAVX512(input1.data(), input1.data(), input_size, CMPINT::NLT,
+                        bound, diff);
   }
 }
 

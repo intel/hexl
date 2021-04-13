@@ -22,12 +22,12 @@ TEST(EltwiseCmpAdd, null) {
   std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
 
   EXPECT_ANY_THROW(
-      EltwiseCmpAdd(nullptr, op1.data(), CMPINT::EQ, 1, 1, op1.size()));
+      EltwiseCmpAdd(nullptr, op1.data(), op1.size(), CMPINT::EQ, 1, 1));
   EXPECT_ANY_THROW(
-      EltwiseCmpAdd(op1.data(), nullptr, CMPINT::EQ, 1, 1, op1.size()));
+      EltwiseCmpAdd(op1.data(), nullptr, op1.size(), CMPINT::EQ, 1, 1));
+  EXPECT_ANY_THROW(EltwiseCmpAdd(op1.data(), op1.data(), 0, CMPINT::EQ, 1, 1));
   EXPECT_ANY_THROW(
-      EltwiseCmpAdd(op1.data(), op1.data(), CMPINT::EQ, 1, 0, op1.size()));
-  EXPECT_ANY_THROW(EltwiseCmpAdd(op1.data(), op1.data(), CMPINT::EQ, 1, 1, 0));
+      EltwiseCmpAdd(op1.data(), op1.data(), op1.size(), CMPINT::EQ, 1, 0));
 }
 #endif
 
@@ -52,8 +52,8 @@ TEST_P(EltwiseCmpAddTest, Native) {
   uint64_t diff = std::get<3>(GetParam());
   std::vector<uint64_t> exp_output = std::get<4>(GetParam());
 
-  EltwiseCmpAddNative(input.data(), input.data(), cmp, bound, diff,
-                      input.size());
+  EltwiseCmpAddNative(input.data(), input.data(), input.size(), cmp, bound,
+                      diff);
 
   CheckEqual(input, exp_output);
 }
@@ -103,12 +103,12 @@ TEST(EltwiseCmpAdd, AVX512) {
       std::vector<uint64_t> op1a_out(op1.size(), 0);
       std::vector<uint64_t> op1b_out(op1.size(), 0);
 
-      EltwiseCmpAdd(op1_out.data(), op1.data(), static_cast<CMPINT>(cmp), bound,
-                    diff, op1.size());
-      EltwiseCmpAddNative(op1a_out.data(), op1a.data(),
-                          static_cast<CMPINT>(cmp), bound, diff, op1a.size());
-      EltwiseCmpAddAVX512(op1b_out.data(), op1b.data(),
-                          static_cast<CMPINT>(cmp), bound, diff, op1b.size());
+      EltwiseCmpAdd(op1_out.data(), op1.data(), op1.size(),
+                    static_cast<CMPINT>(cmp), bound, diff);
+      EltwiseCmpAddNative(op1a_out.data(), op1a.data(), op1a.size(),
+                          static_cast<CMPINT>(cmp), bound, diff);
+      EltwiseCmpAddAVX512(op1b_out.data(), op1b.data(), op1b.size(),
+                          static_cast<CMPINT>(cmp), bound, diff);
 
       ASSERT_EQ(op1_out, op1a_out);
       ASSERT_EQ(op1_out, op1b_out);

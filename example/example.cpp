@@ -61,8 +61,8 @@ void ExampleEltwiseCmpAdd() {
   uint64_t diff = 5;
   std::vector<uint64_t> exp_out{1, 2, 3, 9, 10, 11, 12, 13};
 
-  intel::hexl::EltwiseCmpAdd(op1.data(), op1.data(), intel::hexl::CMPINT::NLE,
-                             cmp, diff, op1.size());
+  intel::hexl::EltwiseCmpAdd(op1.data(), op1.data(), op1.size(),
+                             intel::hexl::CMPINT::NLE, cmp, diff);
 
   CheckEqual(op1, exp_out);
   std::cout << "Done running ExampleEltwiseCmpAdd\n";
@@ -78,9 +78,8 @@ void ExampleEltwiseCmpSubMod() {
 
   uint64_t modulus = 10;
 
-  intel::hexl::EltwiseCmpSubMod(op1.data(), op1.data(),
-                                intel::hexl::CMPINT::NLE, bound, diff, modulus,
-                                op1.size());
+  intel::hexl::EltwiseCmpSubMod(op1.data(), op1.data(), op1.size(), modulus,
+                                intel::hexl::CMPINT::NLE, bound, diff);
   CheckEqual(op1, exp_out);
   std::cout << "Done running ExampleEltwiseCmpSubMod\n";
 }

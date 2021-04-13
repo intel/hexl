@@ -14,28 +14,28 @@
 namespace intel {
 namespace hexl {
 
-void EltwiseCmpAdd(uint64_t* result, const uint64_t* operand1, CMPINT cmp,
-                   uint64_t bound, uint64_t diff, uint64_t n) {
+void EltwiseCmpAdd(uint64_t* result, const uint64_t* operand1, uint64_t n,
+                   CMPINT cmp, uint64_t bound, uint64_t diff) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
-  HEXL_CHECK(diff != 0, "Require diff != 0");
   HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(diff != 0, "Require diff != 0");
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
-    EltwiseCmpAddAVX512(result, operand1, cmp, bound, diff, n);
+    EltwiseCmpAddAVX512(result, operand1, n, cmp, bound, diff);
     return;
   }
 #endif
-  EltwiseCmpAddNative(result, operand1, cmp, bound, diff, n);
+  EltwiseCmpAddNative(result, operand1, n, cmp, bound, diff);
 }
 
-void EltwiseCmpAddNative(uint64_t* result, const uint64_t* operand1, CMPINT cmp,
-                         uint64_t bound, uint64_t diff, uint64_t n) {
+void EltwiseCmpAddNative(uint64_t* result, const uint64_t* operand1, uint64_t n,
+                         CMPINT cmp, uint64_t bound, uint64_t diff) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
-  HEXL_CHECK(diff != 0, "Require diff != 0");
   HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(diff != 0, "Require diff != 0");
 
   switch (cmp) {
     case CMPINT::EQ: {
@@ -107,16 +107,16 @@ void EltwiseCmpAddNative(uint64_t* result, const uint64_t* operand1, CMPINT cmp,
 }
 
 #ifdef HEXL_HAS_AVX512DQ
-void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, CMPINT cmp,
-                         uint64_t bound, uint64_t diff, uint64_t n) {
+void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, uint64_t n,
+                         CMPINT cmp, uint64_t bound, uint64_t diff) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
-  HEXL_CHECK(diff != 0, "Require diff != 0");
   HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(diff != 0, "Require diff != 0");
 
   uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
-    EltwiseCmpAddNative(result, operand1, cmp, bound, diff, n_mod_8);
+    EltwiseCmpAddNative(result, operand1, n_mod_8, cmp, bound, diff);
     operand1 += n_mod_8;
     result += n_mod_8;
     n -= n_mod_8;

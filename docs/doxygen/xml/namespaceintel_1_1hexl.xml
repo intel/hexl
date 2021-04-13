@@ -244,10 +244,10 @@ Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $
         </inbodydescription>
         <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" line="36" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" declline="36" declcolumn="6"/>
       </memberdef>
-      <memberdef kind="function" id="namespaceintel_1_1hexl_1ad09f0d71efdfbde79c2a8ed92d7da811" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a5c4fd2ceb53b94efa5f5a959d7ee9819" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>
         <definition>void intel::hexl::EltwiseCmpAdd</definition>
-        <argsstring>(uint64_t *result, const uint64_t *operand1, CMPINT cmp, uint64_t bound, uint64_t diff, uint64_t n)</argsstring>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t n, CMPINT cmp, uint64_t bound, uint64_t diff)</argsstring>
         <name>EltwiseCmpAdd</name>
         <param>
           <type>uint64_t *</type>
@@ -256,6 +256,10 @@ Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $
         <param>
           <type>const uint64_t *</type>
           <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
         </param>
         <param>
           <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>
@@ -268,10 +272,6 @@ Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $
         <param>
           <type>uint64_t</type>
           <declname>diff</declname>
-        </param>
-        <param>
-          <type>uint64_t</type>
-          <declname>n</declname>
         </param>
         <briefdescription>
 <para>Computes element-wise conditional addition. </para>
@@ -295,6 +295,14 @@ Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $
 </parameteritem>
 <parameteritem>
 <parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in <computeroutput>operand1</computeroutput> </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
 <parametername direction="in">cmp</parametername>
 </parameternamelist>
 <parameterdescription>
@@ -314,15 +322,7 @@ Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $
 <parametername direction="in">diff</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>Scalar to conditionally add </para>
-</parameterdescription>
-</parameteritem>
-<parameteritem>
-<parameternamelist>
-<parametername direction="in">n</parametername>
-</parameternamelist>
-<parameterdescription>
-<para>Number of elements in <computeroutput>operand1</computeroutput> </para>
+<para>Scalar to conditionally add</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -332,10 +332,10 @@ Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] 
         </inbodydescription>
         <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-cmp-add.hpp" line="22" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-cmp-add.hpp" declline="22" declcolumn="6"/>
       </memberdef>
-      <memberdef kind="function" id="namespaceintel_1_1hexl_1aa06f039b71cf61990911e753595f1f78" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a78bf86d32140e39d8f99d474ccd0e226" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>
         <definition>void intel::hexl::EltwiseCmpSubMod</definition>
-        <argsstring>(uint64_t *result, const uint64_t *operand1, CMPINT cmp, uint64_t bound, uint64_t diff, uint64_t modulus, uint64_t n)</argsstring>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t n, uint64_t modulus, CMPINT cmp, uint64_t bound, uint64_t diff)</argsstring>
         <name>EltwiseCmpSubMod</name>
         <param>
           <type>uint64_t *</type>
@@ -344,6 +344,14 @@ Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] 
         <param>
           <type>const uint64_t *</type>
           <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
         </param>
         <param>
           <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>
@@ -356,14 +364,6 @@ Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] 
         <param>
           <type>uint64_t</type>
           <declname>diff</declname>
-        </param>
-        <param>
-          <type>uint64_t</type>
-          <declname>modulus</declname>
-        </param>
-        <param>
-          <type>uint64_t</type>
-          <declname>n</declname>
         </param>
         <briefdescription>
 <para>Computes element-wise conditional modular subtraction. </para>
@@ -387,6 +387,22 @@ Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] 
 </parameteritem>
 <parameteritem>
 <parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in <computeroutput>operand1</computeroutput> </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus to reduce by </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
 <parametername direction="in">cmp</parametername>
 </parameternamelist>
 <parameterdescription>
@@ -406,23 +422,7 @@ Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] 
 <parametername direction="in">diff</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>Scalar to subtract by </para>
-</parameterdescription>
-</parameteritem>
-<parameteritem>
-<parameternamelist>
-<parametername direction="in">modulus</parametername>
-</parameternamelist>
-<parameterdescription>
-<para>Modulus to reduce by </para>
-</parameterdescription>
-</parameteritem>
-<parameteritem>
-<parameternamelist>
-<parametername direction="in">n</parametername>
-</parameternamelist>
-<parameterdescription>
-<para>Number of elements in <computeroutput>operand1</computeroutput> </para>
+<para>Scalar to subtract by</para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -620,10 +620,10 @@ Computes <computeroutput>result</computeroutput>[i] = (<computeroutput>operand1<
         </inbodydescription>
         <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-mult-mod.hpp" line="23" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-mult-mod.hpp" declline="23" declcolumn="6"/>
       </memberdef>
-      <memberdef kind="function" id="namespaceintel_1_1hexl_1af7e59b130824f9cd4ad0aa54c52ad50c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1af3ddae165283841d495a322275baf5ee" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>
         <definition>void intel::hexl::EltwiseReduceMod</definition>
-        <argsstring>(uint64_t *result, const uint64_t *operand, uint64_t modulus, uint64_t n, uint64_t input_mod_factor, uint64_t output_mod_factor)</argsstring>
+        <argsstring>(uint64_t *result, const uint64_t *operand, uint64_t n, uint64_t modulus, uint64_t input_mod_factor, uint64_t output_mod_factor)</argsstring>
         <name>EltwiseReduceMod</name>
         <param>
           <type>uint64_t *</type>
@@ -635,11 +635,11 @@ Computes <computeroutput>result</computeroutput>[i] = (<computeroutput>operand1<
         </param>
         <param>
           <type>uint64_t</type>
-          <declname>modulus</declname>
+          <declname>n</declname>
         </param>
         <param>
           <type>uint64_t</type>
-          <declname>n</declname>
+          <declname>modulus</declname>
         </param>
         <param>
           <type>uint64_t</type>
