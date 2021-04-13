@@ -96,6 +96,8 @@ else()
     message(WARNING "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
+check_compiler_version()
+
 if (HEXL_COVERAGE)
   if (NOT HEXL_TESTING)
     message(FATAL_ERROR "HEXL_COVERAGE enabled, but HEXL_TESTING not enabled. Enable HEXL_TESTING for best coverage.")
