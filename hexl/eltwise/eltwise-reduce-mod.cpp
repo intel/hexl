@@ -31,7 +31,7 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
 
   uint64_t barrett_factor = MultiplyFactor(1, 64, modulus).BarrettFactor();
 
-  uint64_t twice_mod = modulus << 1;
+  uint64_t twice_modulus = modulus << 1;
   switch (input_mod_factor) {
     case 0:
       for (size_t i = 0; i < n; ++i) {
@@ -46,11 +46,7 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
 
     case 2:
       for (size_t i = 0; i < n; ++i) {
-        if (operand[i] >= modulus) {
-          result[i] = operand[i] - modulus;
-        } else {
-          result[i] = operand[i];
-        }
+        result[i] = ReduceMod<2>(operand[i], modulus);
       }
       HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
       break;
@@ -58,28 +54,17 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
     case 4:
       if (output_mod_factor == 1) {
         for (size_t i = 0; i < n; ++i) {
-          if (operand[i] >= twice_mod) {
-            result[i] = operand[i] - twice_mod;
-          } else {
-            result[i] = operand[i];
-          }
-          if (result[i] >= modulus) {
-            result[i] -= modulus;
-          }
+          result[i] = ReduceMod<4>(operand[i], modulus, &twice_modulus);
         }
         HEXL_CHECK_BOUNDS(result, n, modulus,
                           "result exceeds bound " << modulus);
       }
       if (output_mod_factor == 2) {
         for (size_t i = 0; i < n; ++i) {
-          if (operand[i] >= twice_mod) {
-            result[i] = operand[i] - twice_mod;
-          } else {
-            result[i] = operand[i];
-          }
+          result[i] = ReduceMod<2>(operand[i], twice_modulus);
         }
-        HEXL_CHECK_BOUNDS(result, n, twice_mod,
-                          "result exceeds bound " << twice_mod);
+        HEXL_CHECK_BOUNDS(result, n, twice_modulus,
+                          "result exceeds bound " << twice_modulus);
       }
       break;
   }
