@@ -63,8 +63,8 @@ NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t q,
 NTT::NTTImpl::~NTTImpl() = default;
 
 void NTT::NTTImpl::ComputeRootOfUnityPowers() {
-  AlignedVector64<uint64_t> root_of_unity_powers(m_degree, alloc);
-  AlignedVector64<uint64_t> inv_root_of_unity_powers(m_degree, alloc);
+  AlignedVector64<uint64_t> root_of_unity_powers(m_degree, 0, alloc);
+  AlignedVector64<uint64_t> inv_root_of_unity_powers(m_degree, 0, alloc);
 
   // 64-bit  precon
   root_of_unity_powers[0] = 1;
@@ -83,7 +83,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
   }
 
   // Reordering inv_root_of_powers
-  AlignedVector64<uint64_t> temp(m_degree, alloc);
+  AlignedVector64<uint64_t> temp(m_degree, 0, alloc);
   temp[0] = inv_root_of_unity_powers[0];
   idx = 1;
 
