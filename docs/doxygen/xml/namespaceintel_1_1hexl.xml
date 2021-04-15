@@ -522,7 +522,7 @@ Computes <computeroutput>operand1</computeroutput>[i] = (<computeroutput>cmp</co
 <parametername direction="in">input_mod_factor</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>Assumes input elements are in [0, input_mod_factor * p). Must be 1, 2, 4, or 8. </para>
+<para>Assumes input elements are in [0, input_mod_factor * modulus). Must be 1, 2, 4, or 8. </para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -698,10 +698,7 @@ Computes <computeroutput>result</computeroutput>[i] = (<computeroutput>operand1<
 <parametername direction="in">output_mod_factor</parametername>
 </parameternamelist>
 <parameterdescription>
-<para>output elements will be in [0, output_mod_factor<itemizedlist>
-<listitem><para>p) Must be 1 or 2. for input_mod_factor=0, output_mod_factor will be set to 1. </para>
-</listitem></itemizedlist>
-</para>
+<para>output elements will be in [0, output_mod_factor * modulus) Must be 1 or 2. For input_mod_factor=0, output_mod_factor will be set to 1. </para>
 </parameterdescription>
 </parameteritem>
 </parameterlist>
@@ -709,7 +706,7 @@ Computes <computeroutput>result</computeroutput>[i] = (<computeroutput>operand1<
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" line="24" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" declline="24" declcolumn="6"/>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" line="23" column="6" declfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" declline="23" declcolumn="6"/>
       </memberdef>
       <memberdef kind="function" id="namespaceintel_1_1hexl_1a6a45c30bc21b9b1e1410b23fce5424c8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>void</type>

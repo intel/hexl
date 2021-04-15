@@ -144,8 +144,8 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t prime = GeneratePrimes(1, bits, length)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, prime - 1);
+    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -161,9 +161,9 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 0,
+      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 0,
                              1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 0,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 0,
                              1);
 
       ASSERT_EQ(result1, result2);
@@ -179,8 +179,8 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t prime = GeneratePrimes(1, bits, length)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, (4 * prime) - 1);
+    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, (4 * modulus) - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -196,9 +196,9 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 4,
                              1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 4,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 4,
                              1);
 
       ASSERT_EQ(result1, result2);
@@ -214,8 +214,8 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t prime = GeneratePrimes(1, bits, length)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, (4 * prime) - 1);
+    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, (4 * modulus) - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -231,9 +231,9 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 4,
                              2);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 4,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 4,
                              2);
 
       ASSERT_EQ(result1, result2);
@@ -249,8 +249,8 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t prime = GeneratePrimes(1, bits, length)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, (2 * prime) - 1);
+    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, (2 * modulus) - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -266,9 +266,9 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), prime, op1.size(), 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 4,
                              1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), prime, op1.size(), 4,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 4,
                              1);
 
       ASSERT_EQ(result1, result2);

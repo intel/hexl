@@ -134,27 +134,29 @@ TEST(EltwiseMultMod, 8big) {
 }
 
 TEST(EltwiseMultMod, 8big2) {
-  uint64_t p = 281474976749569;
+  uint64_t modulus = 281474976749569;
 
-  std::vector<uint64_t> op1{(p - 1) / 2, 1, 1, 1, 1, 1, 1, 1};
-  std::vector<uint64_t> op2{(p + 1) / 2, 1, 1, 1, 1, 1, 1, 1};
+  std::vector<uint64_t> op1{(modulus - 1) / 2, 1, 1, 1, 1, 1, 1, 1};
+  std::vector<uint64_t> op2{(modulus + 1) / 2, 1, 1, 1, 1, 1, 1, 1};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<uint64_t> exp_out{70368744187392, 1, 1, 1, 1, 1, 1, 1};
 
-  EltwiseMultModNative<1>(result.data(), op1.data(), op2.data(), op1.size(), p);
+  EltwiseMultModNative<1>(result.data(), op1.data(), op2.data(), op1.size(),
+                          modulus);
 
   CheckEqual(result, exp_out);
 }
 
 TEST(EltwiseMultMod, 8big3) {
-  uint64_t p = 1125891450734593;
+  uint64_t modulus = 1125891450734593;
 
   std::vector<uint64_t> op1{1078888294739028, 1, 1, 1, 1, 1, 1, 1};
   std::vector<uint64_t> op2{1114802337613200, 1, 1, 1, 1, 1, 1, 1};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<uint64_t> exp_out{13344071208410, 1, 1, 1, 1, 1, 1, 1};
 
-  EltwiseMultModNative<1>(result.data(), op1.data(), op2.data(), op1.size(), p);
+  EltwiseMultModNative<1>(result.data(), op1.data(), op2.data(), op1.size(),
+                          modulus);
 
   CheckEqual(result, exp_out);
 }

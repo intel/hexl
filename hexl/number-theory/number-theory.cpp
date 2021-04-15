@@ -42,9 +42,9 @@ uint64_t InverseUIntMod(uint64_t input, uint64_t modulus) {
   return uint64_t(x);
 }
 
-uint64_t BarrettReduce64(uint64_t input, uint64_t modulus, uint64_t p_barr) {
+uint64_t BarrettReduce64(uint64_t input, uint64_t modulus, uint64_t q_barr) {
   HEXL_CHECK(modulus != 0, "modulus == 0");
-  uint64_t q = MultiplyUInt64Hi<64>(input, p_barr);
+  uint64_t q = MultiplyUInt64Hi<64>(input, q_barr);
   uint64_t q_times_input = input - q * modulus;
   return q_times_input >= modulus ? q_times_input - modulus : q_times_input;
 }

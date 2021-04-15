@@ -20,32 +20,32 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-/// @brief The Harvey butterfly: assume X, Y in [0, 2p), and return X', Y' in
-/// [0, 2p). such that X', Y' = X + Y (mod p), W(X - Y) (mod p).
+/// @brief The Harvey butterfly: assume X, Y in [0, 2q), and return X', Y' in
+/// [0, 2q). such that X', Y' = X + Y (mod q), W(X - Y) (mod q).
 /// @param[in,out] X Input representing 8 64-bit signed integers in SIMD form
 /// @param[in,out] Y Input representing 8 64-bit signed integers in SIMD form
 /// @param[in] W_op Root of unity representing 8 64-bit signed integers in SIMD
 /// form
 /// @param[in] W_precon Preconditioned \p W_op for BitShift-bit Barrett
 /// reduction
-/// @param[in] neg_modulus Negative modulus, i.e. (-p) represented as 8 64-bit
+/// @param[in] neg_modulus Negative modulus, i.e. (-q) represented as 8 64-bit
 /// signed integers in SIMD form
-/// @param[in] twice_modulus Twice the modulus, i.e. 2*p represented as 8 64-bit
+/// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
-/// @param InputLessThanMod If true, assumes \p X, \p Y < \p p. Otherwise,
-/// assumes \p X, \p Y < 2*\p p
+/// @param InputLessThanMod If true, assumes \p X, \p Y < \p q. Otherwise,
+/// assumes \p X, \p Y < 2*\p q
 /// @details See Algorithm 3 of https://arxiv.org/pdf/1205.2926.pdf
 template <int BitShift, bool InputLessThanMod>
 inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
                          __m512i neg_modulus, __m512i twice_modulus) {
-  __m512i Y_minus_2p = _mm512_sub_epi64(*Y, twice_modulus);
-  __m512i T = _mm512_sub_epi64(*X, Y_minus_2p);
+  __m512i Y_minus_2q = _mm512_sub_epi64(*Y, twice_modulus);
+  __m512i T = _mm512_sub_epi64(*X, Y_minus_2q);
 
   if (InputLessThanMod) {
-    // No need for modulus reduction, since inputs are in [0,p)
+    // No need for modulus reduction, since inputs are in [0, q)
     *X = _mm512_add_epi64(*X, *Y);
   } else {
-    *X = _mm512_add_epi64(*X, Y_minus_2p);
+    *X = _mm512_add_epi64(*X, Y_minus_2q);
     __mmask8 sign_bits = _mm512_movepi64_mask(*X);
     *X = _mm512_mask_add_epi64(*X, sign_bits, *X, twice_modulus);
   }
@@ -54,7 +54,7 @@ inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
   *Y = _mm512_hexl_mullo_add_epi<BitShift>(Q_p, W_op, T);
 
   if (BitShift == 52) {
-    // Discard high 12 bits; deals with case when W*T < Q*p in the low BitShift
+    // Discard high 12 bits; deals with case when W*T < Q*q in the low BitShift
     // bits.
     *Y = _mm512_and_epi64(*Y, _mm512_set1_epi64((1ULL << 52) - 1));
   }
@@ -179,28 +179,28 @@ void InvT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift>
 void InverseTransformFromBitReverseAVX512(
-    uint64_t* operand, uint64_t n, uint64_t mod,
+    uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor) {
-  HEXL_CHECK(CheckNTTArguments(n, mod), "");
-  HEXL_CHECK(mod < MaximumValue(BitShift) / 2,
-             "mod " << mod << " too large for BitShift " << BitShift
-                    << " => maximum value " << MaximumValue(BitShift) / 2);
+  HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(modulus < MaximumValue(BitShift) / 2,
+             "modulus " << modulus << " too large for BitShift " << BitShift
+                        << " => maximum value " << MaximumValue(BitShift) / 2);
   HEXL_CHECK_BOUNDS(precon_inv_root_of_unity_powers, n, MaximumValue(BitShift),
                     "precon_inv_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");
-  HEXL_CHECK_BOUNDS(operand, n, input_mod_factor * mod,
+  HEXL_CHECK_BOUNDS(operand, n, input_mod_factor * modulus,
                     "operand larger than input_mod_factor * modulus ("
-                        << input_mod_factor << " * " << mod << ")");
+                        << input_mod_factor << " * " << modulus << ")");
   HEXL_CHECK(input_mod_factor == 1 || input_mod_factor == 2,
              "input_mod_factor must be 1 or 2; got " << input_mod_factor);
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
 
-  uint64_t twice_mod = mod << 1;
-  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(mod));
-  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(mod));
+  uint64_t twice_mod = modulus << 1;
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   size_t t = 1;
@@ -254,11 +254,12 @@ void InverseTransformFromBitReverseAVX512(
                    << std::vector<uint64_t>(operand, operand + n));
 
   const uint64_t W_op = inv_root_of_unity_powers[root_index];
-  MultiplyFactor mf_inv_n(InverseUIntMod(n, mod), BitShift, mod);
+  MultiplyFactor mf_inv_n(InverseUIntMod(n, modulus), BitShift, modulus);
   const uint64_t inv_n = mf_inv_n.Operand();
   const uint64_t inv_n_prime = mf_inv_n.BarrettFactor();
 
-  MultiplyFactor mf_inv_n_w(MultiplyUIntMod(inv_n, W_op, mod), BitShift, mod);
+  MultiplyFactor mf_inv_n_w(MultiplyUIntMod(inv_n, W_op, modulus), BitShift,
+                            modulus);
   const uint64_t inv_n_w = mf_inv_n_w.Operand();
   const uint64_t inv_n_w_prime = mf_inv_n_w.BarrettFactor();
 
@@ -287,15 +288,15 @@ void InverseTransformFromBitReverseAVX512(
     // Slightly different from regular InvButterfly because different W is used
     // for X and Y
 
-    __m512i Y_minus_2p = _mm512_sub_epi64(v_Y, v_twice_mod);
-    __m512i X_plus_Y_mod2p =
+    __m512i Y_minus_2q = _mm512_sub_epi64(v_Y, v_twice_mod);
+    __m512i X_plus_Y_mod2q =
         _mm512_hexl_small_add_mod_epi64(v_X, v_Y, v_twice_mod);
     // T = *X + twice_mod - *Y
-    __m512i T = _mm512_sub_epi64(v_X, Y_minus_2p);
+    __m512i T = _mm512_sub_epi64(v_X, Y_minus_2q);
 
-    __m512i Q1 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2p);
-    // X = inv_N * X_plus_Y_mod2p - Q1 * modulus;
-    __m512i inv_N_tx = _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2p);
+    __m512i Q1 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
+    // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
+    __m512i inv_N_tx = _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
     v_X = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_tx, Q1, v_neg_modulus);
     if (BitShift == 52) {
       // Discard high 12 bits; deals with case when W*T < Q1*p in the low
@@ -314,7 +315,7 @@ void InverseTransformFromBitReverseAVX512(
     }
 
     if (output_mod_factor == 1) {
-      // Modulus reduction from [0,2p), to [0,p)
+      // Modulus reduction from [0, 2q), to [0, q)
       v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
       v_Y = _mm512_hexl_small_mod_epu64(v_Y, v_modulus);
     }

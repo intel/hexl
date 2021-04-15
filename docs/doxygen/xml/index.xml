@@ -23,10 +23,10 @@
     <member refid="classintel_1_1hexl_1_1_n_t_t_1a2ddf6cf8973978de8d8a90998e5735c2" kind="variable"><name>m_impl</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1ade0447617b50232d2a076f99e672d15c" kind="function"><name>NTT</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1ab6fca1753db0834c692232e8897c725f" kind="function"><name>~NTT</name></member>
-    <member refid="classintel_1_1hexl_1_1_n_t_t_1a6989d7d77ade294c556525e80d0909de" kind="function"><name>NTT</name></member>
-    <member refid="classintel_1_1hexl_1_1_n_t_t_1aba658b9cbb91754a6a1a111fa39b3b56" kind="function"><name>NTT</name></member>
-    <member refid="classintel_1_1hexl_1_1_n_t_t_1a8577aba58e23fdd6b6865d019a9df3ee" kind="function"><name>NTT</name></member>
-    <member refid="classintel_1_1hexl_1_1_n_t_t_1a4c529039fcafa8949a218e0e14bdede6" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a0caa480b571ad66230f0c00ebca02ccd" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a716fd07255e9b68fec80e2a9b98841f4" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1ada33098dd6eb5f8b088a6e873b1bf355" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1_n_t_t_1a831df901cf9ea5a83e5d628cdbd36671" kind="function"><name>NTT</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1a7f8dac5ff3fc117d3e7259762a716140" kind="function"><name>ComputeForward</name></member>
     <member refid="classintel_1_1hexl_1_1_n_t_t_1a31e78375dcafd5df85cb1259a9156a9a" kind="function"><name>ComputeInverse</name></member>
   </compound>

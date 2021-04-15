@@ -508,7 +508,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">arg3</td><td>Vector to add. Will not add if <code>arg3</code> == nullptr </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of elements in each vector </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">modulus</td><td>Modulus with which to perform modular reduction. Must be in the range \( [2, 2^{61} - 1]\) </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">input_mod_factor</td><td>Assumes input elements are in [0, input_mod_factor * p). Must be 1, 2, 4, or 8. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_mod_factor</td><td>Assumes input elements are in [0, input_mod_factor * modulus). Must be 1, 2, 4, or 8. </td></tr>
   </table>
   </dd>
 </dl>
@@ -639,10 +639,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of elements in operand </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">modulus</td><td>Modulus with which to perform modular reduction </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">input_mod_factor</td><td>Assumes input elements are in [0, input_mod_factor * p) Must be 0, 1, 2 or 4. input_mod_factor=0 means, no knowledge of input range. Barrett reduction will be used in this case. input_mod_factor &gt;= output_mod_factor unless input_mod_factor == 0 </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">output_mod_factor</td><td>output elements will be in [0, output_mod_factor<ul>
-<li>p) Must be 1 or 2. for input_mod_factor=0, output_mod_factor will be set to 1. </li>
-</ul>
-</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">output_mod_factor</td><td>output elements will be in [0, output_mod_factor * modulus) Must be 1 or 2. For input_mod_factor=0, output_mod_factor will be set to 1. </td></tr>
   </table>
   </dd>
 </dl>

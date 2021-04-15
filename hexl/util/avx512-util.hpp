@@ -134,12 +134,12 @@ inline __m512i _mm512_hexl_mullo_add_epi<64>(__m512i x, __m512i y, __m512i z) {
   return _mm512_add_epi64(x, prod);
 }
 
-// Returns x mod p across each 64-bit integer SIMD lanes
-// Assumes x < InputModFactor * p in all lanes
+// Returns x mod q across each 64-bit integer SIMD lanes
+// Assumes x < InputModFactor * q in all lanes
 template <int InputModFactor = 2>
-inline __m512i _mm512_hexl_small_mod_epu64(__m512i x, __m512i p,
-                                           __m512i* p_times_2 = nullptr,
-                                           __m512i* p_times_4 = nullptr) {
+inline __m512i _mm512_hexl_small_mod_epu64(__m512i x, __m512i q,
+                                           __m512i* q_times_2 = nullptr,
+                                           __m512i* q_times_4 = nullptr) {
   HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 ||
                  InputModFactor == 4 || InputModFactor == 8,
              "InputModFactor must be 1, 2, 4, or 8");
@@ -147,55 +147,55 @@ inline __m512i _mm512_hexl_small_mod_epu64(__m512i x, __m512i p,
     return x;
   }
   if (InputModFactor == 2) {
-    return _mm512_min_epu64(x, _mm512_sub_epi64(x, p));
+    return _mm512_min_epu64(x, _mm512_sub_epi64(x, q));
   }
   if (InputModFactor == 4) {
-    HEXL_CHECK(p_times_2 != nullptr, "p_times_2 must not be nullptr");
-    x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *p_times_2));
-    return _mm512_min_epu64(x, _mm512_sub_epi64(x, p));
+    HEXL_CHECK(q_times_2 != nullptr, "q_times_2 must not be nullptr");
+    x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *q_times_2));
+    return _mm512_min_epu64(x, _mm512_sub_epi64(x, q));
   }
   if (InputModFactor == 8) {
-    HEXL_CHECK(p_times_2 != nullptr, "p_times_2 must not be nullptr");
-    HEXL_CHECK(p_times_4 != nullptr, "p_times_4 must not be nullptr");
-    x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *p_times_4));
-    x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *p_times_2));
-    return _mm512_min_epu64(x, _mm512_sub_epi64(x, p));
+    HEXL_CHECK(q_times_2 != nullptr, "q_times_2 must not be nullptr");
+    HEXL_CHECK(q_times_4 != nullptr, "q_times_4 must not be nullptr");
+    x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *q_times_4));
+    x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *q_times_2));
+    return _mm512_min_epu64(x, _mm512_sub_epi64(x, q));
   }
 }
 
-// Returns (x + y) mod p; assumes 0 < x, y < p
+// Returns (x + y) mod q; assumes 0 < x, y < q
 inline __m512i _mm512_hexl_small_add_mod_epi64(__m512i x, __m512i y,
-                                               __m512i p) {
-  HEXL_CHECK_BOUNDS(ExtractValues(x).data(), 8, ExtractValues(p)[0],
-                    "x exceeds bound " << ExtractValues(p)[0]);
-  HEXL_CHECK_BOUNDS(ExtractValues(y).data(), 8, ExtractValues(p)[0],
-                    "y exceeds bound " << ExtractValues(p)[0]);
-  return _mm512_hexl_small_mod_epu64(_mm512_add_epi64(x, y), p);
+                                               __m512i q) {
+  HEXL_CHECK_BOUNDS(ExtractValues(x).data(), 8, ExtractValues(q)[0],
+                    "x exceeds bound " << ExtractValues(q)[0]);
+  HEXL_CHECK_BOUNDS(ExtractValues(y).data(), 8, ExtractValues(q)[0],
+                    "y exceeds bound " << ExtractValues(q)[0]);
+  return _mm512_hexl_small_mod_epu64(_mm512_add_epi64(x, y), q);
 
   // Alternate implementation:
-  // x += y - p;
-  // if (x < 0) x+= p
+  // x += y - q;
+  // if (x < 0) x+= q
   // return x
-  // __m512i v_diff = _mm512_sub_epi64(y, p);
+  // __m512i v_diff = _mm512_sub_epi64(y, q);
   // x = _mm512_add_epi64(x, v_diff);
   // __mmask8 sign_bits = _mm512_movepi64_mask(x);
-  // return _mm512_mask_add_epi64(x, sign_bits, x, p);
+  // return _mm512_mask_add_epi64(x, sign_bits, x, q);
 }
 
-// Returns (x - y) mod p; assumes 0 < x, y < p
+// Returns (x - y) mod q; assumes 0 < x, y < q
 
 inline __m512i _mm512_hexl_small_sub_mod_epi64(__m512i x, __m512i y,
-                                               __m512i p) {
-  HEXL_CHECK_BOUNDS(ExtractValues(x).data(), 8, ExtractValues(p)[0],
-                    "x exceeds bound " << ExtractValues(p)[0]);
-  HEXL_CHECK_BOUNDS(ExtractValues(y).data(), 8, ExtractValues(p)[0],
-                    "y exceeds bound " << ExtractValues(p)[0]);
+                                               __m512i q) {
+  HEXL_CHECK_BOUNDS(ExtractValues(x).data(), 8, ExtractValues(q)[0],
+                    "x exceeds bound " << ExtractValues(q)[0]);
+  HEXL_CHECK_BOUNDS(ExtractValues(y).data(), 8, ExtractValues(q)[0],
+                    "y exceeds bound " << ExtractValues(q)[0]);
 
   // diff = x - y;
-  // return (diff < 0) ? (diff + p) : diff
+  // return (diff < 0) ? (diff + q) : diff
   __m512i v_diff = _mm512_sub_epi64(x, y);
   __mmask8 sign_bits = _mm512_movepi64_mask(v_diff);
-  return _mm512_mask_add_epi64(v_diff, sign_bits, v_diff, p);
+  return _mm512_mask_add_epi64(v_diff, sign_bits, v_diff, q);
 }
 
 inline __mmask8 _mm512_hexl_cmp_epu64_mask(__m512i a, __m512i b, CMPINT cmp) {
@@ -253,19 +253,19 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
   return _mm512_hexl_cmp_epi64(a, b, CMPINT::LE, match_value);
 }
 
-// returns x mod p, computed via Barrett reduction
-// @param p_barr floor(2^BitShift / p)
+// returns x mod q, computed via Barrett reduction
+// @param q_barr floor(2^BitShift / q)
 template <int BitShift = 64>
-inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i p,
-                                            __m512i p_barr) {
-  __m512i rnd1_hi = _mm512_hexl_mulhi_epi<BitShift>(x, p_barr);
+inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
+                                            __m512i q_barr) {
+  __m512i rnd1_hi = _mm512_hexl_mulhi_epi<BitShift>(x, q_barr);
 
   // Barrett subtraction
-  // tmp[0] = input - tmp[1] * modulus;
-  __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, p);
+  // tmp[0] = input - tmp[1] * q;
+  __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
   x = _mm512_sub_epi64(x, tmp1_times_mod);
   // Correction
-  x = _mm512_hexl_small_mod_epu64(x, p);
+  x = _mm512_hexl_small_mod_epu64(x, q);
   return x;
 }
 
