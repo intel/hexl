@@ -219,7 +219,7 @@ Computes fused multiply-\/add ({\ttfamily arg1} $\ast$ {\ttfamily arg2} + {\ttfa
 \hline
 \mbox{\texttt{ in}}  & {\em modulus} & Modulus with which to perform modular reduction. Must be in the range $ [2, 2^{61} - 1]$ \\
 \hline
-\mbox{\texttt{ in}}  & {\em input\+\_\+mod\+\_\+factor} & Assumes input elements are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ p). Must be 1, 2, 4, or 8. \\
+\mbox{\texttt{ in}}  & {\em input\+\_\+mod\+\_\+factor} & Assumes input elements are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ modulus). Must be 1, 2, 4, or 8. \\
 \hline
 \end{DoxyParams}
 \mbox{\Hypertarget{namespaceintel_1_1hexl_a705bc0321d937ae4d1f8d50279e3cff1}\label{namespaceintel_1_1hexl_a705bc0321d937ae4d1f8d50279e3cff1}} 
@@ -269,10 +269,7 @@ Performs elementwise modular reduction.
 \hline
 \mbox{\texttt{ in}}  & {\em input\+\_\+mod\+\_\+factor} & Assumes input elements are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ p) Must be 0, 1, 2 or 4. input\+\_\+mod\+\_\+factor=0 means, no knowledge of input range. Barrett reduction will be used in this case. input\+\_\+mod\+\_\+factor $>$= output\+\_\+mod\+\_\+factor unless input\+\_\+mod\+\_\+factor == 0 \\
 \hline
-\mbox{\texttt{ in}}  & {\em output\+\_\+mod\+\_\+factor} & output elements will be in \mbox{[}0, output\+\_\+mod\+\_\+factor
-\begin{DoxyItemize}
-\item p) Must be 1 or 2. for input\+\_\+mod\+\_\+factor=0, output\+\_\+mod\+\_\+factor will be set to 1. 
-\end{DoxyItemize}\\
+\mbox{\texttt{ in}}  & {\em output\+\_\+mod\+\_\+factor} & output elements will be in \mbox{[}0, output\+\_\+mod\+\_\+factor $\ast$ modulus) Must be 1 or 2. For input\+\_\+mod\+\_\+factor=0, output\+\_\+mod\+\_\+factor will be set to 1. \\
 \hline
 \end{DoxyParams}
 \mbox{\Hypertarget{namespaceintel_1_1hexl_a6a45c30bc21b9b1e1410b23fce5424c8}\label{namespaceintel_1_1hexl_a6a45c30bc21b9b1e1410b23fce5424c8}} 

@@ -18,7 +18,7 @@ namespace hexl {
 /// @param[in] modulus Modulus with which to perform modular reduction. Must be
 /// in the range \f$ [2, 2^{61} - 1]\f$
 /// @param[in] input_mod_factor Assumes input elements are in [0,
-/// input_mod_factor * p). Must be 1, 2, 4, or 8.
+/// input_mod_factor * modulus). Must be 1, 2, 4, or 8.
 void EltwiseFMAMod(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
                    const uint64_t* arg3, uint64_t n, uint64_t modulus,
                    uint64_t input_mod_factor);

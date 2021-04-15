@@ -21,20 +21,20 @@ namespace hexl {
 
 #ifdef HEXL_DEBUG
 TEST(NTT, bad_input) {
-  uint64_t p = 769;
   uint64_t N = 8;
+  uint64_t modulus = 769;
   std::vector<uint64_t> input;
   std::vector<uint64_t> p_input;
   std::vector<uint64_t> p_times_2_input;
   std::vector<uint64_t> p_times_4_input;
 
-  NTT ntt(N, p);
+  NTT ntt(N, modulus);
 
   auto init_inputs = [&]() {
     input = {1, 2, 3, 4, 5, 6, 7, 8};
-    p_input = std::vector<uint64_t>(N, p);
-    p_times_2_input = std::vector<uint64_t>(N, 2 * p);
-    p_times_4_input = std::vector<uint64_t>(N, 4 * p);
+    p_input = std::vector<uint64_t>(N, modulus);
+    p_times_2_input = std::vector<uint64_t>(N, 2 * modulus);
+    p_times_4_input = std::vector<uint64_t>(N, 4 * modulus);
   };
 
   // Forward transform
@@ -172,23 +172,23 @@ struct NTT::allocator_adapter<std::allocator<T>>
 };
 
 TEST(NTT, root_of_unity_with_allocator) {
-  uint64_t p = 769;
   uint64_t N = 8;
+  uint64_t modulus = 769;
   std::vector<uint64_t> input{1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint64_t> input2 = input;
   std::vector<uint64_t> input3 = input;
   std::vector<uint64_t> input4 = input;
 
-  uint64_t root_of_unity = MinimalPrimitiveRoot(2 * N, p);
+  uint64_t root_of_unity = MinimalPrimitiveRoot(2 * N, modulus);
 
   {
     allocators::custom_allocator a;
-    NTT ntt1(N, p);
-    NTT ntt2(N, p, std::move(a));
-    NTT ntt3(N, p, root_of_unity);
+    NTT ntt1(N, modulus);
+    NTT ntt2(N, modulus, std::move(a));
+    NTT ntt3(N, modulus, root_of_unity);
 
     std::allocator<int> s;
-    NTT ntt4(N, p, root_of_unity, std::move(s));
+    NTT ntt4(N, modulus, root_of_unity, std::move(s));
 
     ntt1.ComputeForward(input.data(), input.data(), 1, 1);
     ntt2.ComputeForward(input2.data(), input2.data(), 1, 1);
@@ -206,15 +206,15 @@ TEST(NTT, root_of_unity_with_allocator) {
 }
 
 TEST(NTT, root_of_unity) {
-  uint64_t p = 769;
   uint64_t N = 8;
+  uint64_t modulus = 769;
   std::vector<uint64_t> input{1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint64_t> input2 = input;
 
-  uint64_t root_of_unity = MinimalPrimitiveRoot(2 * N, p);
+  uint64_t root_of_unity = MinimalPrimitiveRoot(2 * N, modulus);
 
-  NTT ntt1(N, p);
-  NTT ntt2(N, p, root_of_unity);
+  NTT ntt1(N, modulus);
+  NTT ntt2(N, modulus, root_of_unity);
 
   ntt1.ComputeForward(input.data(), input.data(), 1, 1);
   ntt2.ComputeForward(input2.data(), input2.data(), 1, 1);
@@ -223,18 +223,19 @@ TEST(NTT, root_of_unity) {
 }
 
 TEST(NTTImpl, root_of_unity) {
-  uint64_t p = 769;
   uint64_t N = 8;
+  uint64_t modulus = 769;
 
-  NTT::NTTImpl ntt_impl(N, p);
+  NTT::NTTImpl ntt_impl(N, modulus);
 
-  EXPECT_EQ(ntt_impl.GetMinimalRootOfUnity(), MinimalPrimitiveRoot(2 * N, p));
+  EXPECT_EQ(ntt_impl.GetMinimalRootOfUnity(),
+            MinimalPrimitiveRoot(2 * N, modulus));
   EXPECT_EQ(ntt_impl.GetDegree(), N);
   EXPECT_EQ(ntt_impl.GetInvRootOfUnityPower(0),
             ntt_impl.GetInvRootOfUnityPowers()[0]);
 }
 
-// Parameters = (degree, prime, input, expected_output)
+// Parameters = (degree, modulus, input, expected_output)
 class NTTAPITest
     : public ::testing::TestWithParam<std::tuple<
           uint64_t, uint64_t, std::vector<uint64_t>, std::vector<uint64_t>>> {
@@ -249,7 +250,7 @@ class NTTAPITest
 // Test different parts of the API
 TEST_P(NTTAPITest, Fwd) {
   uint64_t N = std::get<0>(GetParam());
-  uint64_t prime = std::get<1>(GetParam());
+  uint64_t modulus = std::get<1>(GetParam());
 
   const std::vector<uint64_t> input_copy = std::get<2>(GetParam());
   std::vector<uint64_t> exp_output = std::get<3>(GetParam());
@@ -257,8 +258,8 @@ TEST_P(NTTAPITest, Fwd) {
   std::vector<uint64_t> out_buffer(input.size(), 99);
 
   // In-place Fwd NTT
-  NTT::NTTImpl ntt_impl(N, prime);
-  NTT ntt(N, prime);
+  NTT::NTTImpl ntt_impl(N, modulus);
+  NTT ntt(N, modulus);
   ntt.ComputeForward(input.data(), input.data(), 1, 1);
   AssertEqual(input, exp_output);
 
@@ -266,13 +267,13 @@ TEST_P(NTTAPITest, Fwd) {
   input = input_copy;
   ntt.ComputeForward(input.data(), input.data(), 2, 4);
   for (auto& elem : input) {
-    elem = elem % prime;
+    elem = elem % modulus;
   }
   AssertEqual(input, exp_output);
 
   // Compute reference
   input = input_copy;
-  ReferenceForwardTransformToBitReverse(input.data(), N, prime,
+  ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
                                         ntt_impl.GetRootOfUnityPowers().data());
   AssertEqual(input, exp_output);
 
@@ -298,7 +299,7 @@ TEST_P(NTTAPITest, Fwd) {
   ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
   ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2);
   for (auto& elem : input) {
-    elem = elem % prime;
+    elem = elem % modulus;
   }
   AssertEqual(input, input_copy);
 }
@@ -361,16 +362,16 @@ class FwdNTTZerosTest
  public:
 };
 
-// Parameters = (degree, prime_bits)
+// Parameters = (degree, modulus_bits)
 TEST_P(FwdNTTZerosTest, Zeros) {
   uint64_t N = std::get<0>(GetParam());
-  uint64_t prime_bits = std::get<1>(GetParam());
-  uint64_t prime = GeneratePrimes(1, prime_bits, N)[0];
+  uint64_t modulus_bits = std::get<1>(GetParam());
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
 
   std::vector<uint64_t> input(N, 0);
   std::vector<uint64_t> exp_output(N, 0);
 
-  NTT ntt(N, prime);
+  NTT ntt(N, modulus);
   ntt.ComputeForward(input.data(), input.data(), 1, 1);
 
   AssertEqual(input, exp_output);
@@ -398,16 +399,16 @@ class InvNTTZerosTest
  public:
 };
 
-// Parameters = (degree, prime_bits)
+// Parameters = (degree, modulus_bits)
 TEST_P(InvNTTZerosTest, Zeros) {
   uint64_t N = std::get<0>(GetParam());
-  uint64_t prime_bits = std::get<1>(GetParam());
-  uint64_t prime = GeneratePrimes(1, prime_bits, N)[0];
+  uint64_t modulus_bits = std::get<1>(GetParam());
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
 
   std::vector<uint64_t> input(N, 0);
   std::vector<uint64_t> exp_output(N, 0);
 
-  NTT ntt(N, prime);
+  NTT ntt(N, modulus);
   ntt.ComputeInverse(input.data(), input.data(), 1, 1);
 
   AssertEqual(input, exp_output);
@@ -427,7 +428,7 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple(1 << 17, 55)));
 
 #ifdef HEXL_HAS_AVX512IFMA
-class NTTPrimesTest
+class NTTmodulussTest
     : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t>> {
  protected:
   void SetUp() {}
@@ -437,16 +438,16 @@ class NTTPrimesTest
  public:
 };
 
-// Test primes around 50 bits to check IFMA behavior
-// Parameters = (degree, prime_bits)
-TEST_P(NTTPrimesTest, IFMAPrimes) {
+// Test modulus around 50 bits to check IFMA behavior
+// Parameters = (degree, modulus_bits)
+TEST_P(NTTmodulussTest, IFMAmoduluss) {
   uint64_t N = std::get<0>(GetParam());
-  uint64_t prime_bits = std::get<1>(GetParam());
-  uint64_t prime = GeneratePrimes(1, prime_bits, N)[0];
+  uint64_t modulus_bits = std::get<1>(GetParam());
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
 
   std::vector<uint64_t> input64(N, 0);
   for (size_t i = 0; i < N; ++i) {
-    input64[i] = i % prime;
+    input64[i] = i % modulus;
   }
   std::vector<uint64_t> input_ifma = input64;
   std::vector<uint64_t> input_ifma_lazy = input64;
@@ -454,12 +455,12 @@ TEST_P(NTTPrimesTest, IFMAPrimes) {
   std::vector<uint64_t> exp_output(N, 0);
 
   // Compute reference
-  NTT::NTTImpl ntt64(N, prime);
-  ReferenceForwardTransformToBitReverse(input64.data(), N, prime,
+  NTT::NTTImpl ntt64(N, modulus);
+  ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
                                         ntt64.GetRootOfUnityPowers().data());
 
   // Compute with 52-bit bit shift
-  NTT::NTTImpl ntt_ifma(N, prime);
+  NTT::NTTImpl ntt_ifma(N, modulus);
   ForwardTransformToBitReverseAVX512<52>(
       input_ifma.data(), N, ntt_ifma.GetModulus(),
       ntt_ifma.GetRootOfUnityPowers().data(),
@@ -471,14 +472,14 @@ TEST_P(NTTPrimesTest, IFMAPrimes) {
       ntt_ifma.GetRootOfUnityPowers().data(),
       ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 4);
   for (auto& elem : input_ifma_lazy) {
-    elem = elem % prime;
+    elem = elem % modulus;
   }
 
   AssertEqual(input64, input_ifma);
   AssertEqual(input64, input_ifma_lazy);
 }
 
-INSTANTIATE_TEST_SUITE_P(NTTPrimesTest, NTTPrimesTest,
+INSTANTIATE_TEST_SUITE_P(NTTmodulussTest, NTTmodulussTest,
                          ::testing::Values(std::make_tuple(1 << 4, 48),
                                            std::make_tuple(1 << 5, 49),
                                            std::make_tuple(1 << 6, 49),
@@ -604,11 +605,11 @@ TEST(NTT, WriteInvInterleavedT4) {
 // Checks AVX512 and native forward NTT implementations match
 TEST(NTT, FwdNTT_AVX512) {
   uint64_t N = 512;
-  uint64_t prime = GeneratePrimes(1, 55, N)[0];
+  uint64_t modulus = GeneratePrimes(1, 55, N)[0];
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(0, prime - 1);
+  std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
   for (size_t trial = 0; trial < 200; ++trial) {
     std::vector<std::uint64_t> input(N, 0);
@@ -618,9 +619,9 @@ TEST(NTT, FwdNTT_AVX512) {
     std::vector<std::uint64_t> input_avx = input;
     std::vector<std::uint64_t> input_avx_lazy = input;
 
-    NTT::NTTImpl ntt_impl(N, prime);
+    NTT::NTTImpl ntt_impl(N, modulus);
     ForwardTransformToBitReverse64(
-        input.data(), N, prime, ntt_impl.GetRootOfUnityPowers().data(),
+        input.data(), N, modulus, ntt_impl.GetRootOfUnityPowers().data(),
         ntt_impl.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
     ForwardTransformToBitReverseAVX512<64>(
@@ -634,7 +635,7 @@ TEST(NTT, FwdNTT_AVX512) {
         ntt_impl.GetRootOfUnityPowers().data(),
         ntt_impl.GetPrecon64RootOfUnityPowers().data(), 2, 4);
     for (auto& elem : input_avx_lazy) {
-      elem = elem % prime;
+      elem = elem % modulus;
     }
 
     ASSERT_EQ(input, input_avx);
@@ -645,11 +646,11 @@ TEST(NTT, FwdNTT_AVX512) {
 // Checks AVX512 and native InvNTT implementations match
 TEST(NTT, InvNTT_AVX512) {
   uint64_t N = 512;
-  uint64_t prime = GeneratePrimes(1, 55, N)[0];
+  uint64_t modulus = GeneratePrimes(1, 55, N)[0];
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(0, prime - 1);
+  std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
   for (size_t trial = 0; trial < 200; ++trial) {
     std::vector<std::uint64_t> input(N, 0);
@@ -659,9 +660,9 @@ TEST(NTT, InvNTT_AVX512) {
     std::vector<std::uint64_t> input_avx = input;
     std::vector<std::uint64_t> input_avx_lazy = input;
 
-    NTT::NTTImpl ntt_impl(N, prime);
+    NTT::NTTImpl ntt_impl(N, modulus);
     InverseTransformFromBitReverse64(
-        input.data(), N, prime, ntt_impl.GetInvRootOfUnityPowers().data(),
+        input.data(), N, modulus, ntt_impl.GetInvRootOfUnityPowers().data(),
         ntt_impl.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     InverseTransformFromBitReverseAVX512<64>(
@@ -675,7 +676,7 @@ TEST(NTT, InvNTT_AVX512) {
         ntt_impl.GetInvRootOfUnityPowers().data(),
         ntt_impl.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
     for (auto& elem : input_avx_lazy) {
-      elem = elem % prime;
+      elem = elem % modulus;
     }
 
     ASSERT_EQ(input, input_avx);

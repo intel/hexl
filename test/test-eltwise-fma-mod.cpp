@@ -276,13 +276,13 @@ TEST(EltwiseFMAMod, AVX512) {
   constexpr uint64_t input_mod_factor = 8;
 
   for (size_t bits = 48; bits <= 51; ++bits) {
-    uint64_t prime = GeneratePrimes(1, bits, length)[0];
+    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
     std::uniform_int_distribution<uint64_t> distrib(
-        0, input_mod_factor * prime - 1);
+        0, input_mod_factor * modulus - 1);
 
     for (size_t trial = 0; trial < 1000; ++trial) {
       std::vector<uint64_t> arg1(length, 0);
-      uint64_t arg2 = distrib(gen) % prime;
+      uint64_t arg2 = distrib(gen) % modulus;
       std::vector<uint64_t> arg3(length, 0);
       for (size_t i = 0; i < length; ++i) {
         arg1[i] = distrib(gen);
@@ -294,13 +294,13 @@ TEST(EltwiseFMAMod, AVX512) {
       uint64_t* arg3_data = (trial % 2 == 0) ? arg3.data() : nullptr;
 
       EltwiseFMAMod(arg1.data(), arg1.data(), arg2, arg3_data, arg1.size(),
-                    prime, input_mod_factor);
+                    modulus, input_mod_factor);
 
       EltwiseFMAModAVX512<52, input_mod_factor>(
-          arg1a.data(), arg1a.data(), arg2, arg3_data, arg1.size(), prime);
+          arg1a.data(), arg1a.data(), arg2, arg3_data, arg1.size(), modulus);
 
       EltwiseFMAModAVX512<64, input_mod_factor>(
-          arg1b.data(), arg1b.data(), arg2, arg3_data, arg1.size(), prime);
+          arg1b.data(), arg1b.data(), arg2, arg3_data, arg1.size(), modulus);
 
       ASSERT_EQ(arg1, arg1a);
       ASSERT_EQ(arg1, arg1b);

@@ -20,19 +20,19 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-/// @brief The Harvey butterfly: assume \p X, \p Y in [0, 4p), and return X', Y'
-/// in [0, 4p) such that X', Y' = X + WY, X - WY (mod p).
+/// @brief The Harvey butterfly: assume \p X, \p Y in [0, 4q), and return X', Y'
+/// in [0, 4q) such that X', Y' = X + WY, X - WY (mod q).
 /// @param[in,out] X Input representing 8 64-bit signed integers in SIMD form
 /// @param[in,out] Y Input representing 8 64-bit signed integers in SIMD form
 /// @param[in] W_op Input representing 8 64-bit signed integers in SIMD form
 /// @param[in] W_precon Preconditioned \p W_op for BitShift-bit Barrett
 /// reduction
-/// @param[in] neg_modulus Negative modulus, i.e. (-p) represented as 8 64-bit
+/// @param[in] neg_modulus Negative modulus, i.e. (-q) represented as 8 64-bit
 /// signed integers in SIMD form
-/// @param[in] twice_modulus Twice the modulus, i.e. 2*p represented as 8 64-bit
+/// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
-/// @param InputLessThanMod If true, assumes \p X, \p Y < \p p. Otherwise,
-/// assumes \p X, \p Y < 4*\p p
+/// @param InputLessThanMod If true, assumes \p X, \p Y < \p qp. Otherwise,
+/// assumes \p X, \p Y < 4*\p q
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
 template <int BitShift, bool InputLessThanMod>
 inline void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
@@ -175,20 +175,20 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512(
-    uint64_t* operand, uint64_t n, uint64_t mod,
+    uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor) {
-  HEXL_CHECK(CheckNTTArguments(n, mod), "");
-  HEXL_CHECK(mod < MaximumValue(BitShift) / 4,
-             "mod " << mod << " too large for BitShift " << BitShift
-                    << " => maximum value " << MaximumValue(BitShift) / 4);
+  HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(modulus < MaximumValue(BitShift) / 4,
+             "modulus " << modulus << " too large for BitShift " << BitShift
+                        << " => maximum value " << MaximumValue(BitShift) / 4);
   HEXL_CHECK_BOUNDS(precon_root_of_unity_powers, n, MaximumValue(BitShift),
                     "precon_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");
-  HEXL_CHECK_BOUNDS(operand, n, input_mod_factor * mod,
+  HEXL_CHECK_BOUNDS(operand, n, input_mod_factor * modulus,
                     "operand larger than input_mod_factor * modulus ("
-                        << input_mod_factor << " * " << mod << ")");
+                        << input_mod_factor << " * " << modulus << ")");
   HEXL_CHECK(n >= 16,
              "Don't support small transforms. Need n > 16, got n = " << n);
   HEXL_CHECK(
@@ -197,10 +197,10 @@ void ForwardTransformToBitReverseAVX512(
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
              "output_mod_factor must be 1 or 4; got " << output_mod_factor);
 
-  uint64_t twice_mod = mod << 1;
+  uint64_t twice_mod = modulus << 1;
 
-  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(mod));
-  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(mod));
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   HEXL_VLOG(5, "root_of_unity_powers " << std::vector<uint64_t>(
@@ -259,12 +259,12 @@ void ForwardTransformToBitReverseAVX512(
     for (size_t i = 0; i < n; i += 8) {
       __m512i v_X = _mm512_loadu_si512(v_X_pt);
 
-      // Reduce from [0, 4p) to [0, p)
+      // Reduce from [0, 4q) to [0, q)
       v_X = _mm512_hexl_small_mod_epu64(v_X, v_twice_mod);
       v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
 
-      HEXL_CHECK_BOUNDS(ExtractValues(v_X).data(), 8, mod,
-                        "v_X exceeds bound " << mod);
+      HEXL_CHECK_BOUNDS(ExtractValues(v_X).data(), 8, modulus,
+                        "v_X exceeds bound " << modulus);
 
       _mm512_storeu_si512(v_X_pt, v_X);
 

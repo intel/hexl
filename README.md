@@ -24,9 +24,9 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
     - [Version 1.0](#version-10)
 
 ## Introduction
-Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree `N` a power of two roughly in the range `N=[2^{10}, 2^{17}]`. The coefficients of these polynomials are in a finite field with a word-sized primes, `p`, up to `p`~62 bits. More precisely, the polynomials live in the ring `Z_p[X]/(X^N + 1)`. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus `p`. When multiplying two polynomials, the resulting polynomials of degree `2N` is additionally reduced by taking the remainder when dividing by `X^N+1`.
+Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree `N` a power of two roughly in the range `N=[2^{10}, 2^{17}]`. The coefficients of these polynomials are in a finite field with a word-sized prime, `q`, up to `q`~62 bits. More precisely, the polynomials live in the ring `Z_q[X]/(X^N + 1)`. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus `q`. When multiplying two polynomials, the resulting polynomials of degree `2N` is additionally reduced by taking the remainder when dividing by `X^N+1`.
 
- The primary bottleneck in many HE applications is polynomial-polynomial multiplication in `Z_p[X]/(X^N + 1)`. For efficient implementation, Intel HEXL implements the negacyclic number-theoretic transform (NTT). To multiply two polynomials, `p_1(x), p_2(x)` using the NTT, we perform the FwdNTT on the two input polynomials, then perform an element-wise modular multiplication, and perform the InvNTT on the result.
+ The primary bottleneck in many HE applications is polynomial-polynomial multiplication in `Z_q[X]/(X^N + 1)`. For efficient implementation, Intel HEXL implements the negacyclic number-theoretic transform (NTT). To multiply two polynomials, `q_1(x), q_2(x)` using the NTT, we perform the FwdNTT on the two input polynomials, then perform an element-wise modular multiplication, and perform the InvNTT on the result.
 
 Intel HEXL implements the following functions:
 - The forward and inverse negacyclic number-theoretic transform (NTT)
@@ -34,7 +34,7 @@ Intel HEXL implements the following functions:
 - Element-wise vector-scalar modular multiplication with optional addition
 - Element-wise modular multiplication
 
-For each function, the library implements one or several Intel(R) AVX-512 implementations, as well as a less performant, more readable native C++ implementation. Intel HEXL will automatically choose the best implementation for the given CPU Intel(R) AVX-512 feature set. In particular, when the modulus `p` is less than `2^{50}`, the AVX512IFMA instruction set available on Intel IceLake server and IceLake client will provide a more efficient implementation.
+For each function, the library implements one or several Intel(R) AVX-512 implementations, as well as a less performant, more readable native C++ implementation. Intel HEXL will automatically choose the best implementation for the given CPU Intel(R) AVX-512 feature set. In particular, when the modulus `q` is less than `2^{50}`, the AVX512IFMA instruction set available on Intel IceLake server and IceLake client will provide a more efficient implementation.
 
 For additional functionality, see the public headers, located in `include/hexl`
 ## Building Intel HEXL

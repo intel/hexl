@@ -139,10 +139,10 @@ TEST(AVX512, _mm512_hexl_small_mod_epu64) {
   // Small
   {
     __m512i a = _mm512_set_epi64(0, 2, 4, 6, 8, 10, 11, 12);
-    __m512i mods = _mm512_set_epi64(1, 2, 3, 4, 5, 6, 7, 8);
+    __m512i moduli = _mm512_set_epi64(1, 2, 3, 4, 5, 6, 7, 8);
     __m512i expected_out = _mm512_set_epi64(0, 0, 1, 2, 3, 4, 4, 4);
 
-    __m512i c = _mm512_hexl_small_mod_epu64(a, mods);
+    __m512i c = _mm512_hexl_small_mod_epu64(a, moduli);
 
     CheckEqual(c, expected_out);
   }
@@ -157,18 +157,18 @@ TEST(AVX512, _mm512_hexl_small_mod_epu64) {
                                  0,                  //
                                  0,                  //
                                  0);
-    __m512i mods = _mm512_set_epi64(1ULL << 32,         //
-                                    1ULL << 63,         //
-                                    1ULL << 63,         //
-                                    (1ULL << 63) + 17,  //
-                                    0,                  //
-                                    0,                  //
-                                    0,                  //
-                                    0);
+    __m512i moduli = _mm512_set_epi64(1ULL << 32,         //
+                                      1ULL << 63,         //
+                                      1ULL << 63,         //
+                                      (1ULL << 63) + 17,  //
+                                      0,                  //
+                                      0,                  //
+                                      0,                  //
+                                      0);
     __m512i expected_out =
         _mm512_set_epi64(0, 0, 1, (1ULL << 63) + 10, 0, 0, 0, 0);
 
-    __m512i c = _mm512_hexl_small_mod_epu64(a, mods);
+    __m512i c = _mm512_hexl_small_mod_epu64(a, moduli);
 
     CheckEqual(c, expected_out);
   }
@@ -179,20 +179,21 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
   {
     __m512i a = _mm512_set_epi64(12, 11, 10, 8, 6, 4, 2, 0);
 
-    std::vector<uint64_t> mods{2, 2, 3, 4, 5, 6, 7, 8};
-    std::vector<uint64_t> barrs(mods.size());
+    std::vector<uint64_t> moduli{2, 2, 3, 4, 5, 6, 7, 8};
+    std::vector<uint64_t> barrs(moduli.size());
     for (size_t i = 0; i < barrs.size(); ++i) {
-      barrs[i] = MultiplyFactor(1, 64, mods[i]).BarrettFactor();
+      barrs[i] = MultiplyFactor(1, 64, moduli[i]).BarrettFactor();
     }
 
-    __m512i vmods = _mm512_set_epi64(mods[7], mods[6], mods[5], mods[4],
-                                     mods[3], mods[2], mods[1], mods[0]);
+    __m512i vmoduli =
+        _mm512_set_epi64(moduli[7], moduli[6], moduli[5], moduli[4], moduli[3],
+                         moduli[2], moduli[1], moduli[0]);
     __m512i vbarrs = _mm512_set_epi64(barrs[7], barrs[6], barrs[5], barrs[4],
                                       barrs[3], barrs[2], barrs[1], barrs[0]);
 
     __m512i expected_out = _mm512_set_epi64(4, 4, 4, 3, 2, 1, 0, 0);
 
-    __m512i c = _mm512_hexl_barrett_reduce64(a, vmods, vbarrs);
+    __m512i c = _mm512_hexl_barrett_reduce64(a, vmoduli, vbarrs);
     AssertEqual(c, expected_out);
   }
 
@@ -203,7 +204,7 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
 
     uint64_t modulus = 75;
     std::uniform_int_distribution<uint64_t> distrib(50, modulus * modulus - 1);
-    __m512i vmod = _mm512_set1_epi64(modulus);
+    __m512i vmodulus = _mm512_set1_epi64(modulus);
     __m512i vbarr =
         _mm512_set1_epi64(MultiplyFactor(1, 64, modulus).BarrettFactor());
 
@@ -217,7 +218,7 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
       __m512i varg1 = _mm512_set_epi64(arg1[7], arg1[6], arg1[5], arg1[4],
                                        arg1[3], arg1[2], arg1[1], arg1[0]);
 
-      __m512i c = _mm512_hexl_barrett_reduce64(varg1, vmod, vbarr);
+      __m512i c = _mm512_hexl_barrett_reduce64(varg1, vmodulus, vbarr);
       std::vector<uint64_t> result = ExtractValues(c);
 
       ASSERT_EQ(result, exp);

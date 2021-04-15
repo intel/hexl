@@ -116,11 +116,11 @@ void ExampleEltwiseMultMod() {
 void ExampleNTT() {
   std::cout << "Running ExampleNTT...\n";
 
-  uint64_t prime = 769;
   uint64_t N = 8;
+  uint64_t modulus = 769;
   std::vector<uint64_t> arg{1, 2, 3, 4, 5, 6, 7, 8};
   auto exp_out = arg;
-  intel::hexl::NTT ntt(N, prime);
+  intel::hexl::NTT ntt(N, modulus);
 
   ntt.ComputeForward(arg.data(), arg.data(), 1, 1);
   ntt.ComputeInverse(arg.data(), arg.data(), 1, 1);
