@@ -30,7 +30,7 @@ variables:
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./"
 
-  GCOV_BIN: "/usr/bin/gcov-7"
+  GCOV_BIN: "/usr/bin/gcov-9"
   DEFAULT_EXAMPLE_FLAGS: "-DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/"
 
 stages:
