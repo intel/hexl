@@ -9,17 +9,25 @@ set(SRC
     eltwise/eltwise-fma-mod.cpp
     eltwise/eltwise-cmp-add.cpp
     eltwise/eltwise-cmp-sub-mod.cpp
-    eltwise/eltwise-mult-mod-avx512.cpp
-    eltwise/eltwise-reduce-mod-avx512.cpp
-    eltwise/eltwise-add-mod-avx512.cpp
-    eltwise/eltwise-sub-mod-avx512.cpp
-    eltwise/eltwise-fma-mod-avx512.cpp
-    ntt/fwd-ntt-avx512.cpp
-    ntt/inv-ntt-avx512.cpp
     ntt/ntt-internal.cpp
-    logging/logging.cpp
     number-theory/number-theory.cpp
 )
+
+if (HEXL_HAS_AVX512DQ)
+    list(APPEND SRC
+        eltwise/eltwise-mult-mod-avx512.cpp
+        eltwise/eltwise-reduce-mod-avx512.cpp
+        eltwise/eltwise-add-mod-avx512.cpp
+        eltwise/eltwise-sub-mod-avx512.cpp
+        eltwise/eltwise-fma-mod-avx512.cpp
+        ntt/fwd-ntt-avx512.cpp
+        ntt/inv-ntt-avx512.cpp
+    )
+endif()
+
+if (HEXL_DEBUG)
+    list(APPEND SRC logging/logging.cpp)
+endif()
 
 if (HEXL_SHARED_LIB)
     add_library(hexl SHARED ${SRC})

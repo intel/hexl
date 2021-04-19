@@ -50,6 +50,8 @@ NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t q, uint64_t root_of_unity,
     m_inv_bit_shift = s_ifma_shift_bits;
   }
 #endif
+  (void)m_fwd_bit_shift;  // Avoid unused variable
+  (void)m_inv_bit_shift;  // Avoid unused variable
 
   m_degree_bits = Log2(m_degree);
   m_winv = InverseUIntMod(m_w, m_q);
