@@ -45,7 +45,6 @@ inline void AssertEqual(const __m512i a, const __m512i b) {
   std::vector<uint64_t> bs = ExtractValues(b);
   AssertEqual(as, bs);
 }
-
 #endif
 
 }  // namespace hexl

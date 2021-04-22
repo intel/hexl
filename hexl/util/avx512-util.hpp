@@ -229,12 +229,6 @@ inline __m512i _mm512_hexl_cmp_epi64(__m512i a, __m512i b, CMPINT cmp,
       mask, _mm_set1_epi64x(static_cast<int64_t>(match_value)));
 }
 
-// Returns c[i] = a[i] CMP b[i] ? match_value : 0
-inline __m512i _mm512_hexl_cmp_epi64(__m512i a, __m512i b, int cmp,
-                                     uint64_t match_value) {
-  return _mm512_hexl_cmp_epi64(a, b, static_cast<CMPINT>(cmp), match_value);
-}
-
 // Returns c[i] = a[i] >= b[i] ? match_value : 0
 inline __m512i _mm512_hexl_cmpge_epu64(__m512i a, __m512i b,
                                        uint64_t match_value) {
@@ -284,11 +278,10 @@ inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y, int bit_shift) {
 // 64 bits.
 template <int BitShift>
 inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y) {
-#ifdef HEXL_HAS_AVX512IFMA
+#ifdef HEXL_HAS_AVX512VBMI2
   return _mm512_shrdi_epi64(x, y, BitShift);
-#else
-  return _mm512_hexl_shrdi_epi64(x, y, BitShift);
 #endif
+  return _mm512_hexl_shrdi_epi64(x, y, BitShift);
 }
 
 #endif  // HEXL_HAS_AVX512DQ

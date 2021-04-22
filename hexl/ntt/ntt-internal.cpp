@@ -40,19 +40,6 @@ NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t q, uint64_t root_of_unity,
   HEXL_CHECK(IsPrimitiveRoot(m_w, 2 * degree, q),
              m_w << " is not a primitive 2*" << degree << "'th root of unity");
 
-#ifdef HEXL_HAS_AVX512IFMA
-  if (m_q < s_max_fwd_ifma_modulus) {
-    HEXL_VLOG(3, "Setting m_fwd_bit_shift to " << s_ifma_shift_bits);
-    m_fwd_bit_shift = s_ifma_shift_bits;
-  }
-  if (m_q < s_max_inv_ifma_modulus) {
-    HEXL_VLOG(3, "Setting m_inv_bit_shift to " << s_ifma_shift_bits);
-    m_inv_bit_shift = s_ifma_shift_bits;
-  }
-#endif
-  (void)m_fwd_bit_shift;  // Avoid unused variable
-  (void)m_inv_bit_shift;  // Avoid unused variable
-
   m_degree_bits = Log2(m_degree);
   m_winv = InverseUIntMod(m_w, m_q);
   ComputeRootOfUnityPowers();
@@ -149,11 +136,6 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
 void NTT::NTTImpl::ComputeForward(uint64_t* result, const uint64_t* operand,
                                   uint64_t input_mod_factor,
                                   uint64_t output_mod_factor) {
-  HEXL_CHECK(m_fwd_bit_shift == s_ifma_shift_bits ||
-                 m_fwd_bit_shift == s_default_shift_bits,
-             "Bit shift " << m_fwd_bit_shift << " should be either "
-                          << s_ifma_shift_bits << " or "
-                          << s_default_shift_bits);
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
   HEXL_CHECK_BOUNDS(
@@ -165,8 +147,7 @@ void NTT::NTTImpl::ComputeForward(uint64_t* result, const uint64_t* operand,
   }
 
 #ifdef HEXL_HAS_AVX512IFMA
-  if (has_avx512ifma && m_fwd_bit_shift == s_ifma_shift_bits &&
-      (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16))) {
+  if (has_avx512ifma && (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16))) {
     const uint64_t* root_of_unity_powers = GetRootOfUnityPowersPtr();
     const uint64_t* precon_root_of_unity_powers =
         GetPrecon52RootOfUnityPowersPtr();
@@ -216,15 +197,8 @@ void NTT::NTTImpl::ComputeInverse(uint64_t* result, const uint64_t* operand,
     std::memcpy(result, operand, m_degree * sizeof(uint64_t));
   }
 
-  HEXL_CHECK(m_inv_bit_shift == s_ifma_shift_bits ||
-                 m_inv_bit_shift == s_default_shift_bits,
-             "Bit shift " << m_inv_bit_shift << " should be either "
-                          << s_ifma_shift_bits << " or "
-                          << s_default_shift_bits);
-
 #ifdef HEXL_HAS_AVX512IFMA
-  if (has_avx512ifma && m_inv_bit_shift == s_ifma_shift_bits &&
-      (m_q < s_max_inv_ifma_modulus) && (m_degree >= 16)) {
+  if (has_avx512ifma && (m_q < s_max_inv_ifma_modulus) && (m_degree >= 16)) {
     HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA InvNTT");
     const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowersPtr();
     const uint64_t* precon_inv_root_of_unity_powers =

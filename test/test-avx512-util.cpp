@@ -92,6 +92,50 @@ TEST(AVX512, _mm512_hexl_cmplt_epu64) {
   }
 }
 
+TEST(AVX512, _mm512_hexl_cmple_epu64) {
+  // Small
+  {
+    uint64_t match_value = 10;
+    __m512i a = _mm512_set_epi64(0, 1, 2, 3, 4, 5, 6, 7);
+    __m512i b = _mm512_set_epi64(0, 1, 1, 0, 5, 6, 100, 100);
+    __m512i expected_out =
+        _mm512_set_epi64(match_value, match_value, 0, 0, match_value,
+                         match_value, match_value, match_value);
+
+    __m512i c = _mm512_hexl_cmple_epu64(a, b, match_value);
+
+    CheckEqual(c, expected_out);
+  }
+
+  // Large
+  {
+    uint64_t match_value = 13;
+    __m512i a = _mm512_set_epi64(1ULL << 32,         //
+                                 1ULL << 63,         //
+                                 (1ULL << 63) + 1,   //
+                                 (1ULL << 63) + 10,  //
+                                 0,                  //
+                                 0,                  //
+                                 0,                  //
+                                 0);
+    __m512i b = _mm512_set_epi64(1ULL << 32,         //
+                                 1ULL << 63,         //
+                                 1ULL << 63,         //
+                                 (1ULL << 63) + 17,  //
+                                 0,                  //
+                                 0,                  //
+                                 0,                  //
+                                 0);
+    __m512i expected_out =
+        _mm512_set_epi64(match_value, match_value, 0, match_value, match_value,
+                         match_value, match_value, match_value);
+
+    __m512i c = _mm512_hexl_cmple_epu64(a, b, match_value);
+
+    CheckEqual(c, expected_out);
+  }
+}
+
 TEST(AVX512, _mm512_hexl_cmpge_epu64) {
   // Small
   {

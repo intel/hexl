@@ -18,7 +18,7 @@ namespace hexl {
 //=================================================================
 
 // state[0] is the degree
-static void BM_EltwiseFMANative(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseFMAModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
@@ -32,7 +32,7 @@ static void BM_EltwiseFMANative(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseFMANative)
+BENCHMARK(BM_EltwiseFMAModNative)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024})
@@ -43,7 +43,7 @@ BENCHMARK(BM_EltwiseFMANative)
 
 #ifdef HEXL_HAS_AVX512DQ
 // state[0] is the degree
-static void BM_EltwiseFMAAVX512DQ(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseFMAModAVX512DQ(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 100;
 
@@ -57,7 +57,7 @@ static void BM_EltwiseFMAAVX512DQ(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseFMAAVX512DQ)
+BENCHMARK(BM_EltwiseFMAModAVX512DQ)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024})
@@ -69,7 +69,7 @@ BENCHMARK(BM_EltwiseFMAAVX512DQ)
 
 #ifdef HEXL_HAS_AVX512IFMA
 // state[0] is the degree
-static void BM_EltwiseFMAAVX512IFMA(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseFMAModAVX512IFMA(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 100;
 
@@ -83,7 +83,7 @@ static void BM_EltwiseFMAAVX512IFMA(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseFMAAVX512IFMA)
+BENCHMARK(BM_EltwiseFMAModAVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024})

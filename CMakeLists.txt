@@ -155,6 +155,7 @@ message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 #------------------------------------------------------------------------------
 check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
 check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
+check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
 check_compile_flag("${CMAKE_MODULE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
 
 # ------------------------------------------------------------------------------

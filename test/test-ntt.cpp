@@ -428,7 +428,7 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple(1 << 17, 55)));
 
 #ifdef HEXL_HAS_AVX512IFMA
-class NTTmodulussTest
+class NTTModulusTest
     : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t>> {
  protected:
   void SetUp() {}
@@ -440,7 +440,7 @@ class NTTmodulussTest
 
 // Test modulus around 50 bits to check IFMA behavior
 // Parameters = (degree, modulus_bits)
-TEST_P(NTTmodulussTest, IFMAmoduluss) {
+TEST_P(NTTModulusTest, IFMAModuli) {
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
   uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
@@ -479,7 +479,7 @@ TEST_P(NTTmodulussTest, IFMAmoduluss) {
   AssertEqual(input64, input_ifma_lazy);
 }
 
-INSTANTIATE_TEST_SUITE_P(NTTmodulussTest, NTTmodulussTest,
+INSTANTIATE_TEST_SUITE_P(NTTModulusTest, NTTModulusTest,
                          ::testing::Values(std::make_tuple(1 << 4, 48),
                                            std::make_tuple(1 << 5, 49),
                                            std::make_tuple(1 << 6, 49),

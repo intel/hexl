@@ -123,9 +123,6 @@ class NTT::NTTImpl {
 
   uint64_t m_degree_bits;  // log_2(m_degree)
   // Bit shift to use in computing Barrett reduction for forward transform
-  uint64_t m_fwd_bit_shift{s_default_shift_bits};
-  // Bit shift to use in computing Barrett reduction for inverse transform
-  uint64_t m_inv_bit_shift{s_default_shift_bits};
 
   uint64_t m_winv;  // Inverse of minimal root of unity
   uint64_t m_w;     // A 2N'th root of unity
@@ -171,6 +168,7 @@ void InverseTransformFromBitReverse64(
     const uint64_t* precon_inv_root_of_unity_powers,
     uint64_t input_mod_factor = 1, uint64_t output_mod_factor = 1);
 
+// Returns true if arguments satisfy constraints for negacyclic NTT
 bool CheckNTTArguments(uint64_t degree, uint64_t modulus);
 
 }  // namespace hexl
