@@ -117,6 +117,8 @@ debug_build:
     - ls
     - echo ${CI_PROJECT_DIR}
     - build/test/unit-test
+    - HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
+    - HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
     - lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
     # Remove unwanted directories
     - lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
