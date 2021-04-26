@@ -24,7 +24,7 @@ static void BM_EltwiseReduceModInPlace(benchmark::State& state) {  //  NOLINT
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
   for (auto _ : state) {
-    EltwiseReduceMod(input1.data(), input1.data(), modulus, input_size,
+    EltwiseReduceMod(input1.data(), input1.data(), input_size, modulus,
                      input_mod_factor, output_mod_factor);
   }
 }
@@ -49,7 +49,7 @@ static void BM_EltwiseReduceModCopy(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseReduceMod(output.data(), input1.data(), modulus, input_size,
+    EltwiseReduceMod(output.data(), input1.data(), input_size, modulus,
                      input_mod_factor, output_mod_factor);
   }
 }
@@ -74,7 +74,7 @@ static void BM_EltwiseReduceModNative(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseReduceModNative(output.data(), input1.data(), modulus, input_size,
+    EltwiseReduceModNative(output.data(), input1.data(), input_size, modulus,
                            input_mod_factor, output_mod_factor);
   }
 }
@@ -100,7 +100,7 @@ static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseReduceModAVX512(output.data(), input1.data(), modulus, input_size,
+    EltwiseReduceModAVX512(output.data(), input1.data(), input_size, modulus,
                            input_mod_factor, output_mod_factor);
   }
 }

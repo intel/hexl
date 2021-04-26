@@ -136,7 +136,7 @@ void ExampleReduceMod() {
   std::vector<uint64_t> arg{1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint64_t> exp_out{1, 2, 3, 4, 0, 1, 2, 3};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
-  intel::hexl::EltwiseReduceMod(result.data(), arg.data(), modulus, arg.size(),
+  intel::hexl::EltwiseReduceMod(result.data(), arg.data(), arg.size(), modulus,
                                 2, 1);
 
   CheckEqual(result, exp_out);

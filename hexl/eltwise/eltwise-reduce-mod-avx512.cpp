@@ -19,7 +19,7 @@ namespace hexl {
 #ifdef HEXL_HAS_AVX512DQ
 
 void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
-                            uint64_t modulus, uint64_t n,
+                            uint64_t n, uint64_t modulus,
                             uint64_t input_mod_factor,
                             uint64_t output_mod_factor) {
   HEXL_CHECK(operand != nullptr, "Require operand1 != nullptr");
@@ -40,7 +40,7 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
   // Deals with n not divisible by 8
   uint64_t n_mod_8 = n_tmp % 8;
   if (n_mod_8 != 0) {
-    EltwiseReduceModNative(result, operand, modulus, n_mod_8, input_mod_factor,
+    EltwiseReduceModNative(result, operand, n_mod_8, modulus, input_mod_factor,
                            output_mod_factor);
     operand += n_mod_8;
     result += n_mod_8;

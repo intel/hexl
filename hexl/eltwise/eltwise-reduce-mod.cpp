@@ -14,7 +14,7 @@ namespace intel {
 namespace hexl {
 
 void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
-                            uint64_t modulus, uint64_t n,
+                            uint64_t n, uint64_t modulus,
                             uint64_t input_mod_factor,
                             uint64_t output_mod_factor) {
   HEXL_CHECK(operand != nullptr, "Require operand1 != nullptr");
@@ -70,8 +70,8 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
   }
 }
 
-void EltwiseReduceMod(uint64_t* result, const uint64_t* operand,
-                      uint64_t modulus, uint64_t n, uint64_t input_mod_factor,
+void EltwiseReduceMod(uint64_t* result, const uint64_t* operand, uint64_t n,
+                      uint64_t modulus, uint64_t input_mod_factor,
                       uint64_t output_mod_factor) {
   HEXL_CHECK(operand != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
@@ -91,13 +91,13 @@ void EltwiseReduceMod(uint64_t* result, const uint64_t* operand,
   }
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
-    EltwiseReduceModAVX512(result, operand, modulus, n, input_mod_factor,
+    EltwiseReduceModAVX512(result, operand, n, modulus, input_mod_factor,
                            output_mod_factor);
     return;
   }
 #endif
   HEXL_VLOG(3, "Calling EltwiseReduceModNative");
-  EltwiseReduceModNative(result, operand, modulus, n, input_mod_factor,
+  EltwiseReduceModNative(result, operand, n, modulus, input_mod_factor,
                          output_mod_factor);
 }
 }  // namespace hexl
