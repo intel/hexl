@@ -228,11 +228,6 @@ endif()
 # Config export...
 #------------------------------------------------------------------------------
 if (HEXL_EXPORT)
-  if (HEXL_SHARED_LIB OR HEXL_DEBUG)
-    message(FATAL_ERROR "HEXL_EXPORT=ON only valid when
-                         HEXL_SHARED_LIB=OFF and HEXL_DEBUG=OFF ")
-  endif()
-
   # Config
   set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLTargets.cmake)
   set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake.in)
