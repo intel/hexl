@@ -75,10 +75,10 @@ else ()
         add_dependencies(hexl gflags)
         # Manually add logging include directory
         target_include_directories(hexl
-        PUBLIC $<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>)
+            PRIVATE $<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>)
         # Manually add gflags include directory
         target_include_directories(hexl
-        PUBLIC $<TARGET_PROPERTY:gflags,INTERFACE_INCLUDE_DIRECTORIES>)
+            PRIVATE $<TARGET_PROPERTY:gflags,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
 
     # Manually add cpu_features include directory
@@ -125,9 +125,8 @@ else ()
                 COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
                     $<TARGET_FILE:hexl>
                     $<TARGET_FILE:cpu_features>
-                    # $<TARGET_FILE:gflags>
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                DEPENDS hexl cpu_features # gflags
+                DEPENDS hexl cpu_features
             )
       endif()
     endif()
