@@ -25,7 +25,7 @@ TEST(EltwiseReduceMod, 2_2) {
   const uint64_t modulus = 750;
   const uint64_t input_mod_factor = 2;
   const uint64_t output_mod_factor = 2;
-  EltwiseReduceMod(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
                    input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -38,7 +38,7 @@ TEST(EltwiseReduceMod, 4_1) {
   const uint64_t modulus = 750;
   const uint64_t input_mod_factor = 4;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceMod(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
                    input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -51,7 +51,7 @@ TEST(EltwiseReduceMod, 0_1) {
   const uint64_t modulus = 750;
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceMod(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
                    input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -64,7 +64,7 @@ TEST(EltwiseReduceMod, 2_1) {
   const uint64_t modulus = 730;
   const uint64_t input_mod_factor = 2;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceMod(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
                    input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -77,7 +77,7 @@ TEST(EltwiseReduceMod, 4_2) {
   const uint64_t modulus = 730;
   const uint64_t input_mod_factor = 4;
   const uint64_t output_mod_factor = 2;
-  EltwiseReduceMod(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
                    input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -91,7 +91,7 @@ TEST(EltwiseReduceMod, avx512_0_1) {
   uint64_t modulus = 769;
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
                          input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -104,7 +104,7 @@ TEST(EltwiseReduceMod, avx512_2_1) {
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 2;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
                          input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -117,7 +117,7 @@ TEST(EltwiseReduceMod, avx512_4_1) {
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 4;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
                          input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -130,7 +130,7 @@ TEST(EltwiseReduceMod, avx512_4_2) {
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 4;
   const uint64_t output_mod_factor = 2;
-  EltwiseReduceModAVX512(result.data(), op.data(), modulus, op.size(),
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
                          input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
@@ -161,9 +161,9 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 0,
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 0,
                              1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 0,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 0,
                              1);
 
       ASSERT_EQ(result1, result2);
@@ -196,9 +196,9 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
                              1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 4,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 4,
                              1);
 
       ASSERT_EQ(result1, result2);
@@ -231,9 +231,9 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
                              2);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 4,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 4,
                              2);
 
       ASSERT_EQ(result1, result2);
@@ -266,9 +266,9 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
       std::vector<uint64_t> result2(length, 0);
       auto op2 = op1;
 
-      EltwiseReduceModNative(result1.data(), op1.data(), modulus, op1.size(), 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
                              1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), modulus, op1.size(), 4,
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 4,
                              1);
 
       ASSERT_EQ(result1, result2);
