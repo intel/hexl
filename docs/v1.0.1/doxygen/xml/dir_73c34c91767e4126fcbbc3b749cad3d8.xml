@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="dir_73c34c91767e4126fcbbc3b749cad3d8" kind="dir">
+    <compoundname>util</compoundname>
+    <innerfile refid="util_8hpp">util.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/"/>
+  </compounddef>
+</doxygen>
