@@ -1,5 +1,0 @@
-var searchData=
-[
-  ['not_76',['Not',['../namespaceintel_1_1hexl.html#a8c654502a5e7fe2cfdd198f0fd920f2a',1,'intel::hexl']]],
-  ['ntt_77',['NTT',['../classintel_1_1hexl_1_1_n_t_t.html#ade0447617b50232d2a076f99e672d15c',1,'intel::hexl::NTT::NTT()'],['../classintel_1_1hexl_1_1_n_t_t.html#a0caa480b571ad66230f0c00ebca02ccd',1,'intel::hexl::NTT::NTT(uint64_t degree, uint64_t q, std::shared_ptr&lt; allocator_base &gt; alloc_ptr={})'],['../classintel_1_1hexl_1_1_n_t_t.html#a716fd07255e9b68fec80e2a9b98841f4',1,'intel::hexl::NTT::NTT(uint64_t degree, uint64_t q, Allocator &amp;&amp;a, AllocatorArgs &amp;&amp;... args)'],['../classintel_1_1hexl_1_1_n_t_t.html#ada33098dd6eb5f8b088a6e873b1bf355',1,'intel::hexl::NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity, std::shared_ptr&lt; allocator_base &gt; alloc_ptr={})'],['../classintel_1_1hexl_1_1_n_t_t.html#a831df901cf9ea5a83e5d628cdbd36671',1,'intel::hexl::NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity, Allocator &amp;&amp;a, AllocatorArgs &amp;&amp;... args)']]]
-];
