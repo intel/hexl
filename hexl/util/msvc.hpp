@@ -158,13 +158,16 @@ inline uint64_t SignificantBitLength(const uint64_t* value) {
 
   // second 64bit block
   _BitScanReverse64(&count, *(value + 1));
-  if (count > 0) {
+  if (count >= 0 && *(value + 1) > 0) {
     return static_cast<uint64_t>(count) + 1 + 64;
   }
 
   // first 64bit block
   _BitScanReverse64(&count, *value);
-  return static_cast<uint64_t>(count) + 1;
+  if (count >= 0 && *(value) > 0) {
+    return static_cast<uint64_t>(count) + 1;
+  }
+  return 0;
 }
 
 /// @brief Checks if input is negative number
