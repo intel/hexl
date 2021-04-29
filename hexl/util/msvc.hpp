@@ -154,10 +154,10 @@ inline void SubWithCarry128(uint64_t* result_hi, uint64_t* result_lo,
 inline uint64_t SignificantBitLength(const uint64_t* value) {
   HEXL_CHECK(value != nullptr, "Require value != nullptr");
 
-  unsigned long count = 0;  // NOLINT
+  unsigned long count = 0;  // NOLINT(runtime/int)
 
   // second 64bit block
-  _BitScanReverse64(&count, *(value + 1));  // NOLINT
+  _BitScanReverse64(&count, *(value + 1));
   if (count > 0) {
     return static_cast<uint64_t>(count) + 1 + 64;
   }

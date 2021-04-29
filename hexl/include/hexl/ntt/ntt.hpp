@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-#include "hexl/util/util.hpp"
+#include "hexl/util/allocator.hpp"
 
 namespace intel {
 namespace hexl {
@@ -21,14 +21,14 @@ namespace hexl {
 class NTT {
  public:
   template <class Adaptee, class... Args>
-  struct allocator_adapter
-      : public allocator_interface<allocator_adapter<Adaptee, Args...>> {
-    explicit allocator_adapter(Adaptee&& _a, Args&&... args);
-    allocator_adapter(const Adaptee& _a, Args&... args);
+  struct AllocatorAdapter
+      : public AllocatorInterface<AllocatorAdapter<Adaptee, Args...>> {
+    explicit AllocatorAdapter(Adaptee&& _a, Args&&... args);
+    AllocatorAdapter(const Adaptee& _a, Args&... args);
 
     // interface implementation
-    void* allocate_impl(std::size_t bytes_count);
-    void deallocate_impl(void* p, std::size_t n);
+    void* allocate_impl(size_t bytes_count);
+    void deallocate_impl(void* p, size_t n);
 
    private:
     Adaptee alloc;
@@ -50,14 +50,13 @@ class NTT {
   /// @brief Performs pre-computation necessary for forward and inverse
   /// transforms
   NTT(uint64_t degree, uint64_t q,
-      std::shared_ptr<allocator_base> alloc_ptr = {});
+      std::shared_ptr<AllocatorBase> alloc_ptr = {});
 
   template <class Allocator, class... AllocatorArgs>
   NTT(uint64_t degree, uint64_t q, Allocator&& a, AllocatorArgs&&... args)
       : NTT(degree, q,
-            std::static_pointer_cast<allocator_base>(
-                std::make_shared<
-                    allocator_adapter<Allocator, AllocatorArgs...>>(
+            std::static_pointer_cast<AllocatorBase>(
+                std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
   /// @brief Initializes an NTT object with degree \p degree and modulus
@@ -72,15 +71,14 @@ class NTT {
   /// @details  Performs pre-computation necessary for forward and inverse
   /// transforms
   NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
-      std::shared_ptr<allocator_base> alloc_ptr = {});
+      std::shared_ptr<AllocatorBase> alloc_ptr = {});
 
   template <class Allocator, class... AllocatorArgs>
   NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity, Allocator&& a,
       AllocatorArgs&&... args)
       : NTT(degree, q, root_of_unity,
-            std::static_pointer_cast<allocator_base>(
-                std::make_shared<
-                    allocator_adapter<Allocator, AllocatorArgs...>>(
+            std::static_pointer_cast<AllocatorBase>(
+                std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
   /// @brief Compute forward NTT. Results are bit-reversed.
