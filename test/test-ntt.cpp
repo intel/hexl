@@ -116,10 +116,9 @@ TEST(NTT, Powers) {
 }
 
 namespace allocators {
-// template <class T>
-struct custom_allocator {
-  using T = int;
-  T* invoke_allocation(int size) {
+struct CustomAllocator {
+  using T = size_t;
+  T* invoke_allocation(size_t size) {
     number_allocations++;
     return new T[size];
   }
@@ -132,39 +131,37 @@ struct custom_allocator {
   static size_t number_deallocations;
 };
 
-size_t custom_allocator::number_allocations = 0;
-size_t custom_allocator::number_deallocations = 0;
+size_t CustomAllocator::number_allocations = 0;
+size_t CustomAllocator::number_deallocations = 0;
 }  // namespace allocators
 
 template <>
-struct NTT::allocator_adapter<allocators::custom_allocator>
-    : public allocator_interface<
-          NTT::allocator_adapter<allocators::custom_allocator>> {
-  explicit allocator_adapter(allocators::custom_allocator&& a_)
+struct NTT::AllocatorAdapter<allocators::CustomAllocator>
+    : public AllocatorInterface<
+          NTT::AllocatorAdapter<allocators::CustomAllocator>> {
+  explicit AllocatorAdapter(allocators::CustomAllocator&& a_)
       : a(std::move(a_)) {}
 
   // interface implementations
-  void* allocate_impl(std::size_t bytes_count) {
+  void* allocate_impl(size_t bytes_count) {
     return a.invoke_allocation(bytes_count);
   }
-  void deallocate_impl(void* p, std::size_t n) {
+  void deallocate_impl(void* p, size_t n) {
     (void)n;
-    a.lets_deallocate(static_cast<allocators::custom_allocator::T*>(p));
+    a.lets_deallocate(static_cast<allocators::CustomAllocator::T*>(p));
   }
 
-  allocators::custom_allocator a;
+  allocators::CustomAllocator a;
 };
 
 template <class T>
-struct NTT::allocator_adapter<std::allocator<T>>
-    : public allocator_interface<NTT::allocator_adapter<std::allocator<T>>> {
-  explicit allocator_adapter(std::allocator<T>&& a_) : a(std::move(a_)) {}
+struct NTT::AllocatorAdapter<std::allocator<T>>
+    : public AllocatorInterface<NTT::AllocatorAdapter<std::allocator<T>>> {
+  explicit AllocatorAdapter(std::allocator<T>&& a_) : a(std::move(a_)) {}
 
   // interface implementations
-  void* allocate_impl(std::size_t bytes_count) {
-    return a.allocate(bytes_count);
-  }
-  void deallocate_impl(void* p, std::size_t n) {
+  void* allocate_impl(size_t bytes_count) { return a.allocate(bytes_count); }
+  void deallocate_impl(void* p, size_t n) {
     a.deallocate(static_cast<T*>(p), n);
   }
 
@@ -182,7 +179,7 @@ TEST(NTT, root_of_unity_with_allocator) {
   uint64_t root_of_unity = MinimalPrimitiveRoot(2 * N, modulus);
 
   {
-    allocators::custom_allocator a;
+    allocators::CustomAllocator a;
     NTT ntt1(N, modulus);
     NTT ntt2(N, modulus, std::move(a));
     NTT ntt3(N, modulus, root_of_unity);
@@ -193,13 +190,13 @@ TEST(NTT, root_of_unity_with_allocator) {
     ntt1.ComputeForward(input.data(), input.data(), 1, 1);
     ntt2.ComputeForward(input2.data(), input2.data(), 1, 1);
 
-    ASSERT_NE(allocators::custom_allocator::number_allocations, 0);
+    ASSERT_NE(allocators::CustomAllocator::number_allocations, 0);
 
     ntt3.ComputeForward(input3.data(), input3.data(), 1, 1);
     ntt3.ComputeForward(input4.data(), input4.data(), 1, 1);
   }
 
-  ASSERT_NE(allocators::custom_allocator::number_deallocations, 0);
+  ASSERT_NE(allocators::CustomAllocator::number_deallocations, 0);
   AssertEqual(input, input2);
   AssertEqual(input, input3);
   AssertEqual(input, input4);

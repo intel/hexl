@@ -7,26 +7,24 @@
 #include <memory>
 #include <vector>
 
-#include "hexl/util/util.hpp"
+#include "hexl/util/allocator.hpp"
 #include "number-theory/number-theory.hpp"
 
 namespace intel {
 namespace hexl {
 
 namespace details {
-struct MallocStrategy : allocator_base {
-  void* allocate(std::size_t bytes_count) final {
-    return std::malloc(bytes_count);
-  }
+struct MallocStrategy : AllocatorBase {
+  void* allocate(size_t bytes_count) final { return std::malloc(bytes_count); }
 
-  void deallocate(void* p, std::size_t n) final {
+  void deallocate(void* p, size_t n) final {
     (void)n;
     std::free(p);
   }
 };
 
 struct CustomAllocStrategy {
-  explicit CustomAllocStrategy(std::shared_ptr<allocator_base> impl)
+  explicit CustomAllocStrategy(std::shared_ptr<AllocatorBase> impl)
       : p_impl(impl) {
     if (!impl) {
       throw std::runtime_error(
@@ -34,33 +32,37 @@ struct CustomAllocStrategy {
     }
   }
 
-  void* allocate_memory(std::size_t bytes_count) {
+  void* allocate_memory(size_t bytes_count) {
     return p_impl->allocate(bytes_count);
   }
 
-  void deallocate_memory(void* p, std::size_t n) { p_impl->deallocate(p, n); }
+  void deallocate_memory(void* p, size_t n) { p_impl->deallocate(p, n); }
 
  private:
-  std::shared_ptr<allocator_base> p_impl;
+  std::shared_ptr<AllocatorBase> p_impl;
 };
 }  // namespace details
 
-using allocator_strategy_ptr = std::shared_ptr<allocator_base>;
-extern allocator_strategy_ptr mallocStrategy;
+using AllocatorStrategyPtr = std::shared_ptr<AllocatorBase>;
+extern AllocatorStrategyPtr mallocStrategy;
 
 template <typename T, uint64_t Alignment>
 class AlignedAllocator {
  public:
+  template <typename, uint64_t>
+  friend class AlignedAllocator;
+
   using value_type = T;
 
-  AlignedAllocator(allocator_strategy_ptr strategy = {}) noexcept  // NOLINT
-      : alloc_impl(strategy ? strategy : mallocStrategy) {}
+  explicit AlignedAllocator(AllocatorStrategyPtr strategy = nullptr) noexcept
+      : m_alloc_impl((strategy != nullptr) ? strategy : mallocStrategy) {}
 
-  AlignedAllocator(const AlignedAllocator& src) : alloc_impl(src.alloc_impl) {}
+  AlignedAllocator(const AlignedAllocator& src)
+      : m_alloc_impl(src.m_alloc_impl) {}
 
   template <typename U>
   AlignedAllocator(const AlignedAllocator<U, Alignment>& src)
-      : alloc_impl(src.alloc_impl) {}
+      : m_alloc_impl(src.m_alloc_impl) {}
 
   ~AlignedAllocator() {}
 
@@ -73,7 +75,7 @@ class AlignedAllocator {
 
   bool operator!=(const AlignedAllocator&) { return false; }
 
-  T* allocate(std::size_t n) {
+  T* allocate(size_t n) {
     if (!IsPowerOfTwo(Alignment)) {
       return nullptr;
     }
@@ -82,7 +84,7 @@ class AlignedAllocator {
     // Additionally, allocate a prefix to store the memory location of the
     // unaligned buffer
     size_t alloc_size = buffer_size + sizeof(void*);
-    void* buffer = alloc_impl->allocate(alloc_size);
+    void* buffer = m_alloc_impl->allocate(alloc_size);
     if (!buffer) {
       return nullptr;
     }
@@ -102,17 +104,17 @@ class AlignedAllocator {
     return static_cast<T*>(aligned_buffer);
   }
 
-  void deallocate(T* p, std::size_t n) {
+  void deallocate(T* p, size_t n) {
     if (!p) {
       return;
     }
     void* store_buffer_addr = (reinterpret_cast<char*>(p) - sizeof(void*));
     void* free_address = *(static_cast<void**>(store_buffer_addr));
-    alloc_impl->deallocate(free_address, n);
+    m_alloc_impl->deallocate(free_address, n);
   }
 
  private:
-  allocator_strategy_ptr alloc_impl;
+  AllocatorStrategyPtr m_alloc_impl;
 };
 
 template <typename T>
