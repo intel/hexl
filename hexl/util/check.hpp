@@ -19,9 +19,9 @@
     throw std::runtime_error("Error. Check log output");             \
   }
 
-#define HEXL_CHECK_BOUNDS(arg, n, bound, expr) \
-  for (size_t i = 0; i < n; ++i) {             \
-    HEXL_CHECK((arg)[i] < bound, expr);        \
+#define HEXL_CHECK_BOUNDS(arg, n, bound, expr)                            \
+  for (size_t hexl_check_idx = 0; hexl_check_idx < n; ++hexl_check_idx) { \
+    HEXL_CHECK((arg)[hexl_check_idx] < bound, expr);                      \
   }
 
 #else  // HEXL_DEBUG=OFF

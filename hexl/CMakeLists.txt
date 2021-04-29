@@ -46,7 +46,8 @@ target_include_directories(hexl
     )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(hexl PRIVATE -Wall -Wextra -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer)
+    target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
+        -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Inling causes some tests to fail on MSVC with AVX512 in Release mode, HEXL_DEBUG=OFF,
     # so we disable it here
