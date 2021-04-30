@@ -10,6 +10,7 @@ INPUT                  = @CMAKE_SOURCE_DIR@/hexl/include \
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 USE_MATHJAX            = YES
+FULL_PATH_NAMES        = NO
 
 GENERATE_XML           = YES
 EXTRACT_ALL            = YES
