@@ -48,8 +48,8 @@ TEST(AlignedVector64, move_constructor) {
 }
 
 struct CustomAllocator {
-  using T = int;
-  T* invoke_allocation(int size) { return new T[size]; }
+  using T = size_t;
+  T* invoke_allocation(size_t size) { return new T[size]; }
 
   void lets_deallocate(T* ptr) { delete[] ptr; }
 };
