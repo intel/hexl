@@ -14,6 +14,7 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Using Intel HEXL](#using-intel-hexl)
   - [Debugging](#debugging)
   - [Threading](#threading)
+- [Community Adoption](#community-adoption)
 - [Documentation](#documentation)
   - [Doxygen](#doxygen)
   - [Sphinx](#sphinx)
@@ -37,6 +38,7 @@ Intel HEXL implements the following functions:
 For each function, the library implements one or several Intel(R) AVX-512 implementations, as well as a less performant, more readable native C++ implementation. Intel HEXL will automatically choose the best implementation for the given CPU Intel(R) AVX-512 feature set. In particular, when the modulus `q` is less than `2^{50}`, the AVX512IFMA instruction set available on Intel IceLake server and IceLake client will provide a more efficient implementation.
 
 For additional functionality, see the public headers, located in `include/hexl`
+
 ## Building Intel HEXL
 
 ### Dependencies
@@ -125,6 +127,11 @@ For optimal performance, Intel HEXL does not perform input validation. In many c
 ## Threading
 Intel HEXL is single-threaded and thread-safe.
 
+# Community Adoption
+Intel HEXL has been integrated to [Microsoft SEAL](https://github.com/Microsoft/SEAL), an easy-to-use homomorphic encryption library.
+
+If you are aware of any other uses of Intel HEXL, please let us know!
+
 # Documentation
 See [https://intel.github.io/hexl](https://intel.github.io/hexl) for Doxygen documentation.
 
@@ -171,7 +178,7 @@ Public headers reside in the `hexl/include` folder.
 Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.
 
 ## Intel HEXL Publication
-Find published paper at https://arxiv.org/abs/2103.16400.
+For more details on Intel HEXL, see our whitepaper at https://arxiv.org/abs/2103.16400.
 
 ## Citing Intel HEXL
 To cite Intel HEXL, please use the following BibTeX entry.
