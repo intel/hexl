@@ -16,7 +16,7 @@ namespace hexl {
 /// @brief Performs negacyclic forward and inverse number-theoretic transform
 /// (NTT), commonly used in RLWE cryptography.
 /// @details The number-theoretic transform (NTT) specializes the discrete
-/// Fourier transform (DFT) to the finite field \f$ \mathbb{Z}_q / (X^N + 1)
+/// Fourier transform (DFT) to the finite field \f$ \mathbb{Z}_q[X] / (X^N + 1)
 /// \f$.
 class NTT {
  public:
