@@ -10,6 +10,7 @@
 #include "number-theory/number-theory.hpp"
 #include "util/aligned-allocator.hpp"
 #include "util/check.hpp"
+#include "util/compiler.hpp"
 
 namespace intel {
 namespace hexl {
@@ -43,7 +44,7 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
                     "operand2 exceeds bound " << (InputModFactor * modulus));
 
-  const uint64_t logmod = uint64_t(floorl(std::log2l(modulus)) - 1);
+  const uint64_t logmod = MSB(modulus);
   // modulus < 2**N
   const uint64_t N = logmod + 1;
   uint64_t L = 63 + N;  // Ensures L - N + 1 == 64

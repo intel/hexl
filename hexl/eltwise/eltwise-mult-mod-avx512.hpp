@@ -13,6 +13,7 @@
 #include "number-theory/number-theory.hpp"
 #include "util/avx512-util.hpp"
 #include "util/check.hpp"
+#include "util/compiler.hpp"
 
 namespace intel {
 namespace hexl {
@@ -360,7 +361,7 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  const uint64_t logmod = uint64_t(floorl(std::log2l(modulus)) - 1);
+  const uint64_t logmod = MSB(modulus);
   uint64_t log2_input_mod_factor = 0;
   if (InputModFactor == 2) {
     log2_input_mod_factor = 1;

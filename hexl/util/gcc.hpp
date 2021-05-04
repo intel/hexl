@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include <cmath>
 #include <iostream>
 
 #include "util/check.hpp"
@@ -51,6 +52,11 @@ template <int BitShift>
 inline uint64_t MultiplyUInt64Hi(uint64_t x, uint64_t y) {
   uint128_t product = MultiplyUInt64(x, y);
   return static_cast<uint64_t>(product >> BitShift);
+}
+
+// Returns maximum number of possible significant bits given modulus
+inline uint64_t MSB(uint64_t modulus) {
+  return static_cast<uint64_t>(std::log2l(modulus));
 }
 
 #define HEXL_LOOP_UNROLL_4 _Pragma("GCC unroll 4")

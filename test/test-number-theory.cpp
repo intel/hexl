@@ -5,6 +5,7 @@
 
 #include "gtest/gtest.h"
 #include "number-theory/number-theory.hpp"
+#include "util/compiler.hpp"
 
 namespace intel {
 namespace hexl {
@@ -421,6 +422,12 @@ TEST(NumberTheory, DivideUInt128UInt64Lo) {
   EXPECT_EQ(4294908659ULL,
             DivideUInt128UInt64Lo(4294908658ULL, 0xffffffffffffffffULL,
                                   0xffffffffffffffffULL));
+}
+
+TEST(NumberTheory, MSB) {
+  EXPECT_EQ(60ULL, MSB(2305843009213689601));
+  EXPECT_EQ(59ULL, MSB(1152921504606844417));
+  EXPECT_EQ(59ULL, MSB(1152921504606844289));
 }
 
 }  // namespace hexl
