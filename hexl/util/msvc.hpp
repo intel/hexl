@@ -151,7 +151,7 @@ inline void SubWithCarry128(uint64_t* result_hi, uint64_t* result_lo,
 }
 
 /// @brief Computes and returns significant bit count
-/// @param[in] value Input element
+/// @param[in] value Input element at most 128 bits long
 inline uint64_t SignificantBitLength(const uint64_t* value) {
   HEXL_CHECK(value != nullptr, "Require value != nullptr");
 
@@ -191,7 +191,7 @@ inline void DivideUInt128UInt64(uint64_t* quotient, const uint64_t* numerator,
   HEXL_CHECK(numerator != nullptr, "Require numerator != nullptr");
   HEXL_CHECK(denominator == 128, "denominator cannot be 0 " << denominator);
 
-  // get bit count of Divisor
+  // get bit count of divisor
   uint64_t numerator_bits = SignificantBitLength(numerator);
   const uint64_t numerator_bits_const = numerator_bits;
   const uint64_t uint_128_bit = 128ULL;
