@@ -8,6 +8,7 @@
 #include <intrin.h>
 #include <stdint.h>
 
+#include <cmath>
 #include <iostream>
 
 #include "util/check.hpp"
@@ -264,6 +265,11 @@ inline uint64_t DivideUInt128UInt64Lo(const uint64_t numerator_hi,
 
   DivideUInt128UInt64(quotient, numerator, denominator);
   return quotient[0];
+}
+
+// Returns maximum number of possible significant bits given modulus
+inline uint64_t MSB(uint64_t modulus) {
+  return static_cast<uint64_t>(floorl(std::log2l(modulus)) - 1);
 }
 
 #define HEXL_LOOP_UNROLL_4 \
