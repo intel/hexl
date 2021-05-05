@@ -59,7 +59,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
   AlignedVector64<uint64_t> inv_root_of_unity_powers(
       m_degree, 0, AlignedAllocator<uint64_t, 64>(alloc));
 
-  // 64-bit  precon
+  // 64-bit preconditioning
   root_of_unity_powers[0] = 1;
   inv_root_of_unity_powers[0] = InverseUIntMod(1, m_q);
   uint64_t idx = 0;
@@ -87,7 +87,7 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
       idx++;
     }
   }
-  inv_root_of_unity_powers = temp;
+  inv_root_of_unity_powers = std::move(temp);
 
   // 64-bit preconditioned root of unity powers
   AlignedVector64<uint64_t> precon64_root_of_unity_powers(
@@ -102,16 +102,18 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
       std::move(precon64_root_of_unity_powers);
 
   // 52-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon52_root_of_unity_powers(
-      (AlignedAllocator<uint64_t, 64>(alloc)));
-  precon52_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t root_of_unity : root_of_unity_powers) {
-    MultiplyFactor mf(root_of_unity, 52, m_q);
-    precon52_root_of_unity_powers.push_back(mf.BarrettFactor());
-  }
+  if (has_avx512ifma) {
+    AlignedVector64<uint64_t> precon52_root_of_unity_powers(
+        (AlignedAllocator<uint64_t, 64>(alloc)));
+    precon52_root_of_unity_powers.reserve(m_degree);
+    for (uint64_t root_of_unity : root_of_unity_powers) {
+      MultiplyFactor mf(root_of_unity, 52, m_q);
+      precon52_root_of_unity_powers.push_back(mf.BarrettFactor());
+    }
 
-  NTT::NTTImpl::GetPrecon52RootOfUnityPowers() =
-      std::move(precon52_root_of_unity_powers);
+    NTT::NTTImpl::GetPrecon52RootOfUnityPowers() =
+        std::move(precon52_root_of_unity_powers);
+  }
 
   NTT::NTTImpl::GetRootOfUnityPowers() = std::move(root_of_unity_powers);
 
@@ -128,16 +130,18 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
       std::move(precon64_inv_root_of_unity_powers);
 
   // 52-bit preconditioned inverse root of unity powers
-  AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
-      (AlignedAllocator<uint64_t, 64>(alloc)));
-  precon52_inv_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
-    MultiplyFactor mf(inv_root_of_unity, 52, m_q);
-    precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
-  }
+  if (has_avx512ifma) {
+    AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
+        (AlignedAllocator<uint64_t, 64>(alloc)));
+    precon52_inv_root_of_unity_powers.reserve(m_degree);
+    for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
+      MultiplyFactor mf(inv_root_of_unity, 52, m_q);
+      precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
+    }
 
-  NTT::NTTImpl::GetPrecon52InvRootOfUnityPowers() =
-      std::move(precon52_inv_root_of_unity_powers);
+    NTT::NTTImpl::GetPrecon52InvRootOfUnityPowers() =
+        std::move(precon52_inv_root_of_unity_powers);
+  }
 
   NTT::NTTImpl::GetInvRootOfUnityPowers() = std::move(inv_root_of_unity_powers);
 }
