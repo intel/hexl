@@ -47,3 +47,17 @@ function(check_compiler_version)
       endif()
     endif()
 endfunction()
+
+# If the input variable is set, stores its value in a _CACHE variable
+function(cache_variable variable)
+  if (DEFINED ${variable})
+    set(${variable}_CACHE ${${variable}} PARENT_SCOPE)
+  endif()
+endfunction()
+
+# If the input variable is cached, restores its value from the cache
+function(uncache_variable variable)
+  if (DEFINED ${variable}_CACHE)
+    set(${variable} ${${variable}_CACHE} CACHE BOOL "" FORCE )
+  endif()
+endfunction()

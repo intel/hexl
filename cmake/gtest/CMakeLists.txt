@@ -18,6 +18,7 @@ if(result)
 endif()
 
 # Add gtest directly to our build. This defines the gtest target.
+cache_variable(gtest_force_shared_crt)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gtest-src
@@ -26,3 +27,4 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gtest-src
 
 # Prevent variables from leaking
 unset(gtest_force_shared_crt CACHE)
+uncache_variable(gtest_force_shared_crt)
