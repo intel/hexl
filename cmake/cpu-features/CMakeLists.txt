@@ -18,6 +18,10 @@ endif()
 
 # Add cpu-features directly to our build. This defines the cpu_features target.
 # Cache needed to override option in cpu-features
+cache_variable(BUILD_SHARED_LIBS)
+cache_variable(BUILD_PIC)
+cache_variable(BUILD_TESTING)
+
 set(BUILD_PIC ON CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
@@ -30,3 +34,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/cpu-features-src
 unset(BUILD_PIC CACHE)
 unset(BUILD_SHARED_LIBS CACHE)
 unset(BUILD_TESTING CACHE)
+
+uncache_variable(BUILD_SHARED_LIBS)
+uncache_variable(BUILD_PIC)
+uncache_variable(BUILD_TESTING)
