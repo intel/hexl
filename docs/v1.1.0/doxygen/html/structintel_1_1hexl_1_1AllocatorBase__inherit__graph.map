@@ -1,0 +1,5 @@
+<map id="intel::hexl::AllocatorBase" name="intel::hexl::AllocatorBase">
+<area shape="rect" id="node2" href="$structintel_1_1hexl_1_1AllocatorInterface.html" title="intel::hexl::AllocatorInterface\l\&lt; AllocatorAdapter\&lt; Adaptee,\l Args... \&gt; \&gt;" alt="" coords="220,5,415,61"/>
+<area shape="rect" id="node4" href="$structintel_1_1hexl_1_1AllocatorInterface.html" title="intel::hexl::AllocatorInterface\l\&lt; AllocatorImpl \&gt;" alt="" coords="223,86,411,127"/>
+<area shape="rect" id="node3" href="$structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter.html" title="intel::hexl::NTT::Allocator\lAdapter\&lt; Adaptee, Args \&gt;" alt="" coords="463,13,637,54"/>
+</map>

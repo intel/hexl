@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_138f48ea0e5a566a607c4eba361f369f" kind="dir">
+    <compoundname>hexl</compoundname>
+    <innerdir refid="dir_39ccd546f6f66dfa0601ecdd2198d1cd">eltwise</innerdir>
+    <innerdir refid="dir_b99b5b9111a7dc9d17666ca9627e721f">ntt</innerdir>
+    <innerdir refid="dir_73c34c91767e4126fcbbc3b749cad3d8">util</innerdir>
+    <innerfile refid="hexl_8hpp">hexl.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/gelila/Desktop/workspace/intel-hexl/hexl/include/hexl/"/>
+  </compounddef>
+</doxygen>

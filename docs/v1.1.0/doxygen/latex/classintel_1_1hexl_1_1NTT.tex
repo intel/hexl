@@ -1,0 +1,163 @@
+\hypertarget{classintel_1_1hexl_1_1NTT}{}\section{intel\+:\+:hexl\+:\+:N\+TT Class Reference}
+\label{classintel_1_1hexl_1_1NTT}\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+
+
+Performs negacyclic forward and inverse number-\/theoretic transform (\hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}), commonly used in R\+L\+WE cryptography.  
+
+
+
+
+{\ttfamily \#include $<$ntt.\+hpp$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter}{Allocator\+Adapter}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_ade0447617b50232d2a076f99e672d15c}{N\+TT} ()
+\begin{DoxyCompactList}\small\item\em Initializes an empty \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. \end{DoxyCompactList}\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_ab6fca1753db0834c692232e8897c725f}{$\sim$\+N\+TT} ()
+\begin{DoxyCompactList}\small\item\em Destructs the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. \end{DoxyCompactList}\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_a7a86355beefbe191d0e77618eeaaf6b7}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$ alloc\+\_\+ptr=\{\})
+\begin{DoxyCompactList}\small\item\em Performs pre-\/computation necessary for forward and inverse transforms. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Allocator , class... Allocator\+Args$>$ }\\\hyperlink{classintel_1_1hexl_1_1NTT_a716fd07255e9b68fec80e2a9b98841f4}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, Allocator \&\&a, Allocator\+Args \&\&... args)
+\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_ac5ef577bf39789c1e200b7d5a7b65989}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, uint64\+\_\+t root\+\_\+of\+\_\+unity, std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$ alloc\+\_\+ptr=\{\})
+\begin{DoxyCompactList}\small\item\em Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Allocator , class... Allocator\+Args$>$ }\\\hyperlink{classintel_1_1hexl_1_1NTT_a831df901cf9ea5a83e5d628cdbd36671}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, uint64\+\_\+t root\+\_\+of\+\_\+unity, Allocator \&\&a, Allocator\+Args \&\&... args)
+\item 
+void \hyperlink{classintel_1_1hexl_1_1NTT_a7f8dac5ff3fc117d3e7259762a716140}{Compute\+Forward} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand, uint64\+\_\+t input\+\_\+mod\+\_\+factor, uint64\+\_\+t output\+\_\+mod\+\_\+factor)
+\begin{DoxyCompactList}\small\item\em Compute forward \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. Results are bit-\/reversed. \end{DoxyCompactList}\item 
+void \hyperlink{classintel_1_1hexl_1_1NTT_a31e78375dcafd5df85cb1259a9156a9a}{Compute\+Inverse} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand, uint64\+\_\+t input\+\_\+mod\+\_\+factor, uint64\+\_\+t output\+\_\+mod\+\_\+factor)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Performs negacyclic forward and inverse number-\/theoretic transform (\hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}), commonly used in R\+L\+WE cryptography. 
+
+The number-\/theoretic transform (\hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}) specializes the discrete Fourier transform (D\+FT) to the finite field $ \mathbb{Z}_q[X] / (X^N + 1) $. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ade0447617b50232d2a076f99e672d15c}\label{classintel_1_1hexl_1_1NTT_ade0447617b50232d2a076f99e672d15c}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initializes an empty \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ab6fca1753db0834c692232e8897c725f}\label{classintel_1_1hexl_1_1NTT_ab6fca1753db0834c692232e8897c725f}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!````~N\+TT@{$\sim$\+N\+TT}}
+\index{````~N\+TT@{$\sim$\+N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{$\sim$\+N\+T\+T()}{~NTT()}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::$\sim$\+N\+TT (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Destructs the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a7a86355beefbe191d0e77618eeaaf6b7}\label{classintel_1_1hexl_1_1NTT_a7a86355beefbe191d0e77618eeaaf6b7}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$}]{alloc\+\_\+ptr = {\ttfamily \{\}} }\end{DoxyParamCaption})}
+
+
+
+Performs pre-\/computation necessary for forward and inverse transforms. 
+
+Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em degree} & also known as N. Size of the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} transform. Must be a power of 2 \\
+\hline
+\mbox{\tt in}  & {\em q} & Prime modulus. Must satisfy $ q == 1 \mod 2N $ \\
+\hline
+\mbox{\tt in}  & {\em alloc\+\_\+ptr} & Custom memory allocator used for intermediate calculations \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a716fd07255e9b68fec80e2a9b98841f4}\label{classintel_1_1hexl_1_1NTT_a716fd07255e9b68fec80e2a9b98841f4}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template$<$class Allocator , class... Allocator\+Args$>$ \\
+intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{Allocator \&\&}]{a,  }\item[{Allocator\+Args \&\&...}]{args }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ac5ef577bf39789c1e200b7d5a7b65989}\label{classintel_1_1hexl_1_1NTT_ac5ef577bf39789c1e200b7d5a7b65989}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{uint64\+\_\+t}]{root\+\_\+of\+\_\+unity,  }\item[{std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$}]{alloc\+\_\+ptr = {\ttfamily \{\}} }\end{DoxyParamCaption})}
+
+
+
+Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em degree} & also known as N. Size of the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} transform. Must be a power of 2 \\
+\hline
+\mbox{\tt in}  & {\em q} & Prime modulus. Must satisfy $ q == 1 \mod 2N $ \\
+\hline
+\mbox{\tt in}  & {\em root\+\_\+of\+\_\+unity} & 2N\textquotesingle{}th root of unity in $ \mathbb{Z_q} $. \\
+\hline
+\mbox{\tt in}  & {\em alloc\+\_\+ptr} & Custom memory allocator used for intermediate calculations\\
+\hline
+\end{DoxyParams}
+Performs pre-\/computation necessary for forward and inverse transforms \mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a831df901cf9ea5a83e5d628cdbd36671}\label{classintel_1_1hexl_1_1NTT_a831df901cf9ea5a83e5d628cdbd36671}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template$<$class Allocator , class... Allocator\+Args$>$ \\
+intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{uint64\+\_\+t}]{root\+\_\+of\+\_\+unity,  }\item[{Allocator \&\&}]{a,  }\item[{Allocator\+Args \&\&...}]{args }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a7f8dac5ff3fc117d3e7259762a716140}\label{classintel_1_1hexl_1_1NTT_a7f8dac5ff3fc117d3e7259762a716140}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Compute\+Forward@{Compute\+Forward}}
+\index{Compute\+Forward@{Compute\+Forward}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Compute\+Forward()}{ComputeForward()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+N\+T\+T\+::\+Compute\+Forward (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor,  }\item[{uint64\+\_\+t}]{output\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+
+
+Compute forward \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. Results are bit-\/reversed. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em result} & Stores the result \\
+\hline
+\mbox{\tt in}  & {\em operand} & Data on which to compute the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} \\
+\hline
+\mbox{\tt in}  & {\em input\+\_\+mod\+\_\+factor} & Assume input {\ttfamily operand} are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ q). Must be 1, 2 or 4. \\
+\hline
+\mbox{\tt in}  & {\em output\+\_\+mod\+\_\+factor} & Returns output {\ttfamily operand} in \mbox{[}0, output\+\_\+mod\+\_\+factor $\ast$ q). Must be 1 or 4. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a31e78375dcafd5df85cb1259a9156a9a}\label{classintel_1_1hexl_1_1NTT_a31e78375dcafd5df85cb1259a9156a9a}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Compute\+Inverse@{Compute\+Inverse}}
+\index{Compute\+Inverse@{Compute\+Inverse}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Compute\+Inverse()}{ComputeInverse()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+N\+T\+T\+::\+Compute\+Inverse (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor,  }\item[{uint64\+\_\+t}]{output\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+Compute inverse \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. Results are bit-\/reversed. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em result} & Stores the result \\
+\hline
+\mbox{\tt in}  & {\em operand} & Data on which to compute the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} \\
+\hline
+\mbox{\tt in}  & {\em input\+\_\+mod\+\_\+factor} & Assume input {\ttfamily operand} are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ q). Must be 1 or 2. \\
+\hline
+\mbox{\tt in}  & {\em output\+\_\+mod\+\_\+factor} & Returns output {\ttfamily operand} in \mbox{[}0, output\+\_\+mod\+\_\+factor $\ast$ q). Must be 1 or 2. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{ntt_8hpp}{ntt.\+hpp}\end{DoxyCompactItemize}

@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="README_8md" kind="file" language="Markdown">
+    <compoundname>README.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/>Intel<sp/>Homomorphic<sp/>Encryption<sp/>Acceleration<sp/>Library<sp/>(HEXL)</highlight></codeline>
+<codeline><highlight class="normal">Intel:registered:<sp/>HEXL<sp/>is<sp/>an<sp/>open-source<sp/>library<sp/>which<sp/>provides<sp/>efficient<sp/>implementations<sp/>of<sp/>integer<sp/>arithmetic<sp/>on<sp/>Galois<sp/>fields.<sp/>Such<sp/>arithmetic<sp/>is<sp/>prevalent<sp/>in<sp/>cryptography,<sp/>particularly<sp/>in<sp/>homomorphic<sp/>encryption<sp/>(HE)<sp/>schemes.<sp/>Intel<sp/>HEXL<sp/>targets<sp/>integer<sp/>arithmetic<sp/>with<sp/>word-sized<sp/>primes,<sp/>typically<sp/>40-60<sp/>bits.<sp/>Intel<sp/>HEXL<sp/>provides<sp/>an<sp/>API<sp/>for<sp/>64-bit<sp/>unsigned<sp/>integers<sp/>and<sp/>targets<sp/>Intel<sp/>CPUs.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Contents</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Intel<sp/>Homomorphic<sp/>Encryption<sp/>Acceleration<sp/>Library<sp/>(HEXL)](#intel-homomorphic-encryption-acceleration-library-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Contents](#contents)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Introduction](#introduction)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Building<sp/>Intel<sp/>HEXL](#building-intel-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>[Dependencies](#dependencies)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>[Compile-time<sp/>options](#compile-time-options)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>[Compiling<sp/>Intel<sp/>HEXL](#compiling-intel-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Testing<sp/>Intel<sp/>HEXL](#testing-intel-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Benchmarking<sp/>Intel<sp/>HEXL](#benchmarking-intel-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Using<sp/>Intel<sp/>HEXL](#using-intel-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Debugging](#debugging)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Threading](#threading)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Community<sp/>Adoption](#community-adoption)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Documentation](#documentation)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Doxygen](#doxygen)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Sphinx](#sphinx)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>[Contributing](#contributing)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Repository<sp/>layout](#repository-layout)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Intel<sp/>HEXL<sp/>Publication](#intel-hexl-publication)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>-<sp/>[Citing<sp/>Intel<sp/>HEXL](#citing-intel-hexl)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>-<sp/>[Version<sp/>1.0](#version-10)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Introduction</highlight></codeline>
+<codeline><highlight class="normal">Many<sp/>cryptographic<sp/>applications,<sp/>particularly<sp/>homomorphic<sp/>encryption<sp/>(HE),<sp/>rely<sp/>on<sp/>integer<sp/>polynomial<sp/>arithmetic<sp/>in<sp/>a<sp/>finite<sp/>field.<sp/>HE,<sp/>which<sp/>enables<sp/>computation<sp/>on<sp/>encrypted<sp/>data,<sp/>typically<sp/>uses<sp/>polynomials<sp/>with<sp/>degree<sp/>`N`<sp/>a<sp/>power<sp/>of<sp/>two<sp/>roughly<sp/>in<sp/>the<sp/>range<sp/>`N=[2^{10},<sp/>2^{17}]`.<sp/>The<sp/>coefficients<sp/>of<sp/>these<sp/>polynomials<sp/>are<sp/>in<sp/>a<sp/>finite<sp/>field<sp/>with<sp/>a<sp/>word-sized<sp/>prime,<sp/>`q`,<sp/>up<sp/>to<sp/>`q`~62<sp/>bits.<sp/>More<sp/>precisely,<sp/>the<sp/>polynomials<sp/>live<sp/>in<sp/>the<sp/>ring<sp/>`Z_q[X]/(X^N<sp/>+<sp/>1)`.<sp/>That<sp/>is,<sp/>when<sp/>adding<sp/>or<sp/>multiplying<sp/>two<sp/>polynomials,<sp/>each<sp/>coefficient<sp/>of<sp/>the<sp/>result<sp/>is<sp/>reduced<sp/>by<sp/>the<sp/>prime<sp/>modulus<sp/>`q`.<sp/>When<sp/>multiplying<sp/>two<sp/>polynomials,<sp/>the<sp/>resulting<sp/>polynomials<sp/>of<sp/>degree<sp/>`2N`<sp/>is<sp/>additionally<sp/>reduced<sp/>by<sp/>taking<sp/>the<sp/>remainder<sp/>when<sp/>dividing<sp/>by<sp/>`X^N+1`.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>The<sp/>primary<sp/>bottleneck<sp/>in<sp/>many<sp/>HE<sp/>applications<sp/>is<sp/>polynomial-polynomial<sp/>multiplication<sp/>in<sp/>`Z_q[X]/(X^N<sp/>+<sp/>1)`.<sp/>For<sp/>efficient<sp/>implementation,<sp/>Intel<sp/>HEXL<sp/>implements<sp/>the<sp/>negacyclic<sp/>number-theoretic<sp/>transform<sp/>(NTT).<sp/>To<sp/>multiply<sp/>two<sp/>polynomials,<sp/>`q_1(x),<sp/>q_2(x)`<sp/>using<sp/>the<sp/>NTT,<sp/>we<sp/>perform<sp/>the<sp/>FwdNTT<sp/>on<sp/>the<sp/>two<sp/>input<sp/>polynomials,<sp/>then<sp/>perform<sp/>an<sp/>element-wise<sp/>modular<sp/>multiplication,<sp/>and<sp/>perform<sp/>the<sp/>InvNTT<sp/>on<sp/>the<sp/>result.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>implements<sp/>the<sp/>following<sp/>functions:</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>The<sp/>forward<sp/>and<sp/>inverse<sp/>negacyclic<sp/>number-theoretic<sp/>transform<sp/>(NTT)</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Element-wise<sp/>vector-vector<sp/>modular<sp/>multiplication</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Element-wise<sp/>vector-scalar<sp/>modular<sp/>multiplication<sp/>with<sp/>optional<sp/>addition</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Element-wise<sp/>modular<sp/>multiplication</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">For<sp/>each<sp/>function,<sp/>the<sp/>library<sp/>implements<sp/>one<sp/>or<sp/>several<sp/>Intel(R)<sp/>AVX-512<sp/>implementations,<sp/>as<sp/>well<sp/>as<sp/>a<sp/>less<sp/>performant,<sp/>more<sp/>readable<sp/>native<sp/>C++<sp/>implementation.<sp/>Intel<sp/>HEXL<sp/>will<sp/>automatically<sp/>choose<sp/>the<sp/>best<sp/>implementation<sp/>for<sp/>the<sp/>given<sp/>CPU<sp/>Intel(R)<sp/>AVX-512<sp/>feature<sp/>set.<sp/>In<sp/>particular,<sp/>when<sp/>the<sp/>modulus<sp/>`q`<sp/>is<sp/>less<sp/>than<sp/>`2^{50}`,<sp/>the<sp/>AVX512IFMA<sp/>instruction<sp/>set<sp/>available<sp/>on<sp/>Intel<sp/>IceLake<sp/>server<sp/>and<sp/>IceLake<sp/>client<sp/>will<sp/>provide<sp/>a<sp/>more<sp/>efficient<sp/>implementation.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">For<sp/>additional<sp/>functionality,<sp/>see<sp/>the<sp/>public<sp/>headers,<sp/>located<sp/>in<sp/>`include/hexl`</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Building<sp/>Intel<sp/>HEXL</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Dependencies</highlight></codeline>
+<codeline><highlight class="normal">We<sp/>have<sp/>tested<sp/>Intel<sp/>HEXL<sp/>on<sp/>the<sp/>following<sp/>operating<sp/>systems:</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Ubuntu<sp/>18.04</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>macOS<sp/>10.15</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Microsoft<sp/>Windows<sp/>10</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>requires<sp/>the<sp/>following<sp/>dependencies:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">|<sp/>Dependency<sp/><sp/>|<sp/>Version<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|-------------|----------------------------------------------|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>CMake<sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>&gt;=<sp/>3.5.1<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>Compiler<sp/><sp/><sp/><sp/>|<sp/>gcc<sp/>&gt;=<sp/>7.0,<sp/>clang++<sp/>&gt;=<sp/>5.0,<sp/>MSVC<sp/>&gt;=<sp/>2019<sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">For<sp/>best<sp/>performance,<sp/>we<sp/>recommend<sp/>using<sp/>a<sp/>processor<sp/>with<sp/>AVX512-IFMA52<sp/>support,<sp/>and<sp/>a<sp/>recent<sp/>compiler<sp/>(gcc<sp/>&gt;=<sp/>8.0,<sp/>clang++<sp/>&gt;=<sp/>6.0).<sp/>To<sp/>determine<sp/>if<sp/>your<sp/>process<sp/>supports<sp/>AVX512-IFMA52,<sp/>simply<sp/>look<sp/>for<sp/>`HEXL_HAS_AVX512IFMA`<sp/>during<sp/>the<sp/>configure<sp/>step<sp/>(see<sp/>[Compiling<sp/>Intel<sp/>HEXL](#compiling-hexl)).</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Compile-time<sp/>options</highlight></codeline>
+<codeline><highlight class="normal">In<sp/>addition<sp/>to<sp/>the<sp/>standard<sp/>CMake<sp/>build<sp/>options,<sp/>Intel<sp/>HEXL<sp/>supports<sp/>several<sp/>compile-time<sp/>flags<sp/>to<sp/>configure<sp/>the<sp/>build.</highlight></codeline>
+<codeline><highlight class="normal">For<sp/>convenience,<sp/>they<sp/>are<sp/>listed<sp/>below:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">|<sp/>CMake<sp/>option<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>Values<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>---------------------------------|<sp/>----------------------<sp/>|<sp/>------------------------------------------------------------------------<sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_BENCHMARK<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>ON)<sp/><sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>benchmark<sp/>suite<sp/>via<sp/>Google<sp/>benchmark<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_COVERAGE<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>coverage<sp/>report<sp/>of<sp/>unit-tests<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_DEBUG<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>debugging<sp/>at<sp/>large<sp/>runtime<sp/>penalty<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_DOCS<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>building<sp/>of<sp/>documentation<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_ENABLE_ADDRESS_SANITIZER<sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>building<sp/>with<sp/>address<sp/>sanitizer<sp/>(ASan)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_ENABLE_THREAD_SANITIZER<sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>building<sp/>with<sp/>thread<sp/>sanitizer<sp/>(TSan)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_ENABLE_UB_SANITIZER<sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>building<sp/>with<sp/>undefined<sp/>behavior<sp/>sanitizer<sp/>(UBSan)<sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_EXPORT<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>export<sp/>of<sp/>Intel<sp/>HEXL<sp/>for<sp/>use<sp/>in<sp/>3rd-party<sp/>project<sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_SHARED_LIB<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>building<sp/>shared<sp/>library<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_TESTING<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>ON)<sp/><sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>enable<sp/>building<sp/>of<sp/>unit-tests<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>HEXL_TREAT_WARNING_AS_ERROR<sp/><sp/><sp/>|<sp/>ON<sp/>/<sp/>OFF<sp/>(default<sp/>OFF)<sp/>|<sp/>Set<sp/>to<sp/>ON<sp/>to<sp/>treat<sp/>all<sp/>warnings<sp/>as<sp/>error<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Compiling<sp/>Intel<sp/>HEXL</highlight></codeline>
+<codeline><highlight class="normal">The<sp/>instructions<sp/>to<sp/>build<sp/>Intel<sp/>HEXL<sp/>are<sp/>common<sp/>between<sp/>Linux,<sp/>MacOS,<sp/>and<sp/>Windows.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">To<sp/>compile<sp/>Intel<sp/>HEXL<sp/>from<sp/>source<sp/>code,<sp/>first<sp/>clone<sp/>the<sp/>repository<sp/>into<sp/>your<sp/>current<sp/>directory.<sp/>Then,<sp/>to<sp/>configure<sp/>the<sp/>build,<sp/>call</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>-S<sp/>.<sp/>-B<sp/>build</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">adding<sp/>the<sp/>desired<sp/>compile-time<sp/>options<sp/>with<sp/>a<sp/>`-D`<sp/>flag.<sp/>For<sp/>instance,<sp/>to<sp/>build<sp/>Intel<sp/>HEXL<sp/>with<sp/>debugging<sp/>capabilities,<sp/>call</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>-S<sp/>.<sp/>-B<sp/>build<sp/>-DHEXL_DEBUG=ON</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Then,<sp/>to<sp/>build<sp/>Intel<sp/>HEXL,<sp/>call</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">This<sp/>will<sp/>build<sp/>the<sp/>Intel<sp/>HEXL<sp/>library<sp/>in<sp/>the<sp/>`build/hexl/lib/`<sp/>directory.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">To<sp/>install<sp/>Intel<sp/>HEXL<sp/>to<sp/>the<sp/>installation<sp/>directory,<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--install<sp/>build</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>use<sp/>a<sp/>non-standard<sp/>installation<sp/>directory,<sp/>configure<sp/>the<sp/>build<sp/>with</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>-S<sp/>.<sp/>-B<sp/>build<sp/>-DCMAKE_INSTALL_PREFIX=/path/to/install</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Testing<sp/>Intel<sp/>HEXL</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>run<sp/>a<sp/>set<sp/>of<sp/>unit<sp/>tests<sp/>via<sp/>Googletest,<sp/>configure<sp/>and<sp/>build<sp/>Intel<sp/>HEXL<sp/>with<sp/>`-DHEXL_TESTING=ON`<sp/>(see<sp/>[Compile-time<sp/>options](#compile-time-options)).</highlight></codeline>
+<codeline><highlight class="normal">Then,<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>unittest</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">The<sp/>unit-test<sp/>executable<sp/>itself<sp/>is<sp/>located<sp/>at<sp/>`build/test/unit-test`</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>Benchmarking<sp/>Intel<sp/>HEXL</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>run<sp/>a<sp/>set<sp/>of<sp/>benchmarks<sp/>via<sp/>Google<sp/>benchmark,<sp/>configure<sp/>and<sp/>build<sp/>Intel<sp/>HEXL<sp/>with<sp/>`-DHEXL_BENCHMARK=ON`<sp/>(see<sp/>[Compile-time<sp/>options](#compile-time-options)).</highlight></codeline>
+<codeline><highlight class="normal">Then,<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>bench</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">The<sp/>benchmark<sp/>executable<sp/>itself<sp/>is<sp/>located<sp/>at<sp/>`build/benchmark/bench_hexl`</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Using<sp/>Intel<sp/>HEXL</highlight></codeline>
+<codeline><highlight class="normal">The<sp/>`example`<sp/>folder<sp/>has<sp/>an<sp/>example<sp/>of<sp/>using<sp/>Intel<sp/>HEXL<sp/>in<sp/>a<sp/>third-party<sp/>project.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Debugging</highlight></codeline>
+<codeline><highlight class="normal">For<sp/>optimal<sp/>performance,<sp/>Intel<sp/>HEXL<sp/>does<sp/>not<sp/>perform<sp/>input<sp/>validation.<sp/>In<sp/>many<sp/>cases<sp/>the<sp/>time<sp/>required<sp/>for<sp/>the<sp/>validation<sp/>would<sp/>be<sp/>longer<sp/>than<sp/>the<sp/>execution<sp/>of<sp/>the<sp/>function<sp/>itself.<sp/>To<sp/>debug<sp/>Intel<sp/>HEXL,<sp/>configure<sp/>and<sp/>build<sp/>Intel<sp/>HEXL<sp/>with<sp/>`-DHEXL_DEBUG=ON`<sp/>(see<sp/>[Compile-time<sp/>options](#compile-time-options)).<sp/>This<sp/>will<sp/>generate<sp/>a<sp/>debug<sp/>version<sp/>of<sp/>the<sp/>library,<sp/>e.g.<sp/>`libhexl_debug.a`,<sp/>that<sp/>can<sp/>be<sp/>used<sp/>to<sp/>debug<sp/>the<sp/>execution.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">**Note**,<sp/>enabling<sp/>`HEXL_DEBUG=ON`<sp/>will<sp/>result<sp/>in<sp/>a<sp/>significant<sp/>runtime<sp/>overhead.</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>Threading</highlight></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>is<sp/>single-threaded<sp/>and<sp/>thread-safe.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Community<sp/>Adoption</highlight></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>has<sp/>been<sp/>integrated<sp/>to<sp/>[Microsoft<sp/>SEAL](https://github.com/Microsoft/SEAL),<sp/>an<sp/>easy-to-use<sp/>homomorphic<sp/>encryption<sp/>library.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">If<sp/>you<sp/>are<sp/>aware<sp/>of<sp/>any<sp/>other<sp/>uses<sp/>of<sp/>Intel<sp/>HEXL,<sp/>please<sp/>let<sp/>us<sp/>know!</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Documentation</highlight></codeline>
+<codeline><highlight class="normal">See<sp/>[https://intel.github.io/hexl](https://intel.github.io/hexl)<sp/>for<sp/>Doxygen<sp/>documentation.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>supports<sp/>documentation<sp/>via<sp/>Doxygen<sp/>and<sp/>sphinx.</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>build<sp/>documentation,<sp/>first<sp/>install<sp/>`doxygen`<sp/>and<sp/>`graphviz`,<sp/>e.g.</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">sudo<sp/>apt-get<sp/>install<sp/>doxygen<sp/>graphviz</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">Then,<sp/>configure<sp/>Intel<sp/>HEXL<sp/>with<sp/>`-DHEXL_DOCS=ON`<sp/>(see<sp/>[Compile-time<sp/>options](#compile-time-options)).</highlight></codeline>
+<codeline><highlight class="normal">##<sp/>Doxygen</highlight></codeline>
+<codeline><highlight class="normal"><sp/>To<sp/>build<sp/>Doxygen<sp/>documentation,<sp/>after<sp/>configuring<sp/>Intel<sp/>HEXL<sp/>with<sp/>`-DHEXL_DOCS=ON`,<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>doxygen</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>view<sp/>the<sp/>generated<sp/>Doxygen<sp/>documentation,<sp/>open<sp/>the<sp/>generated<sp/>`build/docs/doxygen/html/index.html`<sp/>file<sp/>in<sp/>a<sp/>web<sp/>browser.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Sphinx</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>build<sp/>the<sp/>sphinx<sp/>documentation,<sp/>install<sp/>`sphinx`<sp/>and<sp/>required<sp/>dependencies<sp/>`breathe,<sp/>m2r2`,<sp/>e.g.</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">sudo<sp/>apt-get<sp/>install<sp/>python3-sphinx</highlight></codeline>
+<codeline><highlight class="normal">pip3<sp/>install<sp/>breathe<sp/>m2r2</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Then,<sp/>after<sp/>configuring<sp/>Intel<sp/>HEXL<sp/>with<sp/>`-DHEXL_DOCS=ON`,<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>docs</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>view<sp/>the<sp/>generated<sp/>Sphinx<sp/>documentation,<sp/>open<sp/>the<sp/>generated<sp/>`build/docs/sphinx/html/index.html`<sp/>file<sp/>in<sp/>a<sp/>web<sp/>browser.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Contributing</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">At<sp/>this<sp/>time,<sp/>Intel<sp/>HEXL<sp/>does<sp/>not<sp/>accept<sp/>external<sp/>contributions.<sp/>We<sp/>encourage<sp/>feedback<sp/>and<sp/>suggestions<sp/>via<sp/>issues.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">For<sp/>Intel<sp/>developers,<sp/>use<sp/>[pre-commit](https://pre-commit.com/)<sp/>to<sp/>validate<sp/>the<sp/>formatting<sp/>of<sp/>the<sp/>code.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Before<sp/>contributing,<sp/>please<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>check<sp/>unittest</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">and<sp/>make<sp/>sure<sp/>pre-commit<sp/>checks<sp/>and<sp/>all<sp/>unit<sp/>tests<sp/>pass.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Repository<sp/>layout</highlight></codeline>
+<codeline><highlight class="normal">Public<sp/>headers<sp/>reside<sp/>in<sp/>the<sp/>`hexl/include`<sp/>folder.</highlight></codeline>
+<codeline><highlight class="normal">Private<sp/>headers,<sp/>e.g.<sp/>those<sp/>containing<sp/>Intel(R)<sp/>AVX-512<sp/>code<sp/>should<sp/>not<sp/>be<sp/>put<sp/>in<sp/>this<sp/>folder.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Intel<sp/>HEXL<sp/>Publication</highlight></codeline>
+<codeline><highlight class="normal">For<sp/>more<sp/>details<sp/>on<sp/>Intel<sp/>HEXL,<sp/>see<sp/>our<sp/>whitepaper<sp/>at<sp/>https://arxiv.org/abs/2103.16400.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Citing<sp/>Intel<sp/>HEXL</highlight></codeline>
+<codeline><highlight class="normal">To<sp/>cite<sp/>Intel<sp/>HEXL,<sp/>please<sp/>use<sp/>the<sp/>following<sp/>BibTeX<sp/>entry.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Version<sp/>1.0</highlight></codeline>
+<codeline><highlight class="normal">```tex</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>@misc{IntelHEXL,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>title<sp/>=<sp/>{{I}ntel<sp/>{HEXL}<sp/>(release<sp/>1.0)},</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>howpublished<sp/>=<sp/>{\url{https://arxiv.org/abs/2103.16400}},</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>month<sp/>=<sp/>mar,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>year<sp/>=<sp/>2021,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>key<sp/>=<sp/>{Intel<sp/>HEXL}</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+    </programlisting>
+    <location file="/home/gelila/Desktop/workspace/intel-hexl/README.md"/>
+  </compounddef>
+</doxygen>
