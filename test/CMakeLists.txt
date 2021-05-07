@@ -32,7 +32,9 @@ target_include_directories(unit-test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${HEXL_SRC_ROOT_DIR} # Private headers
 )
-target_link_libraries(unit-test PRIVATE hexl gtest Threads::Threads)
+
+# Link to cpu_features to allow selectively disabling AVX512 support for CI
+target_link_libraries(unit-test PRIVATE hexl cpu_features gtest Threads::Threads)
 if (HEXL_DEBUG)
     target_link_libraries(unit-test PRIVATE easyloggingpp)
 endif()
