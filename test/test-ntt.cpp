@@ -15,6 +15,7 @@
 #include "ntt/ntt-internal.hpp"
 #include "number-theory/number-theory.hpp"
 #include "test-util.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -438,42 +439,45 @@ class NTTModulusTest
 // Test modulus around 50 bits to check IFMA behavior
 // Parameters = (degree, modulus_bits)
 TEST_P(NTTModulusTest, IFMAModuli) {
-  uint64_t N = std::get<0>(GetParam());
-  uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
+  if (has_avx512ifma) {
+    uint64_t N = std::get<0>(GetParam());
+    uint64_t modulus_bits = std::get<1>(GetParam());
+    uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
 
-  std::vector<uint64_t> input64(N, 0);
-  for (size_t i = 0; i < N; ++i) {
-    input64[i] = i % modulus;
+    std::vector<uint64_t> input64(N, 0);
+    for (size_t i = 0; i < N; ++i) {
+      input64[i] = i % modulus;
+    }
+    std::vector<uint64_t> input_ifma = input64;
+    std::vector<uint64_t> input_ifma_lazy = input64;
+
+    std::vector<uint64_t> exp_output(N, 0);
+
+    // Compute reference
+    NTT::NTTImpl ntt64(N, modulus);
+    ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
+                                          ntt64.GetRootOfUnityPowers().data());
+
+    // Compute with 52-bit bit shift
+    NTT::NTTImpl ntt_ifma(N, modulus);
+
+    ForwardTransformToBitReverseAVX512<52>(
+        input_ifma.data(), N, ntt_ifma.GetModulus(),
+        ntt_ifma.GetRootOfUnityPowers().data(),
+        ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 1);
+
+    // Compute lazy
+    ForwardTransformToBitReverseAVX512<52>(
+        input_ifma_lazy.data(), N, ntt_ifma.GetModulus(),
+        ntt_ifma.GetRootOfUnityPowers().data(),
+        ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 4);
+    for (auto& elem : input_ifma_lazy) {
+      elem = elem % modulus;
+    }
+
+    AssertEqual(input64, input_ifma);
+    AssertEqual(input64, input_ifma_lazy);
   }
-  std::vector<uint64_t> input_ifma = input64;
-  std::vector<uint64_t> input_ifma_lazy = input64;
-
-  std::vector<uint64_t> exp_output(N, 0);
-
-  // Compute reference
-  NTT::NTTImpl ntt64(N, modulus);
-  ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
-                                        ntt64.GetRootOfUnityPowers().data());
-
-  // Compute with 52-bit bit shift
-  NTT::NTTImpl ntt_ifma(N, modulus);
-  ForwardTransformToBitReverseAVX512<52>(
-      input_ifma.data(), N, ntt_ifma.GetModulus(),
-      ntt_ifma.GetRootOfUnityPowers().data(),
-      ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 1);
-
-  // Compute lazy
-  ForwardTransformToBitReverseAVX512<52>(
-      input_ifma_lazy.data(), N, ntt_ifma.GetModulus(),
-      ntt_ifma.GetRootOfUnityPowers().data(),
-      ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 4);
-  for (auto& elem : input_ifma_lazy) {
-    elem = elem % modulus;
-  }
-
-  AssertEqual(input64, input_ifma);
-  AssertEqual(input64, input_ifma_lazy);
 }
 
 INSTANTIATE_TEST_SUITE_P(NTTModulusTest, NTTModulusTest,
