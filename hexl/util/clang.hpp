@@ -53,9 +53,9 @@ inline uint64_t MultiplyUInt64Hi(uint64_t x, uint64_t y) {
   return static_cast<uint64_t>(product >> BitShift);
 }
 
-// Returns maximum number of possible significant bits given modulus
-inline uint64_t MSB(uint64_t modulus) {
-  return static_cast<uint64_t>(std::log2l(modulus));
+// Returns most-significant bit of the input
+inline uint64_t MSB(uint64_t input) {
+  return static_cast<uint64_t>(std::log2l(input));
 }
 
 #define HEXL_LOOP_UNROLL_4 _Pragma("clang loop unroll_count(4)")
