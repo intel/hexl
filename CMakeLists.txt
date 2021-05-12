@@ -56,7 +56,6 @@ option(HEXL_BENCHMARK "Enable benchmarking" ON)
 option(HEXL_COVERAGE "Enables coverage for unit tests" OFF)
 option(HEXL_DEBUG "Enable runtime debug checking; will yield much slower code " OFF)
 option(HEXL_DOCS "Enable documentation building" OFF)
-option(HEXL_EXPORT "Enables export of hexl target" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
@@ -71,7 +70,6 @@ message(STATUS "HEXL_BENCHMARK:                ${HEXL_BENCHMARK}")
 message(STATUS "HEXL_COVERAGE:                 ${HEXL_COVERAGE}")
 message(STATUS "HEXL_DEBUG:                    ${HEXL_DEBUG}")
 message(STATUS "HEXL_DOCS:                     ${HEXL_DOCS}")
-message(STATUS "HEXL_EXPORT:                   ${HEXL_EXPORT}")
 message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
@@ -227,49 +225,47 @@ endif()
 #------------------------------------------------------------------------------
 # Config export...
 #------------------------------------------------------------------------------
-if (HEXL_EXPORT)
-  # Config
-  set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLTargets.cmake)
-  set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake.in)
-  set(HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake)
-  set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLConfigVersion.cmake)
+# Config filenames
+set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLTargets.cmake)
+set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake.in)
+set(HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake)
+set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLConfigVersion.cmake)
 
-  set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/)
+set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/)
 
-  # Create and install the CMake config and target file
-  install(
-      EXPORT HEXLTargets
-      NAMESPACE HEXL::
-      DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
-  )
+# Create and install the CMake config and target file
+install(
+    EXPORT HEXLTargets
+    NAMESPACE HEXL::
+    DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
+)
 
-  # Export version
-  write_basic_package_version_file(
-    ${HEXL_CONFIG_VERSION_FILENAME}
-    VERSION ${HEXL_VERSION}
-    COMPATIBILITY ExactVersion)
+# Export version
+write_basic_package_version_file(
+  ${HEXL_CONFIG_VERSION_FILENAME}
+  VERSION ${HEXL_VERSION}
+  COMPATIBILITY ExactVersion)
 
-  include(CMakePackageConfigHelpers)
-      configure_package_config_file(
-          ${HEXL_CONFIG_IN_FILENAME} ${HEXL_CONFIG_FILENAME}
-          INSTALL_DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
-      )
+include(CMakePackageConfigHelpers)
+    configure_package_config_file(
+        ${HEXL_CONFIG_IN_FILENAME} ${HEXL_CONFIG_FILENAME}
+        INSTALL_DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
+    )
 
-  install(
-      TARGETS hexl
-      EXPORT HEXLTargets
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      )
+install(
+    TARGETS hexl
+    EXPORT HEXLTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 
-  install(FILES ${HEXL_CONFIG_FILENAME}
-                ${HEXL_CONFIG_VERSION_FILENAME}
-          DESTINATION ${HEXL_CONFIG_INSTALL_DIR})
+install(FILES ${HEXL_CONFIG_FILENAME}
+              ${HEXL_CONFIG_VERSION_FILENAME}
+        DESTINATION ${HEXL_CONFIG_INSTALL_DIR})
 
-  export(EXPORT HEXLTargets
-         FILE ${HEXL_TARGET_FILENAME})
+export(EXPORT HEXLTargets
+        FILE ${HEXL_TARGET_FILENAME})
 
-endif()
 
 add_custom_target(check COMMAND pre-commit install && pre-commit run --all-files)
