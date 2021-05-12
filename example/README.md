@@ -1,8 +1,6 @@
 # Example using Intel HEXL in an external application
 
-To use Intel HEXL in an external application, first build Intel HEXL with `HEXL_EXPORT=ON`. Then, run `make install`.
-
-Next, in your external application, add the following lines to your `CMakeLists.txt`:
+To use Intel HEXL in an external application, first install Intel HEXL. Then, in your external application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
 find_package(HEXL 1.1.0

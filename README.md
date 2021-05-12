@@ -70,7 +70,6 @@ For convenience, they are listed below:
 | HEXL_ENABLE_ADDRESS_SANITIZER | ON / OFF (default OFF) | Set to ON to enable building with address sanitizer (ASan)               |
 | HEXL_ENABLE_THREAD_SANITIZER  | ON / OFF (default OFF) | Set to ON to enable building with thread sanitizer (TSan)                |
 | HEXL_ENABLE_UB_SANITIZER      | ON / OFF (default OFF) | Set to ON to enable building with undefined behavior sanitizer (UBSan)   |
-| HEXL_EXPORT                   | ON / OFF (default OFF) | Set to ON to enable export of Intel HEXL for use in 3rd-party project    |
 | HEXL_SHARED_LIB               | ON / OFF (default OFF) | Set to ON to enable building shared library                              |
 | HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                               |
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
