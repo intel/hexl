@@ -86,7 +86,7 @@ class NTT {
   /// @param[in] operand Data on which to compute the NTT
   /// @param[in] input_mod_factor Assume input \p operand are in [0,
   /// input_mod_factor * q). Must be 1, 2 or 4.
-  /// @param[in] output_mod_factor Returns output \p operand in [0,
+  /// @param[in] output_mod_factor Returns output \p result in [0,
   /// output_mod_factor * q). Must be 1 or 4.
   void ComputeForward(uint64_t* result, const uint64_t* operand,
                       uint64_t input_mod_factor, uint64_t output_mod_factor);
@@ -96,7 +96,7 @@ class NTT {
   /// @param[in] operand Data on which to compute the NTT
   /// @param[in] input_mod_factor Assume input \p operand are in [0,
   /// input_mod_factor * q). Must be 1 or 2.
-  /// @param[in] output_mod_factor Returns output \p operand in [0,
+  /// @param[in] output_mod_factor Returns output \p result in [0,
   /// output_mod_factor * q). Must be 1 or 2.
   void ComputeInverse(uint64_t* result, const uint64_t* operand,
                       uint64_t input_mod_factor, uint64_t output_mod_factor);

@@ -10,7 +10,8 @@ namespace hexl {
 
 /// @brief Performs elementwise modular reduction
 /// @param[out] result Stores the result
-/// @param[in] operand
+/// @param[in] operand Data on which to compute the elementwise modular
+/// reduction
 /// @param[in] n Number of elements in operand
 /// @param[in] modulus Modulus with which to perform modular reduction
 /// @param[in] input_mod_factor Assumes input elements are in [0,
