@@ -38,6 +38,9 @@ add_library(HEXL::hexl ALIAS hexl)
 
 set_target_properties(hexl PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(hexl PROPERTIES VERSION ${HEXL_VERSION})
+if (HEXL_DEBUG)
+    set_target_properties(hexl PROPERTIES OUTPUT_NAME "hexl_debug")
+endif()
 
 target_include_directories(hexl
     PRIVATE ${HEXL_SRC_ROOT_DIR}                               # Private headers
@@ -91,7 +94,6 @@ else ()
 
     # Export logging only if we are debugging
     if (${HEXL_DEBUG})
-        set_target_properties(hexl PROPERTIES OUTPUT_NAME "hexl_debug")
         if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             add_custom_command(TARGET hexl POST_BUILD
                 COMMAND ar -x $<TARGET_FILE:hexl>
