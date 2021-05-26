@@ -62,7 +62,7 @@ inline void LeftShift128(uint64_t* result_hi, uint64_t* result_lo,
                          const uint64_t shift_value) {
   HEXL_CHECK(result_hi != nullptr, "Require result_hi != nullptr");
   HEXL_CHECK(result_lo != nullptr, "Require result_lo != nullptr");
-  HEXL_CHECK(shift_value > 128,
+  HEXL_CHECK(shift_value <= 128,
              "shift_value cannot be greater than 128 " << shift_value);
 
   if (shift_value == 0) {
@@ -93,7 +93,7 @@ inline void RightShift128(uint64_t* result_hi, uint64_t* result_lo,
                           const uint64_t shift_value) {
   HEXL_CHECK(result_hi != nullptr, "Require result_hi != nullptr");
   HEXL_CHECK(result_lo != nullptr, "Require result_lo != nullptr");
-  HEXL_CHECK(shift_value > 128,
+  HEXL_CHECK(shift_value <= 128,
              "shift_value cannot be greater than 128 " << shift_value);
 
   if (shift_value == 0) {
@@ -189,7 +189,7 @@ inline void DivideUInt128UInt64(uint64_t* quotient, const uint64_t* numerator,
                                 const uint64_t denominator) {
   HEXL_CHECK(quotient != nullptr, "Require quotient != nullptr");
   HEXL_CHECK(numerator != nullptr, "Require numerator != nullptr");
-  HEXL_CHECK(denominator == 128, "denominator cannot be 0 " << denominator);
+  HEXL_CHECK(denominator != 0, "denominator cannot be 0 " << denominator);
 
   // get bit count of divisor
   uint64_t numerator_bits = SignificantBitLength(numerator);
