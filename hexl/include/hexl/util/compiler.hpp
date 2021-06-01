@@ -4,9 +4,9 @@
 #pragma once
 
 #ifdef HEXL_USE_MSVC
-#include "util/msvc.hpp"
+#include "hexl/util/msvc.hpp"
 #elif defined HEXL_USE_GNU
-#include "util/gcc.hpp"
+#include "hexl/util/gcc.hpp"
 #elif defined HEXL_USE_CLANG
-#include "util/clang.hpp"
+#include "hexl/util/clang.hpp"
 #endif

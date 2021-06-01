@@ -10,8 +10,8 @@
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"
 #include "eltwise/eltwise-cmp-sub-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-cmp-sub-mod.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 #include "test-util.hpp"
 
 namespace intel {

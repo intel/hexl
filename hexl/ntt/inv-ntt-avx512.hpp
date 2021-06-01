@@ -8,11 +8,11 @@
 #include <functional>
 #include <vector>
 
+#include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
-#include "logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "number-theory/number-theory.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -254,11 +254,11 @@ void InverseTransformFromBitReverseAVX512(
                    << std::vector<uint64_t>(operand, operand + n));
 
   const uint64_t W_op = inv_root_of_unity_powers[root_index];
-  MultiplyFactor mf_inv_n(InverseUIntMod(n, modulus), BitShift, modulus);
+  MultiplyFactor mf_inv_n(InverseMod(n, modulus), BitShift, modulus);
   const uint64_t inv_n = mf_inv_n.Operand();
   const uint64_t inv_n_prime = mf_inv_n.BarrettFactor();
 
-  MultiplyFactor mf_inv_n_w(MultiplyUIntMod(inv_n, W_op, modulus), BitShift,
+  MultiplyFactor mf_inv_n_w(MultiplyMod(inv_n, W_op, modulus), BitShift,
                             modulus);
   const uint64_t inv_n_w = mf_inv_n_w.Operand();
   const uint64_t inv_n_w_prime = mf_inv_n_w.BarrettFactor();

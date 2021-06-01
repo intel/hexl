@@ -8,8 +8,8 @@
 
 #include "eltwise/eltwise-sub-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-sub-mod.hpp"
+#include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
-#include "util/check.hpp"
 
 #ifdef HEXL_HAS_AVX512DQ
 

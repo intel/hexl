@@ -74,26 +74,6 @@ message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
 
-# Compiler flags
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # using Visual Studio C++
-    set(HEXL_USE_MSVC ON)
-    add_definitions(-DHEXL_USE_MSVC)
-    message(STATUS "HEXL_USE_MSVC:                 ${HEXL_USE_MSVC}")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  # using GCC
-    set(HEXL_USE_GNU ON)
-    add_definitions(-DHEXL_USE_GNU)
-    message(STATUS "HEXL_USE_GNU:                  ${HEXL_USE_GNU}")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # using Clang
-    set(HEXL_USE_CLANG ON)
-    add_definitions(-DHEXL_USE_CLANG)
-    message(STATUS "HEXL_USE_CLANG:                ${HEXL_USE_CLANG}")
-else()
-    message(WARNING "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
-endif()
-
 check_compiler_version()
 
 if (HEXL_COVERAGE)

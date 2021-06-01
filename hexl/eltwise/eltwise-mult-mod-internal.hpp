@@ -7,10 +7,9 @@
 
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/aligned-allocator.hpp"
-#include "util/check.hpp"
-#include "util/compiler.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
+#include "hexl/util/compiler.hpp"
 
 namespace intel {
 namespace hexl {

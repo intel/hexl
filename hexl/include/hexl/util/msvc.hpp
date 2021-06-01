@@ -11,7 +11,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "util/check.hpp"
+#include "hexl/util/check.hpp"
 
 #pragma intrinsic(_addcarry_u64, _BitScanReverse64, _subborrow_u64, _udiv128, \
                   _umul128)
