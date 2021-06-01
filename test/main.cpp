@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "logging/logging.hpp"
+#include "hexl/logging/logging.hpp"
 
 int main(int argc, char** argv) {
   START_EASYLOGGINGPP(argc, argv);

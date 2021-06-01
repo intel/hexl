@@ -7,8 +7,8 @@
 #include <memory>
 #include <vector>
 
+#include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/allocator.hpp"
-#include "number-theory/number-theory.hpp"
 
 namespace intel {
 namespace hexl {

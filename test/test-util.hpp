@@ -6,9 +6,9 @@
 #include <limits>
 #include <vector>
 
-#include "logging/logging.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
-#include "util/check.hpp"
 
 namespace intel {
 namespace hexl {

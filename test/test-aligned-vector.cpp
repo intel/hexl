@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "gtest/gtest.h"
-#include "logging/logging.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/util/aligned-allocator.hpp"
+#include "hexl/util/types.hpp"
 #include "test-util.hpp"
-#include "util/aligned-allocator.hpp"
-#include "util/types.hpp"
 
 namespace intel {
 namespace hexl {

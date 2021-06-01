@@ -8,9 +8,9 @@
 
 #include "eltwise/eltwise-fma-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-fma-mod.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
-#include "util/check.hpp"
 
 namespace intel {
 namespace hexl {

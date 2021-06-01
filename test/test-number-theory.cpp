@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "number-theory/number-theory.hpp"
-#include "util/compiler.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/compiler.hpp"
 
 namespace intel {
 namespace hexl {
@@ -27,38 +27,38 @@ TEST(NumberTheory, Log2) {
   ASSERT_EQ(13, Log2(8192));
 }
 
-TEST(NumberTheory, MultiplyUIntMod) {
+TEST(NumberTheory, MultiplyMod) {
   uint64_t modulus(2);
-  ASSERT_EQ(0ULL, MultiplyUIntMod(0, 0, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntMod(0, 1, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntMod(1, 0, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntMod(1, 1, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(0, 0, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(0, 1, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(1, 0, modulus));
+  ASSERT_EQ(1ULL, MultiplyMod(1, 1, modulus));
 
   modulus = 10;
-  ASSERT_EQ(0ULL, MultiplyUIntMod(0, 0, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntMod(0, 1, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntMod(1, 0, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntMod(1, 1, modulus));
-  ASSERT_EQ(9ULL, MultiplyUIntMod(7, 7, modulus));
-  ASSERT_EQ(2ULL, MultiplyUIntMod(6, 7, modulus));
-  ASSERT_EQ(2ULL, MultiplyUIntMod(7, 6, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(0, 0, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(0, 1, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(1, 0, modulus));
+  ASSERT_EQ(1ULL, MultiplyMod(1, 1, modulus));
+  ASSERT_EQ(9ULL, MultiplyMod(7, 7, modulus));
+  ASSERT_EQ(2ULL, MultiplyMod(6, 7, modulus));
+  ASSERT_EQ(2ULL, MultiplyMod(7, 6, modulus));
 
   modulus = 2305843009211596801ULL;
-  ASSERT_EQ(0ULL, MultiplyUIntMod(0, 0, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntMod(0, 1, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntMod(1, 0, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntMod(1, 1, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(0, 0, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(0, 1, modulus));
+  ASSERT_EQ(0ULL, MultiplyMod(1, 0, modulus));
+  ASSERT_EQ(1ULL, MultiplyMod(1, 1, modulus));
   ASSERT_EQ(
       576460752302899200ULL,
-      MultiplyUIntMod(1152921504605798400ULL, 1152921504605798401ULL, modulus));
+      MultiplyMod(1152921504605798400ULL, 1152921504605798401ULL, modulus));
   ASSERT_EQ(
       576460752302899200ULL,
-      MultiplyUIntMod(1152921504605798401ULL, 1152921504605798400ULL, modulus));
+      MultiplyMod(1152921504605798401ULL, 1152921504605798400ULL, modulus));
   ASSERT_EQ(
       1729382256908697601ULL,
-      MultiplyUIntMod(1152921504605798401ULL, 1152921504605798401ULL, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntMod(2305843009211596800ULL,
-                                  2305843009211596800ULL, modulus));
+      MultiplyMod(1152921504605798401ULL, 1152921504605798401ULL, modulus));
+  ASSERT_EQ(1ULL, MultiplyMod(2305843009211596800ULL, 2305843009211596800ULL,
+                              modulus));
 }
 
 TEST(NumberTheory, MultiplyModPreCon) {
@@ -166,141 +166,130 @@ TEST(NumberTheory, MinimalPrimitiveRoot) {
   ASSERT_EQ(249725733ULL, MinimalPrimitiveRoot(8, modulus));
 }
 
-TEST(NumberTheory, InverseUIntMod) {
+TEST(NumberTheory, InverseMod) {
   uint64_t input;
   uint64_t modulus;
 
   input = 1, modulus = 2;
-  ASSERT_EQ(1ULL, InverseUIntMod(input, modulus));
+  ASSERT_EQ(1ULL, InverseMod(input, modulus));
 
 #ifdef HEXL_DEBUG
   input = 2, modulus = 2;
-  EXPECT_ANY_THROW(InverseUIntMod(input, modulus));
+  EXPECT_ANY_THROW(InverseMod(input, modulus));
 
   input = 0xFFFFFE, modulus = 2;
-  EXPECT_ANY_THROW(InverseUIntMod(input, modulus));
+  EXPECT_ANY_THROW(InverseMod(input, modulus));
 
   input = 12345, modulus = 3;
-  EXPECT_ANY_THROW(InverseUIntMod(input, modulus));
+  EXPECT_ANY_THROW(InverseMod(input, modulus));
 #endif
 
   input = 3, modulus = 2;
-  ASSERT_EQ(1ULL, InverseUIntMod(input, modulus));
+  ASSERT_EQ(1ULL, InverseMod(input, modulus));
 
   input = 0xFFFFFF, modulus = 2;
-  ASSERT_EQ(1ULL, InverseUIntMod(input, modulus));
+  ASSERT_EQ(1ULL, InverseMod(input, modulus));
 
   input = 5, modulus = 19;
-  ASSERT_EQ(4ULL, InverseUIntMod(input, modulus));
+  ASSERT_EQ(4ULL, InverseMod(input, modulus));
 
   input = 4, modulus = 19;
-  ASSERT_EQ(5ULL, InverseUIntMod(input, modulus));
+  ASSERT_EQ(5ULL, InverseMod(input, modulus));
 }
 
-TEST(NumberTheory, ReverseBitsUInt64) {
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0ULL, 0));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0ULL, 1));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0ULL, 32));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0ULL, 64));
+TEST(NumberTheory, ReverseBits64) {
+  ASSERT_EQ(0ULL, ReverseBits(0ULL, 0));
+  ASSERT_EQ(0ULL, ReverseBits(0ULL, 1));
+  ASSERT_EQ(0ULL, ReverseBits(0ULL, 32));
+  ASSERT_EQ(0ULL, ReverseBits(0ULL, 64));
 
-  ASSERT_EQ(0ULL, ReverseBitsUInt(1ULL, 0));
-  ASSERT_EQ(1ULL, ReverseBitsUInt(1ULL, 1));
-  ASSERT_EQ(1ULL << 31, ReverseBitsUInt(1ULL, 32));
-  ASSERT_EQ(1ULL << 63, ReverseBitsUInt(1ULL, 64));
+  ASSERT_EQ(0ULL, ReverseBits(1ULL, 0));
+  ASSERT_EQ(1ULL, ReverseBits(1ULL, 1));
+  ASSERT_EQ(1ULL << 31, ReverseBits(1ULL, 32));
+  ASSERT_EQ(1ULL << 63, ReverseBits(1ULL, 64));
 
-  ASSERT_EQ(0ULL, ReverseBitsUInt(1ULL << 31, 0));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(1ULL << 31, 1));
-  ASSERT_EQ(1ULL, ReverseBitsUInt(1ULL << 31, 32));
-  ASSERT_EQ(1ULL << 32, ReverseBitsUInt(1ULL << 31, 64));
+  ASSERT_EQ(1ULL, ReverseBits(1ULL << 31, 32));
+  ASSERT_EQ(1ULL << 32, ReverseBits(1ULL << 31, 64));
 
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0xFFFFULL << 16, 0));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0xFFFFULL << 16, 1));
-  ASSERT_EQ(0xFFFFULL, ReverseBitsUInt(0xFFFFULL << 16, 32));
-  ASSERT_EQ(0xFFFFULL << 32, ReverseBitsUInt(0xFFFFULL << 16, 64));
+  ASSERT_EQ(0xFFFFULL, ReverseBits(0xFFFFULL << 16, 32));
+  ASSERT_EQ(0xFFFFULL << 32, ReverseBits(0xFFFFULL << 16, 64));
 
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0x0000FFFFFFFF0000ULL, 0));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0x0000FFFFFFFF0000ULL, 1));
-  ASSERT_EQ(0xFFFFULL, ReverseBitsUInt(0x0000FFFFFFFF0000ULL, 32));
-  ASSERT_EQ(0x0000FFFFFFFF0000ULL, ReverseBitsUInt(0x0000FFFFFFFF0000ULL, 64));
-
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0xFFFF0000FFFF0000ULL, 0));
-  ASSERT_EQ(0ULL, ReverseBitsUInt(0xFFFF0000FFFF0000ULL, 1));
-  ASSERT_EQ(0xFFFFULL, ReverseBitsUInt(0xFFFF0000FFFF0000ULL, 32));
-  ASSERT_EQ(0x0000FFFF0000FFFFULL, ReverseBitsUInt(0xFFFF0000FFFF0000ULL, 64));
+  ASSERT_EQ(0x0000FFFFFFFF0000ULL, ReverseBits(0x0000FFFFFFFF0000ULL, 64));
+  ASSERT_EQ(0x0000FFFF0000FFFFULL, ReverseBits(0xFFFF0000FFFF0000ULL, 64));
 }
 
-TEST(NumberTheory, MultiplyUIntModLazy64) {
+TEST(NumberTheory, MultiplyModLazy64) {
   uint64_t modulus = 2;
   uint64_t y = 0;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(0, y, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(0, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(1, y, modulus));
   y = 1;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(0, y, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntModLazy<64>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(0, y, modulus));
+  ASSERT_EQ(1ULL, MultiplyModLazy<64>(1, y, modulus));
 
   modulus = 10;
   y = 0;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(0, y, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(0, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(1, y, modulus));
   y = 1;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(0, y, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntModLazy<64>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(0, y, modulus));
+  ASSERT_EQ(1ULL, MultiplyModLazy<64>(1, y, modulus));
   y = 6;
-  ASSERT_EQ(2ULL, MultiplyUIntModLazy<64>(7, y, modulus));
+  ASSERT_EQ(2ULL, MultiplyModLazy<64>(7, y, modulus));
   y = 7;
-  ASSERT_EQ(9ULL, MultiplyUIntModLazy<64>(7, y, modulus));
-  ASSERT_EQ(2ULL, MultiplyUIntModLazy<64>(6, y, modulus));
+  ASSERT_EQ(9ULL, MultiplyModLazy<64>(7, y, modulus));
+  ASSERT_EQ(2ULL, MultiplyModLazy<64>(6, y, modulus));
 
   modulus = 2305843009211596801ULL;
   y = 0;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(0, y, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(0, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(1, y, modulus));
   y = 1;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<64>(0, y, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntModLazy<64>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<64>(0, y, modulus));
+  ASSERT_EQ(1ULL, MultiplyModLazy<64>(1, y, modulus));
   y = 1152921504605798400ULL;
   ASSERT_EQ(576460752302899200ULL,
-            MultiplyUIntModLazy<64>(1152921504605798401ULL, y, modulus));
+            MultiplyModLazy<64>(1152921504605798401ULL, y, modulus));
   y = 1152921504605798401ULL;
   ASSERT_EQ(576460752302899200ULL,
-            MultiplyUIntModLazy<64>(1152921504605798400ULL, y, modulus));
+            MultiplyModLazy<64>(1152921504605798400ULL, y, modulus));
   ASSERT_EQ(1729382256908697601ULL,
-            MultiplyUIntModLazy<64>(1152921504605798401ULL, y, modulus));
+            MultiplyModLazy<64>(1152921504605798401ULL, y, modulus));
   y = 2305843009211596800ULL;
   ASSERT_EQ(2305843009211596802ULL,
-            MultiplyUIntModLazy<64>(2305843009211596800ULL, y, modulus));
+            MultiplyModLazy<64>(2305843009211596800ULL, y, modulus));
 }
 
-TEST(NumberTheory, MultiplyUIntModLazy52) {
+TEST(NumberTheory, MultiplyModLazy52) {
   uint64_t modulus = 2;
   uint64_t y = 0;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<52>(0, y, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<52>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<52>(0, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<52>(1, y, modulus));
   y = 1;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<52>(0, y, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntModLazy<52>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<52>(0, y, modulus));
+  ASSERT_EQ(1ULL, MultiplyModLazy<52>(1, y, modulus));
 
   modulus = 10;
   y = 0;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<52>(0, y, modulus));
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<52>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<52>(0, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<52>(1, y, modulus));
   y = 1;
-  ASSERT_EQ(0ULL, MultiplyUIntModLazy<52>(0, y, modulus));
-  ASSERT_EQ(1ULL, MultiplyUIntModLazy<52>(1, y, modulus));
+  ASSERT_EQ(0ULL, MultiplyModLazy<52>(0, y, modulus));
+  ASSERT_EQ(1ULL, MultiplyModLazy<52>(1, y, modulus));
   y = 6;
-  ASSERT_EQ(2ULL, MultiplyUIntModLazy<52>(7, y, modulus));
+  ASSERT_EQ(2ULL, MultiplyModLazy<52>(7, y, modulus));
   y = 7;
-  ASSERT_EQ(9ULL, MultiplyUIntModLazy<52>(7, y, modulus));
-  ASSERT_EQ(2ULL, MultiplyUIntModLazy<52>(6, y, modulus));
+  ASSERT_EQ(9ULL, MultiplyModLazy<52>(7, y, modulus));
+  ASSERT_EQ(2ULL, MultiplyModLazy<52>(6, y, modulus));
 
 #ifdef HEXL_DEBUG
   y = 1152921504605798400ULL;
-  EXPECT_ANY_THROW(MultiplyUIntModLazy<52>(1152921504605798401ULL, y, modulus));
+  EXPECT_ANY_THROW(MultiplyModLazy<52>(1152921504605798401ULL, y, modulus));
   y = 1152921504605798401ULL;
-  EXPECT_ANY_THROW(MultiplyUIntModLazy<52>(1152921504605798400ULL, y, modulus));
-  EXPECT_ANY_THROW(MultiplyUIntModLazy<52>(1152921504605798401ULL, y, modulus));
+  EXPECT_ANY_THROW(MultiplyModLazy<52>(1152921504605798400ULL, y, modulus));
+  EXPECT_ANY_THROW(MultiplyModLazy<52>(1152921504605798401ULL, y, modulus));
   y = 2305843009211596800ULL;
-  EXPECT_ANY_THROW(MultiplyUIntModLazy<52>(2305843009211596800ULL, y, modulus));
+  EXPECT_ANY_THROW(MultiplyModLazy<52>(2305843009211596800ULL, y, modulus));
 #endif
 }
 

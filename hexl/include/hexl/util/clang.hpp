@@ -3,15 +3,14 @@
 
 #pragma once
 #include <cmath>
-#include <iostream>
 
-#include "util/check.hpp"
-#include "util/types.hpp"
+#include "hexl/util/check.hpp"
+#include "hexl/util/types.hpp"
 
 namespace intel {
 namespace hexl {
 
-#ifdef HEXL_USE_GNU
+#ifdef HEXL_USE_CLANG
 // Return x * y as 128-bit integer
 // Correctness if x * y < 128 bits
 inline uint128_t MultiplyUInt64(uint64_t x, uint64_t y) {
@@ -24,7 +23,7 @@ inline uint64_t BarrettReduce128(uint64_t input_hi, uint64_t input_lo,
   uint128_t n = (static_cast<uint128_t>(input_hi) << 64) |
                 (static_cast<uint128_t>(input_lo));
 
-  return static_cast<uint64_t>(n % modulus);
+  return n % modulus;
   // TODO(fboemer): actually use barrett reduction if performance-critical
 }
 
@@ -50,7 +49,7 @@ inline void MultiplyUInt64(uint64_t x, uint64_t y, uint64_t* prod_hi,
 // Return the high 128 minus BitShift bits of the 128-bit product x * y
 template <int BitShift>
 inline uint64_t MultiplyUInt64Hi(uint64_t x, uint64_t y) {
-  uint128_t product = MultiplyUInt64(x, y);
+  uint128_t product = static_cast<uint128_t>(x) * y;
   return static_cast<uint64_t>(product >> BitShift);
 }
 
@@ -59,8 +58,8 @@ inline uint64_t MSB(uint64_t input) {
   return static_cast<uint64_t>(std::log2l(input));
 }
 
-#define HEXL_LOOP_UNROLL_4 _Pragma("GCC unroll 4")
-#define HEXL_LOOP_UNROLL_8 _Pragma("GCC unroll 8")
+#define HEXL_LOOP_UNROLL_4 _Pragma("clang loop unroll_count(4)")
+#define HEXL_LOOP_UNROLL_8 _Pragma("clang loop unroll_count(8)")
 
 #endif
 

@@ -36,6 +36,8 @@ else()
 endif()
 add_library(HEXL::hexl ALIAS hexl)
 
+add_compiler_definition(hexl)
+
 set_target_properties(hexl PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(hexl PROPERTIES VERSION ${HEXL_VERSION})
 if (HEXL_DEBUG)

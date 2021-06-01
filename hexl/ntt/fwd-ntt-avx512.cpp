@@ -4,14 +4,12 @@
 #include "ntt/fwd-ntt-avx512.hpp"
 
 #include "hexl/ntt/ntt.hpp"
-#include "ntt/ntt-internal.hpp"
 
 namespace intel {
 namespace hexl {
 
 #ifdef HEXL_HAS_AVX512IFMA
-template void
-ForwardTransformToBitReverseAVX512<NTT::NTTImpl::s_ifma_shift_bits>(
+template void ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
     uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
@@ -19,8 +17,7 @@ ForwardTransformToBitReverseAVX512<NTT::NTTImpl::s_ifma_shift_bits>(
 #endif
 
 #ifdef HEXL_HAS_AVX512DQ
-template void
-ForwardTransformToBitReverseAVX512<NTT::NTTImpl::s_default_shift_bits>(
+template void ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
     uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,

@@ -10,6 +10,7 @@ build*/
 
 # Generated files
 docs/conf.py
-cmake/IntelHEXLConfig.cmake
+docs/doxygen/
+docs/sphinx/
 *.log
 Doxyfile

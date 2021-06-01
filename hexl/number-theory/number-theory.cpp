@@ -1,17 +1,17 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "number-theory/number-theory.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 
 #include <random>
 
-#include "logging/logging.hpp"
-#include "util/check.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/util/check.hpp"
 
 namespace intel {
 namespace hexl {
 
-uint64_t InverseUIntMod(uint64_t input, uint64_t modulus) {
+uint64_t InverseMod(uint64_t input, uint64_t modulus) {
   uint64_t a = input % modulus;
   HEXL_CHECK(a != 0, input << " does not have a InverseMod");
 
@@ -49,7 +49,7 @@ uint64_t BarrettReduce64(uint64_t input, uint64_t modulus, uint64_t q_barr) {
   return q_times_input >= modulus ? q_times_input - modulus : q_times_input;
 }
 
-uint64_t MultiplyUIntMod(uint64_t x, uint64_t y, uint64_t modulus) {
+uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus) {
   HEXL_CHECK(modulus != 0, "modulus == 0");
   HEXL_CHECK(x < modulus, "x " << x << " >= modulus " << modulus);
   HEXL_CHECK(y < modulus, "y " << y << " >= modulus " << modulus);
@@ -86,9 +86,9 @@ uint64_t PowMod(uint64_t base, uint64_t exp, uint64_t modulus) {
   uint64_t result = 1;
   while (exp > 0) {
     if (exp & 1) {
-      result = MultiplyUIntMod(result, base, modulus);
+      result = MultiplyMod(result, base, modulus);
     }
-    base = MultiplyUIntMod(base, base, modulus);
+    base = MultiplyMod(base, base, modulus);
     exp >>= 1;
   }
   return result;
@@ -142,7 +142,7 @@ uint64_t MinimalPrimitiveRoot(uint64_t degree, uint64_t modulus) {
 
   uint64_t root = GeneratePrimitiveRoot(degree, modulus);
 
-  uint64_t generator_sq = MultiplyUIntMod(root, root, modulus);
+  uint64_t generator_sq = MultiplyMod(root, root, modulus);
   uint64_t current_generator = root;
 
   uint64_t min_root = root;
@@ -152,14 +152,16 @@ uint64_t MinimalPrimitiveRoot(uint64_t degree, uint64_t modulus) {
     if (current_generator < min_root) {
       min_root = current_generator;
     }
-    current_generator =
-        MultiplyUIntMod(current_generator, generator_sq, modulus);
+    current_generator = MultiplyMod(current_generator, generator_sq, modulus);
   }
 
   return min_root;
 }
 
-uint64_t ReverseBitsUInt(uint64_t x, uint64_t bit_width) {
+uint64_t ReverseBits(uint64_t x, uint64_t bit_width) {
+  HEXL_CHECK(x == 0 || MSB(x) <= bit_width, "MSB(" << x << ") = " << MSB(x)
+                                                   << " must be >= bit_width "
+                                                   << bit_width)
   if (bit_width == 0) {
     return 0;
   }

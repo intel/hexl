@@ -5,12 +5,12 @@
 
 #include <stdint.h>
 
-#include "util/types.hpp"
+#include "hexl/util/types.hpp"
 
 // Create logging/debug macros with no run-time overhead unless HEXL_DEBUG is
 // enabled
 #ifdef HEXL_DEBUG
-#include "logging/logging.hpp"
+#include "hexl/logging/logging.hpp"
 
 #define HEXL_CHECK(cond, expr)                                       \
   if (!(cond)) {                                                     \

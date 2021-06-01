@@ -6,10 +6,10 @@
 #include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/aligned-allocator.hpp"
-#include "util/check.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/aligned-allocator.hpp"
+#include "hexl/util/check.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {

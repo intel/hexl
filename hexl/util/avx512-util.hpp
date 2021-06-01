@@ -7,9 +7,9 @@
 
 #include <vector>
 
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
 #include "hexl/util/util.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/check.hpp"
 
 namespace intel {
 namespace hexl {
