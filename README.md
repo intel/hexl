@@ -22,7 +22,7 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Repository layout](#repository-layout)
   - [Intel HEXL Publication](#intel-hexl-publication)
   - [Citing Intel HEXL](#citing-intel-hexl)
-    - [Version 1.0](#version-10)
+    - [Version 1.1.1](#version-111)
 
 ## Introduction
 Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree `N` a power of two roughly in the range `N=[2^{10}, 2^{17}]`. The coefficients of these polynomials are in a finite field with a word-sized prime, `q`, up to `q`~62 bits. More precisely, the polynomials live in the ring `Z_q[X]/(X^N + 1)`. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus `q`. When multiplying two polynomials, the resulting polynomials of degree `2N` is additionally reduced by taking the remainder when dividing by `X^N+1`.
@@ -183,10 +183,10 @@ For more details on Intel HEXL, see our whitepaper at https://arxiv.org/abs/2103
 ## Citing Intel HEXL
 To cite Intel HEXL, please use the following BibTeX entry.
 
-### Version 1.0
+### Version 1.1.1
 ```tex
     @misc{IntelHEXL,
-        title = {{I}ntel {HEXL} (release 1.0)},
+        title = {{I}ntel {HEXL} (release 1.1.1)},
         howpublished = {\url{https://arxiv.org/abs/2103.16400}},
         month = mar,
         year = 2021,
