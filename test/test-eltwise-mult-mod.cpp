@@ -271,7 +271,7 @@ TEST(EltwiseMultMod, AVX512Int) {
   std::uniform_int_distribution<uint64_t> distrib(
       0, input_mod_factor * modulus - 1);
 
-  for (size_t length = 1024; length <= 32768; length <<= 1) {
+  for (size_t length = 1024; length <= 32768; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> out_avx(length, 0);
@@ -300,83 +300,84 @@ TEST(EltwiseMultMod, AVX512Big) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  size_t length = 173;
+  for (size_t length = 1024; length <= 32768; length *= 2) {
+    std::vector<uint64_t> op1(length, 0);
+    std::vector<uint64_t> op2(length, 0);
+    std::vector<uint64_t> rs1(length, 0);
+    std::vector<uint64_t> rs2(length, 0);
+    std::vector<uint64_t> rs3(length, 0);
+    std::vector<uint64_t> rs4(length, 0);
 
-  for (size_t input_mod_factor = 1; input_mod_factor <= 4;
-       input_mod_factor *= 2) {
-    for (size_t bits = 1; bits <= 60; ++bits) {
-      uint64_t modulus = (1ULL << bits) + 7;
-      std::uniform_int_distribution<uint64_t> distrib(
-          0, input_mod_factor * modulus - 1);
+    for (size_t input_mod_factor = 1; input_mod_factor <= 4;
+         input_mod_factor *= 2) {
+      for (size_t bits = 40; bits <= 60; ++bits) {
+        uint64_t modulus = (1ULL << bits) + 7;
+        std::uniform_int_distribution<uint64_t> distrib(
+            0, input_mod_factor * modulus - 1);
 
-      bool use_avx512_float = (input_mod_factor * modulus < MaximumValue(50));
+        bool use_avx512_float = (input_mod_factor * modulus < MaximumValue(50));
 
 #ifdef HEXL_DEBUG
-      size_t num_trials = 10;
+        size_t num_trials = 1;
 #else
-      size_t num_trials = 100;
+        size_t num_trials = 10;
 #endif
-      for (size_t trial = 0; trial < num_trials; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        std::vector<uint64_t> op2(length, 0);
-        std::vector<uint64_t> rs1(length, 0);
-        std::vector<uint64_t> rs2(length, 0);
-        std::vector<uint64_t> rs3(length, 0);
-        std::vector<uint64_t> rs4(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-          op2[i] = distrib(gen);
-        }
-        op1[0] = input_mod_factor * modulus - 1;
-        op2[0] = input_mod_factor * modulus - 1;
+        for (size_t trial = 0; trial < num_trials; ++trial) {
+          for (size_t i = 0; i < length; ++i) {
+            op1[i] = distrib(gen);
+            op2[i] = distrib(gen);
+          }
+          op1[0] = input_mod_factor * modulus - 1;
+          op2[0] = input_mod_factor * modulus - 1;
 
-        switch (input_mod_factor) {
-          case 1:
-            EltwiseMultModNative<1>(rs1.data(), op1.data(), op2.data(),
-                                    op1.size(), modulus);
-            if (use_avx512_float) {
-              EltwiseMultModAVX512Float<1>(rs2.data(), op1.data(), op2.data(),
+          switch (input_mod_factor) {
+            case 1:
+              EltwiseMultModNative<1>(rs1.data(), op1.data(), op2.data(),
+                                      op1.size(), modulus);
+              if (use_avx512_float) {
+                EltwiseMultModAVX512Float<1>(rs2.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
+              } else {
+                EltwiseMultModAVX512Int<1>(rs3.data(), op1.data(), op2.data(),
                                            op1.size(), modulus);
-            } else {
-              EltwiseMultModAVX512Int<1>(rs3.data(), op1.data(), op2.data(),
-                                         op1.size(), modulus);
-            }
-            break;
-          case 2:
-            EltwiseMultModNative<2>(rs1.data(), op1.data(), op2.data(),
-                                    op1.size(), modulus);
-            if (use_avx512_float) {
-              EltwiseMultModAVX512Float<2>(rs2.data(), op1.data(), op2.data(),
+              }
+              break;
+            case 2:
+              EltwiseMultModNative<2>(rs1.data(), op1.data(), op2.data(),
+                                      op1.size(), modulus);
+              if (use_avx512_float) {
+                EltwiseMultModAVX512Float<2>(rs2.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
+              } else {
+                EltwiseMultModAVX512Int<2>(rs3.data(), op1.data(), op2.data(),
                                            op1.size(), modulus);
-            } else {
-              EltwiseMultModAVX512Int<2>(rs3.data(), op1.data(), op2.data(),
-                                         op1.size(), modulus);
-            }
-            break;
-          case 4:
-            EltwiseMultModNative<4>(rs1.data(), op1.data(), op2.data(),
-                                    op1.size(), modulus);
-            if (use_avx512_float) {
-              EltwiseMultModAVX512Float<4>(rs2.data(), op1.data(), op2.data(),
+              }
+              break;
+            case 4:
+              EltwiseMultModNative<4>(rs1.data(), op1.data(), op2.data(),
+                                      op1.size(), modulus);
+              if (use_avx512_float) {
+                EltwiseMultModAVX512Float<4>(rs2.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
+              } else {
+                EltwiseMultModAVX512Int<4>(rs3.data(), op1.data(), op2.data(),
                                            op1.size(), modulus);
-            } else {
-              EltwiseMultModAVX512Int<4>(rs3.data(), op1.data(), op2.data(),
-                                         op1.size(), modulus);
-            }
-            break;
-        }
-        EltwiseMultMod(rs4.data(), op1.data(), op2.data(), op1.size(), modulus,
-                       input_mod_factor);
+              }
+              break;
+          }
+          EltwiseMultMod(rs4.data(), op1.data(), op2.data(), op1.size(),
+                         modulus, input_mod_factor);
 
-        ASSERT_EQ(rs4, rs1);
+          ASSERT_EQ(rs4, rs1);
 
-        ASSERT_EQ(rs1[0], 1);
-        if (use_avx512_float) {
-          ASSERT_EQ(rs1, rs2);
-          ASSERT_EQ(rs2[0], 1);
-        } else {
-          ASSERT_EQ(rs1, rs3);
-          ASSERT_EQ(rs3[0], 1);
+          ASSERT_EQ(rs1[0], 1);
+          if (use_avx512_float) {
+            ASSERT_EQ(rs1, rs2);
+            ASSERT_EQ(rs2[0], 1);
+          } else {
+            ASSERT_EQ(rs1, rs3);
+            ASSERT_EQ(rs3[0], 1);
+          }
         }
       }
     }
