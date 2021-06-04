@@ -127,7 +127,10 @@ For optimal performance, Intel HEXL does not perform input validation. In many c
 Intel HEXL is single-threaded and thread-safe.
 
 # Community Adoption
-Intel HEXL has been integrated to [Microsoft SEAL](https://github.com/Microsoft/SEAL), an easy-to-use homomorphic encryption library.
+
+- Intel HEXL has been integrated to the following homomorphic encryption libraries:
+- [Microsoft SEAL](https://github.com/microsoft/SEAL)
+- [PALISADE](https://gitlab.com/palisade/palisade-release)
 
 If you are aware of any other uses of Intel HEXL, please let us know!
 
