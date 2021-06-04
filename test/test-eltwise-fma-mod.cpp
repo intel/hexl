@@ -210,7 +210,7 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 #ifdef HEXL_DEBUG
       size_t num_trials = 10;
 #else
-      size_t num_trials = 1000;
+      size_t num_trials = 100;
 #endif
 
       for (size_t trial = 0; trial < num_trials; ++trial) {
