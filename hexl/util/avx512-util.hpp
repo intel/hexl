@@ -267,7 +267,8 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 // 128-bit result. Shift the result right by bit_shift bits, and return the
 // lower 64 bits. The bit_shift is a run-time argument, rather than a
 // compile-time template parameter, so we can't use _mm512_shrdi_epi64
-inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y, int bit_shift) {
+inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y,
+                                       unsigned int bit_shift) {
   __m512i c_lo = _mm512_srli_epi64(x, bit_shift);
   __m512i c_hi = _mm512_slli_epi64(y, 64 - bit_shift);
   return _mm512_add_epi64(c_lo, c_hi);
