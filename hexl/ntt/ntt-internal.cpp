@@ -270,35 +270,35 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
   for (size_t m = 1; m < n; m <<= 1) {
     size_t j1 = 0;
     for (size_t i = 0; i < m; i++) {
+      if (i != 0) j1 += (t << 1);
       size_t j2 = j1 + t;
       const uint64_t W_op = root_of_unity_powers[m + i];
       const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-      uint64_t* X = operand + j1;
+      uint64_t* X = operand;
       uint64_t* Y = X + t;
 
       uint64_t tx;
       uint64_t T;
-      HEXL_LOOP_UNROLL_4
+      HEXL_LOOP_UNROLL_8
       for (size_t j = j1; j < j2; j++) {
         // The Harvey butterfly: assume X, Y in [0, 4q), and return X', Y'
         // in [0, 4q). Such that X', Y' = X + WY, X - WY (mod q).
         // See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
-        HEXL_CHECK(*X < modulus * 4, "input X " << (*X) << " too large");
-        HEXL_CHECK(*Y < modulus * 4, "input Y " << (*Y) << " too large");
+        HEXL_CHECK(X[j] < modulus * 4, "input X " << X[j] << " too large");
+        HEXL_CHECK(Y[j] < modulus * 4, "input Y " << Y[j] << " too large");
 
-        tx = (*X >= twice_mod) ? (*X - twice_mod) : *X;
-        T = MultiplyModLazy<64>(*Y, W_op, W_precon, modulus);
+        tx = (X[j] >= twice_mod) ? (X[j] - twice_mod) : X[j];
+        T = MultiplyModLazy<64>(Y[j], W_op, W_precon, modulus);
 
-        *X++ = tx + T;
-        *Y++ = tx + twice_mod - T;
+        X[j] = tx + T;
+        Y[j] = tx + twice_mod - T;
 
         HEXL_CHECK(tx + T < modulus * 4,
                    "ouput X " << (tx + T) << " too large");
         HEXL_CHECK(tx + twice_mod - T < modulus * 4,
                    "output Y " << (tx + twice_mod - T) << " too large");
       }
-      j1 += (t << 1);
     }
     t >>= 1;
   }
@@ -370,32 +370,26 @@ void InverseTransformFromBitReverse64(
   for (size_t m = (n >> 1); m > 1; m >>= 1) {
     size_t j1 = 0;
     for (size_t i = 0; i < m; i++, root_index++) {
+      if (i != 0) j1 += (t << 1);
       size_t j2 = j1 + t;
       const uint64_t W_op = inv_root_of_unity_powers[root_index];
       const uint64_t W_op_precon = precon_inv_root_of_unity_powers[root_index];
 
-      HEXL_VLOG(4, "m = " << i << ", i = " << i);
-      HEXL_VLOG(4, "j1 = " << j1 << ", j2 = " << j2);
-
-      uint64_t* X = operand + j1;
+      uint64_t* X = operand;
       uint64_t* Y = X + t;
 
-      uint64_t tx;
-      uint64_t ty;
-
-      HEXL_LOOP_UNROLL_4
+      HEXL_LOOP_UNROLL_8
       for (size_t j = j1; j < j2; j++) {
-        HEXL_VLOG(4, "Loaded *X " << *X);
-        HEXL_VLOG(4, "Loaded *Y " << *Y);
+        HEXL_VLOG(4, "Loaded X " << X[j]);
+        HEXL_VLOG(4, "Loaded Y " << Y[j]);
         // The Harvey butterfly: assume X, Y in [0, 2q), and return X', Y'
         // in [0, 2q). X', Y' = X + Y (mod q), W(X - Y) (mod q).
-        tx = *X + *Y;
-        ty = *X + twice_mod - *Y;
+        uint64_t tx = X[j] + Y[j];
+        uint64_t ty = X[j] + twice_mod - Y[j];
 
-        *X++ = (tx >= twice_mod) ? (tx - twice_mod) : tx;
-        *Y++ = MultiplyModLazy<64>(ty, W_op, W_op_precon, modulus);
+        X[j] = (tx >= twice_mod) ? (tx - twice_mod) : tx;
+        Y[j] = MultiplyModLazy<64>(ty, W_op, W_op_precon, modulus);
       }
-      j1 += (t << 1);
     }
     t <<= 1;
   }
@@ -409,14 +403,14 @@ void InverseTransformFromBitReverse64(
   uint64_t tx;
   uint64_t ty;
 
-  for (size_t j = (n >> 1); j < n; j++) {
-    tx = *X + *Y;
+  for (size_t j = 0; j < (n >> 1); ++j) {
+    tx = X[j] + Y[j];
     if (tx >= twice_mod) {
       tx -= twice_mod;
     }
-    ty = *X + twice_mod - *Y;
-    *X++ = MultiplyModLazy<64>(tx, inv_n, modulus);
-    *Y++ = MultiplyModLazy<64>(ty, inv_n_w, modulus);
+    ty = X[j] + twice_mod - Y[j];
+    X[j] = MultiplyModLazy<64>(tx, inv_n, modulus);
+    Y[j] = MultiplyModLazy<64>(ty, inv_n_w, modulus);
   }
 
   if (output_mod_factor == 1) {
