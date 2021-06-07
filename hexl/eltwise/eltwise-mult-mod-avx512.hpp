@@ -529,8 +529,8 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
           __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
           __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
 
-          __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
-                                               static_cast<int>(N - 1));
+          __m512i c1 = _mm512_hexl_shrdi_epi64(
+              vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
 
           // L - N + 1 == 64, so we only need high 64 bits
           __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
