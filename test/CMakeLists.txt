@@ -17,8 +17,6 @@ set(SRC main.cpp
 
 add_executable(unit-test ${SRC})
 
-add_compiler_definition(unit-test)
-
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(unit-test PRIVATE -Wall -Wextra -march=native)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -49,7 +47,6 @@ endif()
 # if (HEXL_DEBUG)
 #     target_link_libraries(test-public-api PUBLIC easyloggingpp)
 # endif()
-# add_compiler_definition(test-public-api)
 # target_include_directories(test-public-api PRIVATE ${HEXL_INC_ROOT_DIR})
 # target_include_directories(test-public-api
 #       PRIVATE $<TARGET_PROPERTY:cpu_features,INTERFACE_INCLUDE_DIRECTORIES>)

@@ -36,7 +36,11 @@ else()
 endif()
 add_library(HEXL::hexl ALIAS hexl)
 
-add_compiler_definition(hexl)
+add_compiler_definition()
+
+set(HEXL_DEFINES_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/include/hexl/util/defines.hpp.in)
+set(HEXL_DEFINES_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/include/hexl/util/defines.hpp)
+configure_file(${HEXL_DEFINES_IN_FILENAME} ${HEXL_DEFINES_FILENAME})
 
 set_target_properties(hexl PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(hexl PROPERTIES VERSION ${HEXL_VERSION})
@@ -52,7 +56,10 @@ target_include_directories(hexl
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
-        -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer)
+        -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer
+        -Wno-sign-conversion # clang-10 and clang-12 have different APIs for _mm512_slli_epi64
+        -Wno-implicit-int-conversion # easylogging triggers this warning
+    )
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Inling causes some tests to fail on MSVC with AVX512 in Release mode, HEXL_DEBUG=OFF,
     # so we disable it here
@@ -71,7 +78,8 @@ install(DIRECTORY ${HEXL_INC_ROOT_DIR}/
 if (HEXL_SHARED_LIB)
     target_link_libraries(hexl PRIVATE cpu_features)
     if (HEXL_DEBUG)
-        target_link_libraries(hexl PRIVATE easyloggingpp gflags)
+        target_link_libraries(hexl PUBLIC easyloggingpp)
+        target_link_libraries(hexl PRIVATE gflags)
     endif()
 else ()
     # For static library, we include all the dependencies for Intel HEXL in
@@ -82,9 +90,10 @@ else ()
     add_dependencies(hexl cpu_features)
     if (HEXL_DEBUG)
         add_dependencies(hexl gflags)
+        add_dependencies(hexl easyloggingpp)
         # Manually add logging include directory
         target_include_directories(hexl
-            PRIVATE $<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>)
+            PUBLIC $<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>)
         # Manually add gflags include directory
         target_include_directories(hexl
             PRIVATE $<TARGET_PROPERTY:gflags,INTERFACE_INCLUDE_DIRECTORIES>)
