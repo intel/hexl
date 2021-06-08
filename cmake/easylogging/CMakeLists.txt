@@ -33,3 +33,7 @@ uncache_variable(build_static_lib)
 
 set_target_properties(easyloggingpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_BINARY_DIR}/easylogging-src/src)
+
+install(
+  TARGETS easyloggingpp
+  EXPORT HEXLTargets)

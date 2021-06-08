@@ -9,7 +9,7 @@ include(CheckCXXCompilerFlag)
 include(CMakePackageConfigHelpers)
 
 # set directory where the custom finders live
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl/")
 include(HEXLHelpers)
 
 if(CMAKE_BUILD_TYPE)
@@ -89,10 +89,6 @@ endif()
 
 if (HEXL_TREAT_WARNING_AS_ERROR)
   add_compile_options(-Werror)
-endif()
-
-if (HEXL_DEBUG)
-  add_definitions(-DHEXL_DEBUG)
 endif()
 
 set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hexl)
@@ -206,12 +202,12 @@ endif()
 # Config export...
 #------------------------------------------------------------------------------
 # Config filenames
-set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLTargets.cmake)
-set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake.in)
-set(HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HEXLConfig.cmake)
-set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/HEXLConfigVersion.cmake)
+set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLTargets.cmake)
+set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl/HEXLConfig.cmake.in)
+set(HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLConfig.cmake)
+set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLConfigVersion.cmake)
 
-set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/)
+set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/hexl-${HEXL_VERSION}/)
 
 # Create and install the CMake config and target file
 install(
