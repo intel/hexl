@@ -65,11 +65,7 @@ For convenience, they are listed below:
 | ---------------------------------| ---------------------- | ------------------------------------------------------------------------ |
 | HEXL_BENCHMARK                | ON / OFF (default ON)  | Set to ON to enable benchmark suite via Google benchmark                 |
 | HEXL_COVERAGE                 | ON / OFF (default OFF) | Set to ON to enable coverage report of unit-tests                        |
-| HEXL_DEBUG                    | ON / OFF (default OFF) | Set to ON to enable debugging at large runtime penalty                   |
 | HEXL_DOCS                     | ON / OFF (default OFF) | Set to ON to enable building of documentation                            |
-| HEXL_ENABLE_ADDRESS_SANITIZER | ON / OFF (default OFF) | Set to ON to enable building with address sanitizer (ASan)               |
-| HEXL_ENABLE_THREAD_SANITIZER  | ON / OFF (default OFF) | Set to ON to enable building with thread sanitizer (TSan)                |
-| HEXL_ENABLE_UB_SANITIZER      | ON / OFF (default OFF) | Set to ON to enable building with undefined behavior sanitizer (UBSan)   |
 | HEXL_SHARED_LIB               | ON / OFF (default OFF) | Set to ON to enable building shared library                              |
 | HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                               |
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
@@ -81,9 +77,9 @@ To compile Intel HEXL from source code, first clone the repository into your cur
 ```bash
 cmake -S . -B build
 ```
-adding the desired compile-time options with a `-D` flag. For instance, to build Intel HEXL with debugging capabilities, call
+adding the desired compile-time options with a `-D` flag. For instance, to build Intel HEXL as a shared library, call
 ```bash
-cmake -S . -B build -DHEXL_DEBUG=ON
+cmake -S . -B build -DHEXL_SHARED_LIB=ON
 ```
 
 Then, to build Intel HEXL, call
@@ -120,9 +116,9 @@ The benchmark executable itself is located at `build/benchmark/bench_hexl`
 The `example` folder has an example of using Intel HEXL in a third-party project.
 
 ## Debugging
-For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DHEXL_DEBUG=ON` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution.
+For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl.a`, that can be used to debug the execution.
 
-**Note**, enabling `HEXL_DEBUG=ON` will result in a significant runtime overhead.
+**Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
 ## Threading
 Intel HEXL is single-threaded and thread-safe.
 

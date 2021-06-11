@@ -20,7 +20,7 @@ endif()
 # Add easylogging directly to our build. This defines the easylogging target.
 # Cache needed to override option in easylogging
 
-cache_variable(build_static_lib)
+hexl_cache_variable(build_static_lib)
 set(build_static_lib ON CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/easylogging-src
@@ -29,11 +29,18 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/easylogging-src
 
 # Prevent variables from leaking
 unset(build_static_lib CACHE)
-uncache_variable(build_static_lib)
+hexl_uncache_variable(build_static_lib)
 
-set_target_properties(easyloggingpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-    ${CMAKE_CURRENT_BINARY_DIR}/easylogging-src/src)
+set(EASYLOGGINGPP_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/easylogging-src/src)
+set_target_properties(easyloggingpp PROPERTIES INCLUDE_DIRECTORIES
+    ${EASYLOGGINGPP_INCLUDE_DIR})
 
 install(
   TARGETS easyloggingpp
   EXPORT HEXLTargets)
+
+install(DIRECTORY ${EASYLOGGINGPP_INCLUDE_DIR}/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/
+  FILES_MATCHING
+  PATTERN "*.hpp"
+  PATTERN "*.h")

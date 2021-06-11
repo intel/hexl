@@ -36,7 +36,8 @@ else()
 endif()
 add_library(HEXL::hexl ALIAS hexl)
 
-add_compiler_definition()
+hexl_add_asan_flag(hexl)
+hexl_add_compiler_definition()
 
 set(HEXL_DEFINES_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/include/hexl/util/defines.hpp.in)
 set(HEXL_DEFINES_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/include/hexl/util/defines.hpp)
@@ -52,7 +53,7 @@ target_include_directories(hexl
     PRIVATE ${HEXL_SRC_ROOT_DIR}                               # Private headers
     PUBLIC  $<BUILD_INTERFACE:${HEXL_INC_ROOT_DIR}>            # Public headers
     PUBLIC  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>   # Public headers
-    )
+)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
@@ -91,9 +92,12 @@ else ()
     if (HEXL_DEBUG)
         add_dependencies(hexl gflags)
         add_dependencies(hexl easyloggingpp)
+
         # Manually add logging include directory
         target_include_directories(hexl
-            PUBLIC $<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>)
+            PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
+        )
+
         # Manually add gflags include directory
         target_include_directories(hexl
             PRIVATE $<TARGET_PROPERTY:gflags,INTERFACE_INCLUDE_DIRECTORIES>)
