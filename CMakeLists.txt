@@ -10,7 +10,7 @@ include(CMakePackageConfigHelpers)
 
 # set directory where the custom finders live
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl/")
-include(HEXLHelpers)
+include(hexl-util)
 
 if(CMAKE_BUILD_TYPE)
   set(RELEASE_TYPES
@@ -31,6 +31,12 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(HEXL_DEBUG ON)
+else()
+  set(HEXL_DEBUG OFF)
+endif()
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -47,14 +53,8 @@ set(CMAKE_INSTALL_RPATH "\$ORIGIN")
 # Compiler options...
 #------------------------------------------------------------------------------
 
-# Sanitizers
-option(HEXL_ENABLE_ADDRESS_SANITIZER "Compiles and links with Address Sanitizer" OFF)
-option(HEXL_ENABLE_THREAD_SANITIZER "Compiles and links with Thread Sanitizer" OFF)
-option(HEXL_ENABLE_UB_SANITIZER "Compiles and links with Undefined Behavior Sanitizer" OFF)
-
 option(HEXL_BENCHMARK "Enable benchmarking" ON)
 option(HEXL_COVERAGE "Enables coverage for unit tests" OFF)
-option(HEXL_DEBUG "Enable runtime debug checking; will yield much slower code " OFF)
 option(HEXL_DOCS "Enable documentation building" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
@@ -63,9 +63,6 @@ option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" O
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE_C_COMPILER:              ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_CXX_COMPILER:            ${CMAKE_CXX_COMPILER}")
-message(STATUS "HEXL_ENABLE_ADDRESS_SANITIZER: ${HEXL_ENABLE_ADDRESS_SANITIZER}")
-message(STATUS "HEXL_ENABLE_THREAD_SANITIZER:  ${HEXL_ENABLE_THREAD_SANITIZER}")
-message(STATUS "HEXL_ENABLE_UB_SANITIZER:      ${HEXL_ENABLE_UB_SANITIZER}")
 message(STATUS "HEXL_BENCHMARK:                ${HEXL_BENCHMARK}")
 message(STATUS "HEXL_COVERAGE:                 ${HEXL_COVERAGE}")
 message(STATUS "HEXL_DEBUG:                    ${HEXL_DEBUG}")
@@ -74,7 +71,7 @@ message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
 
-check_compiler_version()
+hexl_check_compiler_version()
 
 if (HEXL_COVERAGE)
   if (NOT HEXL_TESTING)
@@ -94,30 +91,6 @@ endif()
 set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hexl)
 set(HEXL_INC_ROOT_DIR ${HEXL_SRC_ROOT_DIR}/include) # Public headers
 
-if(HEXL_ENABLE_ADDRESS_SANITIZER)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=leak")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=leak")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fsanitize=address -fsanitize=leak")
-endif()
-
-if(HEXL_ENABLE_THREAD_SANITIZER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
-	set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fsanitize=thread")
-endif()
-
-if(HEXL_ENABLE_UB_SANITIZER)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=float-divide-by-zero -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=implicit-conversion -fPIE")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=float-divide-by-zero -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=implicit-conversion  -fPIE -pie")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fsanitize=float-divide-by-zero -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=implicit-conversion -fPIE -pie")
-endif()
-
-if(HEXL_ENABLE_ADDRESS_SANITIZER OR HEXL_ENABLE_THREAD_SANITIZER OR HEXL_ENABLE_UB_SANITIZER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -fno-omit-frame-pointer")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -g -fno-omit-frame-pointer")
-endif()
-
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 message(STATUS "CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE}")
 message(STATUS "CMAKE_CXX_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_MINSIZEREL}")
@@ -127,10 +100,10 @@ message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 #------------------------------------------------------------------------------
 # Set AVX flags
 #------------------------------------------------------------------------------
-check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
-check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
-check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
-check_compile_flag("${CMAKE_MODULE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
+hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
+hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
+hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
+hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
 
 # ------------------------------------------------------------------------------
 # Installation logic...
@@ -157,7 +130,7 @@ message(STATUS "CMAKE_INSTALL_PREFIX:     ${CMAKE_INSTALL_PREFIX}")
 #------------------------------------------------------------------------------
 # Third-party code...
 #------------------------------------------------------------------------------
-add_subdirectory(cmake/cpu-features)
+add_subdirectory(cmake/third-party/cpu-features)
 
 if (HEXL_TESTING OR HEXL_BENCHMARK OR HEXL_DEBUG)
   if(NOT TARGET Threads::Threads)
@@ -167,16 +140,16 @@ if (HEXL_TESTING OR HEXL_BENCHMARK OR HEXL_DEBUG)
 endif()
 
 if (HEXL_TESTING)
-  add_subdirectory(cmake/gtest)
+  add_subdirectory(cmake/third-party/gtest)
 endif()
 
 if (HEXL_BENCHMARK)
-  add_subdirectory(cmake/gbenchmark)
+  add_subdirectory(cmake/third-party/gbenchmark)
 endif()
 
 if (HEXL_DEBUG)
-  add_subdirectory(cmake/easylogging)
-  add_subdirectory(cmake/gflags)
+  add_subdirectory(cmake/third-party/easylogging)
+  add_subdirectory(cmake/third-party/gflags)
 endif()
 
 #------------------------------------------------------------------------------

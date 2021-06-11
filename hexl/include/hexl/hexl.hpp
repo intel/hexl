@@ -15,5 +15,6 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/compiler.hpp"
+#include "hexl/util/defines.hpp"
 #include "hexl/util/types.hpp"
 #include "hexl/util/util.hpp"

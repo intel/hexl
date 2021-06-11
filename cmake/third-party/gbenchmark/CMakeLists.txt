@@ -19,7 +19,7 @@ endif()
 
 # Add gbenchmark directly to our build. This defines the gbenchmark target.
 # Cache needed to override option in gbenchmark
-cache_variable(BENCHMARK_ENABLE_TESTING)
+hexl_cache_variable(BENCHMARK_ENABLE_TESTING)
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gbenchmark-src
@@ -28,4 +28,4 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gbenchmark-src
 
 # Prevent variables from leaking
 unset(BENCHMARK_ENABLE_TESTING CACHE)
-uncache_variable(BENCHMARK_ENABLE_TESTING)
+hexl_uncache_variable(BENCHMARK_ENABLE_TESTING)

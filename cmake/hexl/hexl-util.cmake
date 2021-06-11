@@ -3,7 +3,7 @@
 
 # Checks if SOURCE_FILE can be compiled and returns 0 upon running
 # If so, adds OUTPUT_FLAG to compile definitions
-function(check_compile_flag SOURCE_FILE OUTPUT_FLAG)
+function(hexl_check_compile_flag SOURCE_FILE OUTPUT_FLAG)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         set(NATIVE_COMPILE_DEFINITIONS "/arch:AVX512")
     else()
@@ -26,7 +26,7 @@ function(check_compile_flag SOURCE_FILE OUTPUT_FLAG)
     endif()
 endfunction()
 
-function(check_compiler_version)
+function(hexl_check_compiler_version)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
       if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
         message(FATAL_ERROR "HEXL requires gcc version >= 7.0")
@@ -49,20 +49,20 @@ function(check_compiler_version)
 endfunction()
 
 # If the input variable is set, stores its value in a _CACHE variable
-function(cache_variable variable)
+function(hexl_cache_variable variable)
   if (DEFINED ${variable})
     set(${variable}_CACHE ${${variable}} PARENT_SCOPE)
   endif()
 endfunction()
 
 # If the input variable is cached, restores its value from the cache
-function(uncache_variable variable)
+function(hexl_uncache_variable variable)
   if (DEFINED ${variable}_CACHE)
     set(${variable} ${${variable}_CACHE} CACHE BOOL "" FORCE )
   endif()
 endfunction()
 
-function(add_compiler_definition)
+function(hexl_add_compiler_definition)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(HEXL_USE_MSVC ON PARENT_SCOPE)
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -71,5 +71,13 @@ function(add_compiler_definition)
     set(HEXL_USE_CLANG ON PARENT_SCOPE)
   else()
       message(WARNING "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
+  endif()
+endfunction()
+
+function(hexl_add_asan_flag target)
+  # Enable AddressSanitizer in Debug mode on Mac/Linux
+  if(HEXL_DEBUG AND UNIX)
+    target_compile_options(${target} PUBLIC -fsanitize=address)
+    target_link_options(${target} PUBLIC -fsanitize=address)
   endif()
 endfunction()
