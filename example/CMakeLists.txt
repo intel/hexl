@@ -9,7 +9,7 @@ find_package(HEXL 1.1.0
     HINTS ${HEXL_HINT_DIR}
     REQUIRED)
 if (NOT TARGET HEXL::hexl)
-    FATAL_ERROR("TARGET HEXL::hexl not found")
+    message(FATAL_ERROR "TARGET HEXL::hexl not found")
 endif()
 
 add_executable(example example.cpp)

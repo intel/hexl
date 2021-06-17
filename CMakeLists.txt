@@ -8,8 +8,8 @@ include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include(CMakePackageConfigHelpers)
 
-# set directory where the custom finders live
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl/")
+set(HEXL_CMAKE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/hexl")
+list(APPEND CMAKE_MODULE_PATH "${HEXL_CMAKE_PATH}")
 include(hexl-util)
 
 if(CMAKE_BUILD_TYPE)
@@ -100,10 +100,10 @@ message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 #------------------------------------------------------------------------------
 # Set AVX flags
 #------------------------------------------------------------------------------
-hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
-hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
-hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
-hexl_check_compile_flag("${CMAKE_MODULE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
+hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
+hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
+hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
+hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
 
 # ------------------------------------------------------------------------------
 # Installation logic...
