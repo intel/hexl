@@ -61,6 +61,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         -Wno-sign-conversion # clang-10 and clang-12 have different APIs for _mm512_slli_epi64
         -Wno-implicit-int-conversion # easylogging triggers this warning
     )
+    # Avoid 3rd-party dependency warnings when including HEXL as a dependency
+    target_compile_options(hexl PUBLIC
+        -Wno-sign-conversion         # avoid warnings in gflags headers
+        -Wno-implicit-int-conversion # avoid warnings in gflags headers
+    )
+
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Inling causes some tests to fail on MSVC with AVX512 in Release mode, HEXL_DEBUG=OFF,
     # so we disable it here
