@@ -58,13 +58,13 @@ target_include_directories(hexl
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
         -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer
-        -Wno-sign-conversion # clang-10 and clang-12 have different APIs for _mm512_slli_epi64
-        -Wno-implicit-int-conversion # easylogging triggers this warning
     )
     # Avoid 3rd-party dependency warnings when including HEXL as a dependency
     target_compile_options(hexl PUBLIC
         -Wno-sign-conversion         # avoid warnings in gflags headers
         -Wno-implicit-int-conversion # avoid warnings in gflags headers
+        -Wno-unknown-warning
+        -Wno-unknown-warning-option
     )
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -86,6 +86,10 @@ if (HEXL_SHARED_LIB)
     target_link_libraries(hexl PRIVATE cpu_features)
     if (HEXL_DEBUG)
         target_link_libraries(hexl PUBLIC easyloggingpp)
+        # Manually add logging include directory
+        target_include_directories(hexl
+            PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
+        )
         target_link_libraries(hexl PRIVATE gflags)
     endif()
 else ()
