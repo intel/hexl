@@ -6,7 +6,8 @@ PROJECT_BRIEF          = "Intel Homomorphic Encryption Acceleration Library, acc
 
 OUTPUT_DIRECTORY       = @CMAKE_CURRENT_SOURCE_DIR@/doxygen
 INPUT                  = @CMAKE_SOURCE_DIR@/hexl/include \
-                         @CMAKE_SOURCE_DIR@/README.md
+                         @CMAKE_SOURCE_DIR@/README.md \
+                         @CMAKE_SOURCE_DIR@/CONTRIBUTING.md
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 USE_MATHJAX            = YES
