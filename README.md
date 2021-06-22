@@ -124,7 +124,7 @@ Intel HEXL is single-threaded and thread-safe.
 
 # Community Adoption
 
-- Intel HEXL has been integrated to the following homomorphic encryption libraries:
+Intel HEXL has been integrated to the following homomorphic encryption libraries:
 - [Microsoft SEAL](https://github.com/microsoft/SEAL)
 - [PALISADE](https://gitlab.com/palisade/palisade-release)
 
@@ -160,16 +160,8 @@ cmake --build build --target docs
 To view the generated Sphinx documentation, open the generated `build/docs/sphinx/html/index.html` file in a web browser.
 
 # Contributing
-
-At this time, Intel HEXL does not accept external contributions. We encourage feedback and suggestions via issues.
-
-For Intel developers, use [pre-commit](https://pre-commit.com/) to validate the formatting of the code.
-
-Before contributing, please run
-```bash
-cmake --build build --target check unittest
-```
-and make sure pre-commit checks and all unit tests pass.
+To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
+This project welcomes external contributions. We encourage feedback and suggestions via [Github Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github Discussions](https://github.com/intel/hexl/discussions).
 
 ## Repository layout
 Public headers reside in the `hexl/include` folder.
