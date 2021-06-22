@@ -168,49 +168,31 @@ benchmark:
 # IceLake builds below
 format_icelake:
   extends: format
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 default_build_icelake:
   extends: default_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 shared_build_icelake:
   extends: shared_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 debug_build_icelake:
   extends: debug_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 coverage_build_icelake:
   extends: coverage_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 benchmark_icelake:
   extends: benchmark
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
   dependencies:
