@@ -641,42 +641,43 @@ TEST(NTT, FwdNTT_AVX512) {
 
 // Checks AVX512 and native InvNTT implementations match
 TEST(NTT, InvNTT_AVX512) {
-  uint64_t N = 512;
-  uint64_t modulus = GeneratePrimes(1, 55, N)[0];
+  for (size_t N = 512; N <= 65536; N *= 2) {
+    uint64_t modulus = GeneratePrimes(1, 55, N)[0];
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
-  for (size_t trial = 0; trial < 200; ++trial) {
-    std::vector<std::uint64_t> input(N, 0);
-    for (size_t i = 0; i < N; ++i) {
-      input[i] = distrib(gen);
+    for (size_t trial = 0; trial < 10; ++trial) {
+      std::vector<std::uint64_t> input(N, 0);
+      for (size_t i = 0; i < N; ++i) {
+        input[i] = distrib(gen);
+      }
+      std::vector<std::uint64_t> input_avx = input;
+      std::vector<std::uint64_t> input_avx_lazy = input;
+
+      NTT ntt(N, modulus);
+      InverseTransformFromBitReverse64(
+          input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+
+      InverseTransformFromBitReverseAVX512<64>(
+          input_avx.data(), N, ntt.GetModulus(),
+          ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+
+      // Compute lazy
+      InverseTransformFromBitReverseAVX512<64>(
+          input_avx_lazy.data(), N, ntt.GetModulus(),
+          ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
+      for (auto& elem : input_avx_lazy) {
+        elem = elem % modulus;
+      }
+
+      ASSERT_EQ(input, input_avx);
+      ASSERT_EQ(input, input_avx_lazy);
     }
-    std::vector<std::uint64_t> input_avx = input;
-    std::vector<std::uint64_t> input_avx_lazy = input;
-
-    NTT ntt(N, modulus);
-    InverseTransformFromBitReverse64(
-        input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
-        ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
-
-    InverseTransformFromBitReverseAVX512<64>(
-        input_avx.data(), N, ntt.GetModulus(),
-        ntt.GetInvRootOfUnityPowers().data(),
-        ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
-
-    // Compute lazy
-    InverseTransformFromBitReverseAVX512<64>(
-        input_avx_lazy.data(), N, ntt.GetModulus(),
-        ntt.GetInvRootOfUnityPowers().data(),
-        ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
-    for (auto& elem : input_avx_lazy) {
-      elem = elem % modulus;
-    }
-
-    ASSERT_EQ(input, input_avx);
-    ASSERT_EQ(input, input_avx_lazy);
   }
 }
 #endif
