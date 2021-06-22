@@ -177,20 +177,49 @@ void InvT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   }
 }
 
+/// @brief AVX512 implementation of the inverse NTT
+/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[in] n Size of the transfrom, i.e. the polynomial degree. Must be a
+/// power of two.
+/// @param[in] modulus Prime modulus. Must satisfy q == 1 mod 2n
+/// @param[in] root_of_unity_powers Powers of inverse 2n'th root of unity in
+/// F_q. In bit-reversed order.
+/// @param[in] precon_root_of_unity_powers Pre-conditioned powers of inverse
+/// 2n'th root of unity in F_q. In bit-reversed order.
+/// @param[in] input_mod_factor Upper bound for inputs; inputs must be in [0,
+/// input_mod_factor * modulus)
+/// @param[in] output_mod_factor Upper bound for result; result must be in [0,
+/// output_mod_factor * modulus)
+/// @param[in] recursion_depth Depth of recursive call
+/// @param[in] recursion_half Helper for indexing roots of unity
+/// @details The implementation is recursive. The base case is a breadth-first
+/// NTT, where all the butterflies in a given stage are processed before any
+/// butteflies in the next stage. The base case is small enough to fit in the
+/// smallest cache. Larger NTTs are processed recursively in a depth-first
+/// manner, such that an entire subtransform is completed before moving to the
+/// next subtransform. This reduces the number of cache misses, improving
+/// performance on larger transform sizes.
 template <int BitShift>
 void InverseTransformFromBitReverseAVX512(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
-    uint64_t output_mod_factor) {
+    uint64_t output_mod_factor, uint64_t recursion_depth = 0,
+    uint64_t recursion_half = 0) {
   HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(n >= 16,
+             "InverseTransformFromBitReverseAVX512 doesn't support small "
+             "transforms. Need n >= 16, got n = "
+                 << n);
   HEXL_CHECK(modulus < MaximumValue(BitShift) / 2,
              "modulus " << modulus << " too large for BitShift " << BitShift
                         << " => maximum value " << MaximumValue(BitShift) / 2);
   HEXL_CHECK_BOUNDS(precon_inv_root_of_unity_powers, n, MaximumValue(BitShift),
                     "precon_inv_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");
-  HEXL_CHECK_BOUNDS(operand, n, input_mod_factor * modulus,
+  // Skip input bound checking for recursive steps
+  HEXL_CHECK_BOUNDS(operand, (recursion_depth == 0) ? n : 0,
+                    input_mod_factor * modulus,
                     "operand larger than input_mod_factor * modulus ("
                         << input_mod_factor << " * " << modulus << ")");
   HEXL_CHECK(input_mod_factor == 1 || input_mod_factor == 2,
@@ -204,128 +233,172 @@ void InverseTransformFromBitReverseAVX512(
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   size_t t = 1;
-  size_t root_index = 1;
   size_t m = (n >> 1);
+  size_t W_idx = 1 + m * recursion_half;
 
-  // Extract t=1, t=2, t=4 loops separately
-  {
-    // t = 1
-    const uint64_t* W_op = &inv_root_of_unity_powers[root_index];
-    const uint64_t* W_precon = &precon_inv_root_of_unity_powers[root_index];
-    if (input_mod_factor == 1) {
-      InvT1<BitShift, true>(operand, v_neg_modulus, v_twice_mod, m, W_op,
-                            W_precon);
-    } else {
-      InvT1<BitShift, false>(operand, v_neg_modulus, v_twice_mod, m, W_op,
-                             W_precon);
+  static const size_t base_ntt_size = 1024;
+
+  if (n <= base_ntt_size) {  // Perform breadth-first InvNTT
+    // Extract t=1, t=2, t=4 loops separately
+    {
+      // t = 1
+      const uint64_t* W_op = &inv_root_of_unity_powers[W_idx];
+      const uint64_t* W_precon = &precon_inv_root_of_unity_powers[W_idx];
+      if (input_mod_factor == 1) {
+        InvT1<BitShift, true>(operand, v_neg_modulus, v_twice_mod, m, W_op,
+                              W_precon);
+      } else {
+        InvT1<BitShift, false>(operand, v_neg_modulus, v_twice_mod, m, W_op,
+                               W_precon);
+      }
+
+      t <<= 1;
+      m >>= 1;
+      uint64_t W_idx_delta =
+          m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+      W_idx += W_idx_delta;
+
+      // t = 2
+      W_op = &inv_root_of_unity_powers[W_idx];
+      W_precon = &precon_inv_root_of_unity_powers[W_idx];
+      InvT2<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
+
+      t <<= 1;
+      m >>= 1;
+      W_idx_delta >>= 1;
+      W_idx += W_idx_delta;
+
+      // t = 4
+      W_op = &inv_root_of_unity_powers[W_idx];
+      W_precon = &precon_inv_root_of_unity_powers[W_idx];
+      InvT4<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
+      t <<= 1;
+      m >>= 1;
+      W_idx_delta >>= 1;
+      W_idx += W_idx_delta;
+
+      // t >= 8
+      for (; m > 1;) {
+        W_op = &inv_root_of_unity_powers[W_idx];
+        W_precon = &precon_inv_root_of_unity_powers[W_idx];
+        InvT8<BitShift>(operand, v_neg_modulus, v_twice_mod, t, m, W_op,
+                        W_precon);
+        t <<= 1;
+        m >>= 1;
+        W_idx_delta >>= 1;
+        W_idx += W_idx_delta;
+      }
     }
-    t <<= 1;
-    root_index += m;
-    m >>= 1;
+  } else {
+    InverseTransformFromBitReverseAVX512<BitShift>(
+        operand, n / 2, modulus, inv_root_of_unity_powers,
+        precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, 2 * recursion_half);
+    InverseTransformFromBitReverseAVX512<BitShift>(
+        &operand[n / 2], n / 2, modulus, inv_root_of_unity_powers,
+        precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, 2 * recursion_half + 1);
 
-    // t = 2
-    W_op = &inv_root_of_unity_powers[root_index];
-    W_precon = &precon_inv_root_of_unity_powers[root_index];
-    InvT2<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
-
-    t <<= 1;
-    root_index += m;
-    m >>= 1;
-
-    // t = 4
-    W_op = &inv_root_of_unity_powers[root_index];
-    W_precon = &precon_inv_root_of_unity_powers[root_index];
-    InvT4<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
-    t <<= 1;
-    root_index += m;
-    m >>= 1;
+    uint64_t W_idx_delta =
+        m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    for (; m > 2; m >>= 1) {
+      t <<= 1;
+      W_idx_delta >>= 1;
+      W_idx += W_idx_delta;
+    }
+    if (m == 2) {
+      const uint64_t* W_op = &inv_root_of_unity_powers[W_idx];
+      const uint64_t* W_precon = &precon_inv_root_of_unity_powers[W_idx];
+      InvT8<BitShift>(operand, v_neg_modulus, v_twice_mod, t, m, W_op,
+                      W_precon);
+      t <<= 1;
+      m >>= 1;
+      W_idx_delta >>= 1;
+      W_idx += W_idx_delta;
+    }
   }
 
-  // t >= 8
-  for (; m > 1; m >>= 1) {
-    const uint64_t* W_op = &inv_root_of_unity_powers[root_index];
-    const uint64_t* W_precon = &precon_inv_root_of_unity_powers[root_index];
-    InvT8<BitShift>(operand, v_neg_modulus, v_twice_mod, t, m, W_op, W_precon);
-    t <<= 1;
-    root_index += m;
+  // Final loop through data
+  if (recursion_depth == 0) {
+    HEXL_VLOG(4, "AVX512 intermediate operand "
+                     << std::vector<uint64_t>(operand, operand + n));
+
+    const uint64_t W_op = inv_root_of_unity_powers[W_idx];
+    MultiplyFactor mf_inv_n(InverseMod(n, modulus), BitShift, modulus);
+    const uint64_t inv_n = mf_inv_n.Operand();
+    const uint64_t inv_n_prime = mf_inv_n.BarrettFactor();
+
+    MultiplyFactor mf_inv_n_w(MultiplyMod(inv_n, W_op, modulus), BitShift,
+                              modulus);
+    const uint64_t inv_n_w = mf_inv_n_w.Operand();
+    const uint64_t inv_n_w_prime = mf_inv_n_w.BarrettFactor();
+
+    HEXL_VLOG(4, "inv_n_w " << inv_n_w);
+
+    uint64_t* X = operand;
+    uint64_t* Y = X + (n >> 1);
+
+    __m512i v_inv_n = _mm512_set1_epi64(static_cast<int64_t>(inv_n));
+    __m512i v_inv_n_prime =
+        _mm512_set1_epi64(static_cast<int64_t>(inv_n_prime));
+    __m512i v_inv_n_w = _mm512_set1_epi64(static_cast<int64_t>(inv_n_w));
+    __m512i v_inv_n_w_prime =
+        _mm512_set1_epi64(static_cast<int64_t>(inv_n_w_prime));
+
+    __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
+    __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
+
+    const __m512i two_pow52_min1 = _mm512_set1_epi64((1ULL << 52) - 1);
+
+    // Merge final InvNTT loop with modulus reduction baked-in
+    HEXL_LOOP_UNROLL_4
+    for (size_t j = n / 16; j > 0; --j) {
+      __m512i v_X = _mm512_loadu_si512(v_X_pt);
+      __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
+
+      // Slightly different from regular InvButterfly because different W is
+      // used for X and Y
+      __m512i Y_minus_2q = _mm512_sub_epi64(v_Y, v_twice_mod);
+      __m512i X_plus_Y_mod2q =
+          _mm512_hexl_small_add_mod_epi64(v_X, v_Y, v_twice_mod);
+      // T = *X + twice_mod - *Y
+      __m512i T = _mm512_sub_epi64(v_X, Y_minus_2q);
+
+      __m512i Q1 =
+          _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
+      // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
+      __m512i inv_N_tx =
+          _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
+      v_X = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_tx, Q1, v_neg_modulus);
+      if (BitShift == 52) {
+        // Discard high 12 bits; deals with case when W*T < Q1*p in the low
+        // BitShift bits.
+        v_X = _mm512_and_epi64(v_X, two_pow52_min1);
+      }
+
+      __m512i Q2 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_w_prime, T);
+      // Y = inv_N_W * T - Q2 * modulus;
+      __m512i inv_N_W_T = _mm512_hexl_mullo_epi<BitShift>(v_inv_n_w, T);
+      v_Y = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_W_T, Q2, v_neg_modulus);
+      if (BitShift == 52) {
+        // Discard high 12 bits; deals with case when W*T < Q2*p in the low
+        // BitShift bits.
+        v_Y = _mm512_and_epi64(v_Y, two_pow52_min1);
+      }
+
+      if (output_mod_factor == 1) {
+        // Modulus reduction from [0, 2q), to [0, q)
+        v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
+        v_Y = _mm512_hexl_small_mod_epu64(v_Y, v_modulus);
+      }
+
+      _mm512_storeu_si512(v_X_pt++, v_X);
+      _mm512_storeu_si512(v_Y_pt++, v_Y);
+    }
+
+    HEXL_VLOG(5, "AVX512 returning operand "
+                     << std::vector<uint64_t>(operand, operand + n));
   }
-
-  HEXL_VLOG(4, "AVX512 intermediate operand "
-                   << std::vector<uint64_t>(operand, operand + n));
-
-  const uint64_t W_op = inv_root_of_unity_powers[root_index];
-  MultiplyFactor mf_inv_n(InverseMod(n, modulus), BitShift, modulus);
-  const uint64_t inv_n = mf_inv_n.Operand();
-  const uint64_t inv_n_prime = mf_inv_n.BarrettFactor();
-
-  MultiplyFactor mf_inv_n_w(MultiplyMod(inv_n, W_op, modulus), BitShift,
-                            modulus);
-  const uint64_t inv_n_w = mf_inv_n_w.Operand();
-  const uint64_t inv_n_w_prime = mf_inv_n_w.BarrettFactor();
-
-  HEXL_VLOG(4, "inv_n_w " << inv_n_w);
-
-  uint64_t* X = operand;
-  uint64_t* Y = X + (n >> 1);
-
-  __m512i v_inv_n = _mm512_set1_epi64(static_cast<int64_t>(inv_n));
-  __m512i v_inv_n_prime = _mm512_set1_epi64(static_cast<int64_t>(inv_n_prime));
-  __m512i v_inv_n_w = _mm512_set1_epi64(static_cast<int64_t>(inv_n_w));
-  __m512i v_inv_n_w_prime =
-      _mm512_set1_epi64(static_cast<int64_t>(inv_n_w_prime));
-
-  __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
-  __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
-
-  const __m512i two_pow52_min1 = _mm512_set1_epi64((1ULL << 52) - 1);
-
-  // Merge final InvNTT loop with modulus reduction baked-in
-  HEXL_LOOP_UNROLL_4
-  for (size_t j = n / 16; j > 0; --j) {
-    __m512i v_X = _mm512_loadu_si512(v_X_pt);
-    __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
-
-    // Slightly different from regular InvButterfly because different W is used
-    // for X and Y
-
-    __m512i Y_minus_2q = _mm512_sub_epi64(v_Y, v_twice_mod);
-    __m512i X_plus_Y_mod2q =
-        _mm512_hexl_small_add_mod_epi64(v_X, v_Y, v_twice_mod);
-    // T = *X + twice_mod - *Y
-    __m512i T = _mm512_sub_epi64(v_X, Y_minus_2q);
-
-    __m512i Q1 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
-    // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
-    __m512i inv_N_tx = _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
-    v_X = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_tx, Q1, v_neg_modulus);
-    if (BitShift == 52) {
-      // Discard high 12 bits; deals with case when W*T < Q1*p in the low
-      // BitShift bits.
-      v_X = _mm512_and_epi64(v_X, two_pow52_min1);
-    }
-
-    __m512i Q2 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_w_prime, T);
-    // Y = inv_N_W * T - Q2 * modulus;
-    __m512i inv_N_W_T = _mm512_hexl_mullo_epi<BitShift>(v_inv_n_w, T);
-    v_Y = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_W_T, Q2, v_neg_modulus);
-    if (BitShift == 52) {
-      // Discard high 12 bits; deals with case when W*T < Q2*p in the low
-      // BitShift bits.
-      v_Y = _mm512_and_epi64(v_Y, two_pow52_min1);
-    }
-
-    if (output_mod_factor == 1) {
-      // Modulus reduction from [0, 2q), to [0, q)
-      v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
-      v_Y = _mm512_hexl_small_mod_epu64(v_Y, v_modulus);
-    }
-
-    _mm512_storeu_si512(v_X_pt++, v_X);
-    _mm512_storeu_si512(v_Y_pt++, v_Y);
-  }
-
-  HEXL_VLOG(5, "AVX512 returning operand "
-                   << std::vector<uint64_t>(operand, operand + n));
 }
 
 #endif  // HEXL_HAS_AVX512DQ
