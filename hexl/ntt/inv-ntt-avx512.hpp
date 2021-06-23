@@ -49,9 +49,17 @@ inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
     __mmask8 sign_bits = _mm512_movepi64_mask(*X);
     *X = _mm512_mask_add_epi64(*X, sign_bits, *X, twice_modulus);
   }
-  __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, T);
-  __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
-  *Y = _mm512_hexl_mullo_add_epi<BitShift>(Q_p, W_op, T);
+
+  if (BitShift == 32) {
+    __m512i Q = _mm512_hexl_mullo_epi<64>(W_precon, T);
+    Q = _mm512_srli_epi64(Q, 32);
+    __m512i Q_p = _mm512_hexl_mullo_epi<64>(Q, neg_modulus);
+    *Y = _mm512_hexl_mullo_add_epi<64>(Q_p, W_op, T);
+  } else {
+    __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, T);
+    __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
+    *Y = _mm512_hexl_mullo_add_epi<BitShift>(Q_p, W_op, T);
+  }
 
   if (BitShift == 52) {
     // Discard high 12 bits; deals with case when W*T < Q*q in the low BitShift
@@ -364,26 +372,41 @@ void InverseTransformFromBitReverseAVX512(
       // T = *X + twice_mod - *Y
       __m512i T = _mm512_sub_epi64(v_X, Y_minus_2q);
 
-      __m512i Q1 =
-          _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
-      // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
-      __m512i inv_N_tx =
-          _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
-      v_X = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_tx, Q1, v_neg_modulus);
-      if (BitShift == 52) {
-        // Discard high 12 bits; deals with case when W*T < Q1*p in the low
-        // BitShift bits.
-        v_X = _mm512_and_epi64(v_X, two_pow52_min1);
-      }
+      if (BitShift == 32) {
+        __m512i Q1 = _mm512_hexl_mullo_epi<64>(v_inv_n_prime, X_plus_Y_mod2q);
+        Q1 = _mm512_srli_epi64(Q1, 32);
+        // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
+        __m512i inv_N_tx = _mm512_hexl_mullo_epi<64>(v_inv_n, X_plus_Y_mod2q);
+        v_X = _mm512_hexl_mullo_add_epi<64>(inv_N_tx, Q1, v_neg_modulus);
 
-      __m512i Q2 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_w_prime, T);
-      // Y = inv_N_W * T - Q2 * modulus;
-      __m512i inv_N_W_T = _mm512_hexl_mullo_epi<BitShift>(v_inv_n_w, T);
-      v_Y = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_W_T, Q2, v_neg_modulus);
-      if (BitShift == 52) {
-        // Discard high 12 bits; deals with case when W*T < Q2*p in the low
-        // BitShift bits.
-        v_Y = _mm512_and_epi64(v_Y, two_pow52_min1);
+        __m512i Q2 = _mm512_hexl_mullo_epi<64>(v_inv_n_w_prime, T);
+        Q2 = _mm512_srli_epi64(Q2, 32);
+
+        // Y = inv_N_W * T - Q2 * modulus;
+        __m512i inv_N_W_T = _mm512_hexl_mullo_epi<64>(v_inv_n_w, T);
+        v_Y = _mm512_hexl_mullo_add_epi<64>(inv_N_W_T, Q2, v_neg_modulus);
+      } else {
+        __m512i Q1 =
+            _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
+        // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
+        __m512i inv_N_tx =
+            _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
+        v_X = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_tx, Q1, v_neg_modulus);
+        if (BitShift == 52) {
+          // Discard high 12 bits; deals with case when W*T < Q1*p in the low
+          // BitShift bits.
+          v_X = _mm512_and_epi64(v_X, two_pow52_min1);
+        }
+
+        __m512i Q2 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_w_prime, T);
+        // Y = inv_N_W * T - Q2 * modulus;
+        __m512i inv_N_W_T = _mm512_hexl_mullo_epi<BitShift>(v_inv_n_w, T);
+        v_Y = _mm512_hexl_mullo_add_epi<BitShift>(inv_N_W_T, Q2, v_neg_modulus);
+        if (BitShift == 52) {
+          // Discard high 12 bits; deals with case when W*T < Q2*p in the low
+          // BitShift bits.
+          v_Y = _mm512_and_epi64(v_Y, two_pow52_min1);
+        }
       }
 
       if (output_mod_factor == 1) {

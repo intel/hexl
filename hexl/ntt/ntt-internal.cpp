@@ -30,9 +30,11 @@ NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
       m_w(root_of_unity),
       m_alloc(alloc_ptr),
       m_aligned_alloc(AlignedAllocator<uint64_t, 64>(m_alloc)),
+      m_precon32_root_of_unity_powers(m_aligned_alloc),
       m_precon52_root_of_unity_powers(m_aligned_alloc),
       m_precon64_root_of_unity_powers(m_aligned_alloc),
       m_root_of_unity_powers(m_aligned_alloc),
+      m_precon32_inv_root_of_unity_powers(m_aligned_alloc),
       m_precon52_inv_root_of_unity_powers(m_aligned_alloc),
       m_precon64_inv_root_of_unity_powers(m_aligned_alloc),
       m_inv_root_of_unity_powers(m_aligned_alloc) {
@@ -83,15 +85,14 @@ void NTT::ComputeRootOfUnityPowers() {
   }
   inv_root_of_unity_powers = std::move(temp);
 
-  // 64-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon64_root_of_unity_powers(m_aligned_alloc);
-  precon64_root_of_unity_powers.reserve(m_degree);
+  // 32-bit preconditioned root of unity powers
+  AlignedVector64<uint64_t> precon32_root_of_unity_powers(m_aligned_alloc);
+  precon32_root_of_unity_powers.reserve(m_degree);
   for (uint64_t root_of_unity : root_of_unity_powers) {
-    MultiplyFactor mf(root_of_unity, 64, m_q);
-    precon64_root_of_unity_powers.push_back(mf.BarrettFactor());
+    MultiplyFactor mf(root_of_unity, 32, m_q);
+    precon32_root_of_unity_powers.push_back(mf.BarrettFactor());
   }
-
-  m_precon64_root_of_unity_powers = std::move(precon64_root_of_unity_powers);
+  m_precon32_root_of_unity_powers = std::move(precon32_root_of_unity_powers);
 
   // 52-bit preconditioned root of unity powers
   if (has_avx512ifma) {
@@ -101,11 +102,44 @@ void NTT::ComputeRootOfUnityPowers() {
       MultiplyFactor mf(root_of_unity, 52, m_q);
       precon52_root_of_unity_powers.push_back(mf.BarrettFactor());
     }
-
     m_precon52_root_of_unity_powers = std::move(precon52_root_of_unity_powers);
   }
 
+  // 64-bit preconditioned root of unity powers
+  AlignedVector64<uint64_t> precon64_root_of_unity_powers(m_aligned_alloc);
+  precon64_root_of_unity_powers.reserve(m_degree);
+  for (uint64_t root_of_unity : root_of_unity_powers) {
+    MultiplyFactor mf(root_of_unity, 64, m_q);
+    precon64_root_of_unity_powers.push_back(mf.BarrettFactor());
+  }
+  m_precon64_root_of_unity_powers = std::move(precon64_root_of_unity_powers);
+
   m_root_of_unity_powers = std::move(root_of_unity_powers);
+
+  // Inverse root of unity powers
+
+  // 32-bit preconditioned inverse root of unity powers
+  AlignedVector64<uint64_t> precon32_inv_root_of_unity_powers(m_aligned_alloc);
+  precon32_inv_root_of_unity_powers.reserve(m_degree);
+  for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
+    MultiplyFactor mf(inv_root_of_unity, 32, m_q);
+    precon32_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
+  }
+  m_precon32_inv_root_of_unity_powers =
+      std::move(precon32_inv_root_of_unity_powers);
+
+  // 52-bit preconditioned inverse root of unity powers
+  if (has_avx512ifma) {
+    AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
+        m_aligned_alloc);
+    precon52_inv_root_of_unity_powers.reserve(m_degree);
+    for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
+      MultiplyFactor mf(inv_root_of_unity, 52, m_q);
+      precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
+    }
+    m_precon52_inv_root_of_unity_powers =
+        std::move(precon52_inv_root_of_unity_powers);
+  }
 
   // 64-bit preconditioned inverse root of unity powers
   AlignedVector64<uint64_t> precon64_inv_root_of_unity_powers(m_aligned_alloc);
@@ -117,20 +151,6 @@ void NTT::ComputeRootOfUnityPowers() {
 
   m_precon64_inv_root_of_unity_powers =
       std::move(precon64_inv_root_of_unity_powers);
-
-  // 52-bit preconditioned inverse root of unity powers
-  if (has_avx512ifma) {
-    AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
-        m_aligned_alloc);
-    precon52_inv_root_of_unity_powers.reserve(m_degree);
-    for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
-      MultiplyFactor mf(inv_root_of_unity, 52, m_q);
-      precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
-    }
-
-    m_precon52_inv_root_of_unity_powers =
-        std::move(precon52_inv_root_of_unity_powers);
-  }
 
   m_inv_root_of_unity_powers = std::move(inv_root_of_unity_powers);
 }
@@ -159,7 +179,7 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
     const uint64_t* precon_root_of_unity_powers =
         GetPrecon52RootOfUnityPowers().data();
 
-    HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA NTT");
+    HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA FwdNTT");
     ForwardTransformToBitReverseAVX512<s_ifma_shift_bits>(
         result, m_degree, m_q, root_of_unity_powers,
         precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
@@ -169,19 +189,29 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq && m_degree >= 16) {
-    HEXL_VLOG(3, "Calling 64-bit AVX512 NTT");
-    const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
-    const uint64_t* precon_root_of_unity_powers =
-        GetPrecon64RootOfUnityPowers().data();
+    if (m_q < s_max_fwd_32_modulus) {
+      HEXL_VLOG(3, "Calling 32-bit AVX512-DQ FwdNTT");
+      const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
+      const uint64_t* precon_root_of_unity_powers =
+          GetPrecon32RootOfUnityPowers().data();
+      ForwardTransformToBitReverseAVX512<32>(
+          result, m_degree, m_q, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    } else {
+      HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdNTT");
+      const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
+      const uint64_t* precon_root_of_unity_powers =
+          GetPrecon64RootOfUnityPowers().data();
 
-    ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
-        result, m_degree, m_q, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+      ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
+          result, m_degree, m_q, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    }
     return;
   }
 #endif
 
-  HEXL_VLOG(3, "Calling 64-bit default NTT");
+  HEXL_VLOG(3, "Calling 64-bit default FwdNTT");
   const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
   const uint64_t* precon_root_of_unity_powers =
       GetPrecon64RootOfUnityPowers().data();
@@ -222,14 +252,26 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq && m_degree >= 16) {
-    HEXL_VLOG(3, "Calling 64-bit AVX512 InvNTT");
-    const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowers().data();
-    const uint64_t* precon_inv_root_of_unity_powers =
-        GetPrecon64InvRootOfUnityPowers().data();
+    if (m_q < s_max_inv_32_modulus) {
+      HEXL_VLOG(3, "Calling 32-bit AVX512-DQ InvNTT");
+      const uint64_t* inv_root_of_unity_powers =
+          GetInvRootOfUnityPowers().data();
+      const uint64_t* precon_inv_root_of_unity_powers =
+          GetPrecon32InvRootOfUnityPowers().data();
+      InverseTransformFromBitReverseAVX512<32>(
+          result, m_degree, m_q, inv_root_of_unity_powers,
+          precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    } else {
+      HEXL_VLOG(3, "Calling 64-bit AVX512 InvNTT");
+      const uint64_t* inv_root_of_unity_powers =
+          GetInvRootOfUnityPowers().data();
+      const uint64_t* precon_inv_root_of_unity_powers =
+          GetPrecon64InvRootOfUnityPowers().data();
 
-    InverseTransformFromBitReverseAVX512<s_default_shift_bits>(
-        result, m_degree, m_q, inv_root_of_unity_powers,
-        precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
+      InverseTransformFromBitReverseAVX512<s_default_shift_bits>(
+          result, m_degree, m_q, inv_root_of_unity_powers,
+          precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    }
     return;
   }
 #endif

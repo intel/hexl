@@ -66,6 +66,15 @@ inline std::vector<double> ExtractValues(__m512d x) {
 template <int BitShift>
 inline __m512i _mm512_hexl_mulhi_epi(__m512i x, __m512i y);
 
+// Dummy implementation to avoid template substitution errors
+template <>
+inline __m512i _mm512_hexl_mulhi_epi<32>(__m512i x, __m512i y) {
+  HEXL_CHECK(false, "Unimplemented");
+  (void)x;  // Avoid unused variable warning
+  (void)y;  // Avoid unused variable warning
+  return x;
+}
+
 template <>
 inline __m512i _mm512_hexl_mulhi_epi<64>(__m512i x, __m512i y) {
   // https://stackoverflow.com/questions/28807341/simd-signed-with-unsigned-multiplication-for-64-bit-64-bit-to-128-bit
@@ -97,10 +106,19 @@ inline __m512i _mm512_hexl_mulhi_epi<52>(__m512i x, __m512i y) {
 #endif
 
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of x
-// and y to form a 104-bit intermediate result.
+// and y to form a 2*BitShift-bit intermediate result.
 // Returns the low BitShift-bit unsigned integer from the intermediate result
 template <int BitShift>
 inline __m512i _mm512_hexl_mullo_epi(__m512i x, __m512i y);
+
+// Dummy implementation to avoid template substitution errors
+template <>
+inline __m512i _mm512_hexl_mullo_epi<32>(__m512i x, __m512i y) {
+  HEXL_CHECK(false, "Unimplemented");
+  (void)x;  // Avoid unused variable warning
+  (void)y;  // Avoid unused variable warning
+  return x;
+}
 
 template <>
 inline __m512i _mm512_hexl_mullo_epi<64>(__m512i x, __m512i y) {
@@ -127,6 +145,16 @@ inline __m512i _mm512_hexl_mullo_add_epi<52>(__m512i x, __m512i y, __m512i z) {
   return _mm512_madd52lo_epu64(x, y, z);
 }
 #endif
+
+// Dummy implementation to avoid template substitution errors
+template <>
+inline __m512i _mm512_hexl_mullo_add_epi<32>(__m512i x, __m512i y, __m512i z) {
+  HEXL_CHECK(false, "Unimplemented");
+  (void)x;  // Avoid unused variable warning
+  (void)y;  // Avoid unused variable warning
+  (void)z;  // Avoid unused variable warning
+  return x;
+}
 
 template <>
 inline __m512i _mm512_hexl_mullo_add_epi<64>(__m512i x, __m512i y, __m512i z) {

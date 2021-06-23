@@ -108,11 +108,42 @@ BENCHMARK(BM_FwdNTT_AVX512IFMALazy)
 
 #ifdef HEXL_HAS_AVX512DQ
 // state[0] is the degree
-// state[1] is approximately the number of bits in the coefficient modulus
-static void BM_FwdNTT_AVX512DQ(benchmark::State& state) {  //  NOLINT
+// state[1] is the output modulus factor
+static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   uint64_t output_mod_factor = state.range(1);
-  size_t modulus_bits = 61;
+  size_t modulus_bits = 29;
+  size_t modulus = GeneratePrimes(1, modulus_bits, ntt_size)[0];
+
+  AlignedVector64<uint64_t> input(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon32RootOfUnityPowers();
+  for (auto _ : state) {
+    ForwardTransformToBitReverseAVX512<32>(
+        input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 4, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512DQ_32)
+    ->Unit(benchmark::kMicrosecond)
+    ->MinTime(1.0)
+    ->Args({1024, 1})
+    ->Args({1024, 4})
+    ->Args({4096, 1})
+    ->Args({4096, 4})
+    ->Args({16384, 1})
+    ->Args({16384, 4});
+
+// state[0] is the degree
+// state[1] is the output modulus factor
+static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  uint64_t output_mod_factor = state.range(1);
+  size_t modulus_bits = 55;
   size_t modulus = GeneratePrimes(1, modulus_bits, ntt_size)[0];
 
   AlignedVector64<uint64_t> input(ntt_size, 1);
@@ -122,13 +153,13 @@ static void BM_FwdNTT_AVX512DQ(benchmark::State& state) {  //  NOLINT
   const AlignedVector64<uint64_t> precon_root_of_unity =
       ntt.GetPrecon64RootOfUnityPowers();
   for (auto _ : state) {
-    ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
+    ForwardTransformToBitReverseAVX512<64>(
         input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 4, output_mod_factor);
   }
 }
 
-BENCHMARK(BM_FwdNTT_AVX512DQ)
+BENCHMARK(BM_FwdNTT_AVX512DQ_64)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024, 1})
@@ -275,7 +306,36 @@ BENCHMARK(BM_InvNTT_AVX512IFMALazy)
 
 #ifdef HEXL_HAS_AVX512DQ
 // state[0] is the degree
-static void BM_InvNTT_AVX512DQ(benchmark::State& state) {  //  NOLINT
+static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  uint64_t output_mod_factor = state.range(1);
+  size_t modulus = GeneratePrimes(1, 62, ntt_size)[0];
+
+  AlignedVector64<uint64_t> input(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon32InvRootOfUnityPowers();
+
+  for (auto _ : state) {
+    InverseTransformFromBitReverseAVX512<32>(
+        input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), output_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_InvNTT_AVX512DQ_32)
+    ->Unit(benchmark::kMicrosecond)
+    ->MinTime(1.0)
+    ->Args({1024, 1})
+    ->Args({1024, 2})
+    ->Args({4096, 1})
+    ->Args({4096, 2})
+    ->Args({16384, 1})
+    ->Args({16384, 2});
+
+static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   uint64_t output_mod_factor = state.range(1);
   size_t modulus = GeneratePrimes(1, 62, ntt_size)[0];
@@ -294,7 +354,7 @@ static void BM_InvNTT_AVX512DQ(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTT_AVX512DQ)
+BENCHMARK(BM_InvNTT_AVX512DQ_64)
     ->Unit(benchmark::kMicrosecond)
     ->MinTime(1.0)
     ->Args({1024, 1})
