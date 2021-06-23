@@ -1,5 +1,5 @@
 # Intel Homomorphic Encryption Acceleration Library (HEXL)
-Intel:registered: HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HEXL targets integer arithmetic with word-sized primes, typically 40-60 bits. Intel HEXL provides an API for 64-bit unsigned integers and targets Intel CPUs.
+Intel:registered: HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HEXL targets integer arithmetic with word-sized primes, typically 40-60 bits. Intel HEXL provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HEXL, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf)
 
 ## Contents
 - [Intel Homomorphic Encryption Acceleration Library (HEXL)](#intel-homomorphic-encryption-acceleration-library-hexl)
@@ -20,9 +20,9 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Sphinx](#sphinx)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
-  - [Intel HEXL Publication](#intel-hexl-publication)
-  - [Citing Intel HEXL](#citing-intel-hexl)
+- [Citing Intel HEXL](#citing-intel-hexl)
     - [Version 1.0](#version-10)
+- [Contributors](#contributors)
 
 ## Introduction
 Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree `N` a power of two roughly in the range `N=[2^{10}, 2^{17}]`. The coefficients of these polynomials are in a finite field with a word-sized prime, `q`, up to `q`~62 bits. More precisely, the polynomials live in the ring `Z_q[X]/(X^N + 1)`. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus `q`. When multiplying two polynomials, the resulting polynomials of degree `2N` is additionally reduced by taking the remainder when dividing by `X^N+1`.
@@ -167,10 +167,8 @@ This project welcomes external contributions. We encourage feedback and suggesti
 Public headers reside in the `hexl/include` folder.
 Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.
 
-## Intel HEXL Publication
-For more details on Intel HEXL, see our whitepaper at https://arxiv.org/abs/2103.16400.
 
-## Citing Intel HEXL
+# Citing Intel HEXL
 To cite Intel HEXL, please use the following BibTeX entry.
 
 ### Version 1.0
@@ -183,3 +181,18 @@ To cite Intel HEXL, please use the following BibTeX entry.
         key = {Intel HEXL}
     }
 ```
+
+# Contributors
+The Intel contributors to this project, sorted by last name, are
+  - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
+  - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
+  - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/) (lead)
+  - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
+  - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
+  - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - [Sergey Ivanov](https://www.linkedin.com/in/sergey-ivanov-451b72195/)
+  - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
+  - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
+  - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
+  - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
+  - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
