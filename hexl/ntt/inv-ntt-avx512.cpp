@@ -18,6 +18,13 @@ template void InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
 #endif
 
 #ifdef HEXL_HAS_AVX512DQ
+template void InverseTransformFromBitReverseAVX512<32>(
+    uint64_t* operand, uint64_t degree, uint64_t modulus,
+    const uint64_t* inv_root_of_unity_powers,
+    const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth = 0,
+    uint64_t recursion_half = 0);
+
 template void InverseTransformFromBitReverseAVX512<NTT::s_default_shift_bits>(
     uint64_t* operand, uint64_t degree, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,

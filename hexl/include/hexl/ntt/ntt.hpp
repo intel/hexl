@@ -108,12 +108,16 @@ class NTT {
 
   uint64_t GetModulus() const { return m_q; }
 
-  const AlignedVector64<uint64_t>& GetPrecon64RootOfUnityPowers() const {
-    return m_precon64_root_of_unity_powers;
+  const AlignedVector64<uint64_t>& GetPrecon32RootOfUnityPowers() const {
+    return m_precon32_root_of_unity_powers;
   }
 
   const AlignedVector64<uint64_t>& GetPrecon52RootOfUnityPowers() const {
     return m_precon52_root_of_unity_powers;
+  }
+
+  const AlignedVector64<uint64_t>& GetPrecon64RootOfUnityPowers() const {
+    return m_precon64_root_of_unity_powers;
   }
 
   // Returns the vector of pre-computed root of unity powers for the modulus
@@ -125,16 +129,22 @@ class NTT {
   // Returns the root of unity at index i.
   uint64_t GetRootOfUnityPower(size_t i) { return GetRootOfUnityPowers()[i]; }
 
-  // Returns the vector of 64-bit pre-conditioned pre-computed root of unity
+  // Returns the vector of 32-bit pre-conditioned pre-computed root of unity
   // powers for the modulus and root of unity.
-  const AlignedVector64<uint64_t>& GetPrecon64InvRootOfUnityPowers() const {
-    return m_precon64_inv_root_of_unity_powers;
+  const AlignedVector64<uint64_t>& GetPrecon32InvRootOfUnityPowers() const {
+    return m_precon32_inv_root_of_unity_powers;
   }
 
   // Returns the vector of 52-bit pre-conditioned pre-computed root of unity
   // powers for the modulus and root of unity.
   const AlignedVector64<uint64_t>& GetPrecon52InvRootOfUnityPowers() const {
     return m_precon52_inv_root_of_unity_powers;
+  }
+
+  // Returns the vector of 64-bit pre-conditioned pre-computed root of unity
+  // powers for the modulus and root of unity.
+  const AlignedVector64<uint64_t>& GetPrecon64InvRootOfUnityPowers() const {
+    return m_precon64_inv_root_of_unity_powers;
   }
 
   const AlignedVector64<uint64_t>& GetInvRootOfUnityPowers() const {
@@ -153,15 +163,22 @@ class NTT {
   // Default bit shift used in Barrett precomputation
   static const size_t s_default_shift_bits{64};
 
-  // Bit shift used in Barrett precomputation when IFMA acceleration is enabled
+  // Bit shift used in Barrett precomputation when AVX512-IFMA acceleration is
+  // enabled
   static const size_t s_ifma_shift_bits{52};
 
-  // Maximum number of bits in modulus to use IFMA acceleration for the forward
+  // Maximum modulus to use 32-bit AVX512-DQ acceleration for the forward
   // transform
+  static const size_t s_max_fwd_32_modulus{1ULL << (32 - 2)};
+
+  // Maximum modulus to use 32-bit AVX512-DQ acceleration for the inverse
+  // transform
+  static const size_t s_max_inv_32_modulus{1ULL << (32 - 1)};
+
+  // Maximum modulus to use AVX512-IFMA acceleration for the forward transform
   static const size_t s_max_fwd_ifma_modulus{1ULL << (s_ifma_shift_bits - 2)};
 
-  // Maximum number of bits in modulus to use IFMA acceleration for the inverse
-  // transform
+  // Maximum modulus to use AVX512-IFMA acceleration for the inverse transform
   static const size_t s_max_inv_ifma_modulus{1ULL << (s_ifma_shift_bits - 1)};
 
  private:
@@ -179,6 +196,8 @@ class NTT {
 
   AlignedAllocator<uint64_t, 64> m_aligned_alloc;
 
+  // vector of floor(W * 2**32 / m_q), with W the root of unity powers
+  AlignedVector64<uint64_t> m_precon32_root_of_unity_powers;
   // vector of floor(W * 2**52 / m_q), with W the root of unity powers
   AlignedVector64<uint64_t> m_precon52_root_of_unity_powers;
   // vector of floor(W * 2**64 / m_q), with W the root of unity powers
@@ -186,6 +205,8 @@ class NTT {
   // powers of the minimal root of unity
   AlignedVector64<uint64_t> m_root_of_unity_powers;
 
+  // vector of floor(W * 2**32 / m_q), with W the inverse root of unity powers
+  AlignedVector64<uint64_t> m_precon32_inv_root_of_unity_powers;
   // vector of floor(W * 2**52 / m_q), with W the inverse root of unity powers
   AlignedVector64<uint64_t> m_precon52_inv_root_of_unity_powers;
   // vector of floor(W * 2**64 / m_q), with W the inverse root of unity powers

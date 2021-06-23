@@ -21,24 +21,18 @@ class MultiplyFactor {
  public:
   MultiplyFactor() = default;
 
-  // Computes and stores the Barrett factor (operand << bit_shift) / modulus
+  // Computes and stores the Barrett factor floor((operand << bit_shift) /
+  // modulus)
   MultiplyFactor(uint64_t operand, uint64_t bit_shift, uint64_t modulus)
       : m_operand(operand) {
     HEXL_CHECK(operand <= modulus, "operand " << operand
                                               << " must be less than modulus "
                                               << modulus);
-    HEXL_CHECK(bit_shift == 64 || bit_shift == 52,
-               "Unsupport BitShift " << bit_shift);
-    uint64_t op_hi{0};
-    uint64_t op_lo{0};
+    HEXL_CHECK(bit_shift == 32 || bit_shift == 52 || bit_shift == 64,
+               "Unsupported BitShift " << bit_shift);
+    uint64_t op_hi = operand >> (64 - bit_shift);
+    uint64_t op_lo = (bit_shift == 64) ? 0 : (operand << bit_shift);
 
-    if (bit_shift == 64) {
-      op_hi = operand;
-      op_lo = 0;
-    } else if (bit_shift == 52) {
-      op_hi = operand >> 12;
-      op_lo = operand << 52;
-    }
     m_barrett_factor = DivideUInt128UInt64Lo(op_hi, op_lo, modulus);
   }
 
@@ -147,7 +141,7 @@ inline uint64_t MultiplyModLazy(uint64_t x, uint64_t y_operand,
 template <int BitShift>
 inline uint64_t MultiplyModLazy(uint64_t x, uint64_t y, uint64_t modulus) {
   HEXL_CHECK(BitShift == 64 || BitShift == 52,
-             "Unsupport BitShift " << BitShift);
+             "Unsupported BitShift " << BitShift);
   HEXL_CHECK(x <= MaximumValue(BitShift),
              "Operand " << x << " exceeds bound " << MaximumValue(BitShift));
   HEXL_CHECK(y < modulus,

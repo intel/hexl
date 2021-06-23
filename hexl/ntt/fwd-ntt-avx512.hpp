@@ -40,9 +40,18 @@ inline void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
   if (!InputLessThanMod) {
     *X = _mm512_hexl_small_mod_epu64(*X, twice_modulus);
   }
-  __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
-  __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
-  __m512i T = _mm512_hexl_mullo_add_epi<BitShift>(W_Y, Q, neg_modulus);
+
+  __m512i T;
+  if (BitShift == 32) {
+    __m512i Q = _mm512_hexl_mullo_epi<64>(W_precon, *Y);
+    Q = _mm512_srli_epi64(Q, 32);
+    __m512i W_Y = _mm512_hexl_mullo_epi<64>(W_op, *Y);
+    T = _mm512_hexl_mullo_add_epi<64>(W_Y, Q, neg_modulus);
+  } else {
+    __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
+    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
+    T = _mm512_hexl_mullo_add_epi<BitShift>(W_Y, Q, neg_modulus);
+  }
 
   // Discard high 12 bits if BitShift == 52; deals with case when
   // W*Y < Q*p in the low BitShift bits.
