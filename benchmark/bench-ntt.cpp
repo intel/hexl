@@ -53,9 +53,10 @@ static void BM_FwdNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> input(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
-  const AlignedVector64<uint64_t> root_of_unity = ntt.GetRootOfUnityPowers();
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
   const AlignedVector64<uint64_t> precon_root_of_unity =
-      ntt.GetPrecon52RootOfUnityPowers();
+      ntt.GetAVX512Precon52RootOfUnityPowers();
 
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
@@ -82,9 +83,10 @@ static void BM_FwdNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> input(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
-  const AlignedVector64<uint64_t> root_of_unity = ntt.GetRootOfUnityPowers();
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
   const AlignedVector64<uint64_t> precon_root_of_unity =
-      ntt.GetPrecon52RootOfUnityPowers();
+      ntt.GetAVX512Precon52RootOfUnityPowers();
 
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
@@ -118,9 +120,10 @@ static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> input(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
-  const AlignedVector64<uint64_t> root_of_unity = ntt.GetRootOfUnityPowers();
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
   const AlignedVector64<uint64_t> precon_root_of_unity =
-      ntt.GetPrecon32RootOfUnityPowers();
+      ntt.GetAVX512Precon32RootOfUnityPowers();
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<32>(
         input.data(), ntt_size, modulus, root_of_unity.data(),
@@ -149,9 +152,10 @@ static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> input(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
-  const AlignedVector64<uint64_t> root_of_unity = ntt.GetRootOfUnityPowers();
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
   const AlignedVector64<uint64_t> precon_root_of_unity =
-      ntt.GetPrecon64RootOfUnityPowers();
+      ntt.GetAVX512Precon64RootOfUnityPowers();
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<64>(
         input.data(), ntt_size, modulus, root_of_unity.data(),

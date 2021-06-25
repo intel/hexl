@@ -93,6 +93,9 @@ void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 template <int BitShift>
 void FwdT2(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
            uint64_t m, const uint64_t* W_op, const uint64_t* W_precon) {
+  const __m512i* v_W_op_pt = reinterpret_cast<const __m512i*>(W_op);
+  const __m512i* v_W_precon_pt = reinterpret_cast<const __m512i*>(W_precon);
+
   size_t j1 = 0;
   // 4 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
@@ -104,17 +107,18 @@ void FwdT2(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     __m512i v_Y;
     LoadFwdInterleavedT2(X, &v_X, &v_Y);
 
-    __m512i v_W_op = LoadWOpT2(static_cast<const void*>(W_op));
-    __m512i v_W_precon = LoadWOpT2(static_cast<const void*>(W_precon));
+    __m512i v_W_op = _mm512_loadu_si512(v_W_op_pt++);
+    __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
 
+    HEXL_CHECK(ExtractValues(v_W_op)[0] == ExtractValues(v_W_op)[1],
+               "bad v_W_op " << ExtractValues(v_W_op));
+    HEXL_CHECK(ExtractValues(v_W_precon)[0] == ExtractValues(v_W_precon)[1],
+               "bad v_W_precon " << ExtractValues(v_W_precon));
     FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W_op, v_W_precon, v_neg_modulus,
                                   v_twice_mod);
 
     _mm512_storeu_si512(v_X_pt++, v_X);
     _mm512_storeu_si512(v_X_pt, v_Y);
-
-    W_op += 4;
-    W_precon += 4;
 
     j1 += 16;
   }
@@ -124,6 +128,8 @@ template <int BitShift>
 void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
            uint64_t m, const uint64_t* W_op, const uint64_t* W_precon) {
   size_t j1 = 0;
+  const __m512i* v_W_op_pt = reinterpret_cast<const __m512i*>(W_op);
+  const __m512i* v_W_precon_pt = reinterpret_cast<const __m512i*>(W_precon);
 
   // 2 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
@@ -135,9 +141,8 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     __m512i v_Y;
     LoadFwdInterleavedT4(X, &v_X, &v_Y);
 
-    __m512i v_W_op = LoadWOpT4(static_cast<const void*>(W_op));
-    __m512i v_W_precon = LoadWOpT4(static_cast<const void*>(W_precon));
-
+    __m512i v_W_op = _mm512_loadu_si512(v_W_op_pt++);
+    __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
     FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W_op, v_W_precon, v_neg_modulus,
                                   v_twice_mod);
 
@@ -145,8 +150,6 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     _mm512_storeu_si512(v_X_pt, v_Y);
 
     j1 += 16;
-    W_op += 2;
-    W_precon += 2;
   }
 }
 
@@ -242,7 +245,6 @@ void ForwardTransformToBitReverseAVX512(
   HEXL_VLOG(5,
             "precon_root_of_unity_powers " << std::vector<uint64_t>(
                 precon_root_of_unity_powers, precon_root_of_unity_powers + n));
-
   HEXL_VLOG(5, "operand " << std::vector<uint64_t>(operand, operand + n));
 
   static const size_t base_ntt_size = 1024;
@@ -279,20 +281,54 @@ void ForwardTransformToBitReverseAVX512(
 
     // Do T=4, T=2, T=1 separately
     {
-      const uint64_t* W_op = &root_of_unity_powers[W_idx];
-      const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
+      // Correction step needed due to extra copies of roots of unity in the
+      // AVX512 vectors loaded for FwdT2 and FwdT4
+      auto compute_new_W_idx = [&](size_t idx) {
+        // Originally, from root of unity vector index to loop:
+        // [0, N/8) => FwdT8
+        // [N/8, N/4) => FwdT4
+        // [N/4, N/2) => FwdT2
+        // [N/2, N) => FwdT1
+        // The new mapping from AVX512 root of unity vector index to loop:
+        // [0, N/8) => FwdT8
+        // [N/8, 5N/8) => FwdT4
+        // [5N/8, 9N/8) => FwdT2
+        // [9N/8, 13N/8) => FwdT1
+        size_t N = n << recursion_depth;
+
+        // FwdT8 range
+        if (idx <= N / 8) {
+          return idx;
+        }
+        // FwdT4 range
+        if (idx <= N / 4) {
+          return (idx - N / 8) * 4 + (N / 8);
+        }
+        // FwdT2 range
+        if (idx <= N / 2) {
+          return (idx - N / 4) * 2 + (5 * N / 8);
+        }
+        // FwdT1 range
+        return idx + (5 * N / 8);
+      };
+
+      size_t new_W_idx = compute_new_W_idx(W_idx);
+      const uint64_t* W_op = &root_of_unity_powers[new_W_idx];
+      const uint64_t* W_precon = &precon_root_of_unity_powers[new_W_idx];
       FwdT4<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
 
       m <<= 1;
       W_idx <<= 1;
-      W_op = &root_of_unity_powers[W_idx];
-      W_precon = &precon_root_of_unity_powers[W_idx];
+      new_W_idx = compute_new_W_idx(W_idx);
+      W_op = &root_of_unity_powers[new_W_idx];
+      W_precon = &precon_root_of_unity_powers[new_W_idx];
       FwdT2<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
 
       m <<= 1;
       W_idx <<= 1;
-      W_op = &root_of_unity_powers[W_idx];
-      W_precon = &precon_root_of_unity_powers[W_idx];
+      new_W_idx = compute_new_W_idx(W_idx);
+      W_op = &root_of_unity_powers[new_W_idx];
+      W_precon = &precon_root_of_unity_powers[new_W_idx];
       FwdT1<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
     }
 

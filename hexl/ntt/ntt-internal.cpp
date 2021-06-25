@@ -30,10 +30,13 @@ NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
       m_w(root_of_unity),
       m_alloc(alloc_ptr),
       m_aligned_alloc(AlignedAllocator<uint64_t, 64>(m_alloc)),
-      m_precon32_root_of_unity_powers(m_aligned_alloc),
-      m_precon52_root_of_unity_powers(m_aligned_alloc),
-      m_precon64_root_of_unity_powers(m_aligned_alloc),
       m_root_of_unity_powers(m_aligned_alloc),
+      m_precon32_root_of_unity_powers(m_aligned_alloc),
+      m_precon64_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_precon32_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_precon52_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_precon64_root_of_unity_powers(m_aligned_alloc),
       m_precon32_inv_root_of_unity_powers(m_aligned_alloc),
       m_precon52_inv_root_of_unity_powers(m_aligned_alloc),
       m_precon64_inv_root_of_unity_powers(m_aligned_alloc),
@@ -72,6 +75,75 @@ void NTT::ComputeRootOfUnityPowers() {
     prev_idx = idx;
   }
 
+  m_root_of_unity_powers = root_of_unity_powers;
+  m_avx512_root_of_unity_powers = m_root_of_unity_powers;
+
+  // Duplicate each root of unity at indices [N/4, N/2].
+  // These are the roots of unity used in the FwdNTT FwdT2 function
+  // By creating these duplicates, we avoid extra permutations while loading the
+  // roots of unity
+  AlignedVector64<uint64_t> W2_roots;
+  W2_roots.reserve(m_degree / 2);
+  for (size_t i = m_degree / 4; i < m_degree / 2; ++i) {
+    W2_roots.push_back(m_root_of_unity_powers[i]);
+    W2_roots.push_back(m_root_of_unity_powers[i]);
+  }
+  m_avx512_root_of_unity_powers.erase(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 4,
+      m_avx512_root_of_unity_powers.begin() + m_degree / 2);
+  m_avx512_root_of_unity_powers.insert(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 4, W2_roots.begin(),
+      W2_roots.end());
+
+  // Duplicate each root of unity at indices [N/8, N/4].
+  // These are the roots of unity used in the FwdNTT FwdT4 function
+  // By creating these duplicates, we avoid extra permutations while loading the
+  // roots of unity
+  AlignedVector64<uint64_t> W4_roots;
+  W4_roots.reserve(m_degree / 2);
+  for (size_t i = m_degree / 8; i < m_degree / 4; ++i) {
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+  }
+  m_avx512_root_of_unity_powers.erase(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 8,
+      m_avx512_root_of_unity_powers.begin() + m_degree / 4);
+  m_avx512_root_of_unity_powers.insert(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 8, W4_roots.begin(),
+      W4_roots.end());
+
+  auto compute_barrett_vector = [&](const AlignedVector64<uint64_t>& values,
+                                    uint64_t bit_shift) {
+    AlignedVector64<uint64_t> barrett_vector(m_aligned_alloc);
+    for (uint64_t value : values) {
+      MultiplyFactor mf(value, bit_shift, m_q);
+      barrett_vector.push_back(mf.BarrettFactor());
+    }
+    return barrett_vector;
+  };
+
+  m_precon32_root_of_unity_powers =
+      compute_barrett_vector(root_of_unity_powers, 32);
+  m_precon64_root_of_unity_powers =
+      compute_barrett_vector(root_of_unity_powers, 64);
+
+  // 52-bit preconditioned root of unity powers
+  if (has_avx512ifma) {
+    m_avx512_precon52_root_of_unity_powers =
+        compute_barrett_vector(m_avx512_root_of_unity_powers, 52);
+  }
+
+  if (has_avx512dq) {
+    m_avx512_precon32_root_of_unity_powers =
+        compute_barrett_vector(m_avx512_root_of_unity_powers, 32);
+    m_avx512_precon64_root_of_unity_powers =
+        compute_barrett_vector(m_avx512_root_of_unity_powers, 64);
+  }
+
+  // Inverse root of unity powers
+
   // Reordering inv_root_of_powers
   AlignedVector64<uint64_t> temp(m_degree, 0, m_aligned_alloc);
   temp[0] = inv_root_of_unity_powers[0];
@@ -84,39 +156,6 @@ void NTT::ComputeRootOfUnityPowers() {
     }
   }
   inv_root_of_unity_powers = std::move(temp);
-
-  // 32-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon32_root_of_unity_powers(m_aligned_alloc);
-  precon32_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t root_of_unity : root_of_unity_powers) {
-    MultiplyFactor mf(root_of_unity, 32, m_q);
-    precon32_root_of_unity_powers.push_back(mf.BarrettFactor());
-  }
-  m_precon32_root_of_unity_powers = std::move(precon32_root_of_unity_powers);
-
-  // 52-bit preconditioned root of unity powers
-  if (has_avx512ifma) {
-    AlignedVector64<uint64_t> precon52_root_of_unity_powers(m_aligned_alloc);
-    precon52_root_of_unity_powers.reserve(m_degree);
-    for (uint64_t root_of_unity : root_of_unity_powers) {
-      MultiplyFactor mf(root_of_unity, 52, m_q);
-      precon52_root_of_unity_powers.push_back(mf.BarrettFactor());
-    }
-    m_precon52_root_of_unity_powers = std::move(precon52_root_of_unity_powers);
-  }
-
-  // 64-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon64_root_of_unity_powers(m_aligned_alloc);
-  precon64_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t root_of_unity : root_of_unity_powers) {
-    MultiplyFactor mf(root_of_unity, 64, m_q);
-    precon64_root_of_unity_powers.push_back(mf.BarrettFactor());
-  }
-  m_precon64_root_of_unity_powers = std::move(precon64_root_of_unity_powers);
-
-  m_root_of_unity_powers = std::move(root_of_unity_powers);
-
-  // Inverse root of unity powers
 
   // 32-bit preconditioned inverse root of unity powers
   AlignedVector64<uint64_t> precon32_inv_root_of_unity_powers(m_aligned_alloc);
@@ -175,9 +214,9 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
 
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma && (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16))) {
-    const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
+    const uint64_t* root_of_unity_powers = GetAVX512RootOfUnityPowers().data();
     const uint64_t* precon_root_of_unity_powers =
-        GetPrecon52RootOfUnityPowers().data();
+        GetAVX512Precon52RootOfUnityPowers().data();
 
     HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA FwdNTT");
     ForwardTransformToBitReverseAVX512<s_ifma_shift_bits>(
@@ -191,17 +230,19 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
   if (has_avx512dq && m_degree >= 16) {
     if (m_q < s_max_fwd_32_modulus) {
       HEXL_VLOG(3, "Calling 32-bit AVX512-DQ FwdNTT");
-      const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
+      const uint64_t* root_of_unity_powers =
+          GetAVX512RootOfUnityPowers().data();
       const uint64_t* precon_root_of_unity_powers =
-          GetPrecon32RootOfUnityPowers().data();
+          GetAVX512Precon32RootOfUnityPowers().data();
       ForwardTransformToBitReverseAVX512<32>(
           result, m_degree, m_q, root_of_unity_powers,
           precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
     } else {
       HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdNTT");
-      const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
+      const uint64_t* root_of_unity_powers =
+          GetAVX512RootOfUnityPowers().data();
       const uint64_t* precon_root_of_unity_powers =
-          GetPrecon64RootOfUnityPowers().data();
+          GetAVX512Precon64RootOfUnityPowers().data();
 
       ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
           result, m_degree, m_q, root_of_unity_powers,
