@@ -108,26 +108,55 @@ class NTT {
 
   uint64_t GetModulus() const { return m_q; }
 
-  const AlignedVector64<uint64_t>& GetPrecon32RootOfUnityPowers() const {
-    return m_precon32_root_of_unity_powers;
-  }
-
-  const AlignedVector64<uint64_t>& GetPrecon52RootOfUnityPowers() const {
-    return m_precon52_root_of_unity_powers;
-  }
-
-  const AlignedVector64<uint64_t>& GetPrecon64RootOfUnityPowers() const {
-    return m_precon64_root_of_unity_powers;
-  }
-
-  // Returns the vector of pre-computed root of unity powers for the modulus
-  // and root of unity.
+  // Returns the root of unity powers in bit-reversed order
   const AlignedVector64<uint64_t>& GetRootOfUnityPowers() const {
     return m_root_of_unity_powers;
   }
 
-  // Returns the root of unity at index i.
+  // Returns the root of unity at bit-reversed index i.
   uint64_t GetRootOfUnityPower(size_t i) { return GetRootOfUnityPowers()[i]; }
+
+  // Returns 32-bit pre-conditioned root of unity powers in bit-reversed order
+  const AlignedVector64<uint64_t>& GetPrecon32RootOfUnityPowers() const {
+    return m_precon32_root_of_unity_powers;
+  }
+
+  // Returns 64-bit pre-conditioned root of unity powers in bit-reversed order
+  const AlignedVector64<uint64_t>& GetPrecon64RootOfUnityPowers() const {
+    return m_precon64_root_of_unity_powers;
+  }
+
+  // Returns the root of unity powers in bit-reversed order with modifications
+  // for use by AVX512 implementation
+  const AlignedVector64<uint64_t>& GetAVX512RootOfUnityPowers() const {
+    return m_avx512_root_of_unity_powers;
+  }
+
+  // Returns 32-bit pre-conditioned AVX512 root of unity powers in bit-reversed
+  // order
+  const AlignedVector64<uint64_t>& GetAVX512Precon32RootOfUnityPowers() const {
+    return m_avx512_precon32_root_of_unity_powers;
+  }
+
+  // Returns 52-bit pre-conditioned AVX512 root of unity powers in bit-reversed
+  // order
+  const AlignedVector64<uint64_t>& GetAVX512Precon52RootOfUnityPowers() const {
+    return m_avx512_precon52_root_of_unity_powers;
+  }
+
+  // Returns 64-bit pre-conditioned AVX512 root of unity powers in bit-reversed
+  // order
+  const AlignedVector64<uint64_t>& GetAVX512Precon64RootOfUnityPowers() const {
+    return m_avx512_precon64_root_of_unity_powers;
+  }
+
+  const AlignedVector64<uint64_t>& GetInvRootOfUnityPowers() const {
+    return m_inv_root_of_unity_powers;
+  }
+
+  uint64_t GetInvRootOfUnityPower(size_t i) {
+    return GetInvRootOfUnityPowers()[i];
+  }
 
   // Returns the vector of 32-bit pre-conditioned pre-computed root of unity
   // powers for the modulus and root of unity.
@@ -145,14 +174,6 @@ class NTT {
   // powers for the modulus and root of unity.
   const AlignedVector64<uint64_t>& GetPrecon64InvRootOfUnityPowers() const {
     return m_precon64_inv_root_of_unity_powers;
-  }
-
-  const AlignedVector64<uint64_t>& GetInvRootOfUnityPowers() const {
-    return m_inv_root_of_unity_powers;
-  }
-
-  uint64_t GetInvRootOfUnityPower(size_t i) {
-    return GetInvRootOfUnityPowers()[i];
   }
 
   static const size_t s_max_degree_bits{20};  // Maximum power of 2 in degree
@@ -196,14 +217,22 @@ class NTT {
 
   AlignedAllocator<uint64_t, 64> m_aligned_alloc;
 
-  // vector of floor(W * 2**32 / m_q), with W the root of unity powers
-  AlignedVector64<uint64_t> m_precon32_root_of_unity_powers;
-  // vector of floor(W * 2**52 / m_q), with W the root of unity powers
-  AlignedVector64<uint64_t> m_precon52_root_of_unity_powers;
-  // vector of floor(W * 2**64 / m_q), with W the root of unity powers
-  AlignedVector64<uint64_t> m_precon64_root_of_unity_powers;
   // powers of the minimal root of unity
   AlignedVector64<uint64_t> m_root_of_unity_powers;
+  // vector of floor(W * 2**32 / m_q), with W the root of unity powers
+  AlignedVector64<uint64_t> m_precon32_root_of_unity_powers;
+  // vector of floor(W * 2**64 / m_q), with W the root of unity powers
+  AlignedVector64<uint64_t> m_precon64_root_of_unity_powers;
+
+  // powers of the minimal root of unity adjusted for use in AVX512
+  // implementations
+  AlignedVector64<uint64_t> m_avx512_root_of_unity_powers;
+  // vector of floor(W * 2**32 / m_q), with W the AVX512 root of unity powers
+  AlignedVector64<uint64_t> m_avx512_precon32_root_of_unity_powers;
+  // vector of floor(W * 2**52 / m_q), with W the AVX512 root of unity powers
+  AlignedVector64<uint64_t> m_avx512_precon52_root_of_unity_powers;
+  // vector of floor(W * 2**64 / m_q), with W the AVX512 root of unity powers
+  AlignedVector64<uint64_t> m_avx512_precon64_root_of_unity_powers;
 
   // vector of floor(W * 2**32 / m_q), with W the inverse root of unity powers
   AlignedVector64<uint64_t> m_precon32_inv_root_of_unity_powers;
