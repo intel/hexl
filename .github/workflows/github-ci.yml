@@ -63,9 +63,9 @@ jobs:
       # Required for pre-commit
       - run: pip3 install cpplint
       # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
+      # - uses: pre-commit/action@v2.0.2
+      #   with:
+      #     extra_args: --all-files
 
   build-and-test:
     name: Build, test and run kernels
