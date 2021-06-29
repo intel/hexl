@@ -16,28 +16,28 @@ on:
 # Define env vars #
 ###################
 env:
-  DEFAULT_COMPILER_FLAGS: |
-			"-DCMAKE_CXX_COMPILER=clang++-10
+  DEFAULT_COMPILER_FLAGS: >
+      -DCMAKE_CXX_COMPILER=clang++-10
       -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DCMAKE_INSTALL_PREFIX=./" # TODO: Check if path will work
-  SHARED_LIB_COMPILER_FLAGS: | 
-			"-DHEXL_SHARED_LIB=ON
+      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+  SHARED_LIB_COMPILER_FLAGS: >
+      -DHEXL_SHARED_LIB=ON
       -DHEXL_TESTING=ON
       -DHEXL_BENCHMARK=ON
       -DCMAKE_INSTALL_PREFIX=./" # TODO: Check if path will work
-  DEBUG_COMPILER_FLAGS: |
-			"-DCMAKE_BUILD_TYPE=Debug
+  DEBUG_COMPILER_FLAGS: >
+      -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
       -DCMAKE_C_COMPILER=gcc-9
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=./" # TODO: Check if path will work
-  COVERAGE_COMPILER_FLAGS: |
-			"-DCMAKE_BUILD_TYPE=Debug
+      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+  COVERAGE_COMPILER_FLAGS: >
+      -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
       -DCMAKE_C_COMPILER=gcc-9
       -DHEXL_BENCHMARK=ON
@@ -45,7 +45,7 @@ env:
       -DHEXL_COVERAGE=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=./"  # TODO: Check if path will work
+      -DCMAKE_INSTALL_PREFIX=./  # TODO: Check if path will work
   GCOV_BIN: /usr/bin/gcov-9  # TODO: Make sure that this path exists
   DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=.build/lib/cmake/hexl-1.1.0/  # TODO: Figure out right patb
   # DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/hexl-1.1.0/
