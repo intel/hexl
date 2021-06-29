@@ -1,0 +1,172 @@
+# Copyright (C) 2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: hexl
+on:
+  # By default this will run when the activity type is "opened", "synchronize",
+  # or "reopened".
+  pull_request:
+    branches:
+      - main
+  # Manually run this workflow on any specified branch.
+  workflow_dispatch:
+
+
+###################
+# Define env vars #
+###################
+env:
+	DEFAULT_COMPILER_FLAGS: |
+			-DCMAKE_CXX_COMPILER=clang++-10
+      -DCMAKE_C_COMPILER=clang-10
+      -DHEXL_BENCHMARK=ON
+      -DHEXL_TESTING=ON
+      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+  SHARED_LIB_COMPILER_FLAGS: | 
+			-DHEXL_SHARED_LIB=ON
+      -DHEXL_TESTING=ON
+      -DHEXL_BENCHMARK=ON
+      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+  DEBUG_COMPILER_FLAGS: |
+			-DCMAKE_BUILD_TYPE=Debug
+      -DCMAKE_CXX_COMPILER=g++-9
+      -DCMAKE_C_COMPILER=gcc-9
+      -DHEXL_BENCHMARK=ON
+      -DHEXL_TESTING=ON
+      -DHEXL_DOCS=ON
+      -DHEXL_TREAT_WARNING_AS_ERROR=ON
+      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+  COVERAGE_COMPILER_FLAGS: |
+			-DCMAKE_BUILD_TYPE=Debug
+      -DCMAKE_CXX_COMPILER=g++-9
+      -DCMAKE_C_COMPILER=gcc-9
+      -DHEXL_BENCHMARK=ON
+      -DHEXL_TESTING=ON
+      -DHEXL_COVERAGE=ON
+      -DHEXL_DOCS=ON
+      -DHEXL_TREAT_WARNING_AS_ERROR=ON
+      -DCMAKE_INSTALL_PREFIX=./  # TODO: Check if path will work
+  GCOV_BIN: /usr/bin/gcov-9  # TODO: Make sure that this path exists
+  DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=.build/lib/cmake/hexl-1.1.0/  # TODO: Figure out right patb
+  # DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/hexl-1.1.0/
+
+
+################
+# Ubuntu 18.04 #
+################
+jobs:
+  format:
+    runs-on: ubuntu-18.04
+    environment: intel_workflow
+    steps:
+      - uses: actions/checkout@v2
+      # Required for pre-commit
+      - run: pip3 install cpplint
+      # NOTE: This is deprecated in favor of pre-commit.ci
+      - uses: pre-commit/action@v2.0.2
+        with:
+          extra_args: --all-files
+
+  build-and-test:
+    name: Build, test and run kernels
+    needs: [format]
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: he-samples
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REF
+          pwd
+
+      
+      - name: Default Build
+        run: |
+          # Build library
+          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
+          cmake --build build -j
+          cmake --install build
+
+          # Build example
+          cd example
+          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build build -j
+          cd ..
+
+          # Run tests and example
+          build/test/unit-test
+          example/build/example
+
+      - name: Shared Build
+        run: |
+          # Build library
+          cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
+          cmake --build build -j
+          cmake --install build
+
+          # Build and run example
+          cd example
+          cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS}} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build build -j
+          build/example
+
+      - name: Debug Build
+        run: |
+          # Build library
+          cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
+          cmake --build build -j
+          cmake --build build -j --target doxygen docs
+          cmake --install build
+          build/test/unit-test
+          
+          # Build and run example
+          cd example
+          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build build -j
+          build/example
+
+      # TODO: Check the archiving here
+      - name: Coverage Build
+        run: |
+          # Build library
+          cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
+          cmake --build build -j
+          cmake --build build -j --target doxygen docs
+          cmake --install build
+          
+          # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
+          pwd
+          ls
+          echo ${CI_PROJECT_DIR}
+          build/test/unit-test
+          HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
+          HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+          lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
+          
+          # Remove unwanted directories
+          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+          
+          # Report overall summary to be parsed by gitlab CI
+          lcov --list cov_test.info
+          
+          # Generate coverage html
+          genhtml --branch-coverage cov_test.info --output-directory coverage
+
+      - name: Benchmark
+        run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
+      - name: Archive benchmark results
+        uses: actions/upload-artifact@v2
+        with: 
+          name: bench_hexl_${{github.sha}}.csv
+          path: ${GITHUB_WORKFLOW}_${GITHUB_SHA}  # TODO: What would the path be??
+          retention=days: 90 # Maximum for free version
+      
+      # 
+
