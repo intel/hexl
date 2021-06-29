@@ -16,7 +16,7 @@ on:
 # Define env vars #
 ###################
 env:
-	DEFAULT_COMPILER_FLAGS: |
+  DEFAULT_COMPILER_FLAGS: |
 			-DCMAKE_CXX_COMPILER=clang++-10
       -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
