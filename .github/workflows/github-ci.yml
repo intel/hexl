@@ -21,12 +21,12 @@ env:
       -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+      -DCMAKE_INSTALL_PREFIX=./ 
   SHARED_LIB_COMPILER_FLAGS: >
       -DHEXL_SHARED_LIB=ON
       -DHEXL_TESTING=ON
       -DHEXL_BENCHMARK=ON
-      -DCMAKE_INSTALL_PREFIX=./" # TODO: Check if path will work
+      -DCMAKE_INSTALL_PREFIX=./ 
   DEBUG_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
@@ -35,7 +35,7 @@ env:
       -DHEXL_TESTING=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=./ # TODO: Check if path will work
+      -DCMAKE_INSTALL_PREFIX=./ 
   COVERAGE_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
@@ -45,9 +45,9 @@ env:
       -DHEXL_COVERAGE=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=./  # TODO: Check if path will work
-  GCOV_BIN: /usr/bin/gcov-9  # TODO: Make sure that this path exists
-  DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=.build/lib/cmake/hexl-1.1.0/  # TODO: Figure out right patb
+      -DCMAKE_INSTALL_PREFIX=./  
+  GCOV_BIN: /usr/bin/gcov-9
+  DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-1.1.0/
   # DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/hexl-1.1.0/
 
 
