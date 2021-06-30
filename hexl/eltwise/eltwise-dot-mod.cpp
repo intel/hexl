@@ -3,11 +3,13 @@
 
 #include <stdint.h>
 
+#include "eltwise/eltwise-dot-mod-avx512.hpp"
 #include "eltwise/eltwise-dot-mod-internal.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/compiler.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -72,12 +74,13 @@ void EltwiseDotMod(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand4, n, modulus,
                     "pre-dot value in operand1 exceeds bound " << modulus);
 
-  // #ifdef HEXL_HAS_AVX512DQ
-  //   if (has_avx512dq) {
-  //     EltwiseAddModAVX512(result, operand1, operand2, n, modulus);
-  //     return;
-  //   }
-  // #endif
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq && modulus < (1ULL << 50)) {
+    EltwiseDotModAVX512(result, operand1, operand2, operand3, operand4, n,
+                        modulus);
+    return;
+  }
+#endif
 
   HEXL_VLOG(3, "Calling EltwiseDotModNative");
   EltwiseDotModNative(result, operand1, operand2, operand3, operand4, n,

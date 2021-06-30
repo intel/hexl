@@ -30,7 +30,7 @@ TEST(AVX512, ExtractIntValues) {
 
 TEST(AVX512, ExtractDoubleValues) {
   __m512d x = _mm512_set_pd(-4.4, -3.3, -2.2, -1.1, 0, 1.1, 2.2, 3.3);
-  AssertEqual(ExtractValues(x),
+  AssertEqual(ExtractDoubleValues(x),
               std::vector<double>{3.3, 2.2, 1.1, 0, -1.1, -2.2, -3.3, -4.4});
 }
 #endif
