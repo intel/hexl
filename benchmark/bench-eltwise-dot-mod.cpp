@@ -18,17 +18,25 @@ namespace hexl {
 // state[0] is the degree
 static void BM_EltwiseDotModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  uint64_t modulus = 0xffffffffffc0001ULL;
+  size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  AlignedVector64<uint64_t> input2(input_size, 2);
-  AlignedVector64<uint64_t> input3(input_size, 1);
-  AlignedVector64<uint64_t> input4(input_size, 1);
+  uint64_t num_vectors = 2;
+
+  AlignedVector64<uint64_t> input1(num_vectors * input_size, 1);
+  AlignedVector64<uint64_t> input2(num_vectors * input_size, 2);
   AlignedVector64<uint64_t> output(input_size, 0);
 
+  AlignedVector64<const uint64_t*> input1_addresses;
+  AlignedVector64<const uint64_t*> input2_addresses;
+  for (size_t k = 0; k < num_vectors; ++k) {
+    input1_addresses.push_back(&input1[k * input_size]);
+    input2_addresses.push_back(&input2[k * input_size]);
+  }
+
   for (auto _ : state) {
-    EltwiseDotModNative(output.data(), input1.data(), input2.data(),
-                        input3.data(), input4.data(), input_size, modulus);
+    EltwiseDotModNative(output.data(), input1_addresses.data(),
+                        input2_addresses.data(), num_vectors, input_size,
+                        modulus);
   }
 }
 
@@ -47,15 +55,23 @@ static void BM_EltwiseDotModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  AlignedVector64<uint64_t> input2(input_size, 2);
-  AlignedVector64<uint64_t> input3(input_size, 1);
-  AlignedVector64<uint64_t> input4(input_size, 1);
+  uint64_t num_vectors = 2;
+
+  AlignedVector64<uint64_t> input1(num_vectors * input_size, 1);
+  AlignedVector64<uint64_t> input2(num_vectors * input_size, 2);
   AlignedVector64<uint64_t> output(input_size, 0);
 
+  AlignedVector64<const uint64_t*> input1_addresses;
+  AlignedVector64<const uint64_t*> input2_addresses;
+  for (size_t k = 0; k < num_vectors; ++k) {
+    input1_addresses.push_back(&input1[k * input_size]);
+    input2_addresses.push_back(&input2[k * input_size]);
+  }
+
   for (auto _ : state) {
-    EltwiseDotModAVX512(output.data(), input1.data(), input2.data(),
-                        input3.data(), input4.data(), input_size, modulus);
+    EltwiseDotModAVX512(output.data(), input1_addresses.data(),
+                        input2_addresses.data(), num_vectors, input_size,
+                        modulus);
   }
 }
 

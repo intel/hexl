@@ -8,6 +8,7 @@
 
 #include "eltwise/eltwise-dot-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-dot-mod.hpp"
+#include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
 
@@ -154,35 +155,60 @@ namespace hexl {
 //   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 // }
 
-void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
-                         const uint64_t* operand2, const uint64_t* operand3,
-                         const uint64_t* operand4, uint64_t n,
-                         uint64_t modulus) {
+void EltwiseDotModAVX512(uint64_t* result, const uint64_t** operand1,
+                         const uint64_t** operand2, uint64_t num_vectors,
+                         uint64_t n, uint64_t modulus) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(operand2 != nullptr, "Require operand2 != nullptr");
-  HEXL_CHECK(operand3 != nullptr, "Require operand3 != nullptr");
-  HEXL_CHECK(operand4 != nullptr, "Require operand4 != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(n % 8 == 0, "Require n %8 == 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(modulus < (1ULL << 63), "Require modulus < 2**63");
-  HEXL_CHECK_BOUNDS(operand1, n, modulus,
+  HEXL_CHECK_BOUNDS(operand1[0], n, modulus,
                     "pre-dot value in operand1 exceeds bound " << modulus);
-  HEXL_CHECK_BOUNDS(operand2, n, modulus,
+  HEXL_CHECK_BOUNDS(operand2[0], n, modulus,
                     "pre-dot value in operand1 exceeds bound " << modulus);
-  HEXL_CHECK_BOUNDS(operand3, n, modulus,
-                    "pre-dot value in operand1 exceeds bound " << modulus);
-  HEXL_CHECK_BOUNDS(operand4, n, modulus,
-                    "pre-dot value in operand1 exceeds bound " << modulus)
+
+  // Compute intermediate sums
+  LOG(INFO) << "EltwiseDotModAVX512 num_vectors " << num_vectors;
+  LOG(INFO) << "EltwiseDotModAVX512 n " << n << " p " << modulus;
+
+  AlignedVector64<uint64_t> sum_hi(n, 0);
+  AlignedVector64<uint64_t> sum_lo(n, 0);
+
+  __m512i* v_sum_hi = reinterpret_cast<__m512i*>(&sum_hi[0]);
+  __m512i* v_sum_lo = reinterpret_cast<__m512i*>(&sum_lo[0]);
+  // std::vector<__m512i> sum_hi(n / 8, _mm512_set1_epi64(0));
+  // std::vector<__m512i> sum_lo(n / 8, _mm512_set1_epi64(0));
+  for (size_t k = 0; k < num_vectors; ++k) {
+    const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1[k]);
+    const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2[k]);
+
+    HEXL_LOOP_UNROLL_4
+    for (size_t i = 0; i < n / 8; ++i) {
+      __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
+      __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
+
+      LOG(INFO) << "Loaded " << ExtractValues(v_operand1);
+      LOG(INFO) << "Loaded " << ExtractValues(v_operand2);
+
+      __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
+      __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+
+      _mm512_hexl_add_epi128(vprod_hi, vprod_lo, v_sum_hi[i], v_sum_lo[i],
+                             &v_sum_hi[i], &v_sum_lo[i]);
+
+      LOG(INFO) << "added hi " << ExtractValues(v_sum_hi[i]);
+      LOG(INFO) << "added lo " << ExtractValues(v_sum_lo[i]);
+    }
+  }
+
+  // Compute Barrett reduction on the inputs
 
   const uint64_t logmod = MSB(modulus);
-  uint64_t log2_input_mod_factor = 0;
-  uint64_t InputModFactor = 1;
-  if (InputModFactor == 2) {
-    log2_input_mod_factor = 1;
-  } else if (InputModFactor == 4) {
-    log2_input_mod_factor = 2;
-  }
+
+  __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
   // modulus < 2**N
   const uint64_t N = logmod + 1;
@@ -197,114 +223,38 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
   // This happens when 2 * log_2(input_mod_factor) + N < 63
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * log2_input_mod_factor + N >= 63;
+  // bool reduce_mod = 2 * log2_input_mod_factor + N >= 63;
 
   __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
-  const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
-  const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
-  const __m512i* vp_operand3 = reinterpret_cast<const __m512i*>(operand3);
-  const __m512i* vp_operand4 = reinterpret_cast<const __m512i*>(operand4);
-  __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
-  uint64_t n_mod_8 = n % 8;
-  if (n_mod_8 != 0) {
-    EltwiseDotModNative(result, operand1, operand2, operand3, operand4, n_mod_8,
-                        modulus);
-    operand1 += n_mod_8;
-    operand2 += n_mod_8;
-    result += n_mod_8;
-    n -= n_mod_8;
-  }
+  LOG(INFO) << "reducing sum\n";
 
-  // LOG(INFO) << "modulus " << modulus;
+  LOG(INFO) << "L " << L;
 
-  // Algorithm 1 from
-  // https://hal.archives-ouvertes.fr/hal-01215845/document
   HEXL_LOOP_UNROLL_4
-  for (size_t i = n / 8; i > 0; --i) {
-    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
-    __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
-    __m512i v_operand3 = _mm512_loadu_si512(vp_operand3);
-    __m512i v_operand4 = _mm512_loadu_si512(vp_operand4);
+  for (size_t i = 0; i < n / 8; ++i) {
+    LOG(INFO) << "loaded v_sum_lo " << ExtractValues(v_sum_lo[i]);
+    LOG(INFO) << "loaded v_sum_hi " << ExtractValues(v_sum_hi[i]);
+    __m512i c1 = _mm512_hexl_shrdi_epi64(v_sum_lo[i], v_sum_hi[i],
+                                         static_cast<unsigned int>(N - 1));
+    LOG(INFO) << "N " << N;
+    LOG(INFO) << "c1 " << ExtractValues(c1);
 
-    if (std::getenv("TEST") != nullptr) {
-      __m512i vprod1_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
-      __m512i vprod1_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
-      __m512i vprod2_hi = _mm512_hexl_mulhi_epi<64>(v_operand3, v_operand4);
-      __m512i vprod2_lo = _mm512_hexl_mullo_epi<64>(v_operand3, v_operand4);
+    // L - N + 1 == 64, so we only need high 64 bits
+    __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
 
-      __m512i z_hi, z_lo;
-      _mm512_hexl_add_epi128(vprod1_hi, vprod1_lo, vprod2_hi, vprod2_lo, &z_hi,
-                             &z_lo);
+    // C4 = prod_lo - (p * c3)_lo
+    __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+    vresult = _mm512_sub_epi64(v_sum_lo[i], vresult);
 
-      __m512i c1 =
-          _mm512_hexl_shrdi_epi64(z_lo, z_hi, static_cast<unsigned int>(N - 1));
+    // Conditional subtraction
+    vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
 
-      // L - N + 1 == 64, so we only need high 64 bits
-      __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
-
-      // C4 = prod_lo - (p * c3)_lo
-      __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
-      vresult = _mm512_sub_epi64(z_lo, vresult);
-
-      // Conditional subtraction
-      vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
-
-      // LOG(INFO) << "vresult " << ExtractValues(vresult);
-      _mm512_storeu_si512(vp_result, vresult);
-
-    } else {
-      __m512i vresult1, vresult2;
-      {
-        __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
-        __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
-
-        __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
-                                             static_cast<unsigned int>(N - 1));
-
-        // L - N + 1 == 64, so we only need high 64 bits
-        __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
-
-        // C4 = prod_lo - (p * c3)_lo
-        vresult1 = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
-        vresult1 = _mm512_sub_epi64(vprod_lo, vresult1);
-
-        // Conditional subtraction
-        vresult1 = _mm512_hexl_small_mod_epu64(vresult1, v_modulus);
-      }
-      {
-        __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand3, v_operand4);
-        __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand3, v_operand4);
-
-        __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
-                                             static_cast<unsigned int>(N - 1));
-
-        // L - N + 1 == 64, so we only need high 64 bits
-        __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
-
-        // C4 = prod_lo - (p * c3)_lo
-        vresult2 = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
-        vresult2 = _mm512_sub_epi64(vprod_lo, vresult2);
-
-        // Conditional subtraction
-        vresult2 = _mm512_hexl_small_mod_epu64(vresult2, v_modulus);
-      }
-      __m512i vresult =
-          _mm512_hexl_small_add_mod_epi64(vresult1, vresult2, v_modulus);
-      // LOG(INFO) << "vresult1 " << ExtractValues(vresult1);
-      // LOG(INFO) << "vresult2 " << ExtractValues(vresult2);
-
-      // LOG(INFO) << "vresult " << ExtractValues(vresult);
-      _mm512_storeu_si512(vp_result, vresult);
-    }
-
-    ++vp_operand1;
-    ++vp_operand2;
-    ++vp_operand3;
-    ++vp_operand4;
-    ++vp_result;
+    // LOG(INFO) << "vresult " << ExtractValues(vresult);
+    _mm512_storeu_si512(vp_result, vresult);
+    vp_result++;
   }
 }
 

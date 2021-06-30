@@ -38,10 +38,16 @@ TEST_P(EltwiseDotModTest, Native) {
   uint64_t n = std::get<5>(GetParam());
   uint64_t modulus = std::get<6>(GetParam());
 
-  EltwiseDotModNative(operand1.data(), operand1.data(), operand2.data(),
-                      operand3.data(), operand4.data(), n, modulus);
+  uint64_t num_vectors = 2;
+  std::vector<uint64_t> output(n, 0);
 
-  CheckEqual(expected, operand1);
+  std::vector<const uint64_t*> x_addr{&operand1[0], &operand3[0]};
+  std::vector<const uint64_t*> y_addr{&operand2[0], &operand4[0]};
+
+  EltwiseDotModNative(output.data(), x_addr.data(), y_addr.data(), num_vectors,
+                      n, modulus);
+
+  CheckEqual(expected, output);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -88,10 +94,16 @@ TEST_P(EltwiseDotModTestAVX512, AVX512) {
   uint64_t n = std::get<5>(GetParam());
   uint64_t modulus = std::get<6>(GetParam());
 
-  EltwiseDotModAVX512(operand1.data(), operand1.data(), operand2.data(),
-                      operand3.data(), operand4.data(), n, modulus);
+  uint64_t num_vectors = 2;
+  std::vector<uint64_t> output(n, 0);
 
-  CheckEqual(expected, operand1);
+  std::vector<const uint64_t*> x_addr{&operand1[0], &operand3[0]};
+  std::vector<const uint64_t*> y_addr{&operand2[0], &operand4[0]};
+
+  EltwiseDotModAVX512(output.data(), x_addr.data(), y_addr.data(), num_vectors,
+                      n, modulus);
+
+  CheckEqual(expected, output);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -117,49 +129,50 @@ INSTANTIATE_TEST_SUITE_P(
             8, 1073730817)));
 
 // Checks AVX512 and native eltwise add implementations match
-#ifdef HEXL_HAS_AVX512DQ
-TEST(EltwiseDotMod, avx512_native_match) {
-  std::random_device rd;
-  std::mt19937 gen(42);  // (rd());
+// #ifdef HEXL_HAS_AVX512DQ
+// TEST(EltwiseDotMod, avx512_native_match) {
+//   std::random_device rd;
+//   std::mt19937 gen(42);  // (rd());
 
-  size_t length = 8;
+//   size_t length = 8;
 
-  for (size_t bits = 10; bits <= 12; ++bits) {
-    uint64_t modulus = 1ULL << bits;
+//   for (size_t bits = 10; bits <= 12; ++bits) {
+//     uint64_t modulus = 1ULL << bits;
 
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
+//     std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
-#ifdef HEXL_DEBUG
-    size_t num_trials = 1;
-#else
-    size_t num_trials = 1;
-#endif
+// #ifdef HEXL_DEBUG
+//     size_t num_trials = 1;
+// #else
+//     size_t num_trials = 1;
+// #endif
 
-    for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<uint64_t> op1(length, 0);
-      std::vector<uint64_t> op2(length, 0);
-      std::vector<uint64_t> op3(length, 0);
-      std::vector<uint64_t> op4(length, 0);
-      std::vector<uint64_t> out_native(length, 0);
-      std::vector<uint64_t> out_avx(length, 0);
-      for (size_t i = 0; i < length; ++i) {
-        op1[i] = distrib(gen);
-        op2[i] = distrib(gen);
-        op3[i] = distrib(gen);
-        op4[i] = distrib(gen);
-      }
+//     for (size_t trial = 0; trial < num_trials; ++trial) {
+//       std::vector<uint64_t> op1(length, 0);
+//       std::vector<uint64_t> op2(length, 0);
+//       std::vector<uint64_t> op3(length, 0);
+//       std::vector<uint64_t> op4(length, 0);
+//       std::vector<uint64_t> out_native(length, 0);
+//       std::vector<uint64_t> out_avx(length, 0);
+//       for (size_t i = 0; i < length; ++i) {
+//         op1[i] = distrib(gen);
+//         op2[i] = distrib(gen);
+//         op3[i] = distrib(gen);
+//         op4[i] = distrib(gen);
+//       }
 
-      EltwiseDotModNative(out_native.data(), op1.data(), op2.data(), op3.data(),
-                          op4.data(), length, modulus);
-      EltwiseDotModAVX512(out_avx.data(), op1.data(), op2.data(), op3.data(),
-                          op4.data(), length, modulus);
+//       EltwiseDotModNative(out_native.data(), op1.data(), op2.data(),
+//       op3.data(),
+//                           op4.data(), length, modulus);
+//       EltwiseDotModAVX512(out_avx.data(), op1.data(), op2.data(), op3.data(),
+//                           op4.data(), length, modulus);
 
-      ASSERT_EQ(out_native, out_avx);
-    }
-  }
-}
+//       ASSERT_EQ(out_native, out_avx);
+//     }
+//   }
+// }
 
-#endif
+// #endif
 
 }  // namespace hexl
 }  // namespace intel

@@ -20,10 +20,9 @@ namespace hexl {
 /// in the range \f$[2, 2^{63} - 1]\f$
 /// @details Computes \f$ result[i] = (operand1[i] * operand2[i]) + (operand3[i]
 /// * operand4[i]) \mod modulus \f$ for \f$ i=0, ..., n-1\f$.
-void EltwiseDotModNative(uint64_t* result, const uint64_t* operand1,
-                         const uint64_t* operand2, const uint64_t* operand3,
-                         const uint64_t* operand4, uint64_t n,
-                         uint64_t modulus);
+void EltwiseDotModNative(uint64_t* result, const uint64_t** operand1,
+                         const uint64_t** operand2, uint64_t num_vectors,
+                         uint64_t n, uint64_t modulus);
 
 }  // namespace hexl
 }  // namespace intel
