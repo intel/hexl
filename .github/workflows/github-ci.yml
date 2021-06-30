@@ -74,7 +74,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: cmake/hexl
+        working-directory: cmake
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
