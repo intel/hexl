@@ -3,11 +3,7 @@
 To use Intel HEXL in an external application, first install Intel HEXL. Then, in your external application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
-<<<<<<< HEAD
-find_package(HEXL 1.1.1
-=======
 find_package(HEXL 1.1.0
->>>>>>> 926a309414cc32fb2686c5bee80e9730d306fe58
     HINTS ${HEXL_HINT_DIR}
     REQUIRED)
 target_link_libraries(<your target> hexl)

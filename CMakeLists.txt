@@ -2,11 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.5.1)
-<<<<<<< HEAD
-project(HEXL VERSION 1.1.1 LANGUAGES C CXX)
-=======
 project(HEXL VERSION 1.1.0 LANGUAGES C CXX)
->>>>>>> 926a309414cc32fb2686c5bee80e9730d306fe58
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
