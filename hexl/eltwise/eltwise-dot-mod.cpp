@@ -76,6 +76,7 @@ void EltwiseDotMod(uint64_t* result, const uint64_t* operand1,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq && modulus < (1ULL << 50)) {
+    LOG(INFO) << "EltwiseDotModAVX512";
     EltwiseDotModAVX512(result, operand1, operand2, operand3, operand4, n,
                         modulus);
     return;

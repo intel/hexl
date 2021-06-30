@@ -76,6 +76,11 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
     __m512d x2 = _mm512_cvt_roundepu64_pd(v_operand3, round_mode);
     __m512d y2 = _mm512_cvt_roundepu64_pd(v_operand4, round_mode);
 
+    LOG(INFO) << "x1 " << ExtractDoubleValues(x1);
+    LOG(INFO) << "y1 " << ExtractDoubleValues(y1);
+    LOG(INFO) << "x2 " << ExtractDoubleValues(x2);
+    LOG(INFO) << "y2 " << ExtractDoubleValues(y2);
+
     // Dot product with no mod
     __m512d h1 = _mm512_mul_pd(x1, y1);
     __m512d h2 = _mm512_mul_pd(x2, y2);
