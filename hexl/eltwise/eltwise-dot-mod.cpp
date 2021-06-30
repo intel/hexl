@@ -35,16 +35,24 @@ void EltwiseDotModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand4, n, modulus,
                     "pre-dot value in operand1 exceeds bound " << modulus)
 
+  LOG(INFO) << "EltwiseDotModNative n " << n << " mod " << modulus;
+
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < n; ++i) {
     uint64_t dot1 = MultiplyMod(*operand1, *operand2, modulus);
     uint64_t dot2 = MultiplyMod(*operand3, *operand4, modulus);
+
+    LOG(INFO) << "op1 " << (*operand1);
+    LOG(INFO) << "op2 " << (*operand2);
+    LOG(INFO) << "op3 " << (*operand3);
+    LOG(INFO) << "op4 " << (*operand4);
     uint64_t sum = dot1 + dot2;
     if (sum >= modulus) {
       *result = sum - modulus;
     } else {
       *result = sum;
     }
+    LOG(INFO) << "result " << (*result);
 
     ++operand1;
     ++operand2;
