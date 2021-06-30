@@ -52,7 +52,7 @@ env:
 
 
 ################
-# Ubuntu 18.04 #
+# Ubuntu 20.04 #
 ################
 jobs:
   format:
@@ -61,10 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
-      - run: |
-          pip3 install cpplint
-          sudo apt update
-          sudo apt install clang
+      - run: pip3 install cpplint
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:
@@ -73,7 +70,7 @@ jobs:
   build-and-test:
     name: Build, test and run kernels
     needs: [format]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash
@@ -153,13 +150,13 @@ jobs:
           HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
           HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
-          
+
           # Remove unwanted directories
           lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
-          
+
           # Report overall summary to be parsed by gitlab CI
           lcov --list cov_test.info
-          
+
           # Generate coverage html
           genhtml --branch-coverage cov_test.info --output-directory coverage
 
