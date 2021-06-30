@@ -5,9 +5,9 @@
 
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/check.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {

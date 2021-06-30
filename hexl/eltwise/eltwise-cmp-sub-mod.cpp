@@ -5,10 +5,10 @@
 
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"
 #include "eltwise/eltwise-cmp-sub-mod-internal.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
-#include "util/check.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"
 

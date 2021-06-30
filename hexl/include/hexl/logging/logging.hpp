@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "hexl/util/defines.hpp"
+
 // Wrap HEXL_VLOG with HEXL_DEBUG; this ensures no logging overhead in
 // release mode
 #ifdef HEXL_DEBUG

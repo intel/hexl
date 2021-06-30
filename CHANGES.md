@@ -1,8 +1,11 @@
 # Changes
 
+<<<<<<< HEAD
 ## Version 1.1.1
 - Fix Google benchmark branch to point to "main" instead of "master"
 
+=======
+>>>>>>> 926a309414cc32fb2686c5bee80e9730d306fe58
 ## Version 1.1.0
 - Added vector-vector and vector-scalar EltwiseSubMod
 - Added vector-scalar version of EltwiseAddMod

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "number-theory/number-theory.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 
 namespace intel {
 namespace hexl {

@@ -7,9 +7,9 @@
 
 #include <vector>
 
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
 #include "hexl/util/util.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/check.hpp"
 
 namespace intel {
 namespace hexl {
@@ -66,6 +66,15 @@ inline std::vector<double> ExtractValues(__m512d x) {
 template <int BitShift>
 inline __m512i _mm512_hexl_mulhi_epi(__m512i x, __m512i y);
 
+// Dummy implementation to avoid template substitution errors
+template <>
+inline __m512i _mm512_hexl_mulhi_epi<32>(__m512i x, __m512i y) {
+  HEXL_CHECK(false, "Unimplemented");
+  (void)x;  // Avoid unused variable warning
+  (void)y;  // Avoid unused variable warning
+  return x;
+}
+
 template <>
 inline __m512i _mm512_hexl_mulhi_epi<64>(__m512i x, __m512i y) {
   // https://stackoverflow.com/questions/28807341/simd-signed-with-unsigned-multiplication-for-64-bit-64-bit-to-128-bit
@@ -97,10 +106,19 @@ inline __m512i _mm512_hexl_mulhi_epi<52>(__m512i x, __m512i y) {
 #endif
 
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of x
-// and y to form a 104-bit intermediate result.
+// and y to form a 2*BitShift-bit intermediate result.
 // Returns the low BitShift-bit unsigned integer from the intermediate result
 template <int BitShift>
 inline __m512i _mm512_hexl_mullo_epi(__m512i x, __m512i y);
+
+// Dummy implementation to avoid template substitution errors
+template <>
+inline __m512i _mm512_hexl_mullo_epi<32>(__m512i x, __m512i y) {
+  HEXL_CHECK(false, "Unimplemented");
+  (void)x;  // Avoid unused variable warning
+  (void)y;  // Avoid unused variable warning
+  return x;
+}
 
 template <>
 inline __m512i _mm512_hexl_mullo_epi<64>(__m512i x, __m512i y) {
@@ -127,6 +145,16 @@ inline __m512i _mm512_hexl_mullo_add_epi<52>(__m512i x, __m512i y, __m512i z) {
   return _mm512_madd52lo_epu64(x, y, z);
 }
 #endif
+
+// Dummy implementation to avoid template substitution errors
+template <>
+inline __m512i _mm512_hexl_mullo_add_epi<32>(__m512i x, __m512i y, __m512i z) {
+  HEXL_CHECK(false, "Unimplemented");
+  (void)x;  // Avoid unused variable warning
+  (void)y;  // Avoid unused variable warning
+  (void)z;  // Avoid unused variable warning
+  return x;
+}
 
 template <>
 inline __m512i _mm512_hexl_mullo_add_epi<64>(__m512i x, __m512i y, __m512i z) {
@@ -267,7 +295,8 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 // 128-bit result. Shift the result right by bit_shift bits, and return the
 // lower 64 bits. The bit_shift is a run-time argument, rather than a
 // compile-time template parameter, so we can't use _mm512_shrdi_epi64
-inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y, int bit_shift) {
+inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y,
+                                       unsigned int bit_shift) {
   __m512i c_lo = _mm512_srli_epi64(x, bit_shift);
   __m512i c_hi = _mm512_slli_epi64(y, 64 - bit_shift);
   return _mm512_add_epi64(c_lo, c_hi);

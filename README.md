@@ -1,5 +1,5 @@
 # Intel Homomorphic Encryption Acceleration Library (HEXL)
-Intel:registered: HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HEXL targets integer arithmetic with word-sized primes, typically 40-60 bits. Intel HEXL provides an API for 64-bit unsigned integers and targets Intel CPUs.
+Intel:registered: HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HEXL targets integer arithmetic with word-sized primes, typically 40-60 bits. Intel HEXL provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HEXL, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf)
 
 ## Contents
 - [Intel Homomorphic Encryption Acceleration Library (HEXL)](#intel-homomorphic-encryption-acceleration-library-hexl)
@@ -20,9 +20,15 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Sphinx](#sphinx)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
+<<<<<<< HEAD
   - [Intel HEXL Publication](#intel-hexl-publication)
   - [Citing Intel HEXL](#citing-intel-hexl)
     - [Version 1.1.1](#version-111)
+=======
+- [Citing Intel HEXL](#citing-intel-hexl)
+    - [Version 1.0](#version-10)
+- [Contributors](#contributors)
+>>>>>>> 926a309414cc32fb2686c5bee80e9730d306fe58
 
 ## Introduction
 Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree `N` a power of two roughly in the range `N=[2^{10}, 2^{17}]`. The coefficients of these polynomials are in a finite field with a word-sized prime, `q`, up to `q`~62 bits. More precisely, the polynomials live in the ring `Z_q[X]/(X^N + 1)`. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus `q`. When multiplying two polynomials, the resulting polynomials of degree `2N` is additionally reduced by taking the remainder when dividing by `X^N+1`.
@@ -65,12 +71,7 @@ For convenience, they are listed below:
 | ---------------------------------| ---------------------- | ------------------------------------------------------------------------ |
 | HEXL_BENCHMARK                | ON / OFF (default ON)  | Set to ON to enable benchmark suite via Google benchmark                 |
 | HEXL_COVERAGE                 | ON / OFF (default OFF) | Set to ON to enable coverage report of unit-tests                        |
-| HEXL_DEBUG                    | ON / OFF (default OFF) | Set to ON to enable debugging at large runtime penalty                   |
 | HEXL_DOCS                     | ON / OFF (default OFF) | Set to ON to enable building of documentation                            |
-| HEXL_ENABLE_ADDRESS_SANITIZER | ON / OFF (default OFF) | Set to ON to enable building with address sanitizer (ASan)               |
-| HEXL_ENABLE_THREAD_SANITIZER  | ON / OFF (default OFF) | Set to ON to enable building with thread sanitizer (TSan)                |
-| HEXL_ENABLE_UB_SANITIZER      | ON / OFF (default OFF) | Set to ON to enable building with undefined behavior sanitizer (UBSan)   |
-| HEXL_EXPORT                   | ON / OFF (default OFF) | Set to ON to enable export of Intel HEXL for use in 3rd-party project    |
 | HEXL_SHARED_LIB               | ON / OFF (default OFF) | Set to ON to enable building shared library                              |
 | HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                               |
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
@@ -82,9 +83,9 @@ To compile Intel HEXL from source code, first clone the repository into your cur
 ```bash
 cmake -S . -B build
 ```
-adding the desired compile-time options with a `-D` flag. For instance, to build Intel HEXL with debugging capabilities, call
+adding the desired compile-time options with a `-D` flag. For instance, to build Intel HEXL as a shared library, call
 ```bash
-cmake -S . -B build -DHEXL_DEBUG=ON
+cmake -S . -B build -DHEXL_SHARED_LIB=ON
 ```
 
 Then, to build Intel HEXL, call
@@ -121,14 +122,17 @@ The benchmark executable itself is located at `build/benchmark/bench_hexl`
 The `example` folder has an example of using Intel HEXL in a third-party project.
 
 ## Debugging
-For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DHEXL_DEBUG=ON` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution.
+For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl.a`, that can be used to debug the execution.
 
-**Note**, enabling `HEXL_DEBUG=ON` will result in a significant runtime overhead.
+**Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
 ## Threading
 Intel HEXL is single-threaded and thread-safe.
 
 # Community Adoption
-Intel HEXL has been integrated to [Microsoft SEAL](https://github.com/Microsoft/SEAL), an easy-to-use homomorphic encryption library.
+
+Intel HEXL has been integrated to the following homomorphic encryption libraries:
+- [Microsoft SEAL](https://github.com/microsoft/SEAL)
+- [PALISADE](https://gitlab.com/palisade/palisade-release)
 
 If you are aware of any other uses of Intel HEXL, please let us know!
 
@@ -162,25 +166,15 @@ cmake --build build --target docs
 To view the generated Sphinx documentation, open the generated `build/docs/sphinx/html/index.html` file in a web browser.
 
 # Contributing
-
-At this time, Intel HEXL does not accept external contributions. We encourage feedback and suggestions via issues.
-
-For Intel developers, use [pre-commit](https://pre-commit.com/) to validate the formatting of the code.
-
-Before contributing, please run
-```bash
-cmake --build build --target check unittest
-```
-and make sure pre-commit checks and all unit tests pass.
+To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
+This project welcomes external contributions. We encourage feedback and suggestions via [Github Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github Discussions](https://github.com/intel/hexl/discussions).
 
 ## Repository layout
 Public headers reside in the `hexl/include` folder.
 Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.
 
-## Intel HEXL Publication
-For more details on Intel HEXL, see our whitepaper at https://arxiv.org/abs/2103.16400.
 
-## Citing Intel HEXL
+# Citing Intel HEXL
 To cite Intel HEXL, please use the following BibTeX entry.
 
 ### Version 1.1.1
@@ -193,3 +187,18 @@ To cite Intel HEXL, please use the following BibTeX entry.
         key = {Intel HEXL}
     }
 ```
+
+# Contributors
+The Intel contributors to this project, sorted by last name, are
+  - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
+  - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
+  - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/) (lead)
+  - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
+  - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
+  - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - [Sergey Ivanov](https://www.linkedin.com/in/sergey-ivanov-451b72195/)
+  - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
+  - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
+  - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
+  - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
+  - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)

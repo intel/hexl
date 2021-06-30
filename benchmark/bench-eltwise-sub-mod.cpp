@@ -8,9 +8,9 @@
 #include "eltwise/eltwise-sub-mod-avx512.hpp"
 #include "eltwise/eltwise-sub-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-sub-mod.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/aligned-allocator.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/aligned-allocator.hpp"
 
 namespace intel {
 namespace hexl {

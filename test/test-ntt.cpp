@@ -8,13 +8,14 @@
 #include <tuple>
 #include <vector>
 
+#include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
-#include "logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "number-theory/number-theory.hpp"
 #include "test-util.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -98,20 +99,20 @@ TEST(NTT, Powers) {
   uint64_t modulus = 0xffffffffffc0001ULL;
   {
     uint64_t N = 2;
-    NTT::NTTImpl ntt_impl(N, modulus);
+    NTT ntt(N, modulus);
 
-    ASSERT_EQ(1ULL, ntt_impl.GetRootOfUnityPower(0));
-    ASSERT_EQ(288794978602139552ULL, ntt_impl.GetRootOfUnityPower(1));
+    ASSERT_EQ(1ULL, ntt.GetRootOfUnityPower(0));
+    ASSERT_EQ(288794978602139552ULL, ntt.GetRootOfUnityPower(1));
   }
 
   {
     uint64_t N = 4;
-    NTT::NTTImpl ntt_impl(N, modulus);
+    NTT ntt(N, modulus);
 
-    ASSERT_EQ(1ULL, ntt_impl.GetRootOfUnityPower(0));
-    ASSERT_EQ(288794978602139552ULL, ntt_impl.GetRootOfUnityPower(1));
-    ASSERT_EQ(178930308976060547ULL, ntt_impl.GetRootOfUnityPower(2));
-    ASSERT_EQ(748001537669050592ULL, ntt_impl.GetRootOfUnityPower(3));
+    ASSERT_EQ(1ULL, ntt.GetRootOfUnityPower(0));
+    ASSERT_EQ(288794978602139552ULL, ntt.GetRootOfUnityPower(1));
+    ASSERT_EQ(178930308976060547ULL, ntt.GetRootOfUnityPower(2));
+    ASSERT_EQ(748001537669050592ULL, ntt.GetRootOfUnityPower(3));
   }
 }
 
@@ -143,10 +144,10 @@ struct NTT::AllocatorAdapter<allocators::CustomAllocator>
       : a(std::move(a_)) {}
 
   // interface implementations
-  void* allocate_impl(size_t bytes_count) {
+  void* allocate(size_t bytes_count) {
     return a.invoke_allocation(bytes_count);
   }
-  void deallocate_impl(void* p, size_t n) {
+  void deallocate(void* p, size_t n) {
     (void)n;
     a.lets_deallocate(static_cast<allocators::CustomAllocator::T*>(p));
   }
@@ -160,10 +161,8 @@ struct NTT::AllocatorAdapter<std::allocator<T>>
   explicit AllocatorAdapter(std::allocator<T>&& a_) : a(std::move(a_)) {}
 
   // interface implementations
-  void* allocate_impl(size_t bytes_count) { return a.allocate(bytes_count); }
-  void deallocate_impl(void* p, size_t n) {
-    a.deallocate(static_cast<T*>(p), n);
-  }
+  void* allocate(size_t bytes_count) { return a.allocate(bytes_count); }
+  void deallocate(void* p, size_t n) { a.deallocate(static_cast<T*>(p), n); }
 
   std::allocator<T> a;
 };
@@ -219,17 +218,15 @@ TEST(NTT, root_of_unity) {
   AssertEqual(input, input2);
 }
 
-TEST(NTTImpl, root_of_unity) {
+TEST(NTT, root_of_unity2) {
   uint64_t N = 8;
   uint64_t modulus = 769;
 
-  NTT::NTTImpl ntt_impl(N, modulus);
+  NTT ntt(N, modulus);
 
-  EXPECT_EQ(ntt_impl.GetMinimalRootOfUnity(),
-            MinimalPrimitiveRoot(2 * N, modulus));
-  EXPECT_EQ(ntt_impl.GetDegree(), N);
-  EXPECT_EQ(ntt_impl.GetInvRootOfUnityPower(0),
-            ntt_impl.GetInvRootOfUnityPowers()[0]);
+  EXPECT_EQ(ntt.GetMinimalRootOfUnity(), MinimalPrimitiveRoot(2 * N, modulus));
+  EXPECT_EQ(ntt.GetDegree(), N);
+  EXPECT_EQ(ntt.GetInvRootOfUnityPower(0), ntt.GetInvRootOfUnityPowers()[0]);
 }
 
 // Parameters = (degree, modulus, input, expected_output)
@@ -255,7 +252,6 @@ TEST_P(NTTAPITest, Fwd) {
   std::vector<uint64_t> out_buffer(input.size(), 99);
 
   // In-place Fwd NTT
-  NTT::NTTImpl ntt_impl(N, modulus);
   NTT ntt(N, modulus);
   ntt.ComputeForward(input.data(), input.data(), 1, 1);
   AssertEqual(input, exp_output);
@@ -271,7 +267,7 @@ TEST_P(NTTAPITest, Fwd) {
   // Compute reference
   input = input_copy;
   ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
-                                        ntt_impl.GetRootOfUnityPowers().data());
+                                        ntt.GetRootOfUnityPowers().data());
   AssertEqual(input, exp_output);
 
   // Test round-trip
@@ -438,6 +434,9 @@ class NTTModulusTest
 // Test modulus around 50 bits to check IFMA behavior
 // Parameters = (degree, modulus_bits)
 TEST_P(NTTModulusTest, IFMAModuli) {
+  if (!has_avx512ifma) {
+    return;
+  }
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
   uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
@@ -452,22 +451,23 @@ TEST_P(NTTModulusTest, IFMAModuli) {
   std::vector<uint64_t> exp_output(N, 0);
 
   // Compute reference
-  NTT::NTTImpl ntt64(N, modulus);
+  NTT ntt64(N, modulus);
   ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
                                         ntt64.GetRootOfUnityPowers().data());
 
   // Compute with 52-bit bit shift
-  NTT::NTTImpl ntt_ifma(N, modulus);
+  NTT ntt_ifma(N, modulus);
+
   ForwardTransformToBitReverseAVX512<52>(
       input_ifma.data(), N, ntt_ifma.GetModulus(),
-      ntt_ifma.GetRootOfUnityPowers().data(),
-      ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 1);
+      ntt_ifma.GetAVX512RootOfUnityPowers().data(),
+      ntt_ifma.GetAVX512Precon52RootOfUnityPowers().data(), 2, 1);
 
   // Compute lazy
   ForwardTransformToBitReverseAVX512<52>(
       input_ifma_lazy.data(), N, ntt_ifma.GetModulus(),
-      ntt_ifma.GetRootOfUnityPowers().data(),
-      ntt_ifma.GetPrecon52RootOfUnityPowers().data(), 2, 4);
+      ntt_ifma.GetAVX512RootOfUnityPowers().data(),
+      ntt_ifma.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
   for (auto& elem : input_ifma_lazy) {
     elem = elem % modulus;
   }
@@ -600,84 +600,186 @@ TEST(NTT, WriteInvInterleavedT4) {
 }
 
 // Checks AVX512 and native forward NTT implementations match
-TEST(NTT, FwdNTT_AVX512) {
-  uint64_t N = 512;
-  uint64_t modulus = GeneratePrimes(1, 55, N)[0];
-
+TEST(NTT, FwdNTT_AVX512_32) {
+  if (!has_avx512dq) {
+    return;
+  }
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
-  for (size_t trial = 0; trial < 200; ++trial) {
-    std::vector<std::uint64_t> input(N, 0);
-    for (size_t i = 0; i < N; ++i) {
-      input[i] = distrib(gen);
+  for (size_t N = 512; N <= 65536; N *= 2) {
+    uint64_t modulus = GeneratePrimes(1, 27, N)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
+
+    NTT ntt(N, modulus);
+
+    for (size_t trial = 0; trial < 20; ++trial) {
+      std::vector<std::uint64_t> input(N, 0);
+      for (size_t i = 0; i < N; ++i) {
+        input[i] = distrib(gen);
+      }
+      std::vector<std::uint64_t> input_avx = input;
+      std::vector<std::uint64_t> input_avx_lazy = input;
+
+      ForwardTransformToBitReverse64(
+          input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
+          ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+
+      ForwardTransformToBitReverseAVX512<32>(
+          input_avx.data(), N, ntt.GetModulus(),
+          ntt.GetAVX512RootOfUnityPowers().data(),
+          ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 1);
+
+      // Compute lazy
+      ForwardTransformToBitReverseAVX512<32>(
+          input_avx_lazy.data(), N, ntt.GetModulus(),
+          ntt.GetAVX512RootOfUnityPowers().data(),
+          ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 4);
+      for (auto& elem : input_avx_lazy) {
+        elem = elem % modulus;
+      }
+
+      ASSERT_EQ(input, input_avx);
+      ASSERT_EQ(input, input_avx_lazy);
     }
-    std::vector<std::uint64_t> input_avx = input;
-    std::vector<std::uint64_t> input_avx_lazy = input;
-
-    NTT::NTTImpl ntt_impl(N, modulus);
-    ForwardTransformToBitReverse64(
-        input.data(), N, modulus, ntt_impl.GetRootOfUnityPowers().data(),
-        ntt_impl.GetPrecon64RootOfUnityPowers().data(), 2, 1);
-
-    ForwardTransformToBitReverseAVX512<64>(
-        input_avx.data(), N, ntt_impl.GetModulus(),
-        ntt_impl.GetRootOfUnityPowers().data(),
-        ntt_impl.GetPrecon64RootOfUnityPowers().data(), 2, 1);
-
-    // Compute lazy
-    ForwardTransformToBitReverseAVX512<64>(
-        input_avx_lazy.data(), N, ntt_impl.GetModulus(),
-        ntt_impl.GetRootOfUnityPowers().data(),
-        ntt_impl.GetPrecon64RootOfUnityPowers().data(), 2, 4);
-    for (auto& elem : input_avx_lazy) {
-      elem = elem % modulus;
-    }
-
-    ASSERT_EQ(input, input_avx);
-    ASSERT_EQ(input, input_avx_lazy);
   }
 }
 
-// Checks AVX512 and native InvNTT implementations match
-TEST(NTT, InvNTT_AVX512) {
-  uint64_t N = 512;
-  uint64_t modulus = GeneratePrimes(1, 55, N)[0];
-
+// Checks AVX512 and native forward NTT implementations match
+TEST(NTT, FwdNTT_AVX512_64) {
+  if (!has_avx512dq) {
+    return;
+  }
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
-  for (size_t trial = 0; trial < 200; ++trial) {
-    std::vector<std::uint64_t> input(N, 0);
-    for (size_t i = 0; i < N; ++i) {
-      input[i] = distrib(gen);
+  for (size_t N = 512; N <= 65536; N *= 2) {
+    uint64_t modulus = GeneratePrimes(1, 55, N)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
+
+    NTT ntt(N, modulus);
+
+    for (size_t trial = 0; trial < 1; ++trial) {
+      std::vector<std::uint64_t> input(N, 0);
+      for (size_t i = 0; i < N; ++i) {
+        input[i] = distrib(gen);
+      }
+      std::vector<std::uint64_t> input_avx = input;
+      std::vector<std::uint64_t> input_avx_lazy = input;
+
+      ForwardTransformToBitReverse64(
+          input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
+          ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+
+      ForwardTransformToBitReverseAVX512<64>(
+          input_avx.data(), N, ntt.GetModulus(),
+          ntt.GetAVX512RootOfUnityPowers().data(),
+          ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 1);
+
+      // Compute lazy
+      ForwardTransformToBitReverseAVX512<64>(
+          input_avx_lazy.data(), N, ntt.GetModulus(),
+          ntt.GetAVX512RootOfUnityPowers().data(),
+          ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 4);
+      for (auto& elem : input_avx_lazy) {
+        elem = elem % modulus;
+      }
+
+      ASSERT_EQ(input, input_avx);
+      ASSERT_EQ(input, input_avx_lazy);
     }
-    std::vector<std::uint64_t> input_avx = input;
-    std::vector<std::uint64_t> input_avx_lazy = input;
+  }
+}
 
-    NTT::NTTImpl ntt_impl(N, modulus);
-    InverseTransformFromBitReverse64(
-        input.data(), N, modulus, ntt_impl.GetInvRootOfUnityPowers().data(),
-        ntt_impl.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+// Checks 32-bit AVX512 and native InvNTT implementations match
+TEST(NTT, InvNTT_AVX512_32) {
+  if (!has_avx512dq) {
+    return;
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
 
-    InverseTransformFromBitReverseAVX512<64>(
-        input_avx.data(), N, ntt_impl.GetModulus(),
-        ntt_impl.GetInvRootOfUnityPowers().data(),
-        ntt_impl.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+  for (size_t N = 512; N <= 65536; N *= 2) {
+    uint64_t modulus = GeneratePrimes(1, 27, N)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
-    // Compute lazy
-    InverseTransformFromBitReverseAVX512<64>(
-        input_avx_lazy.data(), N, ntt_impl.GetModulus(),
-        ntt_impl.GetInvRootOfUnityPowers().data(),
-        ntt_impl.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
-    for (auto& elem : input_avx_lazy) {
-      elem = elem % modulus;
+    NTT ntt(N, modulus);
+
+    for (size_t trial = 0; trial < 10; ++trial) {
+      std::vector<std::uint64_t> input(N, 0);
+      for (size_t i = 0; i < N; ++i) {
+        input[i] = distrib(gen);
+      }
+      std::vector<std::uint64_t> input_avx = input;
+      std::vector<std::uint64_t> input_avx_lazy = input;
+
+      InverseTransformFromBitReverse64(
+          input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+
+      InverseTransformFromBitReverseAVX512<32>(
+          input_avx.data(), N, ntt.GetModulus(),
+          ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 1);
+
+      // Compute lazy
+      InverseTransformFromBitReverseAVX512<32>(
+          input_avx_lazy.data(), N, ntt.GetModulus(),
+          ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 2);
+      for (auto& elem : input_avx_lazy) {
+        elem = elem % modulus;
+      }
+
+      ASSERT_EQ(input, input_avx);
+      ASSERT_EQ(input, input_avx_lazy);
     }
+  }
+}
 
-    ASSERT_EQ(input, input_avx);
-    ASSERT_EQ(input, input_avx_lazy);
+// Checks 64-bit AVX512 and native InvNTT implementations match
+TEST(NTT, InvNTT_AVX512_64) {
+  if (!has_avx512dq) {
+    return;
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  for (size_t N = 512; N <= 65536; N *= 2) {
+    uint64_t modulus = GeneratePrimes(1, 55, N)[0];
+    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
+
+    NTT ntt(N, modulus);
+
+    for (size_t trial = 0; trial < 10; ++trial) {
+      std::vector<std::uint64_t> input(N, 0);
+      for (size_t i = 0; i < N; ++i) {
+        input[i] = distrib(gen);
+      }
+      std::vector<std::uint64_t> input_avx = input;
+      std::vector<std::uint64_t> input_avx_lazy = input;
+
+      InverseTransformFromBitReverse64(
+          input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+
+      InverseTransformFromBitReverseAVX512<64>(
+          input_avx.data(), N, ntt.GetModulus(),
+          ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+
+      // Compute lazy
+      InverseTransformFromBitReverseAVX512<64>(
+          input_avx_lazy.data(), N, ntt.GetModulus(),
+          ntt.GetInvRootOfUnityPowers().data(),
+          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
+      for (auto& elem : input_avx_lazy) {
+        elem = elem % modulus;
+      }
+
+      ASSERT_EQ(input, input_avx);
+      ASSERT_EQ(input, input_avx_lazy);
+    }
   }
 }
 #endif

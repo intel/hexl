@@ -8,12 +8,13 @@
 #include <memory>
 #include <utility>
 
-#include "logging/logging.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/ntt/ntt.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/aligned-allocator.hpp"
+#include "hexl/util/check.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
-#include "number-theory/number-theory.hpp"
-#include "util/aligned-allocator.hpp"
-#include "util/check.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
@@ -22,62 +23,129 @@ namespace hexl {
 AllocatorStrategyPtr mallocStrategy =
     AllocatorStrategyPtr(new details::MallocStrategy);
 
-NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t q, uint64_t root_of_unity,
-                      std::shared_ptr<AllocatorBase> alloc_ptr)
+NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
+         std::shared_ptr<AllocatorBase> alloc_ptr)
     : m_degree(degree),
       m_q(q),
       m_w(root_of_unity),
-      alloc(alloc_ptr),
-      m_precon52_root_of_unity_powers(AlignedAllocator<uint64_t, 64>(alloc)),
-      m_precon64_root_of_unity_powers(AlignedAllocator<uint64_t, 64>(alloc)),
-      m_root_of_unity_powers(AlignedAllocator<uint64_t, 64>(alloc)),
-      m_precon52_inv_root_of_unity_powers(
-          AlignedAllocator<uint64_t, 64>(alloc)),
-      m_precon64_inv_root_of_unity_powers(
-          AlignedAllocator<uint64_t, 64>(alloc)),
-      m_inv_root_of_unity_powers(AlignedAllocator<uint64_t, 64>(alloc)) {
-  alloc = alloc_ptr;
-
+      m_alloc(alloc_ptr),
+      m_aligned_alloc(AlignedAllocator<uint64_t, 64>(m_alloc)),
+      m_root_of_unity_powers(m_aligned_alloc),
+      m_precon32_root_of_unity_powers(m_aligned_alloc),
+      m_precon64_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_precon32_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_precon52_root_of_unity_powers(m_aligned_alloc),
+      m_avx512_precon64_root_of_unity_powers(m_aligned_alloc),
+      m_precon32_inv_root_of_unity_powers(m_aligned_alloc),
+      m_precon52_inv_root_of_unity_powers(m_aligned_alloc),
+      m_precon64_inv_root_of_unity_powers(m_aligned_alloc),
+      m_inv_root_of_unity_powers(m_aligned_alloc) {
   HEXL_CHECK(CheckNTTArguments(degree, q), "");
   HEXL_CHECK(IsPrimitiveRoot(m_w, 2 * degree, q),
              m_w << " is not a primitive 2*" << degree << "'th root of unity");
 
   m_degree_bits = Log2(m_degree);
-  m_winv = InverseUIntMod(m_w, m_q);
+  m_winv = InverseMod(m_w, m_q);
   ComputeRootOfUnityPowers();
 }
 
-NTT::NTTImpl::NTTImpl(uint64_t degree, uint64_t q,
-                      std::shared_ptr<AllocatorBase> alloc_ptr)
-    : NTTImpl(degree, q, MinimalPrimitiveRoot(2 * degree, q), alloc_ptr) {}
+NTT::NTT(uint64_t degree, uint64_t q, std::shared_ptr<AllocatorBase> alloc_ptr)
+    : NTT(degree, q, MinimalPrimitiveRoot(2 * degree, q), alloc_ptr) {}
 
-NTT::NTTImpl::~NTTImpl() = default;
+NTT::~NTT() = default;
 
-void NTT::NTTImpl::ComputeRootOfUnityPowers() {
-  AlignedVector64<uint64_t> root_of_unity_powers(
-      m_degree, 0, AlignedAllocator<uint64_t, 64>(alloc));
-  AlignedVector64<uint64_t> inv_root_of_unity_powers(
-      m_degree, 0, AlignedAllocator<uint64_t, 64>(alloc));
+void NTT::ComputeRootOfUnityPowers() {
+  AlignedVector64<uint64_t> root_of_unity_powers(m_degree, 0, m_aligned_alloc);
+  AlignedVector64<uint64_t> inv_root_of_unity_powers(m_degree, 0,
+                                                     m_aligned_alloc);
 
-  // 64-bit preconditioning
+  // 64-bit preconditioned inverse and root of unity powers
   root_of_unity_powers[0] = 1;
-  inv_root_of_unity_powers[0] = InverseUIntMod(1, m_q);
+  inv_root_of_unity_powers[0] = InverseMod(1, m_q);
   uint64_t idx = 0;
   uint64_t prev_idx = idx;
 
   for (size_t i = 1; i < m_degree; i++) {
-    idx = ReverseBitsUInt(i, m_degree_bits);
+    idx = ReverseBits(i, m_degree_bits);
     root_of_unity_powers[idx] =
-        MultiplyUIntMod(root_of_unity_powers[prev_idx], m_w, m_q);
-    inv_root_of_unity_powers[idx] =
-        InverseUIntMod(root_of_unity_powers[idx], m_q);
+        MultiplyMod(root_of_unity_powers[prev_idx], m_w, m_q);
+    inv_root_of_unity_powers[idx] = InverseMod(root_of_unity_powers[idx], m_q);
 
     prev_idx = idx;
   }
 
+  m_root_of_unity_powers = root_of_unity_powers;
+  m_avx512_root_of_unity_powers = m_root_of_unity_powers;
+
+  // Duplicate each root of unity at indices [N/4, N/2].
+  // These are the roots of unity used in the FwdNTT FwdT2 function
+  // By creating these duplicates, we avoid extra permutations while loading the
+  // roots of unity
+  AlignedVector64<uint64_t> W2_roots;
+  W2_roots.reserve(m_degree / 2);
+  for (size_t i = m_degree / 4; i < m_degree / 2; ++i) {
+    W2_roots.push_back(m_root_of_unity_powers[i]);
+    W2_roots.push_back(m_root_of_unity_powers[i]);
+  }
+  m_avx512_root_of_unity_powers.erase(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 4,
+      m_avx512_root_of_unity_powers.begin() + m_degree / 2);
+  m_avx512_root_of_unity_powers.insert(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 4, W2_roots.begin(),
+      W2_roots.end());
+
+  // Duplicate each root of unity at indices [N/8, N/4].
+  // These are the roots of unity used in the FwdNTT FwdT4 function
+  // By creating these duplicates, we avoid extra permutations while loading the
+  // roots of unity
+  AlignedVector64<uint64_t> W4_roots;
+  W4_roots.reserve(m_degree / 2);
+  for (size_t i = m_degree / 8; i < m_degree / 4; ++i) {
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+    W4_roots.push_back(m_root_of_unity_powers[i]);
+  }
+  m_avx512_root_of_unity_powers.erase(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 8,
+      m_avx512_root_of_unity_powers.begin() + m_degree / 4);
+  m_avx512_root_of_unity_powers.insert(
+      m_avx512_root_of_unity_powers.begin() + m_degree / 8, W4_roots.begin(),
+      W4_roots.end());
+
+  auto compute_barrett_vector = [&](const AlignedVector64<uint64_t>& values,
+                                    uint64_t bit_shift) {
+    AlignedVector64<uint64_t> barrett_vector(m_aligned_alloc);
+    for (uint64_t value : values) {
+      MultiplyFactor mf(value, bit_shift, m_q);
+      barrett_vector.push_back(mf.BarrettFactor());
+    }
+    return barrett_vector;
+  };
+
+  m_precon32_root_of_unity_powers =
+      compute_barrett_vector(root_of_unity_powers, 32);
+  m_precon64_root_of_unity_powers =
+      compute_barrett_vector(root_of_unity_powers, 64);
+
+  // 52-bit preconditioned root of unity powers
+  if (has_avx512ifma) {
+    m_avx512_precon52_root_of_unity_powers =
+        compute_barrett_vector(m_avx512_root_of_unity_powers, 52);
+  }
+
+  if (has_avx512dq) {
+    m_avx512_precon32_root_of_unity_powers =
+        compute_barrett_vector(m_avx512_root_of_unity_powers, 32);
+    m_avx512_precon64_root_of_unity_powers =
+        compute_barrett_vector(m_avx512_root_of_unity_powers, 64);
+  }
+
+  // Inverse root of unity powers
+
   // Reordering inv_root_of_powers
-  AlignedVector64<uint64_t> temp(m_degree, 0,
-                                 AlignedAllocator<uint64_t, 64>(alloc));
+  AlignedVector64<uint64_t> temp(m_degree, 0, m_aligned_alloc);
   temp[0] = inv_root_of_unity_powers[0];
   idx = 1;
 
@@ -89,68 +157,53 @@ void NTT::NTTImpl::ComputeRootOfUnityPowers() {
   }
   inv_root_of_unity_powers = std::move(temp);
 
-  // 64-bit preconditioned root of unity powers
-  AlignedVector64<uint64_t> precon64_root_of_unity_powers(
-      (AlignedAllocator<uint64_t, 64>(alloc)));
-  precon64_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t root_of_unity : root_of_unity_powers) {
-    MultiplyFactor mf(root_of_unity, 64, m_q);
-    precon64_root_of_unity_powers.push_back(mf.BarrettFactor());
+  // 32-bit preconditioned inverse root of unity powers
+  AlignedVector64<uint64_t> precon32_inv_root_of_unity_powers(m_aligned_alloc);
+  precon32_inv_root_of_unity_powers.reserve(m_degree);
+  for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
+    MultiplyFactor mf(inv_root_of_unity, 32, m_q);
+    precon32_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
   }
+  m_precon32_inv_root_of_unity_powers =
+      std::move(precon32_inv_root_of_unity_powers);
 
-  NTT::NTTImpl::GetPrecon64RootOfUnityPowers() =
-      std::move(precon64_root_of_unity_powers);
-
-  // 52-bit preconditioned root of unity powers
+  // 52-bit preconditioned inverse root of unity powers
   if (has_avx512ifma) {
-    AlignedVector64<uint64_t> precon52_root_of_unity_powers(
-        (AlignedAllocator<uint64_t, 64>(alloc)));
-    precon52_root_of_unity_powers.reserve(m_degree);
-    for (uint64_t root_of_unity : root_of_unity_powers) {
-      MultiplyFactor mf(root_of_unity, 52, m_q);
-      precon52_root_of_unity_powers.push_back(mf.BarrettFactor());
+    AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
+        m_aligned_alloc);
+    precon52_inv_root_of_unity_powers.reserve(m_degree);
+    for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
+      MultiplyFactor mf(inv_root_of_unity, 52, m_q);
+      precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
     }
-
-    NTT::NTTImpl::GetPrecon52RootOfUnityPowers() =
-        std::move(precon52_root_of_unity_powers);
+    m_precon52_inv_root_of_unity_powers =
+        std::move(precon52_inv_root_of_unity_powers);
   }
-
-  NTT::NTTImpl::GetRootOfUnityPowers() = std::move(root_of_unity_powers);
 
   // 64-bit preconditioned inverse root of unity powers
-  AlignedVector64<uint64_t> precon64_inv_root_of_unity_powers(
-      (AlignedAllocator<uint64_t, 64>(alloc)));
+  AlignedVector64<uint64_t> precon64_inv_root_of_unity_powers(m_aligned_alloc);
   precon64_inv_root_of_unity_powers.reserve(m_degree);
   for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
     MultiplyFactor mf(inv_root_of_unity, 64, m_q);
     precon64_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
   }
 
-  NTT::NTTImpl::GetPrecon64InvRootOfUnityPowers() =
+  m_precon64_inv_root_of_unity_powers =
       std::move(precon64_inv_root_of_unity_powers);
 
-  // 52-bit preconditioned inverse root of unity powers
-  if (has_avx512ifma) {
-    AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
-        (AlignedAllocator<uint64_t, 64>(alloc)));
-    precon52_inv_root_of_unity_powers.reserve(m_degree);
-    for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
-      MultiplyFactor mf(inv_root_of_unity, 52, m_q);
-      precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
-    }
-
-    NTT::NTTImpl::GetPrecon52InvRootOfUnityPowers() =
-        std::move(precon52_inv_root_of_unity_powers);
-  }
-
-  NTT::NTTImpl::GetInvRootOfUnityPowers() = std::move(inv_root_of_unity_powers);
+  m_inv_root_of_unity_powers = std::move(inv_root_of_unity_powers);
 }
 
-void NTT::NTTImpl::ComputeForward(uint64_t* result, const uint64_t* operand,
-                                  uint64_t input_mod_factor,
-                                  uint64_t output_mod_factor) {
+void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
+                         uint64_t input_mod_factor,
+                         uint64_t output_mod_factor) {
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
+  HEXL_CHECK(
+      input_mod_factor == 1 || input_mod_factor == 2 || input_mod_factor == 4,
+      "input_mod_factor must be 1, 2 or 4; got " << input_mod_factor);
+  HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
+             "output_mod_factor must be 1 or 4; got " << output_mod_factor);
   HEXL_CHECK_BOUNDS(
       operand, m_degree, m_q * input_mod_factor,
       "value in operand exceeds bound " << m_q * input_mod_factor);
@@ -161,11 +214,11 @@ void NTT::NTTImpl::ComputeForward(uint64_t* result, const uint64_t* operand,
 
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma && (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16))) {
-    const uint64_t* root_of_unity_powers = GetRootOfUnityPowersPtr();
+    const uint64_t* root_of_unity_powers = GetAVX512RootOfUnityPowers().data();
     const uint64_t* precon_root_of_unity_powers =
-        GetPrecon52RootOfUnityPowersPtr();
+        GetAVX512Precon52RootOfUnityPowers().data();
 
-    HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA NTT");
+    HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA FwdNTT");
     ForwardTransformToBitReverseAVX512<s_ifma_shift_bits>(
         result, m_degree, m_q, root_of_unity_powers,
         precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
@@ -175,34 +228,49 @@ void NTT::NTTImpl::ComputeForward(uint64_t* result, const uint64_t* operand,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq && m_degree >= 16) {
-    HEXL_VLOG(3, "Calling 64-bit AVX512 NTT");
-    const uint64_t* root_of_unity_powers = GetRootOfUnityPowersPtr();
-    const uint64_t* precon_root_of_unity_powers =
-        GetPrecon64RootOfUnityPowersPtr();
+    if (m_q < s_max_fwd_32_modulus) {
+      HEXL_VLOG(3, "Calling 32-bit AVX512-DQ FwdNTT");
+      const uint64_t* root_of_unity_powers =
+          GetAVX512RootOfUnityPowers().data();
+      const uint64_t* precon_root_of_unity_powers =
+          GetAVX512Precon32RootOfUnityPowers().data();
+      ForwardTransformToBitReverseAVX512<32>(
+          result, m_degree, m_q, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    } else {
+      HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdNTT");
+      const uint64_t* root_of_unity_powers =
+          GetAVX512RootOfUnityPowers().data();
+      const uint64_t* precon_root_of_unity_powers =
+          GetAVX512Precon64RootOfUnityPowers().data();
 
-    ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
-        result, m_degree, m_q, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+      ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
+          result, m_degree, m_q, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    }
     return;
   }
 #endif
 
-  HEXL_VLOG(3, "Calling 64-bit default NTT");
-  const uint64_t* root_of_unity_powers = GetRootOfUnityPowersPtr();
+  HEXL_VLOG(3, "Calling 64-bit default FwdNTT");
+  const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
   const uint64_t* precon_root_of_unity_powers =
-      GetPrecon64RootOfUnityPowersPtr();
+      GetPrecon64RootOfUnityPowers().data();
 
   ForwardTransformToBitReverse64(result, m_degree, m_q, root_of_unity_powers,
                                  precon_root_of_unity_powers, input_mod_factor,
                                  output_mod_factor);
 }
 
-void NTT::NTTImpl::ComputeInverse(uint64_t* result, const uint64_t* operand,
-                                  uint64_t input_mod_factor,
-                                  uint64_t output_mod_factor) {
+void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
+                         uint64_t input_mod_factor,
+                         uint64_t output_mod_factor) {
+  HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
-  HEXL_CHECK(operand != nullptr, "operand == nullptr");
-
+  HEXL_CHECK(input_mod_factor == 1 || input_mod_factor == 2,
+             "input_mod_factor must be 1 or 2; got " << input_mod_factor);
+  HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
+             "output_mod_factor must be 1 or 2; got " << output_mod_factor);
   HEXL_CHECK_BOUNDS(operand, m_degree, m_q * input_mod_factor,
                     "operand exceeds bound " << m_q * input_mod_factor);
 
@@ -213,9 +281,9 @@ void NTT::NTTImpl::ComputeInverse(uint64_t* result, const uint64_t* operand,
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma && (m_q < s_max_inv_ifma_modulus) && (m_degree >= 16)) {
     HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA InvNTT");
-    const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowersPtr();
+    const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowers().data();
     const uint64_t* precon_inv_root_of_unity_powers =
-        GetPrecon52InvRootOfUnityPowersPtr();
+        GetPrecon52InvRootOfUnityPowers().data();
     InverseTransformFromBitReverseAVX512<s_ifma_shift_bits>(
         result, m_degree, m_q, inv_root_of_unity_powers,
         precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
@@ -225,70 +293,40 @@ void NTT::NTTImpl::ComputeInverse(uint64_t* result, const uint64_t* operand,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq && m_degree >= 16) {
-    HEXL_VLOG(3, "Calling 64-bit AVX512 InvNTT");
-    const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowersPtr();
-    const uint64_t* precon_inv_root_of_unity_powers =
-        GetPrecon64InvRootOfUnityPowersPtr();
+    if (m_q < s_max_inv_32_modulus) {
+      HEXL_VLOG(3, "Calling 32-bit AVX512-DQ InvNTT");
+      const uint64_t* inv_root_of_unity_powers =
+          GetInvRootOfUnityPowers().data();
+      const uint64_t* precon_inv_root_of_unity_powers =
+          GetPrecon32InvRootOfUnityPowers().data();
+      InverseTransformFromBitReverseAVX512<32>(
+          result, m_degree, m_q, inv_root_of_unity_powers,
+          precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    } else {
+      HEXL_VLOG(3, "Calling 64-bit AVX512 InvNTT");
+      const uint64_t* inv_root_of_unity_powers =
+          GetInvRootOfUnityPowers().data();
+      const uint64_t* precon_inv_root_of_unity_powers =
+          GetPrecon64InvRootOfUnityPowers().data();
 
-    InverseTransformFromBitReverseAVX512<s_default_shift_bits>(
-        result, m_degree, m_q, inv_root_of_unity_powers,
-        precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
+      InverseTransformFromBitReverseAVX512<s_default_shift_bits>(
+          result, m_degree, m_q, inv_root_of_unity_powers,
+          precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    }
     return;
   }
 #endif
 
   HEXL_VLOG(3, "Calling 64-bit default InvNTT");
-  const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowersPtr();
+  const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowers().data();
   const uint64_t* precon_inv_root_of_unity_powers =
-      GetPrecon64InvRootOfUnityPowersPtr();
+      GetPrecon64InvRootOfUnityPowers().data();
   InverseTransformFromBitReverse64(
       result, m_degree, m_q, inv_root_of_unity_powers,
       precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
 }
 
-// NTT API
-NTT::NTT() = default;
-
-NTT::NTT(uint64_t degree, uint64_t q,
-         std::shared_ptr<AllocatorBase> alloc_ptr /* = {}*/)
-    : m_impl(std::make_shared<NTT::NTTImpl>(degree, q, alloc_ptr)) {}
-
-NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
-         std::shared_ptr<AllocatorBase> alloc_ptr /* = {}*/)
-    : m_impl(std::make_shared<NTT::NTTImpl>(degree, q, root_of_unity,
-                                            alloc_ptr)) {}
-
-NTT::~NTT() = default;
-
-void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
-                         uint64_t input_mod_factor,
-                         uint64_t output_mod_factor) {
-  HEXL_CHECK(operand != nullptr, "operand == nullptr");
-  HEXL_CHECK(result != nullptr, "result == nullptr");
-  HEXL_CHECK(
-      input_mod_factor == 1 || input_mod_factor == 2 || input_mod_factor == 4,
-      "input_mod_factor must be 1, 2 or 4; got " << input_mod_factor);
-  HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
-             "output_mod_factor must be 1 or 4; got " << output_mod_factor);
-
-  m_impl->ComputeForward(result, operand, input_mod_factor, output_mod_factor);
-}
-
-void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
-                         uint64_t input_mod_factor,
-                         uint64_t output_mod_factor) {
-  HEXL_CHECK(operand != nullptr, "operand == nullptr");
-  HEXL_CHECK(result != nullptr, "result == nullptr");
-  HEXL_CHECK(input_mod_factor == 1 || input_mod_factor == 2,
-             "input_mod_factor must be 1 or 2; got " << input_mod_factor);
-  HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
-             "output_mod_factor must be 1 or 2; got " << output_mod_factor);
-
-  m_impl->ComputeInverse(result, operand, input_mod_factor, output_mod_factor);
-}
-
 // Free functions
-
 void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
                                     uint64_t modulus,
                                     const uint64_t* root_of_unity_powers,
@@ -315,35 +353,35 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
   for (size_t m = 1; m < n; m <<= 1) {
     size_t j1 = 0;
     for (size_t i = 0; i < m; i++) {
+      if (i != 0) j1 += (t << 1);
       size_t j2 = j1 + t;
       const uint64_t W_op = root_of_unity_powers[m + i];
       const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-      uint64_t* X = operand + j1;
+      uint64_t* X = operand;
       uint64_t* Y = X + t;
 
       uint64_t tx;
       uint64_t T;
-      HEXL_LOOP_UNROLL_4
+      HEXL_LOOP_UNROLL_8
       for (size_t j = j1; j < j2; j++) {
         // The Harvey butterfly: assume X, Y in [0, 4q), and return X', Y'
         // in [0, 4q). Such that X', Y' = X + WY, X - WY (mod q).
         // See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
-        HEXL_CHECK(*X < modulus * 4, "input X " << (*X) << " too large");
-        HEXL_CHECK(*Y < modulus * 4, "input Y " << (*Y) << " too large");
+        HEXL_CHECK(X[j] < modulus * 4, "input X " << X[j] << " too large");
+        HEXL_CHECK(Y[j] < modulus * 4, "input Y " << Y[j] << " too large");
 
-        tx = (*X >= twice_mod) ? (*X - twice_mod) : *X;
-        T = MultiplyUIntModLazy<64>(*Y, W_op, W_precon, modulus);
+        tx = (X[j] >= twice_mod) ? (X[j] - twice_mod) : X[j];
+        T = MultiplyModLazy<64>(Y[j], W_op, W_precon, modulus);
 
-        *X++ = tx + T;
-        *Y++ = tx + twice_mod - T;
+        X[j] = tx + T;
+        Y[j] = tx + twice_mod - T;
 
         HEXL_CHECK(tx + T < modulus * 4,
                    "ouput X " << (tx + T) << " too large");
         HEXL_CHECK(tx + twice_mod - T < modulus * 4,
                    "output Y " << (tx + twice_mod - T) << " too large");
       }
-      j1 += (t << 1);
     }
     t >>= 1;
   }
@@ -381,7 +419,7 @@ void ReferenceForwardTransformToBitReverse(
       for (size_t j = j1; j < j2; j++) {
         uint64_t tx = *X;
         // X', Y' = X + WY, X - WY (mod q).
-        uint64_t W_x_Y = MultiplyUIntMod(*Y, W_op, modulus);
+        uint64_t W_x_Y = MultiplyMod(*Y, W_op, modulus);
         *X++ = AddUIntMod(tx, W_x_Y, modulus);
         *Y++ = SubUIntMod(tx, W_x_Y, modulus);
       }
@@ -415,53 +453,47 @@ void InverseTransformFromBitReverse64(
   for (size_t m = (n >> 1); m > 1; m >>= 1) {
     size_t j1 = 0;
     for (size_t i = 0; i < m; i++, root_index++) {
+      if (i != 0) j1 += (t << 1);
       size_t j2 = j1 + t;
       const uint64_t W_op = inv_root_of_unity_powers[root_index];
       const uint64_t W_op_precon = precon_inv_root_of_unity_powers[root_index];
 
-      HEXL_VLOG(4, "m = " << i << ", i = " << i);
-      HEXL_VLOG(4, "j1 = " << j1 << ", j2 = " << j2);
-
-      uint64_t* X = operand + j1;
+      uint64_t* X = operand;
       uint64_t* Y = X + t;
 
-      uint64_t tx;
-      uint64_t ty;
-
-      HEXL_LOOP_UNROLL_4
+      HEXL_LOOP_UNROLL_8
       for (size_t j = j1; j < j2; j++) {
-        HEXL_VLOG(4, "Loaded *X " << *X);
-        HEXL_VLOG(4, "Loaded *Y " << *Y);
+        HEXL_VLOG(4, "Loaded X " << X[j]);
+        HEXL_VLOG(4, "Loaded Y " << Y[j]);
         // The Harvey butterfly: assume X, Y in [0, 2q), and return X', Y'
         // in [0, 2q). X', Y' = X + Y (mod q), W(X - Y) (mod q).
-        tx = *X + *Y;
-        ty = *X + twice_mod - *Y;
+        uint64_t tx = X[j] + Y[j];
+        uint64_t ty = X[j] + twice_mod - Y[j];
 
-        *X++ = (tx >= twice_mod) ? (tx - twice_mod) : tx;
-        *Y++ = MultiplyUIntModLazy<64>(ty, W_op, W_op_precon, modulus);
+        X[j] = (tx >= twice_mod) ? (tx - twice_mod) : tx;
+        Y[j] = MultiplyModLazy<64>(ty, W_op, W_op_precon, modulus);
       }
-      j1 += (t << 1);
     }
     t <<= 1;
   }
 
   const uint64_t W_op = inv_root_of_unity_powers[root_index];
-  const uint64_t inv_n = InverseUIntMod(n, modulus);
-  const uint64_t inv_n_w = MultiplyUIntMod(inv_n, W_op, modulus);
+  const uint64_t inv_n = InverseMod(n, modulus);
+  const uint64_t inv_n_w = MultiplyMod(inv_n, W_op, modulus);
 
   uint64_t* X = operand;
   uint64_t* Y = X + (n >> 1);
   uint64_t tx;
   uint64_t ty;
 
-  for (size_t j = (n >> 1); j < n; j++) {
-    tx = *X + *Y;
+  for (size_t j = 0; j < (n >> 1); ++j) {
+    tx = X[j] + Y[j];
     if (tx >= twice_mod) {
       tx -= twice_mod;
     }
-    ty = *X + twice_mod - *Y;
-    *X++ = MultiplyUIntModLazy<64>(tx, inv_n, modulus);
-    *Y++ = MultiplyUIntModLazy<64>(ty, inv_n_w, modulus);
+    ty = X[j] + twice_mod - Y[j];
+    X[j] = MultiplyModLazy<64>(tx, inv_n, modulus);
+    Y[j] = MultiplyModLazy<64>(ty, inv_n_w, modulus);
   }
 
   if (output_mod_factor == 1) {
@@ -482,8 +514,8 @@ bool CheckNTTArguments(uint64_t degree, uint64_t modulus) {
   (void)modulus;
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
-  HEXL_CHECK(degree <= (1 << NTT::NTTImpl::s_max_degree_bits),
-             "degree should be less than 2^" << NTT::NTTImpl::s_max_degree_bits
+  HEXL_CHECK(degree <= (1 << NTT::s_max_degree_bits),
+             "degree should be less than 2^" << NTT::s_max_degree_bits
                                              << " got " << degree);
 
   HEXL_CHECK(modulus % (2 * degree) == 1, "modulus mod 2n != 1");

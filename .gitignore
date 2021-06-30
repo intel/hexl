@@ -10,6 +10,9 @@ build*/
 
 # Generated files
 docs/conf.py
-cmake/IntelHEXLConfig.cmake
+docs/doxygen/
+docs/sphinx/
 *.log
 Doxyfile
+hexl/include/hexl/util/defines.hpp
+cmake/hexl-*.*.*/HEXLConfig.cmake

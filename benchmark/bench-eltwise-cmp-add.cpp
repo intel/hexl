@@ -9,8 +9,8 @@
 #include "eltwise/eltwise-cmp-add-avx512.hpp"
 #include "eltwise/eltwise-cmp-add-internal.hpp"
 #include "hexl/eltwise/eltwise-cmp-add.hpp"
-#include "logging/logging.hpp"
-#include "util/aligned-allocator.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/util/aligned-allocator.hpp"
 
 namespace intel {
 namespace hexl {

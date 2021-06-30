@@ -10,38 +10,31 @@ variables:
       -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DHEXL_EXPORT=ON
       -DCMAKE_INSTALL_PREFIX=./"
   SHARED_LIB_COMPILER_FLAGS: "-DHEXL_SHARED_LIB=ON
-      -DHEXL_EXPORT=ON
       -DHEXL_TESTING=ON
       -DHEXL_BENCHMARK=ON
       -DCMAKE_INSTALL_PREFIX=./"
-  DEBUG_COMPILER_FLAGS: "-DCMAKE_BUILD_TYPE=RelWithDebInfo
+  DEBUG_COMPILER_FLAGS: "-DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
       -DCMAKE_C_COMPILER=gcc-9
-      -DHEXL_DEBUG=ON
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DHEXL_EXPORT=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./"
-  COVERAGE_COMPILER_FLAGS: "-DCMAKE_BUILD_TYPE=RelWithDebInfo
+  COVERAGE_COMPILER_FLAGS: "-DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
       -DCMAKE_C_COMPILER=gcc-9
-      -DHEXL_DEBUG=ON
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
       -DHEXL_COVERAGE=ON
-      -DHEXL_ENABLE_ADDRESS_SANITIZER=ON
-      -DHEXL_EXPORT=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./"
 
   GCOV_BIN: "/usr/bin/gcov-9"
-  DEFAULT_EXAMPLE_FLAGS: "-DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/"
+  DEFAULT_EXAMPLE_FLAGS: "-DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/hexl-1.1.0/"
 
 stages:
   - format
@@ -175,49 +168,31 @@ benchmark:
 # IceLake builds below
 format_icelake:
   extends: format
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 default_build_icelake:
   extends: default_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 shared_build_icelake:
   extends: shared_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 debug_build_icelake:
   extends: debug_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 coverage_build_icelake:
   extends: coverage_build
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
 
 benchmark_icelake:
   extends: benchmark
-  only:
-    refs:
-      - schedule
   tags:
     - ice-lake
   dependencies:

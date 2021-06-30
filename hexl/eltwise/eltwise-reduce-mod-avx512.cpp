@@ -8,10 +8,10 @@
 
 #include "eltwise/eltwise-reduce-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
-#include "util/check.hpp"
 
 namespace intel {
 namespace hexl {

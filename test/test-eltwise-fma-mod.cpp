@@ -10,8 +10,8 @@
 #include "eltwise/eltwise-fma-mod-avx512.hpp"
 #include "eltwise/eltwise-fma-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-fma-mod.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 #include "test-util.hpp"
 
 namespace intel {
@@ -210,7 +210,7 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 #ifdef HEXL_DEBUG
       size_t num_trials = 10;
 #else
-      size_t num_trials = 1000;
+      size_t num_trials = 100;
 #endif
 
       for (size_t trial = 0; trial < num_trials; ++trial) {

@@ -10,25 +10,35 @@
 
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/check.hpp"
+#include "hexl/util/compiler.hpp"
 #include "util/avx512-util.hpp"
-#include "util/check.hpp"
-#include "util/compiler.hpp"
 
 namespace intel {
 namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-template <int BitShift, int InputModFactor>
-void EltwiseMultModAVX512IntLoop8192(__m512i* vp_result,
-                                     const __m512i* vp_operand1,
-                                     const __m512i* vp_operand2,
-                                     __m512i vbarr_lo, __m512i v_modulus,
-                                     __m512i v_twice_mod) {
+template <int BitShift, int InputModFactor, int CoeffCount>
+void EltwiseMultModAVX512IntLoopUnroll(__m512i* vp_result,
+                                       const __m512i* vp_operand1,
+                                       const __m512i* vp_operand2,
+                                       __m512i vbarr_lo, __m512i v_modulus,
+                                       __m512i v_twice_mod) {
+  constexpr size_t manual_unroll_factor = 16;
+  constexpr size_t avx512_64bit_count = 8;
+  constexpr size_t loop_count =
+      CoeffCount / (manual_unroll_factor * avx512_64bit_count);
+
+  static_assert(loop_count > 0, "loop_count too small for unrolling");
+  static_assert(CoeffCount % (manual_unroll_factor * avx512_64bit_count) == 0,
+                "CoeffCount must be a factor of manual_unroll_factor * "
+                "avx512_64bit_count");
+
   (void)v_twice_mod;  // Avoid unused variable
   HEXL_LOOP_UNROLL_4
-  for (size_t i = 64; i > 0; --i) {
+  for (size_t i = loop_count; i > 0; --i) {
     __m512i x1 = _mm512_loadu_si512(vp_operand1++);
     __m512i y1 = _mm512_loadu_si512(vp_operand2++);
     __m512i x2 = _mm512_loadu_si512(vp_operand1++);
@@ -266,21 +276,6 @@ void EltwiseMultModAVX512IntLoop8192(__m512i* vp_result,
   }
 }
 
-template <int BitShift, int InputModFactor>
-void EltwiseMultModAVX512IntLoop16384(__m512i* vp_result,
-                                      const __m512i* vp_operand1,
-                                      const __m512i* vp_operand2,
-                                      __m512i vbarr_lo, __m512i v_modulus,
-                                      __m512i v_twice_mod) {
-  EltwiseMultModAVX512IntLoop8192<BitShift, InputModFactor>(
-      vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod);
-  vp_operand1 += 1024;
-  vp_operand2 += 1024;
-  vp_result += 1024;
-  EltwiseMultModAVX512IntLoop8192<BitShift, InputModFactor>(
-      vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod);
-}
-
 // Algorithm 1 from
 // https://hal.archives-ouvertes.fr/hal-01215845/document
 template <int BitShift, int InputModFactor>
@@ -321,16 +316,47 @@ void EltwiseMultModAVX512IntLoop(__m512i* vp_result, const __m512i* vp_operand1,
                                  const __m512i* vp_operand2, __m512i vbarr_lo,
                                  __m512i v_modulus, __m512i v_twice_mod,
                                  uint64_t n) {
-  if (n == 8192) {
-    EltwiseMultModAVX512IntLoop8192<BitShift, InputModFactor>(
-        vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod);
-  } else if (n == 16384) {
-    EltwiseMultModAVX512IntLoop16384<BitShift, InputModFactor>(
-        vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod);
-  } else {
-    EltwiseMultModAVX512IntLoopDefault<BitShift, InputModFactor>(
-        vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod,
-        n);
+  switch (n) {
+    case 1024:
+      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 1024>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+          v_twice_mod);
+      break;
+
+    case 2048:
+      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 2048>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+          v_twice_mod);
+      break;
+
+    case 4096:
+      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 4096>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+          v_twice_mod);
+      break;
+
+    case 8192:
+      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 8192>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+          v_twice_mod);
+      break;
+
+    case 16384:
+      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 16384>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+          v_twice_mod);
+      break;
+
+    case 32768:
+      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 32768>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+          v_twice_mod);
+      break;
+
+    default:
+      EltwiseMultModAVX512IntLoopDefault<BitShift, InputModFactor>(
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod,
+          n);
   }
 }
 
@@ -503,8 +529,8 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
           __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
           __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
 
-          __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
-                                               static_cast<int>(N - 1));
+          __m512i c1 = _mm512_hexl_shrdi_epi64(
+              vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
 
           // L - N + 1 == 64, so we only need high 64 bits
           __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
@@ -531,12 +557,12 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
 // See also Algorithm 2/3 of
 // https://hal.archives-ouvertes.fr/hal-02552673/document
 template <int InputModFactor>
-inline void EltwiseMultModAVX512FloatLoop(__m512i* vp_result,
-                                          const __m512i* vp_operand1,
-                                          const __m512i* vp_operand2, __m512d u,
-                                          __m512d p, __m512i v_modulus,
-                                          __m512i v_twice_mod, uint64_t n) {
+inline void EltwiseMultModAVX512FloatLoopDefault(
+    __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
+    __m512d u, __m512d p, __m512i v_modulus, __m512i v_twice_mod, uint64_t n) {
   (void)v_twice_mod;  // Avoid unused variable
+
+  constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
@@ -548,11 +574,8 @@ inline void EltwiseMultModAVX512FloatLoop(__m512i* vp_result,
     v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
         v_operand2, v_modulus, &v_twice_mod);
 
-    __m512i v_result;
-    __m512d x = _mm512_cvt_roundepu64_pd(
-        v_operand1, (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC));
-    __m512d y = _mm512_cvt_roundepu64_pd(
-        v_operand2, (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC));
+    __m512d x = _mm512_cvt_roundepu64_pd(v_operand1, round_mode);
+    __m512d y = _mm512_cvt_roundepu64_pd(v_operand2, round_mode);
 
     __m512d h = _mm512_mul_pd(x, y);
     __m512d l = _mm512_fmsub_pd(x, y, h);  // rounding error; h + l == x * y
@@ -563,14 +586,167 @@ inline void EltwiseMultModAVX512FloatLoop(__m512i* vp_result,
     __mmask8 m = _mm512_cmp_pd_mask(g, _mm512_setzero_pd(), _CMP_LT_OQ);
     g = _mm512_mask_add_pd(g, m, g, p);
 
-    v_result = _mm512_cvt_roundpd_epu64(
-        g, (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC));
+    __m512i v_result = _mm512_cvt_roundpd_epu64(g, round_mode);
 
     _mm512_storeu_si512(vp_result, v_result);
 
     ++vp_operand1;
     ++vp_operand2;
     ++vp_result;
+  }
+}
+
+template <int InputModFactor, int CoeffCount>
+inline void EltwiseMultModAVX512FloatLoopUnroll(
+    __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
+    __m512d u, __m512d p, __m512i v_modulus, __m512i v_twice_mod) {
+  constexpr size_t manual_unroll_factor = 4;
+  constexpr size_t avx512_64bit_count = 8;
+  constexpr size_t loop_count =
+      CoeffCount / (manual_unroll_factor * avx512_64bit_count);
+
+  static_assert(loop_count > 0, "loop_count too small for unrolling");
+  static_assert(CoeffCount % (manual_unroll_factor * avx512_64bit_count) == 0,
+                "CoeffCount must be a factor of manual_unroll_factor * "
+                "avx512_64bit_count");
+
+  constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = loop_count; i > 0; --i) {
+    __m512i op1_1 = _mm512_loadu_si512(vp_operand1++);
+    __m512i op1_2 = _mm512_loadu_si512(vp_operand1++);
+    __m512i op1_3 = _mm512_loadu_si512(vp_operand1++);
+    __m512i op1_4 = _mm512_loadu_si512(vp_operand1++);
+
+    __m512i op2_1 = _mm512_loadu_si512(vp_operand2++);
+    __m512i op2_2 = _mm512_loadu_si512(vp_operand2++);
+    __m512i op2_3 = _mm512_loadu_si512(vp_operand2++);
+    __m512i op2_4 = _mm512_loadu_si512(vp_operand2++);
+
+    op1_1 = _mm512_hexl_small_mod_epu64<InputModFactor>(op1_1, v_modulus,
+                                                        &v_twice_mod);
+    op1_2 = _mm512_hexl_small_mod_epu64<InputModFactor>(op1_2, v_modulus,
+                                                        &v_twice_mod);
+    op1_3 = _mm512_hexl_small_mod_epu64<InputModFactor>(op1_3, v_modulus,
+                                                        &v_twice_mod);
+    op1_4 = _mm512_hexl_small_mod_epu64<InputModFactor>(op1_4, v_modulus,
+                                                        &v_twice_mod);
+
+    op2_1 = _mm512_hexl_small_mod_epu64<InputModFactor>(op2_1, v_modulus,
+                                                        &v_twice_mod);
+    op2_2 = _mm512_hexl_small_mod_epu64<InputModFactor>(op2_2, v_modulus,
+                                                        &v_twice_mod);
+    op2_3 = _mm512_hexl_small_mod_epu64<InputModFactor>(op2_3, v_modulus,
+                                                        &v_twice_mod);
+    op2_4 = _mm512_hexl_small_mod_epu64<InputModFactor>(op2_4, v_modulus,
+                                                        &v_twice_mod);
+
+    __m512d x1 = _mm512_cvt_roundepu64_pd(op1_1, round_mode);
+    __m512d x2 = _mm512_cvt_roundepu64_pd(op1_2, round_mode);
+    __m512d x3 = _mm512_cvt_roundepu64_pd(op1_3, round_mode);
+    __m512d x4 = _mm512_cvt_roundepu64_pd(op1_4, round_mode);
+
+    __m512d y1 = _mm512_cvt_roundepu64_pd(op2_1, round_mode);
+    __m512d y2 = _mm512_cvt_roundepu64_pd(op2_2, round_mode);
+    __m512d y3 = _mm512_cvt_roundepu64_pd(op2_3, round_mode);
+    __m512d y4 = _mm512_cvt_roundepu64_pd(op2_4, round_mode);
+
+    __m512d h1 = _mm512_mul_pd(x1, y1);
+    __m512d h2 = _mm512_mul_pd(x2, y2);
+    __m512d h3 = _mm512_mul_pd(x3, y3);
+    __m512d h4 = _mm512_mul_pd(x4, y4);
+
+    // ~ (x * y) / p
+    __m512d b1 = _mm512_mul_pd(h1, u);
+    __m512d b2 = _mm512_mul_pd(h2, u);
+    __m512d b3 = _mm512_mul_pd(h3, u);
+    __m512d b4 = _mm512_mul_pd(h4, u);
+
+    // rounding error; h + l == x * y
+    __m512d l1 = _mm512_fmsub_pd(x1, y1, h1);
+    __m512d l2 = _mm512_fmsub_pd(x2, y2, h2);
+    __m512d l3 = _mm512_fmsub_pd(x3, y3, h3);
+    __m512d l4 = _mm512_fmsub_pd(x4, y4, h4);
+
+    // ~ floor(x * y / p)
+    __m512d c1 = _mm512_floor_pd(b1);
+    __m512d c2 = _mm512_floor_pd(b2);
+    __m512d c3 = _mm512_floor_pd(b3);
+    __m512d c4 = _mm512_floor_pd(b4);
+
+    __m512d d1 = _mm512_fnmadd_pd(c1, p, h1);
+    __m512d d2 = _mm512_fnmadd_pd(c2, p, h2);
+    __m512d d3 = _mm512_fnmadd_pd(c3, p, h3);
+    __m512d d4 = _mm512_fnmadd_pd(c4, p, h4);
+
+    __m512d g1 = _mm512_add_pd(d1, l1);
+    __m512d g2 = _mm512_add_pd(d2, l2);
+    __m512d g3 = _mm512_add_pd(d3, l3);
+    __m512d g4 = _mm512_add_pd(d4, l4);
+
+    __mmask8 m1 = _mm512_cmp_pd_mask(g1, _mm512_setzero_pd(), _CMP_LT_OQ);
+    __mmask8 m2 = _mm512_cmp_pd_mask(g2, _mm512_setzero_pd(), _CMP_LT_OQ);
+    __mmask8 m3 = _mm512_cmp_pd_mask(g3, _mm512_setzero_pd(), _CMP_LT_OQ);
+    __mmask8 m4 = _mm512_cmp_pd_mask(g4, _mm512_setzero_pd(), _CMP_LT_OQ);
+
+    g1 = _mm512_mask_add_pd(g1, m1, g1, p);
+    g2 = _mm512_mask_add_pd(g2, m2, g2, p);
+    g3 = _mm512_mask_add_pd(g3, m3, g3, p);
+    g4 = _mm512_mask_add_pd(g4, m4, g4, p);
+
+    __m512i out1 = _mm512_cvt_roundpd_epu64(g1, round_mode);
+    __m512i out2 = _mm512_cvt_roundpd_epu64(g2, round_mode);
+    __m512i out3 = _mm512_cvt_roundpd_epu64(g3, round_mode);
+    __m512i out4 = _mm512_cvt_roundpd_epu64(g4, round_mode);
+
+    _mm512_storeu_si512(vp_result++, out1);
+    _mm512_storeu_si512(vp_result++, out2);
+    _mm512_storeu_si512(vp_result++, out3);
+    _mm512_storeu_si512(vp_result++, out4);
+  }
+}
+
+template <int InputModFactor>
+inline void EltwiseMultModAVX512FloatLoop(__m512i* vp_result,
+                                          const __m512i* vp_operand1,
+                                          const __m512i* vp_operand2, __m512d u,
+                                          __m512d p, __m512i v_modulus,
+                                          __m512i v_twice_mod, uint64_t n) {
+  switch (n) {
+    case 1024:
+      EltwiseMultModAVX512FloatLoopUnroll<InputModFactor, 1024>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod);
+      break;
+
+    case 2048:
+      EltwiseMultModAVX512FloatLoopUnroll<InputModFactor, 2048>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod);
+      break;
+
+    case 4096:
+      EltwiseMultModAVX512FloatLoopUnroll<InputModFactor, 4096>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod);
+      break;
+
+    case 8192:
+      EltwiseMultModAVX512FloatLoopUnroll<InputModFactor, 8192>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod);
+      break;
+
+    case 16384:
+      EltwiseMultModAVX512FloatLoopUnroll<InputModFactor, 16384>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod);
+      break;
+
+    case 32768:
+      EltwiseMultModAVX512FloatLoopUnroll<InputModFactor, 32768>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod);
+      break;
+
+    default:
+      EltwiseMultModAVX512FloatLoopDefault<InputModFactor>(
+          vp_result, vp_operand1, vp_operand2, u, p, v_modulus, v_twice_mod, n);
   }
 }
 

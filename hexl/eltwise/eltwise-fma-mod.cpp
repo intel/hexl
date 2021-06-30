@@ -7,8 +7,8 @@
 
 #include "eltwise/eltwise-fma-mod-avx512.hpp"
 #include "eltwise/eltwise-fma-mod-internal.hpp"
-#include "logging/logging.hpp"
-#include "number-theory/number-theory.hpp"
+#include "hexl/logging/logging.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
