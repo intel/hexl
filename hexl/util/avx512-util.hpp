@@ -337,19 +337,19 @@ inline void _mm512_hexl_add_epi128(__m512i x_hi, __m512i x_lo, __m512i y_hi,
   *z_lo = _mm512_add_epi64(x_lo, y_lo);
   *z_hi = _mm512_add_epi64(x_hi, y_hi);
 
-  LOG(INFO) << "x_hi " << ExtractValues(x_hi);
-  LOG(INFO) << "x_lo " << ExtractValues(x_lo);
-  LOG(INFO) << "y_hi " << ExtractValues(y_hi);
-  LOG(INFO) << "y_lo " << ExtractValues(y_lo);
+  // LOG(INFO) << "x_hi " << ExtractValues(x_hi);
+  // LOG(INFO) << "x_lo " << ExtractValues(x_lo);
+  // LOG(INFO) << "y_hi " << ExtractValues(y_hi);
+  // LOG(INFO) << "y_lo " << ExtractValues(y_lo);
 
   // Get high bit for overflow
   __m512i x_and_y = _mm512_and_epi64(x_lo, y_lo);
 
-  LOG(INFO) << "x_and_y " << ExtractValues(x_and_y);
+  // LOG(INFO) << "x_and_y " << ExtractValues(x_and_y);
 
   // Will be 1 if overflow, 0 otherwise
   __m512i overflow = _mm512_srli_epi64(x_and_y, 63);
-  LOG(INFO) << "overflow " << ExtractValues(overflow);
+  // LOG(INFO) << "overflow " << ExtractValues(overflow);
 
   // // Will be 1 if overflow, 0 else
   // __m512i one = _mm512_set1_epi64(static_cast<int64_t>(1));

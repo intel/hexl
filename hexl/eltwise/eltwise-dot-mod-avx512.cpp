@@ -218,7 +218,7 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  LOG(INFO) << "modulus " << modulus;
+  // LOG(INFO) << "modulus " << modulus;
 
   // Algorithm 1 from
   // https://hal.archives-ouvertes.fr/hal-01215845/document
@@ -252,7 +252,7 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
       // Conditional subtraction
       vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
 
-      LOG(INFO) << "vresult " << ExtractValues(vresult);
+      // LOG(INFO) << "vresult " << ExtractValues(vresult);
       _mm512_storeu_si512(vp_result, vresult);
 
     } else {
@@ -293,10 +293,10 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
       }
       __m512i vresult =
           _mm512_hexl_small_add_mod_epi64(vresult1, vresult2, v_modulus);
-      LOG(INFO) << "vresult1 " << ExtractValues(vresult1);
-      LOG(INFO) << "vresult2 " << ExtractValues(vresult2);
+      // LOG(INFO) << "vresult1 " << ExtractValues(vresult1);
+      // LOG(INFO) << "vresult2 " << ExtractValues(vresult2);
 
-      LOG(INFO) << "vresult " << ExtractValues(vresult);
+      // LOG(INFO) << "vresult " << ExtractValues(vresult);
       _mm512_storeu_si512(vp_result, vresult);
     }
 
