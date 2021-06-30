@@ -64,7 +64,7 @@ jobs:
       - run: |
           pip3 install cpplint
           sudo apt update
-          sudo apt install gcc-10 g++-10
+          sudo apt install clang
       # NOTE: This is deprecated in favor of pre-commit.ci
       # - uses: pre-commit/action@v2.0.2
       #   with:
