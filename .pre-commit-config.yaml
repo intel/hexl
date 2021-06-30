@@ -14,9 +14,9 @@ repos:
       - id: check-yaml
   - repo: local
     hooks:
-      - id: clang-format-9
-        name: clang-format-9
-        entry: clang-format-9
+      - id: clang-format-10
+        name: clang-format-10
+        entry: clang-format-10
         language: system
         files: \.(c|cc|cxx|cpp|h|hpp|hxx|js|proto)$
         args: ["-i"]
