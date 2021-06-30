@@ -20,7 +20,7 @@ static void BM_EltwiseDotModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  uint64_t num_vectors = 2;
+  uint64_t num_vectors = 1000;
 
   AlignedVector64<uint64_t> input1(num_vectors * input_size, 1);
   AlignedVector64<uint64_t> input2(num_vectors * input_size, 2);
@@ -42,7 +42,6 @@ static void BM_EltwiseDotModNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseDotModNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -55,7 +54,7 @@ static void BM_EltwiseDotModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  uint64_t num_vectors = 2;
+  uint64_t num_vectors = 1000;
 
   AlignedVector64<uint64_t> input1(num_vectors * input_size, 1);
   AlignedVector64<uint64_t> input2(num_vectors * input_size, 2);
@@ -77,7 +76,6 @@ static void BM_EltwiseDotModAVX512(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseDotModAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});

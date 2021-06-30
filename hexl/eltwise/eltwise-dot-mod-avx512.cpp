@@ -171,8 +171,8 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t** operand1,
                     "pre-dot value in operand1 exceeds bound " << modulus);
 
   // Compute intermediate sums
-  LOG(INFO) << "EltwiseDotModAVX512 num_vectors " << num_vectors;
-  LOG(INFO) << "EltwiseDotModAVX512 n " << n << " p " << modulus;
+  // LOG(INFO) << "EltwiseDotModAVX512 num_vectors " << num_vectors;
+  // LOG(INFO) << "EltwiseDotModAVX512 n " << n << " p " << modulus;
 
   AlignedVector64<uint64_t> sum_hi(n, 0);
   AlignedVector64<uint64_t> sum_lo(n, 0);
@@ -181,6 +181,7 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t** operand1,
   __m512i* v_sum_lo = reinterpret_cast<__m512i*>(&sum_lo[0]);
   // std::vector<__m512i> sum_hi(n / 8, _mm512_set1_epi64(0));
   // std::vector<__m512i> sum_lo(n / 8, _mm512_set1_epi64(0));
+  HEXL_LOOP_UNROLL_4
   for (size_t k = 0; k < num_vectors; ++k) {
     const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1[k]);
     const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2[k]);
@@ -190,8 +191,8 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t** operand1,
       __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
       __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
 
-      LOG(INFO) << "Loaded " << ExtractValues(v_operand1);
-      LOG(INFO) << "Loaded " << ExtractValues(v_operand2);
+      // LOG(INFO) << "Loaded " << ExtractValues(v_operand1);
+      // LOG(INFO) << "Loaded " << ExtractValues(v_operand2);
 
       __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
       __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
@@ -199,8 +200,8 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t** operand1,
       _mm512_hexl_add_epi128(vprod_hi, vprod_lo, v_sum_hi[i], v_sum_lo[i],
                              &v_sum_hi[i], &v_sum_lo[i]);
 
-      LOG(INFO) << "added hi " << ExtractValues(v_sum_hi[i]);
-      LOG(INFO) << "added lo " << ExtractValues(v_sum_lo[i]);
+      // LOG(INFO) << "added hi " << ExtractValues(v_sum_hi[i]);
+      // LOG(INFO) << "added lo " << ExtractValues(v_sum_lo[i]);
     }
   }
 
@@ -229,18 +230,18 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t** operand1,
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
 
-  LOG(INFO) << "reducing sum\n";
+  // LOG(INFO) << "reducing sum\n";
 
-  LOG(INFO) << "L " << L;
+  // LOG(INFO) << "L " << L;
 
-  HEXL_LOOP_UNROLL_4
+  HEXL_LOOP_UNROLL_8
   for (size_t i = 0; i < n / 8; ++i) {
-    LOG(INFO) << "loaded v_sum_lo " << ExtractValues(v_sum_lo[i]);
-    LOG(INFO) << "loaded v_sum_hi " << ExtractValues(v_sum_hi[i]);
+    // LOG(INFO) << "loaded v_sum_lo " << ExtractValues(v_sum_lo[i]);
+    // LOG(INFO) << "loaded v_sum_hi " << ExtractValues(v_sum_hi[i]);
     __m512i c1 = _mm512_hexl_shrdi_epi64(v_sum_lo[i], v_sum_hi[i],
                                          static_cast<unsigned int>(N - 1));
-    LOG(INFO) << "N " << N;
-    LOG(INFO) << "c1 " << ExtractValues(c1);
+    // LOG(INFO) << "N " << N;
+    // LOG(INFO) << "c1 " << ExtractValues(c1);
 
     // L - N + 1 == 64, so we only need high 64 bits
     __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
