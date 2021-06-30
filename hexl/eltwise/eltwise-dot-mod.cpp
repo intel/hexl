@@ -42,17 +42,12 @@ void EltwiseDotModNative(uint64_t* result, const uint64_t* operand1,
     uint64_t dot1 = MultiplyMod(*operand1, *operand2, modulus);
     uint64_t dot2 = MultiplyMod(*operand3, *operand4, modulus);
 
-    LOG(INFO) << "op1 " << (*operand1);
-    LOG(INFO) << "op2 " << (*operand2);
-    LOG(INFO) << "op3 " << (*operand3);
-    LOG(INFO) << "op4 " << (*operand4);
     uint64_t sum = dot1 + dot2;
     if (sum >= modulus) {
       *result = sum - modulus;
     } else {
       *result = sum;
     }
-    LOG(INFO) << "result " << (*result);
 
     ++operand1;
     ++operand2;
@@ -82,14 +77,14 @@ void EltwiseDotMod(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand4, n, modulus,
                     "pre-dot value in operand1 exceeds bound " << modulus);
 
-  // #ifdef HEXL_HAS_AVX512DQ
-  //   if (has_avx512dq && modulus < (1ULL << 50)) {
-  //     LOG(INFO) << "EltwiseDotModAVX512";
-  //     EltwiseDotModAVX512(result, operand1, operand2, operand3, operand4, n,
-  //                         modulus);
-  //     return;
-  //   }
-  // #endif
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq && modulus < (1ULL << 50)) {
+    LOG(INFO) << "EltwiseDotModAVX512";
+    EltwiseDotModAVX512(result, operand1, operand2, operand3, operand4, n,
+                        modulus);
+    return;
+  }
+#endif
 
   HEXL_VLOG(3, "Calling EltwiseDotModNative");
   EltwiseDotModNative(result, operand1, operand2, operand3, operand4, n,
