@@ -270,50 +270,101 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
   }
 }
 
+// TEST(AVX512, _mm512_hexl_add_epi128) {
+//   // Small
+//   {
+//     __m512i a = _mm512_set_epi64(0, 1, 0, 2, 0, 3, 0, 4);
+//     __m512i b = _mm512_set_epi64(0, 5, 0, 6, 0, 7, 0, 8);
+
+//     __m512i expected_out = _mm512_set_epi64(0, 6, 0, 8, 0, 10, 0, 12);
+
+//     __m512i out = _mm512_hexl_add_epi128(a, b);
+
+//     AssertEqual(out, expected_out);
+//   }
+
+//   // Big
+//   {
+//     __m512i a = _mm512_set_epi64(1, 1, 2, 2, 3, 3, 4, 4);
+//     __m512i b = _mm512_set_epi64(5, 5, 6, 6, 7, 7, 8, 8);
+
+//     __m512i expected_out = _mm512_set_epi64(6, 6, 8, 8, 10, 10, 12, 12);
+
+//     __m512i out = _mm512_hexl_add_epi128(a, b);
+
+//     AssertEqual(out, expected_out);
+//   }
+
+//   // Overflow
+//   {
+//     __m512i a = _mm512_set_epi64(1, (1ULL << 63),      //
+//                                  1, (1ULL << 63) + 1,  //
+//                                  1, (1ULL << 63) + 1,  //
+//                                  0, 0);
+//     __m512i b = _mm512_set_epi64(5, (1ULL << 63),      //
+//                                  5, (1ULL << 63) + 6,  //
+//                                  0, 7,                 //
+//                                  0, 0);
+
+//     __m512i expected_out = _mm512_set_epi64(7, 0,                 //
+//                                             7, 7,                 //
+//                                             1, (1ULL << 63) + 8,  //
+//                                             0, 0);
+
+//     __m512i out = _mm512_hexl_add_epi128(a, b);
+
+//     AssertEqual(out, expected_out);
+//   }
+// }
+
 TEST(AVX512, _mm512_hexl_add_epi128) {
   // Small
   {
-    __m512i a = _mm512_set_epi64(0, 1, 0, 2, 0, 3, 0, 4);
-    __m512i b = _mm512_set_epi64(0, 5, 0, 6, 0, 7, 0, 8);
+    __m512i x_hi = _mm512_set_epi64(0, 1, 2, 3, 4, 5, 6, 7);
+    __m512i x_lo = _mm512_set_epi64(8, 9, 10, 11, 12, 13, 14, 15);
+    __m512i y_hi = _mm512_set_epi64(16, 17, 18, 19, 20, 21, 22, 23);
+    __m512i y_lo = _mm512_set_epi64(24, 25, 26, 27, 28, 29, 30, 31);
 
-    __m512i expected_out = _mm512_set_epi64(0, 6, 0, 8, 0, 10, 0, 12);
+    __m512i expected_out_hi = _mm512_set_epi64(16, 18, 20, 22, 24, 26, 28, 30);
+    __m512i expected_out_lo = _mm512_set_epi64(32, 34, 36, 38, 40, 42, 44, 46);
 
-    __m512i out = _mm512_hexl_add_epi128(a, b);
+    __m512i z_hi, z_lo;
+    _mm512_hexl_add_epi128(x_hi, x_lo, y_hi, y_lo, &z_hi, &z_lo);
 
-    AssertEqual(out, expected_out);
+    AssertEqual(z_hi, expected_out_hi);
+    AssertEqual(z_lo, expected_out_lo);
   }
 
   // Big
   {
-    __m512i a = _mm512_set_epi64(1, 1, 2, 2, 3, 3, 4, 4);
-    __m512i b = _mm512_set_epi64(5, 5, 6, 6, 7, 7, 8, 8);
+    __m512i x_hi = _mm512_set_epi64(0, 1, 2, 3, 4, 5, 6, 7);
+    __m512i x_lo = _mm512_set_epi64((1ULL << 63),      //
+                                    (1ULL << 63) + 1,  //
+                                    (1ULL << 63) + 2,  //
+                                    (1ULL << 63) + 3,  //
+                                    (1ULL << 63) + 4,  //
+                                    (1ULL << 63) + 5,  //
+                                    (1ULL << 63) + 6,  //
+                                    (1ULL << 63) + 7);
+    __m512i y_hi = _mm512_set_epi64(15, 16, 17, 18, 19, 20, 21, 22);
+    __m512i y_lo = _mm512_set_epi64((1ULL << 63) - 1,   //
+                                    (1ULL << 63) + 8,   //
+                                    (1ULL << 63) + 9,   //
+                                    (1ULL << 63) + 10,  //
+                                    (1ULL << 63) + 11,  //
+                                    (1ULL << 63) + 12,  //
+                                    (1ULL << 63) + 13,  //
+                                    (1ULL << 63) + 14);
 
-    __m512i expected_out = _mm512_set_epi64(6, 6, 8, 8, 10, 10, 12, 12);
+    __m512i expected_out_hi = _mm512_set_epi64(15, 18, 20, 22, 24, 26, 28, 30);
+    __m512i expected_out_lo =
+        _mm512_set_epi64(MaximumValue(64), 9, 11, 13, 15, 17, 19, 21);
 
-    __m512i out = _mm512_hexl_add_epi128(a, b);
+    __m512i z_hi, z_lo;
+    _mm512_hexl_add_epi128(x_hi, x_lo, y_hi, y_lo, &z_hi, &z_lo);
 
-    AssertEqual(out, expected_out);
-  }
-
-  // Overflow
-  {
-    __m512i a = _mm512_set_epi64(1, (1ULL << 63),      //
-                                 1, (1ULL << 63) + 1,  //
-                                 1, (1ULL << 63) + 1,  //
-                                 0, 0);
-    __m512i b = _mm512_set_epi64(5, (1ULL << 63),      //
-                                 5, (1ULL << 63) + 6,  //
-                                 0, 7,                 //
-                                 0, 0);
-
-    __m512i expected_out = _mm512_set_epi64(7, 0,                 //
-                                            7, 7,                 //
-                                            1, (1ULL << 63) + 8,  //
-                                            0, 0);
-
-    __m512i out = _mm512_hexl_add_epi128(a, b);
-
-    AssertEqual(out, expected_out);
+    AssertEqual(z_hi, expected_out_hi);
+    AssertEqual(z_lo, expected_out_lo);
   }
 }
 

@@ -315,18 +315,48 @@ inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y) {
 
 // Adds packed 128-bit integers in x and y and returns the result
 // Ignores the possibility of overflow
-inline __m512i _mm512_hexl_add_epi128(__m512i x, __m512i y) {
-  // Add high and low bits
-  __m512i z = _mm512_add_epi64(x, y);
-  // Get high bit for overflow
-  __m512i x_and_y = _mm512_and_epi64(x, y);
-  __m512i and_shift = _mm512_srli_epi64(x_and_y, 63);
-  // Permute across 128-bit lanes
-  __m512i perm = _mm512_permutex_epi64(and_shift, 0b10110001);
-  // add overflow
-  z = _mm512_add_epi64(z, perm);
+// inline __m512i _mm512_hexl_add_epi128(__m512i x, __m512i y) {
+//   // Add high and low bits
+//   __m512i z = _mm512_add_epi64(x, y);
+//   // Get high bit for overflow
+//   __m512i x_and_y = _mm512_and_epi64(x, y);
+//   __m512i and_shift = _mm512_srli_epi64(x_and_y, 63);
+//   // Permute across 128-bit lanes
+//   __m512i perm = _mm512_permutex_epi64(and_shift, 0b10110001);
+//   // add overflow
+//   z = _mm512_add_epi64(z, perm);
 
-  return z;
+//   return z;
+// }
+
+// Adds packed 128-bit integers in x and y and returns the result
+// Ignores the possibility of overflow
+inline void _mm512_hexl_add_epi128(__m512i x_hi, __m512i x_lo, __m512i y_hi,
+                                   __m512i y_lo, __m512i* z_hi, __m512i* z_lo) {
+  // Add high and low bits
+  *z_lo = _mm512_add_epi64(x_lo, y_lo);
+  *z_hi = _mm512_add_epi64(x_hi, y_hi);
+
+  LOG(INFO) << "x_hi " << ExtractValues(x_hi);
+  LOG(INFO) << "x_lo " << ExtractValues(x_lo);
+  LOG(INFO) << "y_hi " << ExtractValues(y_hi);
+  LOG(INFO) << "y_lo " << ExtractValues(y_lo);
+
+  // Get high bit for overflow
+  __m512i x_and_y = _mm512_and_epi64(x_lo, y_lo);
+
+  LOG(INFO) << "x_and_y " << ExtractValues(x_and_y);
+
+  // Will be 1 if overflow, 0 otherwise
+  __m512i overflow = _mm512_srli_epi64(x_and_y, 63);
+  LOG(INFO) << "overflow " << ExtractValues(overflow);
+
+  // // Will be 1 if overflow, 0 else
+  // __m512i one = _mm512_set1_epi64(static_cast<int64_t>(1));
+  // __m512i overflow = _mm512_sub_epi64(one, and_shift);
+  // LOG(INFO) << "overflow " << ExtractValues(overflow);
+
+  *z_hi = _mm512_add_epi64(*z_hi, overflow);
 }
 
 #endif  // HEXL_HAS_AVX512DQ

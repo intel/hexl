@@ -229,48 +229,76 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
     __m512i v_operand3 = _mm512_loadu_si512(vp_operand3);
     __m512i v_operand4 = _mm512_loadu_si512(vp_operand4);
 
-    __m512i vresult1, vresult2;
-    {
-      __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
-      __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+    if (std::getenv("TEST") != nullptr) {
+      __m512i vprod1_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
+      __m512i vprod1_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+      __m512i vprod2_hi = _mm512_hexl_mulhi_epi<64>(v_operand3, v_operand4);
+      __m512i vprod2_lo = _mm512_hexl_mullo_epi<64>(v_operand3, v_operand4);
 
-      __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
-                                           static_cast<unsigned int>(N - 1));
+      __m512i z_hi, z_lo;
+      _mm512_hexl_add_epi128(vprod1_hi, vprod1_lo, vprod2_hi, vprod2_lo, &z_hi,
+                             &z_lo);
 
-      // L - N + 1 == 64, so we only need high 64 bits
-      __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
-
-      // C4 = prod_lo - (p * c3)_lo
-      vresult1 = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
-      vresult1 = _mm512_sub_epi64(vprod_lo, vresult1);
-
-      // Conditional subtraction
-      vresult1 = _mm512_hexl_small_mod_epu64(vresult1, v_modulus);
-    }
-    {
-      __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand3, v_operand4);
-      __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand3, v_operand4);
-
-      __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
-                                           static_cast<unsigned int>(N - 1));
+      __m512i c1 =
+          _mm512_hexl_shrdi_epi64(z_lo, z_hi, static_cast<unsigned int>(N - 1));
 
       // L - N + 1 == 64, so we only need high 64 bits
       __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
 
       // C4 = prod_lo - (p * c3)_lo
-      vresult2 = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
-      vresult2 = _mm512_sub_epi64(vprod_lo, vresult2);
+      __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+      vresult = _mm512_sub_epi64(z_lo, vresult);
 
       // Conditional subtraction
-      vresult2 = _mm512_hexl_small_mod_epu64(vresult2, v_modulus);
-    }
-    __m512i vresult =
-        _mm512_hexl_small_add_mod_epi64(vresult1, vresult2, v_modulus);
-    LOG(INFO) << "vresult1 " << ExtractValues(vresult1);
-    LOG(INFO) << "vresult2 " << ExtractValues(vresult2);
+      vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
 
-    LOG(INFO) << "vresult " << ExtractValues(vresult);
-    _mm512_storeu_si512(vp_result, vresult);
+      LOG(INFO) << "vresult " << ExtractValues(vresult);
+      _mm512_storeu_si512(vp_result, vresult);
+
+    } else {
+      __m512i vresult1, vresult2;
+      {
+        __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
+        __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+
+        __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
+                                             static_cast<unsigned int>(N - 1));
+
+        // L - N + 1 == 64, so we only need high 64 bits
+        __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
+
+        // C4 = prod_lo - (p * c3)_lo
+        vresult1 = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+        vresult1 = _mm512_sub_epi64(vprod_lo, vresult1);
+
+        // Conditional subtraction
+        vresult1 = _mm512_hexl_small_mod_epu64(vresult1, v_modulus);
+      }
+      {
+        __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand3, v_operand4);
+        __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand3, v_operand4);
+
+        __m512i c1 = _mm512_hexl_shrdi_epi64(vprod_lo, vprod_hi,
+                                             static_cast<unsigned int>(N - 1));
+
+        // L - N + 1 == 64, so we only need high 64 bits
+        __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
+
+        // C4 = prod_lo - (p * c3)_lo
+        vresult2 = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+        vresult2 = _mm512_sub_epi64(vprod_lo, vresult2);
+
+        // Conditional subtraction
+        vresult2 = _mm512_hexl_small_mod_epu64(vresult2, v_modulus);
+      }
+      __m512i vresult =
+          _mm512_hexl_small_add_mod_epi64(vresult1, vresult2, v_modulus);
+      LOG(INFO) << "vresult1 " << ExtractValues(vresult1);
+      LOG(INFO) << "vresult2 " << ExtractValues(vresult2);
+
+      LOG(INFO) << "vresult " << ExtractValues(vresult);
+      _mm512_storeu_si512(vp_result, vresult);
+    }
 
     ++vp_operand1;
     ++vp_operand2;
