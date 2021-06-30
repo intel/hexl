@@ -64,12 +64,19 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
   __m512i v_mu = _mm512_set1_epi64(static_cast<int64_t>(mu));
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 
+  LOG(INFO) << "modulus " << modulus;
+
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
     __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
     __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
     __m512i v_operand3 = _mm512_loadu_si512(vp_operand3);
     __m512i v_operand4 = _mm512_loadu_si512(vp_operand4);
+
+    LOG(INFO) << "loaded op1 " << ExtractValues(v_operand1);
+    LOG(INFO) << "loaded op2 " << ExtractValues(v_operand2);
+    LOG(INFO) << "loaded op3 " << ExtractValues(v_operand3);
+    LOG(INFO) << "loaded op4 " << ExtractValues(v_operand4);
 
     __m512d x1 = _mm512_cvt_roundepu64_pd(v_operand1, round_mode);
     __m512d y1 = _mm512_cvt_roundepu64_pd(v_operand2, round_mode);
@@ -96,6 +103,8 @@ void EltwiseDotModAVX512(uint64_t* result, const uint64_t* operand1,
     __m512i v_result = _mm512_cvt_roundpd_epu64(g, round_mode);
 
     _mm512_storeu_si512(vp_result, v_result);
+
+    LOG(INFO) << "v_result " << ExtractValues(v_result);
 
     ++vp_operand1;
     ++vp_operand2;
