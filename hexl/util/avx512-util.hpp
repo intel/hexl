@@ -313,6 +313,25 @@ inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y) {
   return _mm512_hexl_shrdi_epi64(x, y, BitShift);
 }
 
+// Adds packed 128-bit integers in x and y and returns the result
+// Ignores the possibility of overflow
+inline __m512i _mm512_hexl_add_epi128(__m512i x, __m512i y) {
+  // Add high and low bits
+  __m512i z = _mm512_add_epi64(x, y);
+
+  // Get high bit for overflow
+  __m512i x_and_y = _mm512_and_epi64(x, y);
+  __m512i and_shift = _mm512_srli_epi64(x_and_y, 63);
+  // Permute across 128-bit lanes
+
+  __m512i perm = _mm512_permutex_epi64(and_shift, 0b0000);
+
+  // add overflow
+  z = _mm512_add_epi64(z, perm);
+
+  return z;
+}
+
 #endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl

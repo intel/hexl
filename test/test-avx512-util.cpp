@@ -269,6 +269,21 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
     }
   }
 }
+
+TEST(AVX512, _mm512_hexl_add_epi128) {
+  // Small
+  {
+    __m512i a = _mm512_set_epi64(0, 1, 0, 2, 0, 3, 0, 4);
+    __m512i b = _mm512_set_epi64(0, 5, 0, 6, 0, 7, 0, 8);
+
+    __m512i expected_out = _mm512_set_epi64(0, 6, 0, 8, 0, 10, 0, 12);
+
+    __m512i out = _mm512_hexl_add_epi128(a, b);
+
+    ASSERT_EQ(result, exp);
+  }
+}
+
 #endif
 
 }  // namespace hexl
