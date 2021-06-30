@@ -280,7 +280,40 @@ TEST(AVX512, _mm512_hexl_add_epi128) {
 
     __m512i out = _mm512_hexl_add_epi128(a, b);
 
-    ASSERT_EQ(result, exp);
+    AssertEqual(out, expected_out);
+  }
+
+  // Big
+  {
+    __m512i a = _mm512_set_epi64(1, 1, 2, 2, 3, 3, 4, 4);
+    __m512i b = _mm512_set_epi64(5, 5, 6, 6, 7, 7, 8, 8);
+
+    __m512i expected_out = _mm512_set_epi64(6, 6, 8, 8, 10, 10, 12, 12);
+
+    __m512i out = _mm512_hexl_add_epi128(a, b);
+
+    AssertEqual(out, expected_out);
+  }
+
+  // Overflow
+  {
+    __m512i a = _mm512_set_epi64(1, (1ULL << 63),      //
+                                 1, (1ULL << 63) + 1,  //
+                                 1, (1ULL << 63) + 1,  //
+                                 0, 0);
+    __m512i b = _mm512_set_epi64(5, (1ULL << 63),      //
+                                 5, (1ULL << 63) + 6,  //
+                                 0, 7,                 //
+                                 0, 0);
+
+    __m512i expected_out = _mm512_set_epi64(7, 0,                 //
+                                            7, 7,                 //
+                                            1, (1ULL << 63) + 8,  //
+                                            0, 0);
+
+    __m512i out = _mm512_hexl_add_epi128(a, b);
+
+    AssertEqual(out, expected_out);
   }
 }
 

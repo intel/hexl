@@ -9,6 +9,7 @@ set(SRC
     eltwise/eltwise-fma-mod.cpp
     eltwise/eltwise-cmp-add.cpp
     eltwise/eltwise-cmp-sub-mod.cpp
+    eltwise/eltwise-dot-mod.cpp
     ntt/ntt-internal.cpp
     number-theory/number-theory.cpp
 )
