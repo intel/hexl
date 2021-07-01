@@ -88,6 +88,8 @@ jobs:
           cmake --version
           pwd
           ls ${GITHUB_WORKSPACE}/lib/cmake/hexl-1.1.0/
+          echo "Doing another print"
+          echo ${{ env.DEFAULT_EXAMPLE_FLAGS }}
 
       - name: Default Build
         run: |
