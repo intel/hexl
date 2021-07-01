@@ -49,7 +49,8 @@ env:
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./
   GCOV_BIN: /usr/bin/gcov-9
-  DEFAULT_EXAMPLE_FLAGS: -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/ #${GITHUB_WORKSPACE}/lib/cmake/hexl-1.1.0/
+  DEFAULT_EXAMPLE_FLAGS: >
+      -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
 
 ################
 # Ubuntu 20.04 #
