@@ -99,18 +99,19 @@ jobs:
 
           # Build example
           cd example;
-          cmake -S . -B build -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          
           cmake --build build -j
           cd ..
 
           # Run tests and example
           build/test/unit-test
           example/build/example
-          set -x
+          set +x
 
       - name: Shared Build
         run: |
-          set +x
+          set -x
           # Build library
           cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
           cmake --build build -j
@@ -121,11 +122,11 @@ jobs:
           cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS}} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j
           build/example
-          set -x
+          set +x
 
       - name: Debug Build
         run: |
-          set +x
+          set -x
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
           cmake --build build -j
@@ -138,12 +139,12 @@ jobs:
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j
           build/example
-          set -x
+          set +x
 
       # TODO: Check the archiving here
       - name: Coverage Build
         run: |
-          set +x
+          set -x
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j
@@ -167,7 +168,7 @@ jobs:
 
           # Generate coverage html
           genhtml --branch-coverage cov_test.info --output-directory coverage
-          set -x
+          set +x
 
       - name: Benchmark
         run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
