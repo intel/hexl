@@ -81,7 +81,7 @@ jobs:
           echo $GITHUB_WORKSPACE
           echo "Testing from branch:"
           echo $GITHUB_REFHmmm
-          cmake --versions
+          cmake --version
           pwd
           ls
 
