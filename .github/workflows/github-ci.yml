@@ -119,7 +119,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/ -DHEXL_SHARED_LIB=ON -DHEXL_TESTING=ON -DHEXL_BENCHMARK=ON -DCMAKE_INSTALL_PREFIX=./
+          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DHEXL_TESTING=ON -DHEXL_BENCHMARK=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j
           build/example
           set +x
@@ -136,7 +136,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j
           build/example
           set +x
