@@ -23,12 +23,10 @@ env:
       -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DCMAKE_INSTALL_PREFIX=./
   SHARED_LIB_COMPILER_FLAGS: >
       -DHEXL_SHARED_LIB=ON
       -DHEXL_TESTING=ON
       -DHEXL_BENCHMARK=ON
-      -DCMAKE_INSTALL_PREFIX=./
   DEBUG_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
@@ -37,7 +35,6 @@ env:
       -DHEXL_TESTING=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=./
   COVERAGE_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
@@ -47,7 +44,6 @@ env:
       -DHEXL_COVERAGE=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
-      -DCMAKE_INSTALL_PREFIX=./
   GCOV_BIN: /usr/bin/gcov-9
   DEFAULT_EXAMPLE_FLAGS: >
       -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
@@ -85,7 +81,7 @@ jobs:
           echo $GITHUB_WORKSPACE
           echo "Testing from branch:"
           echo $GITHUB_REFHmmm
-          cmake --version
+          cmake --versions
           pwd
           ls
 
