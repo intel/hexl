@@ -98,8 +98,9 @@ jobs:
 
           # Build example
           cd example
-          echo "cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}"
+          set -x
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          set +x
           cmake --build build -j
           cd ..
 
