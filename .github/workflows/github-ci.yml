@@ -16,7 +16,7 @@ on:
 # Define env vars #
 ###################
 env:
-  HEXL_DIR: ${GITHUB_WORKSPACE}/cmake
+  HEXL_DIR: ${GITHUB_WORKSPACE}/cmake/hexl
   DEFAULT_COMPILER_FLAGS: >
       -DCMAKE_CXX_COMPILER=clang++-10
       -DCMAKE_C_COMPILER=clang-10
@@ -87,8 +87,7 @@ jobs:
           echo $GITHUB_REF
           cmake --version
           pwd
-          ls
-          ls $GITHUB_WORKSPACE
+          ls ${GITHUB_WORKSPACE}/cmake
 
       - name: Default Build
         run: |
