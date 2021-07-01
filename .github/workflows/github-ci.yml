@@ -100,7 +100,7 @@ jobs:
           # Build example
           cd example;
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          
+
           cmake --build build -j
           cd ..
 
