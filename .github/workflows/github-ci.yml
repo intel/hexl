@@ -98,8 +98,7 @@ jobs:
           cmake --install build
 
           # Build example
-          cd example
-          # cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cd example;
           cmake -S . -B build -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j
           cd ..
