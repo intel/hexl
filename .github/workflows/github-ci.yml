@@ -116,7 +116,7 @@ jobs:
           cmake --install build
 
           # Build and run example
-          cd example
+          cd example;
           cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS}} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j
           build/example
@@ -131,7 +131,7 @@ jobs:
           build/test/unit-test
 
           # Build and run example
-          cd example
+          cd example;
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j
           build/example
