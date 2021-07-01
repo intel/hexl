@@ -91,6 +91,7 @@ jobs:
 
       - name: Default Build
         run: |
+          set -x
           # Build library
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
           cmake --build build -j
@@ -98,16 +99,15 @@ jobs:
 
           # Build example
           cd example
-          set -x
           # cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake -S . -B build -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-          set +x
           cmake --build build -j
           cd ..
 
           # Run tests and example
           build/test/unit-test
           example/build/example
+          set -x
 
       - name: Shared Build
         run: |
