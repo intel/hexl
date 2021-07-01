@@ -84,7 +84,7 @@ jobs:
           echo $HOME
           echo $GITHUB_WORKSPACE
           echo "Testing from branch:"
-          echo $GITHUB_REFHmmm
+          echo $GITHUB_REFH
           cmake --version
           pwd
           ls
@@ -92,10 +92,11 @@ jobs:
       - name: Default Build
         run: |
           set -x
-          # Build library
+          echo "::group::Build library"
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
           cmake --build build -j
           cmake --install build
+          echo "::endgroup::"
 
           # Build example
           cd example;
@@ -119,7 +120,8 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }} ${{ env.SHARED_LIB_COMPILER_FLAGS}};
+          # cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }} ${{ env.SHARED_LIB_COMPILER_FLAGS}};
+          cmake -S . -B build -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/ -DHEXL_SHARED_LIB=ON -DHEXL_TESTING=ON -DHEXL_BENCHMARK=ON -DCMAKE_INSTALL_PREFIX=./
           cmake --build build -j
           build/example
           set +x
