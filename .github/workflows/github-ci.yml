@@ -16,7 +16,7 @@ on:
 # Define env vars #
 ###################
 env:
-  HEXL_DIR: cmake/hexl
+  HEXL_DIR: cmake/
   DEFAULT_COMPILER_FLAGS: >
       -DCMAKE_CXX_COMPILER=clang++-10
       -DCMAKE_C_COMPILER=clang-10
@@ -88,6 +88,7 @@ jobs:
           cmake --version
           pwd
           ls
+          ls $HEXL_DIR
 
       - name: Default Build
         run: |
