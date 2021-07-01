@@ -84,7 +84,7 @@ jobs:
           echo $HOME
           echo $GITHUB_WORKSPACE
           echo "Testing from branch:"
-          echo $GITHUB_REF
+          echo $GITHUB_REFHmmm
           cmake --version
           pwd
           ls
@@ -99,7 +99,8 @@ jobs:
           # Build example
           cd example
           set -x
-          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          # cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           set +x
           cmake --build build -j
           cd ..
