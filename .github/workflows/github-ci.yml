@@ -68,8 +68,8 @@ jobs:
         with:
           extra_args: --all-files
 
-  build-and-test:
-    name: Build, test and run kernels
+  default-build:
+    name: Default build and test
     needs: [format]
     runs-on: ubuntu-20.04
     defaults:
@@ -109,6 +109,27 @@ jobs:
           example/build/example
           set +x
 
+  shared-build:
+    name: Shared build and test
+    needs: [format]
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+        # working-directory: example
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REFH
+          cmake --version
+          pwd
+          ls
+
       - name: Shared Build
         run: |
           set -x
@@ -123,6 +144,27 @@ jobs:
           cmake --build build -j
           build/example
           set +x
+
+  debug-build:
+    name: Debug build and test
+    needs: [format]
+    runs-on: ubuntu-20.04
+    defaults:
+     run:
+        shell: bash
+        # working-directory: example
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REFH
+          cmake --version
+          pwd
+          ls
 
       - name: Debug Build
         run: |
@@ -144,6 +186,27 @@ jobs:
           cmake --build build -j
           build/example
           set +x
+
+  coverage-build:
+    name: Coverage build and benchmark
+    needs: [format]
+    runs-on: ubuntu-20.04
+    defaults:
+     run:
+        shell: bash
+        # working-directory: example
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REFH
+          cmake --version
+          pwd
+          ls
 
       # TODO: Check the archiving here
       - name: Coverage Build
