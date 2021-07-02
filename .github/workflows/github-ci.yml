@@ -133,6 +133,7 @@ jobs:
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
           #cmake --build build -j
+          cmake --build build --target help
           cmake --build build -j --target doxygen docs all
           cmake --install build
           build/test/unit-test
