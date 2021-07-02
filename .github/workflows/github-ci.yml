@@ -129,10 +129,10 @@ jobs:
           set -x
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
-          pip3 install breathe m2r2
+          pip3 install breathe m2r2 sphinx_rtd_theme
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          #cmake --build build -j
+          cmake --build build -j
           # Print all targets in the make file
           #cd build && make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u && cd ..
           cmake --build build -j --target doxygen docs
