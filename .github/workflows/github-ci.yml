@@ -182,7 +182,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j4
           build/example
           set +x
