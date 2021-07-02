@@ -95,14 +95,14 @@ jobs:
           set -x
           # Build library
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-          cmake --build build -j
+          cmake --build build -j4
           cmake --install build
 
           # Build example
           cd example;
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
 
-          cmake --build build -j
+          cmake --build build -j4
           cd ..
 
           # Run tests and example
@@ -136,13 +136,13 @@ jobs:
           set -x
           # Build library
           cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
-          cmake --build build -j
+          cmake --build build -j4
           cmake --install build
 
           # Build and run example
           cd example;
           cmake -S . -B build -DHEXL_SHARED_LIB=ON -DHEXL_TESTING=ON -DHEXL_BENCHMARK=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-          cmake --build build -j
+          cmake --build build -j4
           build/example
           set +x
 
@@ -176,14 +176,14 @@ jobs:
 
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          cmake --build build -j --target all doxygen docs
+          cmake --build build -j4 --target all doxygen docs
           cmake --install build
           build/test/unit-test
 
           # Build and run example
           cd example;
           cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-          cmake --build build -j
+          cmake --build build -j4
           build/example
           set +x
 
@@ -218,7 +218,7 @@ jobs:
 
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j --target all doxygen docs
+          cmake --build build -j4 --target all doxygen docs
           cmake --install build
 
       - name: Test
