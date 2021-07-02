@@ -174,15 +174,13 @@ jobs:
           pip3 install breathe m2r2 sphinx_rtd_theme
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          #cmake --build build -j
-          cmake --build build --target help
-          cmake --build build -j --target doxygen docs all
+          cmake --build build -j --target all doxygen docs
           cmake --install build
           build/test/unit-test
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j
           build/example
           set +x
@@ -212,6 +210,9 @@ jobs:
       - name: Coverage Build
         run: |
           set -x
+          # Install doxygen, sphinx, and dependencies
+          sudo apt-get install doxygen graphviz python3-sphinx
+          pip3 install breathe m2r2 sphinx_rtd_theme
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           #cmake --build build -j
