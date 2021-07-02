@@ -150,8 +150,8 @@ jobs:
           set -x
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j --target doxygen docs
           cmake --build build -j
+          cmake --build build -j --target doxygen docs
           cmake --install build
 
           # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
