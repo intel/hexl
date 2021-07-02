@@ -127,8 +127,9 @@ jobs:
       - name: Debug Build
         run: |
           set -x
-          # Install doxygen and dependencies
-          sudo apt-get install doxygen graphviz
+          # Install doxygen, sphinx, and dependencies
+          sudo apt-get install doxygen graphviz python3-sphinx
+          pip3 install breathe m2r2
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
           cmake --build build -j
