@@ -31,8 +31,8 @@ env:
       -DCMAKE_INSTALL_PREFIX=./
   DEBUG_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
-      -DCMAKE_CXX_COMPILER=g++-9
-      -DCMAKE_C_COMPILER=gcc-9
+      -DCMAKE_CXX_COMPILER=clang++-10
+      -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
       -DHEXL_DOCS=ON
@@ -133,6 +133,8 @@ jobs:
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
           cmake --build build -j
+          # Print all targets in the make file
+          cd build && make -qp | ^Ck -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u && cd ..
           cmake --build build -j --target doxygen docs
           cmake --install build
           build/test/unit-test
