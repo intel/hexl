@@ -132,9 +132,9 @@ jobs:
           pip3 install breathe m2r2
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          cmake --build build -j
+          #cmake --build build -j
           # Print all targets in the make file
-          cd build && make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u && cd ..
+          #cd build && make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u && cd ..
           cmake --build build -j --target doxygen docs
           cmake --install build
           build/test/unit-test
