@@ -35,6 +35,7 @@ env:
       -DCMAKE_C_COMPILER=gcc-9
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
+      -DHEXL_COVERAGE=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./
@@ -172,6 +173,7 @@ jobs:
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
           pip3 install breathe m2r2 sphinx_rtd_theme
+
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
           cmake --build build -j --target all doxygen docs
@@ -186,7 +188,7 @@ jobs:
           set +x
 
   coverage-build:
-    name: Coverage build and benchmark
+    name: Coverage build, test, and benchmark
     needs: [format]
     runs-on: ubuntu-20.04
     defaults:
@@ -213,12 +215,14 @@ jobs:
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
           pip3 install breathe m2r2 sphinx_rtd_theme
+
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          #cmake --build build -j
           cmake --build build -j --target all doxygen docs
           cmake --install build
 
+      - name: Test
+        run: |
           # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
           pwd
           ls
@@ -226,6 +230,11 @@ jobs:
           build/test/unit-test
           HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
           HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+
+      - name: lcov
+        run: |
+          # Install lcov
+          sudo apt-get install -y lcov
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
 
           # Remove unwanted directories
@@ -244,5 +253,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: bench_hexl_${{github.sha}}.csv
-          path: ${GITHUB_WORKFLOW}_${GITHUB_SHA}  # TODO: What would the path be??
+          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}  # TODO: What would the path be?? ANS: From top level dir, the file name
           retention=days: 90 # Maximum for free version
