@@ -213,7 +213,7 @@ inline __m512i LoadWOpT4(const void* arg) {
   return v_W_op;
 }
 
-#endif // HEXL_HAS_AVX512DQ
+#endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl
 }  // namespace intel
