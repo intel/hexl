@@ -35,7 +35,6 @@ env:
       -DCMAKE_C_COMPILER=gcc-9
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DHEXL_COVERAGE=ON
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./
@@ -141,7 +140,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DHEXL_TESTING=ON -DHEXL_BENCHMARK=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j4
           build/example
           set +x
@@ -182,7 +181,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
           cmake --build build -j4
           build/example
           set +x
@@ -253,5 +252,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: bench_hexl_${{github.sha}}.csv
-          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}  # TODO: What would the path be?? ANS: From top level dir, the file name
-          retention=days: 90 # Maximum for free version
+          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
+          retention-days: 90 # Maximum for free version
