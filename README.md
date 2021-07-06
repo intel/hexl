@@ -16,8 +16,6 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Threading](#threading)
 - [Community Adoption](#community-adoption)
 - [Documentation](#documentation)
-  - [Doxygen](#doxygen)
-  - [Sphinx](#sphinx)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
   - [Citing Intel HEXL](#citing-intel-hexl)
@@ -133,37 +131,22 @@ Intel HEXL has been integrated to the following homomorphic encryption libraries
 If you are aware of any other uses of Intel HEXL, please let us know!
 
 # Documentation
-See [https://intel.github.io/hexl](https://intel.github.io/hexl) for Doxygen documentation.
+Intel HEXL supports documentation via Doxygen. See [https://intel.github.io/hexl](https://intel.github.io/hexl) for the latest Doxygen documentation.
 
-Intel HEXL supports documentation via Doxygen and sphinx.
 To build documentation, first install `doxygen` and `graphviz`, e.g.
 ```bash
 sudo apt-get install doxygen graphviz
 ```
 Then, configure Intel HEXL with `-DHEXL_DOCS=ON` (see [Compile-time options](#compile-time-options)).
-## Doxygen
  To build Doxygen documentation, after configuring Intel HEXL with `-DHEXL_DOCS=ON`, run
 ```
-cmake --build build --target doxygen
+cmake --build build --target docs
 ```
 To view the generated Doxygen documentation, open the generated `build/docs/doxygen/html/index.html` file in a web browser.
 
-## Sphinx
-To build the sphinx documentation, install `sphinx` and required dependencies `breathe, m2r2`, e.g.
-```bash
-sudo apt-get install python3-sphinx
-pip3 install breathe m2r2
-```
-
-Then, after configuring Intel HEXL with `-DHEXL_DOCS=ON`, run
-```bash
-cmake --build build --target docs
-```
-To view the generated Sphinx documentation, open the generated `build/docs/sphinx/html/index.html` file in a web browser.
-
 # Contributing
-To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
-This project welcomes external contributions. We encourage feedback and suggestions via [Github Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github Discussions](https://github.com/intel/hexl/discussions).
+This project welcomes external contributions. To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
+We encourage feedback and suggestions via [Github Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github Discussions](https://github.com/intel/hexl/discussions).
 
 ## Repository layout
 Public headers reside in the `hexl/include` folder.

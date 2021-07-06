@@ -13,7 +13,7 @@
 namespace intel {
 namespace hexl {
 
-namespace details {
+/// @brief Allocater implementation using malloc and free
 struct MallocStrategy : AllocatorBase {
   void* allocate(size_t bytes_count) final { return std::malloc(bytes_count); }
 
@@ -23,29 +23,11 @@ struct MallocStrategy : AllocatorBase {
   }
 };
 
-struct CustomAllocStrategy {
-  explicit CustomAllocStrategy(std::shared_ptr<AllocatorBase> impl)
-      : p_impl(impl) {
-    if (!impl) {
-      throw std::runtime_error(
-          "Cannot create 'CustomAllocStrategy' without `impl`");
-    }
-  }
-
-  void* allocate_memory(size_t bytes_count) {
-    return p_impl->allocate(bytes_count);
-  }
-
-  void deallocate_memory(void* p, size_t n) { p_impl->deallocate(p, n); }
-
- private:
-  std::shared_ptr<AllocatorBase> p_impl;
-};
-}  // namespace details
-
 using AllocatorStrategyPtr = std::shared_ptr<AllocatorBase>;
 extern AllocatorStrategyPtr mallocStrategy;
 
+/// @brief Allocates memory aligned to Alignment-byte sized boundaries
+/// @details Alignment must be a power of two
 template <typename T, uint64_t Alignment>
 class AlignedAllocator {
  public:
@@ -75,6 +57,8 @@ class AlignedAllocator {
 
   bool operator!=(const AlignedAllocator&) { return false; }
 
+  /// @brief Allocates \p n elements aligned to Alignment-byte boundaries
+  /// @return Pointer to the aligned allocated memory
   T* allocate(size_t n) {
     if (!IsPowerOfTwo(Alignment)) {
       return nullptr;
@@ -117,6 +101,7 @@ class AlignedAllocator {
   AllocatorStrategyPtr m_alloc_impl;
 };
 
+/// @brief 64-byte aligned memory allocator
 template <typename T>
 using AlignedVector64 = std::vector<T, AlignedAllocator<T, 64> >;
 

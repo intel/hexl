@@ -15,14 +15,14 @@
 namespace intel {
 namespace hexl {
 
-// Stores an integer on which modular multiplication can be performed more
-// efficiently, at the cost of some precomputation.
+/// @brief Pre-computes a Barrett factor with which modular multiplication can
+/// be performed more efficiently
 class MultiplyFactor {
  public:
   MultiplyFactor() = default;
 
-  // Computes and stores the Barrett factor floor((operand << bit_shift) /
-  // modulus)
+  /// @brief Computes and stores the Barrett factor floor((operand << bit_shift)
+  /// / modulus)
   MultiplyFactor(uint64_t operand, uint64_t bit_shift, uint64_t modulus)
       : m_operand(operand) {
     HEXL_CHECK(operand <= modulus, "operand " << operand
@@ -36,7 +36,10 @@ class MultiplyFactor {
     m_barrett_factor = DivideUInt128UInt64Lo(op_hi, op_lo, modulus);
   }
 
+  /// @brief Returns the pre-computed Barrett factor
   inline uint64_t BarrettFactor() const { return m_barrett_factor; }
+
+  /// @brief Returns the operand corresponding to the Barrett factor
   inline uint64_t Operand() const { return m_operand; }
 
  private:
