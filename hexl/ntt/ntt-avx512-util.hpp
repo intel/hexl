@@ -15,8 +15,6 @@
 namespace intel {
 namespace hexl {
 
-#ifdef HEXL_HAS_AVX512DQ
-
 // Given input: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 // Returns
 // *out1 =  _mm512_set_epi64(14, 6, 12, 4, 10, 2, 8, 0);
@@ -212,8 +210,6 @@ inline __m512i LoadWOpT4(const void* arg) {
 
   return v_W_op;
 }
-
-#endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl
 }  // namespace intel

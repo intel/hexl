@@ -313,7 +313,7 @@ BENCHMARK(BM_InvNTT_AVX512IFMALazy)
 static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   uint64_t output_mod_factor = state.range(1);
-  size_t modulus = GeneratePrimes(1, 30, ntt_size)[0];
+  size_t modulus = GeneratePrimes(1, 62, ntt_size)[0];
 
   AlignedVector64<uint64_t> input(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
