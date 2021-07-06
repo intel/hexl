@@ -31,7 +31,6 @@ static void BM_EltwiseReduceModInPlace(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseReduceModInPlace)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -56,7 +55,6 @@ static void BM_EltwiseReduceModCopy(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseReduceModCopy)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -81,7 +79,6 @@ static void BM_EltwiseReduceModNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseReduceModNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -107,7 +104,6 @@ static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseReduceModAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});

@@ -33,7 +33,6 @@ static void BM_EltwiseVectorVectorAddModNative(
 
 BENCHMARK(BM_EltwiseVectorVectorAddModNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -59,7 +58,6 @@ static void BM_EltwiseVectorVectorAddModAVX512(
 
 BENCHMARK(BM_EltwiseVectorVectorAddModAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -84,7 +82,6 @@ static void BM_EltwiseVectorScalarAddModNative(
 
 BENCHMARK(BM_EltwiseVectorScalarAddModNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -110,7 +107,6 @@ static void BM_EltwiseVectorScalarAddModAVX512(
 
 BENCHMARK(BM_EltwiseVectorScalarAddModAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
