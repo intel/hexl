@@ -37,7 +37,6 @@ static void BM_FwdNTTNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTTNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -67,7 +66,6 @@ static void BM_FwdNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -97,7 +95,6 @@ static void BM_FwdNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512IFMALazy)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -133,7 +130,6 @@ static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512DQ_32)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024, 1})
     ->Args({1024, 4})
     ->Args({4096, 1})
@@ -165,7 +161,6 @@ static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512DQ_64)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024, 1})
     ->Args({1024, 4})
     ->Args({4096, 1})
@@ -192,7 +187,6 @@ static void BM_FwdNTTInPlace(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTTInPlace)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -215,7 +209,6 @@ static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTTCopy)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -244,7 +237,6 @@ static void BM_InvNTTNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTTNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -272,7 +264,6 @@ static void BM_InvNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -299,7 +290,6 @@ static void BM_InvNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512IFMALazy)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -331,7 +321,6 @@ static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512DQ_32)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024, 1})
     ->Args({1024, 2})
     ->Args({4096, 1})
@@ -360,7 +349,6 @@ static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512DQ_64)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024, 1})
     ->Args({1024, 2})
     ->Args({4096, 1})
