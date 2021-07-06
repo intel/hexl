@@ -275,7 +275,7 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
   return _mm512_hexl_cmp_epi64(a, b, CMPINT::LE, match_value);
 }
 
-// returns x mod q, computed via Barrett reduction
+// Returns x mod q, computed via Barrett reduction
 // @param q_barr floor(2^BitShift / q)
 template <int BitShift = 64>
 inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,

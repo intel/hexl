@@ -20,8 +20,7 @@
 namespace intel {
 namespace hexl {
 
-AllocatorStrategyPtr mallocStrategy =
-    AllocatorStrategyPtr(new details::MallocStrategy);
+AllocatorStrategyPtr mallocStrategy = AllocatorStrategyPtr(new MallocStrategy);
 
 NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
          std::shared_ptr<AllocatorBase> alloc_ptr)
@@ -155,43 +154,21 @@ void NTT::ComputeRootOfUnityPowers() {
       idx++;
     }
   }
-  inv_root_of_unity_powers = std::move(temp);
+  m_inv_root_of_unity_powers = std::move(temp);
 
   // 32-bit preconditioned inverse root of unity powers
-  AlignedVector64<uint64_t> precon32_inv_root_of_unity_powers(m_aligned_alloc);
-  precon32_inv_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
-    MultiplyFactor mf(inv_root_of_unity, 32, m_q);
-    precon32_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
-  }
   m_precon32_inv_root_of_unity_powers =
-      std::move(precon32_inv_root_of_unity_powers);
+      compute_barrett_vector(m_inv_root_of_unity_powers, 32);
 
   // 52-bit preconditioned inverse root of unity powers
   if (has_avx512ifma) {
-    AlignedVector64<uint64_t> precon52_inv_root_of_unity_powers(
-        m_aligned_alloc);
-    precon52_inv_root_of_unity_powers.reserve(m_degree);
-    for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
-      MultiplyFactor mf(inv_root_of_unity, 52, m_q);
-      precon52_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
-    }
     m_precon52_inv_root_of_unity_powers =
-        std::move(precon52_inv_root_of_unity_powers);
+        compute_barrett_vector(m_inv_root_of_unity_powers, 52);
   }
 
   // 64-bit preconditioned inverse root of unity powers
-  AlignedVector64<uint64_t> precon64_inv_root_of_unity_powers(m_aligned_alloc);
-  precon64_inv_root_of_unity_powers.reserve(m_degree);
-  for (uint64_t inv_root_of_unity : inv_root_of_unity_powers) {
-    MultiplyFactor mf(inv_root_of_unity, 64, m_q);
-    precon64_inv_root_of_unity_powers.push_back(mf.BarrettFactor());
-  }
-
   m_precon64_inv_root_of_unity_powers =
-      std::move(precon64_inv_root_of_unity_powers);
-
-  m_inv_root_of_unity_powers = std::move(inv_root_of_unity_powers);
+      compute_barrett_vector(m_inv_root_of_unity_powers, 64);
 }
 
 void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,

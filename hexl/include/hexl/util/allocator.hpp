@@ -8,7 +8,7 @@
 namespace intel {
 namespace hexl {
 
-/// @brief Base class for customer memory allocator
+/// @brief Base class for custom memory allocator
 struct AllocatorBase {
   virtual ~AllocatorBase() noexcept {}
 
@@ -23,6 +23,8 @@ struct AllocatorBase {
   virtual void deallocate(void* p, size_t n) = 0;
 };
 
+/// @brief Helper memory allocation struct which delegates implementation to
+/// AllocatorImpl
 template <class AllocatorImpl>
 struct AllocatorInterface : public AllocatorBase {
   /// @brief Override interface and delegate implementation to AllocatorImpl
@@ -36,7 +38,7 @@ struct AllocatorInterface : public AllocatorBase {
   }
 
  private:
-  // in case AllocatorImpl doesn't provide implementations use default null
+  // in case AllocatorImpl doesn't provide implementations, use default null
   // behavior
   void* allocate_impl(size_t bytes_count) {
     (void)bytes_count;
