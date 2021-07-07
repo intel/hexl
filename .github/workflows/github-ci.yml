@@ -289,6 +289,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
+          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -300,6 +301,7 @@ jobs:
 
       - name: Default Build
         run: |
+          wsl
           set -x
           # Build library
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
@@ -331,6 +333,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
+          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -342,6 +345,7 @@ jobs:
 
       - name: Shared Build
         run: |
+          wsl
           set -x
           # Build library
           cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
@@ -368,6 +372,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
+          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -379,6 +384,7 @@ jobs:
 
       - name: Debug Build
         run: |
+          wsl
           set -x
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
@@ -410,6 +416,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
+          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -421,6 +428,7 @@ jobs:
 
       - name: Coverage Build
         run: |
+          wsl
           set -x
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
@@ -433,6 +441,7 @@ jobs:
 
       - name: Test
         run: |
+          wsl
           # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
           pwd
           ls
@@ -443,6 +452,7 @@ jobs:
 
       - name: lcov
         run: |
+          wsl
           # Install lcov
           sudo apt-get install -y lcov
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
