@@ -276,7 +276,7 @@ jobs:
         with:
           extra_args: --all-files
 
-  default-build:
+  default-build-icelake:
     name: Default build and test (IceLake)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
@@ -318,7 +318,7 @@ jobs:
           example/build/example
           set +x
 
-  shared-build:
+  shared-build-icelake:
     name: Shared build and test (IceLake)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
@@ -355,7 +355,7 @@ jobs:
           build/example
           set +x
 
-  debug-build:
+  debug-build-icelake:
     name: Debug build and test (IceLake)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
@@ -397,7 +397,7 @@ jobs:
           build/example
           set +x
 
-  coverage-build:
+  coverage-build-icelake:
     name: Coverage build, test, and benchmark (IceLake)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
