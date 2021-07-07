@@ -56,208 +56,208 @@ env:
 # Ubuntu 20.04 #
 ################
 jobs:
-  format:
-    name: Format
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    steps:
-      - uses: actions/checkout@v2
-      # Required for pre-commit
-      - run: pip3 install cpplint
-      # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
+  # format:
+  #   name: Format
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     # Required for pre-commit
+  #     - run: pip3 install cpplint
+  #     # NOTE: This is deprecated in favor of pre-commit.ci
+  #     - uses: pre-commit/action@v2.0.2
+  #       with:
+  #         extra_args: --all-files
 
-  default-build:
-    name: Default build and test
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-        # working-directory: example
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  # default-build:
+  #   name: Default build and test
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #       # working-directory: example
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Default Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-          cmake --build build -j4
-          cmake --install build
+  #     - name: Default Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
+  #         cmake --build build -j4
+  #         cmake --install build
 
-          # Build example
-          cd example;
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         # Build example
+  #         cd example;
+  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
 
-          cmake --build build -j4
-          cd ..
+  #         cmake --build build -j4
+  #         cd ..
 
-          # Run tests and example
-          build/test/unit-test
-          example/build/example
-          set +x
+  #         # Run tests and example
+  #         build/test/unit-test
+  #         example/build/example
+  #         set +x
 
-  shared-build:
-    name: Shared build and test
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-        # working-directory: example
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  # shared-build:
+  #   name: Shared build and test
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #       # working-directory: example
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Shared Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
-          cmake --build build -j4
-          cmake --install build
+  #     - name: Shared Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
+  #         cmake --build build -j4
+  #         cmake --install build
 
-          # Build and run example
-          cd example;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-          cmake --build build -j4
-          build/example
-          set +x
+  #         # Build and run example
+  #         cd example;
+  #         cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+  #         cmake --build build -j4
+  #         build/example
+  #         set +x
 
-  debug-build:
-    name: Debug build and test
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-     run:
-        shell: bash
-        # working-directory: example
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  # debug-build:
+  #   name: Debug build and test
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #    run:
+  #       shell: bash
+  #       # working-directory: example
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Debug Build
-        run: |
-          set -x
-          # Install doxygen, sphinx, and dependencies
-          sudo apt-get install doxygen graphviz python3-sphinx
-          pip3 install breathe m2r2 sphinx_rtd_theme
+  #     - name: Debug Build
+  #       run: |
+  #         set -x
+  #         # Install doxygen, sphinx, and dependencies
+  #         sudo apt-get install doxygen graphviz python3-sphinx
+  #         pip3 install breathe m2r2 sphinx_rtd_theme
 
-          # Build library
-          cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all doxygen docs
-          cmake --install build
-          build/test/unit-test
+  #         # Build library
+  #         cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
+  #         cmake --build build -j4 --target all doxygen docs
+  #         cmake --install build
+  #         build/test/unit-test
 
-          # Build and run example
-          cd example;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-          cmake --build build -j4
-          build/example
-          set +x
+  #         # Build and run example
+  #         cd example;
+  #         cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+  #         cmake --build build -j4
+  #         build/example
+  #         set +x
 
-  coverage-build:
-    name: Coverage build, test, and benchmark
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-     run:
-        shell: bash
-        # working-directory: example
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  # coverage-build:
+  #   name: Coverage build, test, and benchmark
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #    run:
+  #       shell: bash
+  #       # working-directory: example
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Coverage Build
-        run: |
-          set -x
-          # Install doxygen, sphinx, and dependencies
-          sudo apt-get install doxygen graphviz python3-sphinx
-          pip3 install breathe m2r2 sphinx_rtd_theme
+  #     - name: Coverage Build
+  #       run: |
+  #         set -x
+  #         # Install doxygen, sphinx, and dependencies
+  #         sudo apt-get install doxygen graphviz python3-sphinx
+  #         pip3 install breathe m2r2 sphinx_rtd_theme
 
-          # Build library
-          cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all doxygen docs
-          cmake --install build
+  #         # Build library
+  #         cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
+  #         cmake --build build -j4 --target all doxygen docs
+  #         cmake --install build
 
-      - name: Test
-        run: |
-          # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
-          pwd
-          ls
-          echo ${CI_PROJECT_DIR}
-          build/test/unit-test
-          HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
-          HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+  #     - name: Test
+  #       run: |
+  #         # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
+  #         pwd
+  #         ls
+  #         echo ${CI_PROJECT_DIR}
+  #         build/test/unit-test
+  #         HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
+  #         HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
 
-      - name: lcov
-        run: |
-          # Install lcov
-          sudo apt-get install -y lcov
-          lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
+  #     - name: lcov
+  #       run: |
+  #         # Install lcov
+  #         sudo apt-get install -y lcov
+  #         lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
 
-          # Remove unwanted directories
-          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+  #         # Remove unwanted directories
+  #         lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
 
-          # Report overall summary to be parsed by gitlab CI
-          lcov --list cov_test.info
+  #         # Report overall summary to be parsed by gitlab CI
+  #         lcov --list cov_test.info
 
-          # Generate coverage html
-          genhtml --branch-coverage cov_test.info --output-directory coverage
-          set +x
+  #         # Generate coverage html
+  #         genhtml --branch-coverage cov_test.info --output-directory coverage
+  #         set +x
 
-      - name: Benchmark
-        run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
-      - name: Archive benchmark results
-        uses: actions/upload-artifact@v2
-        with:
-          name: bench_hexl_${{github.sha}}.csv
-          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
-          retention-days: 90 # Maximum for free version
+  #     - name: Benchmark
+  #       run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
+  #     - name: Archive benchmark results
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: bench_hexl_${{github.sha}}.csv
+  #         path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
+  #         retention-days: 90 # Maximum for free version
 
   ###############
   # Ice-lake CI #
