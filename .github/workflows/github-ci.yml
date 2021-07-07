@@ -52,11 +52,11 @@ env:
   DEFAULT_EXAMPLE_FLAGS: >
       -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
 
+jobs:
 
-###############
-# Ice-lake CI #
-###############
-
+  ###############
+  # Ice-lake CI #
+  ###############
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Windows, X64, ice-lake]
@@ -261,10 +261,9 @@ env:
           retention-days: 90 # Maximum for free version
 
 
-################
-# Ubuntu 20.04 #
-################
-jobs:
+  ################
+  # Ubuntu 20.04 #
+  ################
   format:
     name: Format
     runs-on: ubuntu-20.04
