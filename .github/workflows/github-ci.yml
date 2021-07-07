@@ -265,7 +265,7 @@ jobs:
 
   format-icelake:
     name: Format (IceLake)
-    runs-on: [self-hosted, Linux, X64, ice-lake]
+    runs-on: [self-hosted, Windows, X64, ice-lake]
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
@@ -279,7 +279,7 @@ jobs:
   default-build-icelake:
     name: Default build and test (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
+    runs-on: [self-hosted, Windows, X64, ice-lake]
     environment: intel_workflow
     defaults:
       run:
@@ -321,7 +321,7 @@ jobs:
   shared-build-icelake:
     name: Shared build and test (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
+    runs-on: [self-hosted, Windows, X64, ice-lake]
     environment: intel_workflow
     defaults:
       run:
@@ -358,7 +358,7 @@ jobs:
   debug-build-icelake:
     name: Debug build and test (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
+    runs-on: [self-hosted, Windows, X64, ice-lake]
     environment: intel_workflow
     defaults:
      run:
@@ -400,7 +400,7 @@ jobs:
   coverage-build-icelake:
     name: Coverage build, test, and benchmark (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
+    runs-on: [self-hosted, Windows, X64, ice-lake]
     environment: intel_workflow
     defaults:
      run:
