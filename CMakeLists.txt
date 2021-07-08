@@ -72,8 +72,12 @@ message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
 
 hexl_check_compiler_version()
+hexl_add_compiler_definition()
 
 if (HEXL_COVERAGE)
+  if (NOT HEXL_USE_GNU)
+    message(FATAL_ERROR "HEXL_COVERAGE only supported on GCC.")
+  endif()
   if (NOT HEXL_TESTING)
     message(FATAL_ERROR "HEXL_COVERAGE enabled, but HEXL_TESTING not enabled. Enable HEXL_TESTING for best coverage.")
   endif()
