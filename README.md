@@ -41,6 +41,10 @@ For additional functionality, see the public headers, located in `include/hexl`
 
 ## Building Intel HEXL
 
+Intel HEXL can be built in several ways. Intel HEXL has been uploaded to the [Microsoft vcpkg](https://github.com/microsoft/vcpkg) C++ package manager, which supports Linux, macOS, and Windows builds. See the vcpkg repository for instructions to build Intel HEXL with vcpkg, e.g. run `vcpkg install hexl`. There may be some delay in uploading porting the latest release to vcpkg, so please build from source to use the latest change in Intel HEXL.
+
+Intel HEXL also supports a build using the CMake build system. See below for the instructions to build Intel HEXL from source using CMake.
+
 ### Dependencies
 We have tested Intel HEXL on the following operating systems:
 - Ubuntu 18.04
@@ -128,7 +132,9 @@ Intel HEXL has been integrated to the following homomorphic encryption libraries
 - [Microsoft SEAL](https://github.com/microsoft/SEAL)
 - [PALISADE](https://gitlab.com/palisade/palisade-release)
 
-If you are aware of any other uses of Intel HEXL, please let us know!
+See also the [Intel Homomorphic Encryption Toolkit](https://github.com/intel/he-toolkit) for example uses cases using HEXL.
+
+Please let us know if you are aware of any other uses of Intel HEXL.
 
 # Documentation
 Intel HEXL supports documentation via Doxygen. See [https://intel.github.io/hexl](https://intel.github.io/hexl) for the latest Doxygen documentation.
