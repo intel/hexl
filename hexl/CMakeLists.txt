@@ -37,7 +37,6 @@ endif()
 add_library(HEXL::hexl ALIAS hexl)
 
 hexl_add_asan_flag(hexl)
-hexl_add_compiler_definition()
 
 set(HEXL_DEFINES_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/include/hexl/util/defines.hpp.in)
 set(HEXL_DEFINES_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/include/hexl/util/defines.hpp)
