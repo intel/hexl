@@ -262,18 +262,6 @@ jobs:
   ###############
   # Ice-lake CI #
   ###############
-
-    # name: Format (IceLake)
-    # runs-on: [self-hosted, Linux, X64, ice-lake]
-    # environment: intel_workflow
-    # steps:
-    #   - uses: actions/checkout@v2
-    #   # Required for pre-commit
-    #   - run: pip3 install cpplint
-    #   # NOTE: This is deprecated in favor of pre-commit.ci
-    #   - uses: pre-commit/action@v2.0.2
-    #     with:
-    #       extra_args: --all-files
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
@@ -291,7 +279,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
@@ -309,7 +296,8 @@ jobs:
         run: |
           set -x
           # Build library
-          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
+          # cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./
           cmake --build build -j4
           cmake --install build
 
@@ -333,7 +321,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
@@ -370,7 +357,6 @@ jobs:
     defaults:
      run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
@@ -412,7 +398,6 @@ jobs:
     defaults:
      run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
