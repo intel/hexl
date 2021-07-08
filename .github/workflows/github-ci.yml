@@ -266,11 +266,15 @@ jobs:
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      - run: pre-commit run --all-files
+      # Required for pre-commit
+      - run: pip3 install cpplint
+      # NOTE: This is deprecated in favor of pre-commit.ci
+      - uses: pre-commit/action@v2.0.2
+        with:
+          extra_args: --all-files
 
   default-build-icelake:
     name: Default build and test (IceLake)
