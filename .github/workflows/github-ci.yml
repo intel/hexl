@@ -266,10 +266,10 @@ jobs:
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
+    # Use environment protection (require review)
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      # NOTE: This is deprecated in favor of pre-commit.ci
       - run: pre-commit run --all-files
 
   default-build-icelake:
