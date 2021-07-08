@@ -265,12 +265,12 @@ jobs:
 
   format-icelake:
     name: Format (IceLake)
-    runs-on: [self-hosted, Windows, X64, ice-lake]
+    runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
-      - run: wsl; pip3 install cpplint
+      - run: pip3 install cpplint
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:
@@ -279,7 +279,7 @@ jobs:
   default-build-icelake:
     name: Default build and test (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Windows, X64, ice-lake]
+    runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
       run:
@@ -289,7 +289,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
-          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -301,7 +300,6 @@ jobs:
 
       - name: Default Build
         run: |
-          wsl
           set -x
           # Build library
           cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
@@ -323,7 +321,7 @@ jobs:
   shared-build-icelake:
     name: Shared build and test (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Windows, X64, ice-lake]
+    runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
       run:
@@ -333,7 +331,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
-          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -345,7 +342,6 @@ jobs:
 
       - name: Shared Build
         run: |
-          wsl
           set -x
           # Build library
           cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
@@ -362,7 +358,7 @@ jobs:
   debug-build-icelake:
     name: Debug build and test (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Windows, X64, ice-lake]
+    runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
      run:
@@ -372,7 +368,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
-          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -384,7 +379,6 @@ jobs:
 
       - name: Debug Build
         run: |
-          wsl
           set -x
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
@@ -406,7 +400,7 @@ jobs:
   coverage-build-icelake:
     name: Coverage build, test, and benchmark (IceLake)
     needs: [format-icelake]
-    runs-on: [self-hosted, Windows, X64, ice-lake]
+    runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
      run:
@@ -416,7 +410,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Validate paths
         run: |
-          wsl
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
@@ -428,7 +421,6 @@ jobs:
 
       - name: Coverage Build
         run: |
-          wsl
           set -x
           # Install doxygen, sphinx, and dependencies
           sudo apt-get install doxygen graphviz python3-sphinx
@@ -441,7 +433,6 @@ jobs:
 
       - name: Test
         run: |
-          wsl
           # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
           pwd
           ls
@@ -452,7 +443,6 @@ jobs:
 
       - name: lcov
         run: |
-          wsl
           # Install lcov
           sudo apt-get install -y lcov
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
