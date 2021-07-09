@@ -34,7 +34,7 @@ variables:
       -DCMAKE_INSTALL_PREFIX=./"
 
   GCOV_BIN: "/usr/bin/gcov-9"
-  DEFAULT_EXAMPLE_FLAGS: "-DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/hexl-1.1.0/"
+  DEFAULT_EXAMPLE_FLAGS: "-DHEXL_HINT_DIR=${CI_PROJECT_DIR}/lib/cmake/hexl-1.1.1/"
 
 stages:
   - format
