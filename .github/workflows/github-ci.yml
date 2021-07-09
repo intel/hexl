@@ -11,13 +11,10 @@ on:
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
-
 ###################
 # Define env vars #
 ###################
 env:
-  # -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-  # HEXL_DIR: /home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-1.1.0
   DEFAULT_COMPILER_FLAGS: >
       -DCMAKE_CXX_COMPILER=clang++-10
@@ -218,9 +215,11 @@ jobs:
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j4 --target all docs
           cmake --install build
+          set +x
 
       - name: Test
         run: |
+          set -x
           # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
           pwd
           ls
@@ -228,9 +227,11 @@ jobs:
           build/test/unit-test
           HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
           HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+          set +x
 
       - name: lcov
         run: |
+          set -x
           # Install lcov
           sudo apt-get install -y lcov
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
@@ -408,9 +409,11 @@ jobs:
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j4 --target all docs
           cmake --install build
+          set +x
 
       - name: Test
         run: |
+          set -x
           # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
           pwd
           ls
@@ -418,10 +421,11 @@ jobs:
           build/test/unit-test
           HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
           HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+          set +x
 
       - name: lcov
         run: |
-          # Install lcov
+          set -x
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
 
           # Remove unwanted directories
