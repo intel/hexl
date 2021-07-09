@@ -284,7 +284,7 @@ static void BM_InvNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
   for (auto _ : state) {
     InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
         input.data(), ntt_size, modulus, root_of_unity.data(),
-        precon_root_of_unity.data(), 1, 4);
+        precon_root_of_unity.data(), 1, 2);
   }
 }
 
