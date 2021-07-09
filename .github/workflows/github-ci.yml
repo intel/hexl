@@ -296,14 +296,13 @@ jobs:
         run: |
           set -x
           # Build library
-          # cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DHEXL_BENCHMARK=ON -DHEXL_TESTING=ON -DCMAKE_INSTALL_PREFIX=./
+          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
           cmake --build build -j4
           cmake --install build
 
           # Build example
           cd example;
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 ${{ env.DEFAULT_EXAMPLE_FLAGS }}
 
           cmake --build build -j4
           cd ..
