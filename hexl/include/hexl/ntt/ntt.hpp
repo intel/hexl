@@ -21,6 +21,7 @@ namespace hexl {
 /// \f$.
 class NTT {
  public:
+  /// @brief Helper class for custom memory allocation
   template <class Adaptee, class... Args>
   struct AllocatorAdapter
       : public AllocatorInterface<AllocatorAdapter<Adaptee, Args...>> {
@@ -35,13 +36,13 @@ class NTT {
     Adaptee alloc;
   };
 
-  /// Initializes an empty NTT object
+  /// @brief Initializes an empty NTT object
   NTT();
 
-  /// Destructs the NTT object
+  /// @brief Destructs the NTT object
   ~NTT();
 
-  /// Initializes an NTT object with degree \p degree and modulus \p q.
+  /// @brief Initializes an NTT object with degree \p degree and modulus \p q.
   /// @param[in] degree also known as N. Size of the NTT transform. Must be a
   /// power of
   /// 2
@@ -102,104 +103,117 @@ class NTT {
   void ComputeInverse(uint64_t* result, const uint64_t* operand,
                       uint64_t input_mod_factor, uint64_t output_mod_factor);
 
+  /// @brief Returns the minimal 2N'th root of unity
   uint64_t GetMinimalRootOfUnity() const { return m_w; }
 
+  /// @brief Returns the degree N
   uint64_t GetDegree() const { return m_degree; }
 
+  /// @brief Returns the word-sized prime modulus
   uint64_t GetModulus() const { return m_q; }
 
-  // Returns the root of unity powers in bit-reversed order
+  /// @brief Returns the root of unity powers in bit-reversed order
   const AlignedVector64<uint64_t>& GetRootOfUnityPowers() const {
     return m_root_of_unity_powers;
   }
 
-  // Returns the root of unity at bit-reversed index i.
+  /// @brief Returns the root of unity power at bit-reversed index i.
   uint64_t GetRootOfUnityPower(size_t i) { return GetRootOfUnityPowers()[i]; }
 
-  // Returns 32-bit pre-conditioned root of unity powers in bit-reversed order
+  /// @brief Returns 32-bit pre-conditioned root of unity powers in
+  /// bit-reversed order
   const AlignedVector64<uint64_t>& GetPrecon32RootOfUnityPowers() const {
     return m_precon32_root_of_unity_powers;
   }
 
-  // Returns 64-bit pre-conditioned root of unity powers in bit-reversed order
+  /// @brief Returns 64-bit pre-conditioned root of unity powers in
+  /// bit-reversed order
   const AlignedVector64<uint64_t>& GetPrecon64RootOfUnityPowers() const {
     return m_precon64_root_of_unity_powers;
   }
 
-  // Returns the root of unity powers in bit-reversed order with modifications
-  // for use by AVX512 implementation
+  /// @brief Returns the root of unity powers in bit-reversed order with
+  /// modifications for use by AVX512 implementation
   const AlignedVector64<uint64_t>& GetAVX512RootOfUnityPowers() const {
     return m_avx512_root_of_unity_powers;
   }
 
-  // Returns 32-bit pre-conditioned AVX512 root of unity powers in bit-reversed
-  // order
+  /// @brief Returns 32-bit pre-conditioned AVX512 root of unity powers in
+  /// bit-reversed order
   const AlignedVector64<uint64_t>& GetAVX512Precon32RootOfUnityPowers() const {
     return m_avx512_precon32_root_of_unity_powers;
   }
 
-  // Returns 52-bit pre-conditioned AVX512 root of unity powers in bit-reversed
-  // order
+  /// @brief Returns 52-bit pre-conditioned AVX512 root of unity powers in
+  /// bit-reversed order
   const AlignedVector64<uint64_t>& GetAVX512Precon52RootOfUnityPowers() const {
     return m_avx512_precon52_root_of_unity_powers;
   }
 
-  // Returns 64-bit pre-conditioned AVX512 root of unity powers in bit-reversed
-  // order
+  /// @brief Returns 64-bit pre-conditioned AVX512 root of unity powers in
+  /// bit-reversed order
   const AlignedVector64<uint64_t>& GetAVX512Precon64RootOfUnityPowers() const {
     return m_avx512_precon64_root_of_unity_powers;
   }
 
+  /// @brief Returns the inverse root of unity powers in bit-reversed order
   const AlignedVector64<uint64_t>& GetInvRootOfUnityPowers() const {
     return m_inv_root_of_unity_powers;
   }
 
+  /// @brief Returns the inverse root of unity power at bit-reversed index i.
   uint64_t GetInvRootOfUnityPower(size_t i) {
     return GetInvRootOfUnityPowers()[i];
   }
 
-  // Returns the vector of 32-bit pre-conditioned pre-computed root of unity
+  /// @brief Returns the vector of 32-bit pre-conditioned pre-computed root of
+  /// unity
   // powers for the modulus and root of unity.
   const AlignedVector64<uint64_t>& GetPrecon32InvRootOfUnityPowers() const {
     return m_precon32_inv_root_of_unity_powers;
   }
 
-  // Returns the vector of 52-bit pre-conditioned pre-computed root of unity
+  /// @brief Returns the vector of 52-bit pre-conditioned pre-computed root of
+  /// unity
   // powers for the modulus and root of unity.
   const AlignedVector64<uint64_t>& GetPrecon52InvRootOfUnityPowers() const {
     return m_precon52_inv_root_of_unity_powers;
   }
 
-  // Returns the vector of 64-bit pre-conditioned pre-computed root of unity
+  /// @brief Returns the vector of 64-bit pre-conditioned pre-computed root of
+  /// unity
   // powers for the modulus and root of unity.
   const AlignedVector64<uint64_t>& GetPrecon64InvRootOfUnityPowers() const {
     return m_precon64_inv_root_of_unity_powers;
   }
 
-  static const size_t s_max_degree_bits{20};  // Maximum power of 2 in degree
+  /// @brief Maximum power of 2 in degree
+  static const size_t s_max_degree_bits{20};
 
-  // Maximum number of bits in modulus;
+  /// @brief Maximum number of bits in modulus;
   static const size_t s_max_modulus_bits{62};
 
-  // Default bit shift used in Barrett precomputation
+  /// @brief Default bit shift used in Barrett precomputation
   static const size_t s_default_shift_bits{64};
 
-  // Bit shift used in Barrett precomputation when AVX512-IFMA acceleration is
-  // enabled
+  /// @brief Bit shift used in Barrett precomputation when AVX512-IFMA
+  /// acceleration is enabled
   static const size_t s_ifma_shift_bits{52};
 
-  // Maximum modulus to use 32-bit AVX512-DQ acceleration for the forward
-  // transform
+  /// @brief Maximum modulus to use 32-bit AVX512-DQ acceleration for the
+  /// forward transform
   static const size_t s_max_fwd_32_modulus{1ULL << (32 - 2)};
 
-  // Maximum modulus to use 32-bit AVX512-DQ acceleration for the inverse
-  // transform
+  /// @brief Maximum modulus to use 32-bit AVX512-DQ acceleration for the
+  /// inverse transform
   static const size_t s_max_inv_32_modulus{1ULL << (32 - 1)};
 
-  // Maximum modulus to use AVX512-IFMA acceleration for the forward transform
+  /// @brief Maximum modulus to use AVX512-IFMA acceleration for the forward
+  /// transform
   static const size_t s_max_fwd_ifma_modulus{1ULL << (s_ifma_shift_bits - 2)};
 
-  // Maximum modulus to use AVX512-IFMA acceleration for the inverse transform
+  /// @brief Maximum modulus to use AVX512-IFMA acceleration for the inverse
+  /// transform
   static const size_t s_max_inv_ifma_modulus{1ULL << (s_ifma_shift_bits - 1)};
 
  private:

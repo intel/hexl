@@ -42,7 +42,6 @@ static void BM_EltwiseCmpSubModNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseCmpSubModNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -75,7 +74,6 @@ static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseCmpSubModAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});

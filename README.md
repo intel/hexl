@@ -16,8 +16,6 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
   - [Threading](#threading)
 - [Community Adoption](#community-adoption)
 - [Documentation](#documentation)
-  - [Doxygen](#doxygen)
-  - [Sphinx](#sphinx)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
 - [Citing Intel HEXL](#citing-intel-hexl)
@@ -40,6 +38,10 @@ For each function, the library implements one or several Intel(R) AVX-512 implem
 For additional functionality, see the public headers, located in `include/hexl`
 
 ## Building Intel HEXL
+
+Intel HEXL can be built in several ways. Intel HEXL has been uploaded to the [Microsoft vcpkg](https://github.com/microsoft/vcpkg) C++ package manager, which supports Linux, macOS, and Windows builds. See the vcpkg repository for instructions to build Intel HEXL with vcpkg, e.g. run `vcpkg install hexl`. There may be some delay in uploading porting the latest release to vcpkg, so please build from source to use the latest change in Intel HEXL.
+
+Intel HEXL also supports a build using the CMake build system. See below for the instructions to build Intel HEXL from source using CMake.
 
 ### Dependencies
 We have tested Intel HEXL on the following operating systems:
@@ -128,40 +130,27 @@ Intel HEXL has been integrated to the following homomorphic encryption libraries
 - [Microsoft SEAL](https://github.com/microsoft/SEAL)
 - [PALISADE](https://gitlab.com/palisade/palisade-release)
 
-If you are aware of any other uses of Intel HEXL, please let us know!
+See also the [Intel Homomorphic Encryption Toolkit](https://github.com/intel/he-toolkit) for example uses cases using HEXL.
+
+Please let us know if you are aware of any other uses of Intel HEXL.
 
 # Documentation
-See [https://intel.github.io/hexl](https://intel.github.io/hexl) for Doxygen documentation.
+Intel HEXL supports documentation via Doxygen. See [https://intel.github.io/hexl](https://intel.github.io/hexl) for the latest Doxygen documentation.
 
-Intel HEXL supports documentation via Doxygen and sphinx.
 To build documentation, first install `doxygen` and `graphviz`, e.g.
 ```bash
 sudo apt-get install doxygen graphviz
 ```
 Then, configure Intel HEXL with `-DHEXL_DOCS=ON` (see [Compile-time options](#compile-time-options)).
-## Doxygen
  To build Doxygen documentation, after configuring Intel HEXL with `-DHEXL_DOCS=ON`, run
 ```
-cmake --build build --target doxygen
+cmake --build build --target docs
 ```
 To view the generated Doxygen documentation, open the generated `build/docs/doxygen/html/index.html` file in a web browser.
 
-## Sphinx
-To build the sphinx documentation, install `sphinx` and required dependencies `breathe, m2r2`, e.g.
-```bash
-sudo apt-get install python3-sphinx
-pip3 install breathe m2r2
-```
-
-Then, after configuring Intel HEXL with `-DHEXL_DOCS=ON`, run
-```bash
-cmake --build build --target docs
-```
-To view the generated Sphinx documentation, open the generated `build/docs/sphinx/html/index.html` file in a web browser.
-
 # Contributing
-To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
-This project welcomes external contributions. We encourage feedback and suggestions via [Github Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github Discussions](https://github.com/intel/hexl/discussions).
+This project welcomes external contributions. To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
+We encourage feedback and suggestions via [Github Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github Discussions](https://github.com/intel/hexl/discussions).
 
 ## Repository layout
 Public headers reside in the `hexl/include` folder.

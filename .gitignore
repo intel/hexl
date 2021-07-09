@@ -9,9 +9,7 @@ build*/
 .DS_Store
 
 # Generated files
-docs/conf.py
 docs/doxygen/
-docs/sphinx/
 *.log
 Doxyfile
 hexl/include/hexl/util/defines.hpp

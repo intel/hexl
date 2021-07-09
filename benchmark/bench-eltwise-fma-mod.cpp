@@ -34,7 +34,6 @@ static void BM_EltwiseFMAModNative(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseFMAModNative)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -59,7 +58,6 @@ static void BM_EltwiseFMAModAVX512DQ(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseFMAModAVX512DQ)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -85,7 +83,6 @@ static void BM_EltwiseFMAModAVX512IFMA(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseFMAModAVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
