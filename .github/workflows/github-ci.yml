@@ -78,7 +78,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
@@ -120,7 +119,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
@@ -157,7 +155,6 @@ jobs:
     defaults:
      run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
@@ -199,7 +196,6 @@ jobs:
     defaults:
      run:
         shell: bash
-        # working-directory: example
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
