@@ -171,9 +171,12 @@ jobs:
       - name: Debug Build
         run: |
           set -x
+          # Install doxygen and dependencies
+          sudo apt-get install -y doxygen graphviz
+
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all docs
+          cmake --build build -j4 --target all doxygen docs
           cmake --install build
           build/test/unit-test
 
@@ -208,6 +211,9 @@ jobs:
       - name: Coverage Build
         run: |
           set -x
+          # Install doxygen and dependencies
+          sudo apt-get install -y doxygen graphviz
+
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j4 --target all doxygen docs
@@ -361,6 +367,9 @@ jobs:
       - name: Debug Build
         run: |
           set -x
+          # Install doxygen and dependencies
+          sudo apt-get install -y doxygen graphviz
+
           # Build library
           cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
           cmake --build build -j4 --target all doxygen docs
@@ -397,6 +406,10 @@ jobs:
 
       - name: Coverage Build
         run: |
+          set -x
+          # Install doxygen and dependencies
+          sudo apt-get -y install doxygen graphviz
+
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j4 --target all doxygen docs
