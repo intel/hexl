@@ -18,7 +18,7 @@ on:
 env:
   # -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
   # HEXL_DIR: /home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
-  HEXL_DIR: ${GITHUB_WORKSPACE}/cmake/hexl-1.1.0
+  HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-1.1.0
   DEFAULT_COMPILER_FLAGS: >
       -DCMAKE_CXX_COMPILER=clang++-10
       -DCMAKE_C_COMPILER=clang-10
@@ -51,7 +51,7 @@ env:
       -DCMAKE_INSTALL_PREFIX=./
   GCOV_BIN: /usr/bin/gcov-9
   DEFAULT_EXAMPLE_FLAGS: >
-      -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/cmake/hexl-1.1.0
+      -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-1.1.0
 
 ################
 # Ubuntu 20.04 #
