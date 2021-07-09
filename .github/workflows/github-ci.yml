@@ -144,7 +144,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
@@ -175,7 +175,7 @@ jobs:
         run: |
           set -x
           # Install doxygen, sphinx, and dependencies
-          sudo apt-get install doxygen graphviz python3-sphinx
+          sudo apt-get install -y doxygen graphviz python3-sphinx
           pip3 install breathe m2r2 sphinx_rtd_theme
 
           # Build library
@@ -186,7 +186,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
@@ -217,7 +217,7 @@ jobs:
         run: |
           set -x
           # Install doxygen, sphinx, and dependencies
-          sudo apt-get install doxygen graphviz python3-sphinx
+          sudo apt-get install -y doxygen graphviz python3-sphinx
           pip3 install breathe m2r2 sphinx_rtd_theme
 
           # Build library
@@ -344,7 +344,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
@@ -374,7 +374,7 @@ jobs:
         run: |
           set -x
           # Install doxygen, sphinx, and dependencies
-          sudo apt-get install doxygen graphviz python3-sphinx
+          sudo apt-get install -y doxygen graphviz python3-sphinx
           pip3 install breathe m2r2 sphinx_rtd_theme
 
           # Build library
@@ -385,7 +385,7 @@ jobs:
 
           # Build and run example
           cd example;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ -DHEXL_HINT_DIR=/home/runner/work/hexl/hexl/lib/cmake/hexl-1.1.0/
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
@@ -415,7 +415,7 @@ jobs:
         run: |
           set -x
           # Install doxygen, sphinx, and dependencies
-          sudo apt-get install doxygen graphviz python3-sphinx
+          sudo apt-get -y install doxygen graphviz python3-sphinx
           pip3 install breathe m2r2 sphinx_rtd_theme
 
           # Build library
