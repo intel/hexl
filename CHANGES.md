@@ -1,5 +1,8 @@
 # Changes
 
+## Version 1.1.1
+- Fix Google benchmark branch to point to "main" instead of "master"
+
 ## Version 1.1.0
 - Added vector-vector and vector-scalar EltwiseSubMod
 - Added vector-scalar version of EltwiseAddMod
@@ -8,8 +11,6 @@
 - Enabled custom allocator for NTT class
 - Fixed argument order in EltwiseReduceMod
 - Fixed build warnings on Windows and Mac
-
-
 
 ## Version 1.0.1
 - Removed intel- prefix from headers and library name
