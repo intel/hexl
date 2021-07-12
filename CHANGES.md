@@ -12,6 +12,8 @@
 - Fixed argument order in EltwiseReduceMod
 - Fixed build warnings on Windows and Mac
 
+
+
 ## Version 1.0.1
 - Removed intel- prefix from headers and library name
 - Fixed CMake variables from 3rd party libraries from leaking
