@@ -607,13 +607,19 @@ TEST(NTT, FwdNTT_AVX512_32) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
+#ifdef HEXL_DEBUG
+  size_t num_trials = 1;
+#else
+  size_t num_trials = 20;
+#endif
+
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 27, N)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
-    for (size_t trial = 0; trial < 20; ++trial) {
+    for (size_t trial = 0; trial < num_trials; ++trial) {
       std::vector<std::uint64_t> input(N, 0);
       for (size_t i = 0; i < N; ++i) {
         input[i] = distrib(gen);
@@ -653,13 +659,19 @@ TEST(NTT, FwdNTT_AVX512_64) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
+#ifdef HEXL_DEBUG
+  size_t num_trials = 1;
+#else
+  size_t num_trials = 20;
+#endif
+
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 55, N)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
-    for (size_t trial = 0; trial < 1; ++trial) {
+    for (size_t trial = 0; trial < num_trials; ++trial) {
       std::vector<std::uint64_t> input(N, 0);
       for (size_t i = 0; i < N; ++i) {
         input[i] = distrib(gen);
@@ -699,13 +711,19 @@ TEST(NTT, InvNTT_AVX512_32) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
+#ifdef HEXL_DEBUG
+  size_t num_trials = 1;
+#else
+  size_t num_trials = 20;
+#endif
+
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 27, N)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
-    for (size_t trial = 0; trial < 10; ++trial) {
+    for (size_t trial = 0; trial < num_trials; ++trial) {
       std::vector<std::uint64_t> input(N, 0);
       for (size_t i = 0; i < N; ++i) {
         input[i] = distrib(gen);
@@ -745,13 +763,19 @@ TEST(NTT, InvNTT_AVX512_64) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
+#ifdef HEXL_DEBUG
+  size_t num_trials = 1;
+#else
+  size_t num_trials = 20;
+#endif
+
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 55, N)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
-    for (size_t trial = 0; trial < 10; ++trial) {
+    for (size_t trial = 0; trial < num_trials; ++trial) {
       std::vector<std::uint64_t> input(N, 0);
       for (size_t i = 0; i < N; ++i) {
         input[i] = distrib(gen);

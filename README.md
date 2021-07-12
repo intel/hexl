@@ -18,7 +18,8 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
 - [Documentation](#documentation)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
-- [Citing Intel HEXL](#citing-intel-hexl)
+  - [Citing Intel HEXL](#citing-intel-hexl)
+    - [Version 1.1](#version-11)
     - [Version 1.0](#version-10)
 - [Contributors](#contributors)
 
@@ -160,10 +161,10 @@ Private headers, e.g. those containing Intel(R) AVX-512 code should not be put i
 # Citing Intel HEXL
 To cite Intel HEXL, please use the following BibTeX entry.
 
-### Version 1.1.1
+### Version 1.1
 ```tex
     @misc{IntelHEXL,
-        title = {{I}ntel {HEXL} (release 1.1.1)},
+        title = {{I}ntel {HEXL} (release 1.1)},
         howpublished = {\url{https://arxiv.org/abs/2103.16400}},
         month = mar,
         year = 2021,
@@ -180,6 +181,7 @@ The Intel contributors to this project, sorted by last name, are
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
   - [Sergey Ivanov](https://www.linkedin.com/in/sergey-ivanov-451b72195/)
+  - [Akshaya Jagannadharao](https://www.linkedin.com/in/akshaya-jagannadharao/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
