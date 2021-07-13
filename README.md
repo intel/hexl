@@ -22,7 +22,6 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
     - [Version 1.1](#version-11)
     - [Version 1.0](#version-10)
 - [Contributors](#contributors)
->>>>>>> f39b141c... Fboemer/update contributors
 
 ## Introduction
 Many cryptographic applications, particularly homomorphic encryption (HE), rely on integer polynomial arithmetic in a finite field. HE, which enables computation on encrypted data, typically uses polynomials with degree `N` a power of two roughly in the range `N=[2^{10}, 2^{17}]`. The coefficients of these polynomials are in a finite field with a word-sized prime, `q`, up to `q`~62 bits. More precisely, the polynomials live in the ring `Z_q[X]/(X^N + 1)`. That is, when adding or multiplying two polynomials, each coefficient of the result is reduced by the prime modulus `q`. When multiplying two polynomials, the resulting polynomials of degree `2N` is additionally reduced by taking the remainder when dividing by `X^N+1`.
@@ -182,6 +181,7 @@ The Intel contributors to this project, sorted by last name, are
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
   - [Sergey Ivanov](https://www.linkedin.com/in/sergey-ivanov-451b72195/)
+  - [Akshaya Jagannadharao](https://www.linkedin.com/in/akshaya-jagannadharao/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
