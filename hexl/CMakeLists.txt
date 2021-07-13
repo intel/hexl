@@ -94,7 +94,7 @@ if (HEXL_SHARED_LIB)
 else ()
     # For static library, we include all the dependencies for Intel HEXL in
     # the libhexl.a.
-    # For proper export of IntelHEXLConfig.cmake / IntelHEXLTargts.cmake,
+    # For proper export of HEXLConfig.cmake / HEXLTargets.cmake,
     # we avoid explicitly linking dependencies via target_link_libraries, since
     # this would add dependencies to the exported hexl target.
     add_dependencies(hexl cpu_features)
@@ -163,3 +163,48 @@ else ()
 endif()
 
 install(TARGETS hexl DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+#------------------------------------------------------------------------------
+# Config export...
+#------------------------------------------------------------------------------
+
+# Config filenames
+set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLTargets.cmake)
+set(HEXL_CONFIG_IN_FILENAME ${HEXL_CMAKE_PATH}/HEXLConfig.cmake.in)
+set(HEXL_CONFIG_FILENAME ${HEXL_ROOT_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLConfig.cmake)
+set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLConfigVersion.cmake)
+set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/hexl-${HEXL_VERSION}/)
+
+# Create and install the CMake config and target file
+install(
+    EXPORT HEXLTargets
+    NAMESPACE HEXL::
+    DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
+)
+
+# Export version
+write_basic_package_version_file(
+  ${HEXL_CONFIG_VERSION_FILENAME}
+  VERSION ${HEXL_VERSION}
+  COMPATIBILITY ExactVersion)
+
+include(CMakePackageConfigHelpers)
+    configure_package_config_file(
+        ${HEXL_CONFIG_IN_FILENAME} ${HEXL_CONFIG_FILENAME}
+        INSTALL_DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
+    )
+
+install(
+    TARGETS hexl
+    EXPORT HEXLTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+install(FILES ${HEXL_CONFIG_FILENAME}
+              ${HEXL_CONFIG_VERSION_FILENAME}
+        DESTINATION ${HEXL_CONFIG_INSTALL_DIR})
+
+export(EXPORT HEXLTargets
+        FILE ${HEXL_TARGET_FILENAME})
