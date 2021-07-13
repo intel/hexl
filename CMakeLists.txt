@@ -92,6 +92,7 @@ if (HEXL_TREAT_WARNING_AS_ERROR)
   add_compile_options(-Werror)
 endif()
 
+set(HEXL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hexl)
 set(HEXL_INC_ROOT_DIR ${HEXL_SRC_ROOT_DIR}/include) # Public headers
 
@@ -174,51 +175,5 @@ endif()
 if (HEXL_DOCS)
   add_subdirectory(docs)
 endif()
-
-#------------------------------------------------------------------------------
-# Config export...
-#------------------------------------------------------------------------------
-# Config filenames
-set(HEXL_TARGET_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLTargets.cmake)
-set(HEXL_CONFIG_IN_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl/HEXLConfig.cmake.in)
-set(HEXL_CONFIG_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLConfig.cmake)
-set(HEXL_CONFIG_VERSION_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/cmake/hexl-${HEXL_VERSION}/HEXLConfigVersion.cmake)
-
-set(HEXL_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/hexl-${HEXL_VERSION}/)
-
-# Create and install the CMake config and target file
-install(
-    EXPORT HEXLTargets
-    NAMESPACE HEXL::
-    DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
-)
-
-# Export version
-write_basic_package_version_file(
-  ${HEXL_CONFIG_VERSION_FILENAME}
-  VERSION ${HEXL_VERSION}
-  COMPATIBILITY ExactVersion)
-
-include(CMakePackageConfigHelpers)
-    configure_package_config_file(
-        ${HEXL_CONFIG_IN_FILENAME} ${HEXL_CONFIG_FILENAME}
-        INSTALL_DESTINATION ${HEXL_CONFIG_INSTALL_DIR}
-    )
-
-install(
-    TARGETS hexl
-    EXPORT HEXLTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
-
-install(FILES ${HEXL_CONFIG_FILENAME}
-              ${HEXL_CONFIG_VERSION_FILENAME}
-        DESTINATION ${HEXL_CONFIG_INSTALL_DIR})
-
-export(EXPORT HEXLTargets
-        FILE ${HEXL_TARGET_FILENAME})
-
 
 add_custom_target(check COMMAND pre-commit install && pre-commit run --all-files)
