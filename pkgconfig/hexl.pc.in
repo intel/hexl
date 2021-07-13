@@ -1,0 +1,13 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include/hexl
+
+Name: Intel HEXL
+Version: @HEXL_VERSION@
+Description: Intel® HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields.
+
+Libs: -L${libdir} -lhexl
+Cflags: -I${includedir}

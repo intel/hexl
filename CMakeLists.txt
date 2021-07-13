@@ -132,10 +132,30 @@ message(STATUS "CMAKE_INSTALL_LIBDIR:     ${CMAKE_INSTALL_LIBDIR}")
 message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR}")
 message(STATUS "CMAKE_INSTALL_PREFIX:     ${CMAKE_INSTALL_PREFIX}")
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc.in ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc @ONLY)
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc)
+    install(
+        FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
+
 #------------------------------------------------------------------------------
 # Third-party code...
 #------------------------------------------------------------------------------
-add_subdirectory(cmake/third-party/cpu-features)
+find_package(CpuFeatures CONFIG)
+if (NOT CpuFeatures_FOUND)
+  message(STATUS "CpuFeatures: not found")
+  add_subdirectory(cmake/third-party/cpu-features)
+else()
+  message(STATUS "CpuFeatures: found")
+  add_library(cpu_features ALIAS CpuFeatures::cpu_features)
+  get_target_property(
+    CpuFeatures_INCLUDE_DIR
+    CpuFeatures::cpu_features
+    INTERFACE_INCLUDE_DIRECTORIES)
+endif()
+
 
 if (HEXL_TESTING OR HEXL_BENCHMARK OR HEXL_DEBUG)
   if(NOT TARGET Threads::Threads)
