@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
   intel::hexl::register_eltwise_fma_mod_benchmarks();
   intel::hexl::register_eltwise_cmp_add_benchmarks();
   intel::hexl::register_eltwise_cmp_sub_mod_benchmarks();
-  // intel::hexl::register_eltwise_mult_mod_benchmarks();
-  // intel::hexl::register_eltwise_sub_mod_benchmarks();
-  // intel::hexl::register_eltwise_reduce_mod_benchmarks();
+  intel::hexl::register_eltwise_mult_mod_benchmarks();
+  intel::hexl::register_eltwise_sub_mod_benchmarks();
+  intel::hexl::register_eltwise_reduce_mod_benchmarks();
   intel::hexl::register_ntt_benchmarks();
 
   benchmark::Initialize(&argc, argv);

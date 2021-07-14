@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -28,12 +29,6 @@ static void BM_EltwiseReduceModInPlace(benchmark::State& state) {  //  NOLINT
                      input_mod_factor, output_mod_factor);
   }
 }
-
-BENCHMARK(BM_EltwiseReduceModInPlace)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 
 //=================================================================
 
@@ -53,12 +48,6 @@ static void BM_EltwiseReduceModCopy(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseReduceModCopy)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 // state[0] is the degree
@@ -76,12 +65,6 @@ static void BM_EltwiseReduceModNative(benchmark::State& state) {  //  NOLINT
                            input_mod_factor, output_mod_factor);
   }
 }
-
-BENCHMARK(BM_EltwiseReduceModNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 
 //=================================================================
 
@@ -101,15 +84,41 @@ static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
                            input_mod_factor, output_mod_factor);
   }
 }
-
-BENCHMARK(BM_EltwiseReduceModAVX512)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 #endif
 
 //=================================================================
+
+void register_eltwise_reduce_mod_benchmarks() {
+  benchmark::RegisterBenchmark("BM_EltwiseReduceModInPlace",
+                               BM_EltwiseReduceModInPlace)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+  benchmark::RegisterBenchmark("BM_EltwiseReduceModCopy",
+                               BM_EltwiseReduceModCopy)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+  benchmark::RegisterBenchmark("BM_EltwiseReduceModNative",
+                               BM_EltwiseReduceModNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq) {
+    benchmark::RegisterBenchmark("BM_EltwiseReduceModAVX512",
+                                 BM_EltwiseReduceModAVX512)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+  }
+#endif  // HEXL_HAS_AVX512DQ
+}
 
 }  // namespace hexl
 }  // namespace intel
