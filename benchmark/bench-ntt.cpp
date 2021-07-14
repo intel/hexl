@@ -14,7 +14,6 @@
 #include "ntt/ntt-internal.hpp"
 #include "util/cpu-features.hpp"
 
-
 namespace intel {
 namespace hexl {
 
@@ -278,25 +277,21 @@ static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
 void register_ntt_benchmarks() {
   benchmark::RegisterBenchmark("BM_FwdNTTNative", BM_FwdNTTNative)
       ->Unit(benchmark::kMicrosecond)
-      ->MinTime(1.0)
       ->Args({1024})
       ->Args({4096})
       ->Args({16384});
   benchmark::RegisterBenchmark("BM_FwdNTTInPlace", BM_FwdNTTInPlace)
       ->Unit(benchmark::kMicrosecond)
-      ->MinTime(1.0)
       ->Args({1024})
       ->Args({4096})
       ->Args({16384});
   benchmark::RegisterBenchmark("BM_FwdNTTCopy", BM_FwdNTTCopy)
       ->Unit(benchmark::kMicrosecond)
-      ->MinTime(1.0)
       ->Args({1024})
       ->Args({4096})
       ->Args({16384});
   benchmark::RegisterBenchmark("BM_InvNTTNative", BM_InvNTTNative)
       ->Unit(benchmark::kMicrosecond)
-      ->MinTime(1.0)
       ->Args({1024})
       ->Args({4096})
       ->Args({16384});
@@ -305,7 +300,6 @@ void register_ntt_benchmarks() {
   if (has_avx512dq) {
     benchmark::RegisterBenchmark("BM_FwdNTT_AVX512DQ_32", BM_FwdNTT_AVX512DQ_32)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024, 1})
         ->Args({1024, 4})
         ->Args({4096, 1})
@@ -314,7 +308,6 @@ void register_ntt_benchmarks() {
         ->Args({16384, 4});
     benchmark::RegisterBenchmark("BM_FwdNTT_AVX512DQ_64", BM_FwdNTT_AVX512DQ_64)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024, 1})
         ->Args({1024, 4})
         ->Args({4096, 1})
@@ -323,7 +316,6 @@ void register_ntt_benchmarks() {
         ->Args({16384, 4});
     benchmark::RegisterBenchmark("BM_InvNTT_AVX512DQ_32", BM_InvNTT_AVX512DQ_32)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024, 1})
         ->Args({1024, 2})
         ->Args({4096, 1})
@@ -332,7 +324,6 @@ void register_ntt_benchmarks() {
         ->Args({16384, 2});
     benchmark::RegisterBenchmark("BM_InvNTT_AVX512DQ_64", BM_InvNTT_AVX512DQ_64)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024, 1})
         ->Args({1024, 2})
         ->Args({4096, 1})
@@ -346,34 +337,29 @@ void register_ntt_benchmarks() {
   if (has_avx512ifma) {
     benchmark::RegisterBenchmark("BM_FwdNTT_AVX512IFMA", BM_FwdNTT_AVX512IFMA)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024})
         ->Args({4096})
         ->Args({16384});
     benchmark::RegisterBenchmark("BM_FwdNTT_AVX512IFMALazy",
                                  BM_FwdNTT_AVX512IFMALazy)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024})
         ->Args({4096})
         ->Args({16384});
     benchmark::RegisterBenchmark("BM_InvNTT_AVX512IFMA", BM_InvNTT_AVX512IFMA)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024})
         ->Args({4096})
         ->Args({16384});
     benchmark::RegisterBenchmark("BM_InvNTT_AVX512IFMALazy",
                                  BM_InvNTT_AVX512IFMALazy)
         ->Unit(benchmark::kMicrosecond)
-        ->MinTime(1.0)
         ->Args({1024})
         ->Args({4096})
         ->Args({16384});
   }
 #endif
 }
-
 
 }  // namespace hexl
 }  // namespace intel
