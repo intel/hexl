@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "hexl/util/util.hpp"
 
 namespace intel {

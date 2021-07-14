@@ -1,7 +1,7 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set(SRC
+set(NATIVE_SRC
     eltwise/eltwise-mult-mod.cpp
     eltwise/eltwise-reduce-mod.cpp
     eltwise/eltwise-sub-mod.cpp
@@ -14,10 +14,12 @@ set(SRC
 )
 
 if (HEXL_HAS_AVX512DQ)
-    list(APPEND SRC
+    set(AVX512_SRC
         eltwise/eltwise-mult-mod-avx512.cpp
         eltwise/eltwise-reduce-mod-avx512.cpp
         eltwise/eltwise-add-mod-avx512.cpp
+        eltwise/eltwise-cmp-sub-mod-avx512.cpp
+        eltwise/eltwise-cmp-add-avx512.cpp
         eltwise/eltwise-sub-mod-avx512.cpp
         eltwise/eltwise-fma-mod-avx512.cpp
         ntt/fwd-ntt-avx512.cpp
@@ -25,14 +27,16 @@ if (HEXL_HAS_AVX512DQ)
     )
 endif()
 
+set(HEXL_SRC "${NATIVE_SRC};${AVX512_SRC}")
+
 if (HEXL_DEBUG)
-    list(APPEND SRC logging/logging.cpp)
+    list(APPEND HEXL_SRC logging/logging.cpp)
 endif()
 
 if (HEXL_SHARED_LIB)
-    add_library(hexl SHARED ${SRC})
+    add_library(hexl SHARED ${HEXL_SRC})
 else()
-     add_library(hexl STATIC ${SRC})
+     add_library(hexl STATIC ${HEXL_SRC})
 endif()
 add_library(HEXL::hexl ALIAS hexl)
 
