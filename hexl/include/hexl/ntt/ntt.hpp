@@ -188,7 +188,7 @@ class NTT {
   }
 
   /// @brief Maximum power of 2 in degree
-  static const size_t s_max_degree_bits{20};
+  static size_t MaxDegreeBits() { return 20; }
 
   /// @brief Maximum number of bits in modulus;
   static const size_t s_max_modulus_bits{62};

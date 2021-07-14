@@ -162,6 +162,9 @@ TEST(EltwiseMultMod, 8big3) {
 }
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseMultMod, avx512_small) {
+  if (!has_avx512dq) {
+    return;
+  }
   std::vector<uint64_t> op1{1, 2, 3, 1, 1, 1, 0, 1, 0};
   std::vector<uint64_t> op2{1, 1, 1, 1, 2, 3, 1, 0, 0};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -175,6 +178,9 @@ TEST(EltwiseMultMod, avx512_small) {
 }
 
 TEST(EltwiseMultMod, avx512_int2) {
+  if (!has_avx512dq) {
+    return;
+  }
   uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 3, 1, 1, 1, 1, 1, 1, 1};
@@ -241,6 +247,9 @@ TEST(EltwiseMultMod, 9) {
 
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseMultMod, Big) {
+  if (!has_avx512dq) {
+    return;
+  }
   uint64_t modulus = 1125891450734593;
 
   std::vector<uint64_t> op1{706712574074152, 943467560561867, 1115920708919443,
@@ -262,6 +271,10 @@ TEST(EltwiseMultMod, Big) {
 }
 
 TEST(EltwiseMultMod, AVX512Int) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -296,6 +309,10 @@ TEST(EltwiseMultMod, AVX512Int) {
 // Checks AVX512 and native eltwise mult Out-of-Place implementations match
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseMultMod, AVX512Big) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 

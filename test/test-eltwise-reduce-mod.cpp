@@ -84,6 +84,10 @@ TEST(EltwiseReduceMod, 4_2) {
 
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseReduceMod, avx512_0_1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> op{0, 111, 250, 340, 769, 900, 1200, 1530};
   std::vector<uint64_t> exp_out{0, 111, 250, 340, 0, 131, 431, 761};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
@@ -97,6 +101,10 @@ TEST(EltwiseReduceMod, avx512_0_1) {
 }
 
 TEST(EltwiseReduceMod, avx512_2_1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> op{0, 54, 100, 135, 201, 18, 148, 168, 201};
   std::vector<uint64_t> exp_out{0, 54, 100, 34, 100, 18, 47, 67, 100};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -110,6 +118,10 @@ TEST(EltwiseReduceMod, avx512_2_1) {
 }
 
 TEST(EltwiseReduceMod, avx512_4_1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> op{0, 54, 100, 135, 201, 220, 350, 370, 403};
   std::vector<uint64_t> exp_out{0, 54, 100, 34, 100, 18, 47, 67, 100};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -123,6 +135,10 @@ TEST(EltwiseReduceMod, avx512_4_1) {
 }
 
 TEST(EltwiseReduceMod, avx512_4_2) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> op{0, 54, 100, 135, 201, 220, 350, 370, 403};
   std::vector<uint64_t> exp_out{0, 54, 100, 135, 201, 18, 148, 168, 201};
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -138,6 +154,10 @@ TEST(EltwiseReduceMod, avx512_4_2) {
 // Checks AVX512 and native EltwiseReduceMod implementations match with randomly
 // generated inputs
 TEST(EltwiseReduceMod, AVX512Big_0_1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -173,6 +193,10 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
 }
 
 TEST(EltwiseReduceMod, AVX512Big_4_1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -208,6 +232,10 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
 }
 
 TEST(EltwiseReduceMod, AVX512Big_4_2) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -243,6 +271,10 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
 }
 
 TEST(EltwiseReduceMod, AVX512Big_2_1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 

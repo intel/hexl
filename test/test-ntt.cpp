@@ -486,6 +486,10 @@ INSTANTIATE_TEST_SUITE_P(NTTModulusTest, NTTModulusTest,
 
 #ifdef HEXL_HAS_AVX512DQ
 TEST(NTT, LoadFwdInterleavedT1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
@@ -500,6 +504,10 @@ TEST(NTT, LoadFwdInterleavedT1) {
 }
 
 TEST(NTT, LoadInvInterleavedT1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
@@ -514,6 +522,10 @@ TEST(NTT, LoadInvInterleavedT1) {
 }
 
 TEST(NTT, LoadFwdInterleavedT2) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
@@ -528,6 +540,10 @@ TEST(NTT, LoadFwdInterleavedT2) {
 }
 
 TEST(NTT, LoadInvInterleavedT2) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
@@ -542,6 +558,10 @@ TEST(NTT, LoadInvInterleavedT2) {
 }
 
 TEST(NTT, LoadFwdInterleavedT4) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
@@ -556,6 +576,10 @@ TEST(NTT, LoadFwdInterleavedT4) {
 }
 
 TEST(NTT, LoadInvInterleavedT4) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
@@ -570,6 +594,10 @@ TEST(NTT, LoadInvInterleavedT4) {
 }
 
 TEST(NTT, WriteFwdInterleavedT1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i arg1 = _mm512_set_epi64(15, 14, 13, 12, 11, 10, 9, 8);
@@ -585,6 +613,10 @@ TEST(NTT, WriteFwdInterleavedT1) {
 }
 
 TEST(NTT, WriteInvInterleavedT4) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
                             8, 9, 10, 11, 12, 13, 14, 15};
   __m512i arg1 = _mm512_set_epi64(15, 14, 13, 12, 11, 10, 9, 8);

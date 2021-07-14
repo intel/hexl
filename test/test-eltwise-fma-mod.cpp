@@ -99,6 +99,10 @@ TEST(EltwiseFMAMod, mult_input_mod_factor) {
 
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseFMAMod, avx512_small) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t arg2 = 2;
   std::vector<uint64_t> arg3{1, 1, 1, 1, 2, 3, 1, 0};
@@ -112,6 +116,10 @@ TEST(EltwiseFMAMod, avx512_small) {
 }
 
 TEST(EltwiseFMAMod, avx512_small2) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t arg2 = 17;
   std::vector<uint64_t> arg3{9, 10, 11, 12, 13, 14, 15, 16};
@@ -126,6 +134,10 @@ TEST(EltwiseFMAMod, avx512_small2) {
 }
 
 TEST(EltwiseFMAMod, avx512_mult1) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg1{1, 2,  3,  4,  5,  6,  7,  8,
                              9, 10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -143,6 +155,10 @@ TEST(EltwiseFMAMod, avx512_mult1) {
 }
 
 TEST(EltwiseFMAMod, avx512_mult2) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg1{102, 2,  3,  4,  5,  6,  7,  8,
                              9,   10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -160,6 +176,10 @@ TEST(EltwiseFMAMod, avx512_mult2) {
 }
 
 TEST(EltwiseFMAMod, avx512_mult4) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg1{400, 2,  3,  4,  5,  6,  7,  8,
                              9,   10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -177,6 +197,10 @@ TEST(EltwiseFMAMod, avx512_mult4) {
 }
 
 TEST(EltwiseFMAMod, avx512_mult8) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> arg1{800, 2,  3,  4,  5,  6,  7,  8,
                              9,   10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -197,6 +221,10 @@ TEST(EltwiseFMAMod, avx512_mult8) {
 // Check AVX512DQ and native eltwise FMA implementations match
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseFMAMod, AVX512DQ) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   uint64_t length = 1031;
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -270,6 +298,10 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 // Checks AVX512IFMA and native eltwise FMA implementations match
 #ifdef HEXL_HAS_AVX512IFMA
 TEST(EltwiseFMAMod, AVX512) {
+  if (!has_avx512ifma) {
+    return;
+  }
+
   uint64_t length = 1024;
   std::random_device rd;
   std::mt19937 gen(rd());

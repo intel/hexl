@@ -83,6 +83,10 @@ INSTANTIATE_TEST_SUITE_P(
 // Checks AVX512 and native implementations match
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseCmpAdd, AVX512) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   uint64_t length = 1025;
   std::random_device rd;
   std::mt19937 gen(rd());

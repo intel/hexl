@@ -112,6 +112,10 @@ TEST(EltwiseSubMod, vector_scalar_native_big) {
 
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseSubMod, vector_vector_avx512_small) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint64_t> op2{1, 3, 5, 7, 9, 2, 4, 6};
   std::vector<uint64_t> exp_out{0, 9, 8, 7, 6, 4, 3, 2};
@@ -122,6 +126,10 @@ TEST(EltwiseSubMod, vector_vector_avx512_small) {
 }
 
 TEST(EltwiseSubMod, vector_scalar_avx512_small) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t op2{3};
   std::vector<uint64_t> exp_out{8, 9, 0, 1, 2, 3, 4, 5};
@@ -132,6 +140,10 @@ TEST(EltwiseSubMod, vector_scalar_avx512_small) {
 }
 
 TEST(EltwiseSubMod, vector_vector_avx512_big) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
 
   std::vector<uint64_t> op1{0,           1,           2,           3,
@@ -147,6 +159,10 @@ TEST(EltwiseSubMod, vector_vector_avx512_big) {
 }
 
 TEST(EltwiseSubMod, vector_scalar_avx512_big) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
 
   std::vector<uint64_t> op1{0,           1,           2,           3,
@@ -164,6 +180,10 @@ TEST(EltwiseSubMod, vector_scalar_avx512_big) {
 // Checks AVX512 and native eltwise implementations match
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseSubMod, vector_vector_avx512_native_match) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -205,6 +225,10 @@ TEST(EltwiseSubMod, vector_vector_avx512_native_match) {
 }
 
 TEST(EltwiseSubMod, vector_scalar_avx512_native_match) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   std::random_device rd;
   std::mt19937 gen(rd());
 
