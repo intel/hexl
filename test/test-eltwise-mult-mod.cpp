@@ -184,7 +184,6 @@ TEST(EltwiseMultMod, avx512_int2) {
 
   EltwiseMultModAVX512Int<2>(result.data(), op1.data(), op2.data(), op1.size(),
                              modulus);
-
   CheckEqual(result, exp_out);
 }
 

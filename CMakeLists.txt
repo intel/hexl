@@ -105,6 +105,24 @@ message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 #------------------------------------------------------------------------------
 # Set AVX flags
 #------------------------------------------------------------------------------
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(HEXL_MARCH_FLAGS "/arch:AVX512")
+else()
+    set(HEXL_MARCH_FLAGS -march=x86-64 -mavx512f -mavx512dq -mavx512bw)
+
+    if (HEXL_USE_CLANG AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+      set(HEXL_MARCH_FLAGS ${HEXL_MARCH_FLAGS} -mavx512ifma -mavx512vbmi2)
+    endif()
+    if (HEXL_USE_GNU AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+      set(HEXL_MARCH_FLAGS ${HEXL_MARCH_FLAGS} -mavx512ifma -mavx512vbmi2)
+    endif()
+    if (HEXL_USE_MSVC)
+      set(HEXL_MARCH_FLAGS ${HEXL_MARCH_FLAGS} -mavx512ifma -mavx512vbmi2)
+    endif()
+endif()
+
+
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)

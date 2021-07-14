@@ -298,6 +298,7 @@ void EltwiseMultModAVX512IntLoopDefault(__m512i* vp_result,
 
     __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
     __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+
     __m512i c1 = _mm512_hexl_shrdi_epi64<BitShift - 1>(vprod_lo, vprod_hi);
     __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
     __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);

@@ -13,6 +13,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -296,13 +297,15 @@ TEST(EltwiseFMAMod, AVX512) {
       EltwiseFMAMod(arg1.data(), arg1.data(), arg2, arg3_data, arg1.size(),
                     modulus, input_mod_factor);
 
-      EltwiseFMAModAVX512<52, input_mod_factor>(
-          arg1a.data(), arg1a.data(), arg2, arg3_data, arg1.size(), modulus);
+      if (has_avx512ifma) {
+        EltwiseFMAModAVX512<52, input_mod_factor>(
+            arg1a.data(), arg1a.data(), arg2, arg3_data, arg1.size(), modulus);
+        ASSERT_EQ(arg1, arg1a);
+      }
 
       EltwiseFMAModAVX512<64, input_mod_factor>(
           arg1b.data(), arg1b.data(), arg2, arg3_data, arg1.size(), modulus);
 
-      ASSERT_EQ(arg1, arg1a);
       ASSERT_EQ(arg1, arg1b);
     }
   }

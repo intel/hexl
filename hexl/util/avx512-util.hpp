@@ -10,6 +10,8 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/util.hpp"
+#include "util/cpu-features.hpp"
+
 
 namespace intel {
 namespace hexl {
@@ -317,7 +319,9 @@ inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y,
 template <int BitShift>
 inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y) {
 #ifdef HEXL_HAS_AVX512VBMI2
+if (has_avx512vbmi2) {
   return _mm512_shrdi_epi64(x, y, BitShift);
+}
 #endif
   return _mm512_hexl_shrdi_epi64(x, y, BitShift);
 }

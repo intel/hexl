@@ -25,6 +25,9 @@ if (HEXL_HAS_AVX512DQ)
     )
 endif()
 
+SET_SOURCE_FILES_PROPERTIES(number-theory/number-theory.cpp PROPERTIES COMPILE_FLAGS -O0)
+
+
 if (HEXL_DEBUG)
     list(APPEND SRC logging/logging.cpp)
 endif()
@@ -56,7 +59,7 @@ target_include_directories(hexl
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
-        -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer
+        -Wno-unknown-pragmas -fomit-frame-pointer ${HEXL_MARCH_FLAGS} -O3
     )
     # Avoid 3rd-party dependency warnings when including HEXL as a dependency
     target_compile_options(hexl PUBLIC

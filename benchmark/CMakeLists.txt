@@ -3,13 +3,13 @@
 
 set(SRC main.cpp
     bench-ntt.cpp
-    bench-eltwise-add-mod.cpp
-    bench-eltwise-cmp-add.cpp
-    bench-eltwise-cmp-sub-mod.cpp
-    bench-eltwise-fma-mod.cpp
-    bench-eltwise-mult-mod.cpp
-    bench-eltwise-sub-mod.cpp
-    bench-eltwise-reduce-mod.cpp
+    # bench-eltwise-add-mod.cpp
+    # bench-eltwise-cmp-add.cpp
+    # bench-eltwise-cmp-sub-mod.cpp
+    # bench-eltwise-fma-mod.cpp
+    # bench-eltwise-mult-mod.cpp
+    # bench-eltwise-sub-mod.cpp
+    # bench-eltwise-reduce-mod.cpp
     )
 
 add_executable(bench_hexl ${SRC})
@@ -19,13 +19,13 @@ target_include_directories(bench_hexl PRIVATE
     ${HEXL_SRC_ROOT_DIR} # Private headers
     )
 
-target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads)
+target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads cpu_features)
 if (HEXL_DEBUG)
     target_link_libraries(bench_hexl PRIVATE easyloggingpp)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -march=native -O3)
+    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -O3 ${HEXL_MARCH_FLAGS})
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(bench_hexl PRIVATE /Wall /W4 /Zc:preprocessor)
 endif()

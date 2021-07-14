@@ -10,6 +10,8 @@
 #include "gtest/gtest.h"
 #include "test-util.hpp"
 #include "util/avx512-util.hpp"
+#include "util/cpu-features.hpp"
+
 
 namespace intel {
 namespace hexl {
@@ -37,6 +39,9 @@ TEST(AVX512, ExtractDoubleValues) {
 
 #ifdef HEXL_HAS_AVX512IFMA
 TEST(AVX512, _mm512_hexl_mulhi_epi52) {
+  if (!has_avx512ifma)  {
+    return;
+  }
   __m512i w = _mm512_set_epi64(90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991);
