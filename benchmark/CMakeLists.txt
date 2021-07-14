@@ -3,13 +3,13 @@
 
 set(SRC main.cpp
     bench-ntt.cpp
-    # bench-eltwise-add-mod.cpp
-    # bench-eltwise-cmp-add.cpp
-    # bench-eltwise-cmp-sub-mod.cpp
-    # bench-eltwise-fma-mod.cpp
-    # bench-eltwise-mult-mod.cpp
-    # bench-eltwise-sub-mod.cpp
-    # bench-eltwise-reduce-mod.cpp
+    bench-eltwise-add-mod.cpp
+    bench-eltwise-cmp-add.cpp
+    bench-eltwise-cmp-sub-mod.cpp
+    bench-eltwise-fma-mod.cpp
+    bench-eltwise-mult-mod.cpp
+    bench-eltwise-sub-mod.cpp
+    bench-eltwise-reduce-mod.cpp
     )
 
 add_executable(bench_hexl ${SRC})
@@ -25,7 +25,7 @@ if (HEXL_DEBUG)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -O3 ${HEXL_MARCH_FLAGS})
+    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -O3) # ${HEXL_MARCH_FLAGS})
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(bench_hexl PRIVATE /Wall /W4 /Zc:preprocessor)
 endif()

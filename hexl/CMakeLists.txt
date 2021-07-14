@@ -1,7 +1,7 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set(SRC
+set(NATIVE_SRC
     eltwise/eltwise-mult-mod.cpp
     eltwise/eltwise-reduce-mod.cpp
     eltwise/eltwise-sub-mod.cpp
@@ -13,20 +13,26 @@ set(SRC
     number-theory/number-theory.cpp
 )
 
+set_source_files_properties(${NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
+
 if (HEXL_HAS_AVX512DQ)
-    list(APPEND SRC
+    set(AVX512_SRC
         eltwise/eltwise-mult-mod-avx512.cpp
         eltwise/eltwise-reduce-mod-avx512.cpp
         eltwise/eltwise-add-mod-avx512.cpp
+        eltwise/eltwise-cmp-sub-mod-avx512.cpp
+        eltwise/eltwise-cmp-add-avx512.cpp
         eltwise/eltwise-sub-mod-avx512.cpp
         eltwise/eltwise-fma-mod-avx512.cpp
         ntt/fwd-ntt-avx512.cpp
         ntt/inv-ntt-avx512.cpp
     )
+    set_source_files_properties(${AVX512_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
 endif()
 
-SET_SOURCE_FILES_PROPERTIES(number-theory/number-theory.cpp PROPERTIES COMPILE_FLAGS -O0)
-
+set(SRC "${NATIVE_SRC};${AVX512_SRC}")
+message("SRC ${SRC}")
+message("NATIVE_SRC ${NATIVE_SRC}")
 
 if (HEXL_DEBUG)
     list(APPEND SRC logging/logging.cpp)
@@ -59,7 +65,7 @@ target_include_directories(hexl
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
-        -Wno-unknown-pragmas -fomit-frame-pointer ${HEXL_MARCH_FLAGS} -O3
+        -Wno-unknown-pragmas -fomit-frame-pointer
     )
     # Avoid 3rd-party dependency warnings when including HEXL as a dependency
     target_compile_options(hexl PUBLIC

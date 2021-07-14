@@ -17,8 +17,12 @@ set(SRC main.cpp
 
 add_executable(unit-test ${SRC})
 
+set_source_files_properties(${SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
+
+message("HEXL_MARCH_FLAGS ${HEXL_MARCH_FLAGS}")
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(unit-test PRIVATE -Wall -Wextra ${HEXL_MARCH_FLAGS})
+    target_compile_options(unit-test PRIVATE -Wall -Wextra) # ${HEXL_MARCH_FLAGS})
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Workaround for unresolved symbols, shouldn't be needed
     if (HEXL_DEBUG)
