@@ -17,6 +17,8 @@ on:
 env:
   HEXL_VER: 1.1.1
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
+  ICELAKE_CMAKE_TOOLCHAIN_FILE: >
+      -DCMAKE_TOOLCHAIN_FILE=/home/github-ci/vcpkg/scripts/buildsystems/vcpkg.cmake
   DEFAULT_EXAMPLE_FLAGS: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   DEFAULT_COMPILER_FLAGS: >
@@ -98,15 +100,16 @@ jobs:
           cmake --install build
 
           # Build example
-          cd example;
+          cd example/cmake;
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-
           cmake --build build -j4
-          cd ..
 
-          # Run tests and example
+          # Run example
+          build/example
+          cd ../..
+
+          # Run tests
           build/test/unit-test
-          example/build/example
           set +x
 
   shared-build:
@@ -139,7 +142,7 @@ jobs:
           cmake --install build
 
           # Build and run example
-          cd example;
+          cd example/cmake;
           cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
@@ -179,7 +182,7 @@ jobs:
           build/test/unit-test
 
           # Build and run example
-          cd example;
+          cd example/cmake;
           cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
@@ -298,15 +301,33 @@ jobs:
           cmake --install build
 
           # Build example
-          cd example;
+          cd example/cmake;
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-
           cmake --build build -j4
-          cd ..
 
-          # Run tests and example
+          # Run example
+          build/example
+
+          # Build example using pkg-config
+          cd ../pkg-config;
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build build -j4
+
+          # Run example
+          build/example
+
+          # Build example using vcpkg
+          cd ../vcpkg;
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }} ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
+          cmake --build build -j4
+
+          # Run example
+          build/example
+
+          cd ../..
+
+          # Run tests
           build/test/unit-test
-          example/build/example
           set +x
 
   shared-build-icelake:
@@ -339,7 +360,7 @@ jobs:
           cmake --install build
 
           # Build and run example
-          cd example;
+          cd example/cmake;
           cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
@@ -376,7 +397,7 @@ jobs:
           build/test/unit-test
 
           # Build and run example
-          cd example;
+          cd example/cmake;
           cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example

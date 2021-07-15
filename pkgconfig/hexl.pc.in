@@ -3,7 +3,7 @@
 
 prefix=@CMAKE_INSTALL_PREFIX@
 libdir=${prefix}/lib
-includedir=${prefix}/include/hexl
+includedir=${prefix}/include
 
 Name: Intel HEXL
 Version: @HEXL_VERSION@

@@ -101,10 +101,10 @@ else ()
     # we avoid explicitly linking dependencies via target_link_libraries, since
     # this would add dependencies to the exported hexl target.
 
-    if (NOT CpuFeatures_FOUND)
-        add_dependencies(hexl cpu_features)
+    if (CpuFeatures_FOUND)
+      target_link_libraries(hexl PRIVATE cpu_features)
     else()
-        target_link_libraries(hexl PRIVATE cpu_features)
+      add_dependencies(hexl cpu_features)
     endif()
 
     if (HEXL_DEBUG)

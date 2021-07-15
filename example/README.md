@@ -5,7 +5,7 @@ To use Intel HEXL in an external application, you can use one of the three provi
 * Install Intel HEXL. Then, in your external application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
-find_package(HEXL 1.1.0
+find_package(HEXL 1.1.1
     HINTS ${HEXL_HINT_DIR}
     REQUIRED)
 target_link_libraries(<your target> HEXL::hexl)
@@ -25,4 +25,4 @@ target_link_libraries(<your target> PkgConfig::HEXL)
 find_package(HEXL CONFIG REQUIRED)
 target_link_libraries(<your target> HEXL::hexl)
 ```
-If Intel HEXL is installed globally, `HEXL_HINT_DIR` is not needed. Otherwise, `HEXL_HINT_DIR` should be the directory containing  `HEXLConfig.cmake`, e.g. `${CMAKE_INSTALL_PREFIX}/lib/cmake/hexl-1.1.0/`
+If Intel HEXL is installed globally, `HEXL_HINT_DIR` is not needed. Otherwise, `HEXL_HINT_DIR` should be the directory containing  `HEXLConfig.cmake`, e.g. `${CMAKE_INSTALL_PREFIX}/lib/cmake/hexl-1.1.1/`
