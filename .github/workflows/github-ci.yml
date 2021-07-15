@@ -314,8 +314,7 @@ jobs:
           # Build example using pkg-config
           cd ../pkg-config;
           export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          echo $PKG_CONFIG_PATH
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake -S . -B build
           cmake --build build -j4
 
           # Run example
@@ -323,7 +322,7 @@ jobs:
 
           # Build example using vcpkg
           cd ../vcpkg;
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }} ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
+          cmake -S . -B build ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
           cmake --build build -j4
 
           # Run example
