@@ -335,7 +335,7 @@ jobs:
 
   shared-build-icelake:
     name: Shared build and test (IceLake)
-    needs: [format-icelake]
+    needs: [format-icelake, default-build-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
@@ -371,7 +371,7 @@ jobs:
 
   debug-build-icelake:
     name: Debug build and test (IceLake)
-    needs: [format-icelake]
+    needs: [format-icelake, default-build-icelake, shared-build-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
@@ -408,7 +408,7 @@ jobs:
 
   coverage-build-icelake:
     name: Coverage build, test, and benchmark (IceLake)
-    needs: [format-icelake]
+    needs: [format-icelake, default-build-icelake, shared-build-icelake, debug-build-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
