@@ -1,10 +1,11 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include "eltwise/eltwise-cmp-add-avx512.hpp"
+
 #include <immintrin.h>
 #include <stdint.h>
 
-#include "eltwise/eltwise-cmp-add-avx512.hpp"
 #include "eltwise/eltwise-cmp-add-internal.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/util.hpp"

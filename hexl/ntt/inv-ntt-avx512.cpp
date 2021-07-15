@@ -1,8 +1,9 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "hexl/ntt/ntt.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
+
+#include "hexl/ntt/ntt.hpp"
 
 namespace intel {
 namespace hexl {

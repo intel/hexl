@@ -1,10 +1,11 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include "eltwise/eltwise-mult-mod-avx512.hpp"
+
 #include <immintrin.h>
 #include <stdint.h>
 
-#include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/number-theory/number-theory.hpp"
