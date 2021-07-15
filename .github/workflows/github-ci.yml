@@ -292,8 +292,8 @@ jobs:
           cmake --version
           pwd
           ls
-          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          echo $PKG_CONFIG_PATH
+          # export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+          # echo $PKG_CONFIG_PATH
 
       - name: Default Build
         run: |
@@ -313,6 +313,8 @@ jobs:
 
           # Build example using pkg-config
           cd ../pkg-config;
+          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+          echo $PKG_CONFIG_PATH
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
 
