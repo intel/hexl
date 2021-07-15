@@ -15,8 +15,6 @@ include(CMakeFindDependencyMacro)
 find_package(CpuFeatures CONFIG)
 if(NOT CpuFeatures_FOUND)
     message(WARNING "Could not find dependency `CpuFeatures` required by this configuration")
-#     set(HEXL_FOUND FALSE)
-#     return()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/HEXLTargets.cmake)
