@@ -491,7 +491,7 @@ bool CheckNTTArguments(uint64_t degree, uint64_t modulus) {
   (void)modulus;
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
-  HEXL_CHECK(degree <= (1 << NTT::MaxDegreeBits()),
+  HEXL_CHECK(degree <= (1ULL << NTT::MaxDegreeBits()),
              "degree should be less than 2^" << NTT::MaxDegreeBits() << " got "
                                              << degree);
 

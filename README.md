@@ -64,14 +64,15 @@ For best performance, we recommend using a processor with AVX512-IFMA52 support,
 In addition to the standard CMake build options, Intel HEXL supports several compile-time flags to configure the build.
 For convenience, they are listed below:
 
-| CMake option                     | Values                 |                                                                          |
-| ---------------------------------| ---------------------- | ------------------------------------------------------------------------ |
-| HEXL_BENCHMARK                | ON / OFF (default ON)  | Set to ON to enable benchmark suite via Google benchmark                 |
-| HEXL_COVERAGE                 | ON / OFF (default OFF) | Set to ON to enable coverage report of unit-tests                        |
-| HEXL_DOCS                     | ON / OFF (default OFF) | Set to ON to enable building of documentation                            |
-| HEXL_SHARED_LIB               | ON / OFF (default OFF) | Set to ON to enable building shared library                              |
-| HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                               |
-| HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
+| CMake option                  | Values                 |                                                                                                           |
+| ------------------------------| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| HEXL_BENCHMARK                | ON / OFF (default ON)  | Set to ON to enable benchmark suite via Google benchmark                                                  |
+| HEXL_COVERAGE                 | ON / OFF (default OFF) | Set to ON to enable coverage report of unit-tests                                                         |
+| HEXL_DOCS                     | ON / OFF (default OFF) | Set to ON to enable building of documentation                                                             |
+| HEXL_NATIVE_MARCH             | ON / OFF (default OFF) | Set to ON to enable `-march=native` flag for faster native kernels; will break binary compatibility       |
+| HEXL_SHARED_LIB               | ON / OFF (default OFF) | Set to ON to enable building shared library                                                               |
+| HEXL_TESTING                  | ON / OFF (default ON)  | Set to ON to enable building of unit-tests                                                                |
+| HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                                                  |
 
 ### Compiling Intel HEXL
 The instructions to build Intel HEXL are common between Linux, MacOS, and Windows.

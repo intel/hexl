@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {

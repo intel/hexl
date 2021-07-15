@@ -13,6 +13,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
+#include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
 #include "test-util.hpp"
 #include "util/cpu-features.hpp"

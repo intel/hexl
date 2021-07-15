@@ -8,7 +8,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
-#include "util/avx512-util.hpp"
+#include "hexl/util/util.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"
 

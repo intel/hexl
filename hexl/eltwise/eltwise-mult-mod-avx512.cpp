@@ -6,10 +6,13 @@
 #include <immintrin.h>
 #include <stdint.h>
 
+#include <limits>
+
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
+#include "hexl/util/compiler.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
