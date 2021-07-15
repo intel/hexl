@@ -311,6 +311,8 @@ jobs:
 
           # Build example using pkg-config
           cd ../pkg-config;
+          # Test, will be removed
+          echo $PKG_CONFIG_PATH
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
 
