@@ -65,7 +65,7 @@ target_include_directories(hexl
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
-        -Wno-unknown-pragmas -fomit-frame-pointer
+        -Wno-unknown-pragmas -fomit-frame-pointer -O3
     )
     # Avoid 3rd-party dependency warnings when including HEXL as a dependency
     target_compile_options(hexl PUBLIC
