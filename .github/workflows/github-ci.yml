@@ -169,6 +169,7 @@ jobs:
           cmake --version
           pwd
           ls
+          export PKG_CONFIG_PATH=/home/github-ci/actions-runner-hexl2/_work/hexl/hexl/lib/pkgconfig
           echo $PKG_CONFIG_PATH
 
       - name: Debug Build
