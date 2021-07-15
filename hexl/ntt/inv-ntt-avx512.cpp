@@ -3,7 +3,17 @@
 
 #include "ntt/inv-ntt-avx512.hpp"
 
+#include <immintrin.h>
+
+#include <functional>
+#include <vector>
+
+#include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
+#include "hexl/number-theory/number-theory.hpp"
+#include "ntt/ntt-avx512-util.hpp"
+#include "ntt/ntt-internal.hpp"
+#include "util/avx512-util.hpp"
 
 namespace intel {
 namespace hexl {

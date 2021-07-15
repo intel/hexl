@@ -3,14 +3,9 @@
 
 #pragma once
 
-#include <immintrin.h>
 #include <stdint.h>
 
 #include "eltwise/eltwise-fma-mod-internal.hpp"
-#include "hexl/eltwise/eltwise-fma-mod.hpp"
-#include "hexl/number-theory/number-theory.hpp"
-#include "hexl/util/check.hpp"
-#include "util/avx512-util.hpp"
 
 namespace intel {
 namespace hexl {

@@ -6,10 +6,13 @@
 #include <immintrin.h>
 #include <stdint.h>
 
+#include <limits>
+
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
+#include "hexl/util/compiler.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -778,6 +781,9 @@ inline void EltwiseMultModAVX512FloatLoop(__m512i* vp_result,
   }
 }
 
+// From Function 18, page 19 of https://arxiv.org/pdf/1407.3383.pdf
+// See also Algorithm 2/3 of
+// https://hal.archives-ouvertes.fr/hal-02552673/document
 template <int InputModFactor>
 void EltwiseMultModAVX512Float(uint64_t* result, const uint64_t* operand1,
                                const uint64_t* operand2, uint64_t n,

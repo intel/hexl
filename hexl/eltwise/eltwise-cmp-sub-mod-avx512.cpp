@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "eltwise/eltwise-cmp-sub-mod-internal.hpp"
+#include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
 
