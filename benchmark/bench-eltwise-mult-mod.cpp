@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -34,10 +35,6 @@ static void BM_EltwiseMultMod(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseMultMod)
-    ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 8192, 16384}, {48, 60}, {1, 2, 4}});
-
 //=================================================================
 
 // state[0] is the degree
@@ -54,12 +51,6 @@ static void BM_EltwiseMultModNative(benchmark::State& state) {  //  NOLINT
                             input_size, modulus);
   }
 }
-
-BENCHMARK(BM_EltwiseMultModNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 
 //=================================================================
 
@@ -92,18 +83,6 @@ static void BM_EltwiseMultModAVX512Float(benchmark::State& state) {  //  NOLINT
     }
   }
 }
-
-BENCHMARK(BM_EltwiseMultModAVX512Float)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 2})
-    ->Args({16384, 4});
 #endif
 
 //=================================================================
@@ -137,21 +116,51 @@ static void BM_EltwiseMultModAVX512Int(benchmark::State& state) {  //  NOLINT
     }
   }
 }
-
-BENCHMARK(BM_EltwiseMultModAVX512Int)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 2})
-    ->Args({16384, 4});
 #endif
 
 //=================================================================
+
+void register_eltwise_mult_mod_benchmarks() {
+  benchmark::RegisterBenchmark("BM_EltwiseMultMod", BM_EltwiseMultMod)
+      ->Unit(benchmark::kMicrosecond)
+      ->ArgsProduct({{1024, 8192, 16384}, {48, 60}, {1, 2, 4}});
+
+  benchmark::RegisterBenchmark("BM_EltwiseMultModNative",
+                               BM_EltwiseMultModNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq) {
+    benchmark::RegisterBenchmark("BM_EltwiseMultModAVX512Float",
+                                 BM_EltwiseMultModAVX512Float)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024, 1})
+        ->Args({1024, 2})
+        ->Args({1024, 4})
+        ->Args({4096, 1})
+        ->Args({4096, 2})
+        ->Args({4096, 4})
+        ->Args({16384, 1})
+        ->Args({16384, 2})
+        ->Args({16384, 4});
+    benchmark::RegisterBenchmark("BM_EltwiseMultModAVX512Int",
+                                 BM_EltwiseMultModAVX512Int)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024, 1})
+        ->Args({1024, 2})
+        ->Args({1024, 4})
+        ->Args({4096, 1})
+        ->Args({4096, 2})
+        ->Args({4096, 4})
+        ->Args({16384, 1})
+        ->Args({16384, 2})
+        ->Args({16384, 4});
+  }
+#endif  // HEXL_HAS_AVX512DQ
+}
 
 }  // namespace hexl
 }  // namespace intel

@@ -13,6 +13,8 @@ set(NATIVE_SRC
     number-theory/number-theory.cpp
 )
 
+set_source_files_properties(${NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
+
 if (HEXL_HAS_AVX512DQ)
     set(AVX512_SRC
         eltwise/eltwise-mult-mod-avx512.cpp
@@ -25,18 +27,21 @@ if (HEXL_HAS_AVX512DQ)
         ntt/fwd-ntt-avx512.cpp
         ntt/inv-ntt-avx512.cpp
     )
+    set_source_files_properties(${AVX512_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
 endif()
 
-set(HEXL_SRC "${NATIVE_SRC};${AVX512_SRC}")
+set(SRC "${NATIVE_SRC};${AVX512_SRC}")
+message("SRC ${SRC}")
+message("NATIVE_SRC ${NATIVE_SRC}")
 
 if (HEXL_DEBUG)
-    list(APPEND HEXL_SRC logging/logging.cpp)
+    list(APPEND SRC logging/logging.cpp)
 endif()
 
 if (HEXL_SHARED_LIB)
-    add_library(hexl SHARED ${HEXL_SRC})
+    add_library(hexl SHARED ${SRC})
 else()
-     add_library(hexl STATIC ${HEXL_SRC})
+     add_library(hexl STATIC ${SRC})
 endif()
 add_library(HEXL::hexl ALIAS hexl)
 
@@ -65,7 +70,7 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(hexl PRIVATE -Wall -Wconversion -Wshadow -pedantic -Wextra
-        -Wno-unknown-pragmas -march=native -O3 -fomit-frame-pointer
+        -Wno-unknown-pragmas -fomit-frame-pointer -O3
     )
     # Avoid 3rd-party dependency warnings when including HEXL as a dependency
     target_compile_options(hexl PUBLIC

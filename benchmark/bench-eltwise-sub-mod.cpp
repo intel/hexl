@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -31,12 +32,6 @@ static void BM_EltwiseVectorVectorSubModNative(
   }
 }
 
-BENCHMARK(BM_EltwiseVectorVectorSubModNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 #ifdef HEXL_HAS_AVX512DQ
@@ -55,12 +50,6 @@ static void BM_EltwiseVectorVectorSubModAVX512(
                         modulus);
   }
 }
-
-BENCHMARK(BM_EltwiseVectorVectorSubModAVX512)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 #endif
 
 //=================================================================
@@ -80,12 +69,6 @@ static void BM_EltwiseVectorScalarSubModNative(
   }
 }
 
-BENCHMARK(BM_EltwiseVectorScalarSubModNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 #ifdef HEXL_HAS_AVX512DQ
@@ -104,13 +87,41 @@ static void BM_EltwiseVectorScalarSubModAVX512(
                         modulus);
   }
 }
-
-BENCHMARK(BM_EltwiseVectorScalarSubModAVX512)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 #endif
+
+//=================================================================
+
+void register_eltwise_sub_mod_benchmarks() {
+  benchmark::RegisterBenchmark("BM_EltwiseVectorVectorSubModNative",
+                               BM_EltwiseVectorVectorSubModNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+  benchmark::RegisterBenchmark("BM_EltwiseVectorScalarSubModNative",
+                               BM_EltwiseVectorScalarSubModNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq) {
+    benchmark::RegisterBenchmark("BM_EltwiseVectorVectorSubModAVX512",
+                                 BM_EltwiseVectorVectorSubModAVX512)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+    benchmark::RegisterBenchmark("BM_EltwiseVectorScalarSubModAVX512",
+                                 BM_EltwiseVectorScalarSubModAVX512)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+  }
+#endif  // HEXL_HAS_AVX512DQ
+}
 
 }  // namespace hexl
 }  // namespace intel

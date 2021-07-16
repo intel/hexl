@@ -59,6 +59,7 @@ option(HEXL_DOCS "Enable documentation building" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
+option(HEXL_NATIVE_MARCH "Enable -march=native flag for improved native kernel perfromance" OFF)
 
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE_C_COMPILER:              ${CMAKE_C_COMPILER}")
@@ -70,6 +71,7 @@ message(STATUS "HEXL_DOCS:                     ${HEXL_DOCS}")
 message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
+message(STATUS "HEXL_NATIVE_MARCH:             ${HEXL_NATIVE_MARCH}")
 
 hexl_check_compiler_version()
 hexl_add_compiler_definition()
@@ -85,7 +87,6 @@ if (HEXL_COVERAGE)
   add_compile_options(-fprofile-arcs -ftest-coverage)
   add_compile_options(-fkeep-inline-functions)
   add_link_options(--coverage)
-  # link_libraries(gcov)
 endif()
 
 if (HEXL_TREAT_WARNING_AS_ERROR)
@@ -105,9 +106,30 @@ message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 #------------------------------------------------------------------------------
 # Set AVX flags
 #------------------------------------------------------------------------------
+
+if (HEXL_NATIVE_MARCH)
+  set(HEXL_MARCH_FLAGS "-march=native")
+else()
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+      set(HEXL_MARCH_FLAGS "/arch:AVX512")
+  else()
+      set(HEXL_MARCH_FLAGS "-march=x86-64 -mavx512f -mavx512dq -mavx512bw")
+
+      if (HEXL_USE_CLANG AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+        set(HEXL_MARCH_FLAGS "${HEXL_MARCH_FLAGS} -mavx512ifma")
+      endif()
+      if (HEXL_USE_GNU AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+        set(HEXL_MARCH_FLAGS "${HEXL_MARCH_FLAGS} -mavx512ifma")
+      endif()
+      if (HEXL_USE_MSVC)
+        set(HEXL_MARCH_FLAGS "${HEXL_MARCH_FLAGS} -mavx512ifma")
+      endif()
+  endif()
+endif()
+
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
-hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
+# hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
 
 # ------------------------------------------------------------------------------

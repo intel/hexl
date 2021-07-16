@@ -19,13 +19,13 @@ target_include_directories(bench_hexl PRIVATE
     ${HEXL_SRC_ROOT_DIR} # Private headers
     )
 
-target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads)
+target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads cpu_features)
 if (HEXL_DEBUG)
     target_link_libraries(bench_hexl PRIVATE easyloggingpp)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -march=native -O3)
+    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -O3) # ${HEXL_MARCH_FLAGS})
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(bench_hexl PRIVATE /Wall /W4
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr

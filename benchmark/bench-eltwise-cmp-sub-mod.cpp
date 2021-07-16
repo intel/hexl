@@ -11,6 +11,7 @@
 #include "hexl/eltwise/eltwise-cmp-sub-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -40,12 +41,6 @@ static void BM_EltwiseCmpSubModNative(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_EltwiseCmpSubModNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 #ifdef HEXL_HAS_AVX512DQ
@@ -71,15 +66,29 @@ static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
                            CMPINT::NLT, bound, diff);
   }
 }
-
-BENCHMARK(BM_EltwiseCmpSubModAVX512)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 #endif
 
 //=================================================================
+
+void register_eltwise_cmp_sub_mod_benchmarks() {
+  benchmark::RegisterBenchmark("BM_EltwiseCmpSubModNative",
+                               BM_EltwiseCmpSubModNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq) {
+    benchmark::RegisterBenchmark("BM_EltwiseCmpSubModAVX512",
+                                 BM_EltwiseCmpSubModAVX512)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+  }
+#endif  // HEXL_HAS_AVX512DQ
+}
 
 }  // namespace hexl
 }  // namespace intel
