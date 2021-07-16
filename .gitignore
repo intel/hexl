@@ -14,3 +14,4 @@ docs/doxygen/
 Doxyfile
 hexl/include/hexl/util/defines.hpp
 cmake/hexl-*.*.*/HEXLConfig.cmake
+pkgconfig/hexl.pc
