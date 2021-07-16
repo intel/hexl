@@ -1,7 +1,8 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set(NATIVE_TEST_SRC main.cpp
+set(NATIVE_TEST_SRC
+    main.cpp
     test-aligned-vector.cpp
     test-number-theory.cpp
     test-eltwise-add-mod.cpp
@@ -12,7 +13,8 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-reduce-mod.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
-)
+
+set_source_files_properties(${NATIVE_TEST_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
 
 set(AVX512_TEST_SRC
     test-avx512-util.cpp
