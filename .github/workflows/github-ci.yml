@@ -369,6 +369,13 @@ jobs:
           cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
+
+          # Build example using pkg-config
+          cd ../pkg-config;
+          # Set PKG_CONFIG_PATH to locate hexl.pc
+          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+          cmake -S . -B build
+          cmake --build build -j4
           set +x
 
   debug-build-icelake:
