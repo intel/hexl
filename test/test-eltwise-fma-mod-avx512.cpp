@@ -21,7 +21,7 @@ namespace hexl {
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseFMAMod, avx512_small) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
@@ -38,7 +38,7 @@ TEST(EltwiseFMAMod, avx512_small) {
 
 TEST(EltwiseFMAMod, avx512_small2) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
@@ -56,7 +56,7 @@ TEST(EltwiseFMAMod, avx512_small2) {
 
 TEST(EltwiseFMAMod, avx512_mult1) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg1{1, 2,  3,  4,  5,  6,  7,  8,
@@ -77,7 +77,7 @@ TEST(EltwiseFMAMod, avx512_mult1) {
 
 TEST(EltwiseFMAMod, avx512_mult2) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg1{102, 2,  3,  4,  5,  6,  7,  8,
@@ -98,7 +98,7 @@ TEST(EltwiseFMAMod, avx512_mult2) {
 
 TEST(EltwiseFMAMod, avx512_mult4) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg1{400, 2,  3,  4,  5,  6,  7,  8,
@@ -119,7 +119,7 @@ TEST(EltwiseFMAMod, avx512_mult4) {
 
 TEST(EltwiseFMAMod, avx512_mult8) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg1{800, 2,  3,  4,  5,  6,  7,  8,
@@ -143,7 +143,7 @@ TEST(EltwiseFMAMod, avx512_mult8) {
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseFMAMod, AVX512DQ) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   uint64_t length = 1031;
@@ -219,7 +219,7 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 #ifdef HEXL_HAS_AVX512IFMA
 TEST(EltwiseFMAMod, AVX512) {
   if (!has_avx512ifma) {
-    return;
+    GTEST_SKIP();
   }
 
   uint64_t length = 1024;

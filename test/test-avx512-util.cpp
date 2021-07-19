@@ -19,7 +19,7 @@ namespace hexl {
 
 TEST(AVX512, ExtractValues) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   __m512i x = _mm512_set_epi64(1, 2, 3, 4, 5, 6, 7, 8);
 
@@ -28,7 +28,7 @@ TEST(AVX512, ExtractValues) {
 
 TEST(AVX512, ExtractIntValues) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   __m512i x = _mm512_set_epi64(1, 2, 3, 4, 5, 6, 7, 8);
   AssertEqual(ExtractIntValues(x),
@@ -37,7 +37,7 @@ TEST(AVX512, ExtractIntValues) {
 
 TEST(AVX512, ExtractDoubleValues) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   __m512d x = _mm512_set_pd(-4.4, -3.3, -2.2, -1.1, 0, 1.1, 2.2, 3.3);
   AssertEqual(ExtractValues(x),
@@ -48,7 +48,7 @@ TEST(AVX512, ExtractDoubleValues) {
 #ifdef HEXL_HAS_AVX512IFMA
 TEST(AVX512, _mm512_hexl_mulhi_epi52) {
   if (!has_avx512ifma) {
-    return;
+    GTEST_SKIP();
   }
   __m512i w = _mm512_set_epi64(90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991, 90774764920991,
@@ -66,7 +66,7 @@ TEST(AVX512, _mm512_hexl_mulhi_epi52) {
 #ifdef HEXL_HAS_AVX512DQ
 TEST(AVX512, _mm512_hexl_cmplt_epu64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   // Small
@@ -111,7 +111,7 @@ TEST(AVX512, _mm512_hexl_cmplt_epu64) {
 
 TEST(AVX512, _mm512_hexl_cmple_epu64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   // Small
   {
@@ -158,7 +158,7 @@ TEST(AVX512, _mm512_hexl_cmple_epu64) {
 
 TEST(AVX512, _mm512_hexl_cmpge_epu64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   // Small
@@ -205,7 +205,7 @@ TEST(AVX512, _mm512_hexl_cmpge_epu64) {
 
 TEST(AVX512, _mm512_hexl_small_mod_epu64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   // Small
@@ -248,7 +248,7 @@ TEST(AVX512, _mm512_hexl_small_mod_epu64) {
 
 TEST(AVX512, _mm512_hexl_barrett_reduce64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   // Small

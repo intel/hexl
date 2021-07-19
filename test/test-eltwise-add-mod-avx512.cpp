@@ -21,7 +21,7 @@ namespace hexl {
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseAddMod, vector_vector_avx512_small) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
@@ -35,7 +35,7 @@ TEST(EltwiseAddMod, vector_vector_avx512_small) {
 
 TEST(EltwiseAddMod, vector_scalar_avx512_small) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
@@ -49,7 +49,7 @@ TEST(EltwiseAddMod, vector_scalar_avx512_small) {
 
 TEST(EltwiseAddMod, vector_vector_avx512_big) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
@@ -69,7 +69,7 @@ TEST(EltwiseAddMod, vector_vector_avx512_big) {
 
 TEST(EltwiseAddMod, vector_scalar_avx512_big) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
@@ -91,7 +91,7 @@ TEST(EltwiseAddMod, vector_scalar_avx512_big) {
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::random_device rd;
@@ -136,7 +136,7 @@ TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
 
 TEST(EltwiseAddMod, vector_scalar_avx512_native_match) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::random_device rd;

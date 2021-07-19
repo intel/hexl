@@ -36,7 +36,7 @@ class NTTModulusTest
 // Parameters = (degree, modulus_bits)
 TEST_P(NTTModulusTest, IFMAModuli) {
   if (!has_avx512ifma) {
-    return;
+    GTEST_SKIP();
   }
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
@@ -88,7 +88,7 @@ INSTANTIATE_TEST_SUITE_P(NTTModulusTest, NTTModulusTest,
 #ifdef HEXL_HAS_AVX512DQ
 TEST(NTT, LoadFwdInterleavedT1) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -106,7 +106,7 @@ TEST(NTT, LoadFwdInterleavedT1) {
 
 TEST(NTT, LoadInvInterleavedT1) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -124,7 +124,7 @@ TEST(NTT, LoadInvInterleavedT1) {
 
 TEST(NTT, LoadFwdInterleavedT2) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -142,7 +142,7 @@ TEST(NTT, LoadFwdInterleavedT2) {
 
 TEST(NTT, LoadInvInterleavedT2) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -160,7 +160,7 @@ TEST(NTT, LoadInvInterleavedT2) {
 
 TEST(NTT, LoadFwdInterleavedT4) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -178,7 +178,7 @@ TEST(NTT, LoadFwdInterleavedT4) {
 
 TEST(NTT, LoadInvInterleavedT4) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -196,7 +196,7 @@ TEST(NTT, LoadInvInterleavedT4) {
 
 TEST(NTT, WriteFwdInterleavedT1) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -215,7 +215,7 @@ TEST(NTT, WriteFwdInterleavedT1) {
 
 TEST(NTT, WriteInvInterleavedT4) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
@@ -235,7 +235,7 @@ TEST(NTT, WriteInvInterleavedT4) {
 // Checks AVX512 and native forward NTT implementations match
 TEST(NTT, FwdNTT_AVX512_32) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -287,7 +287,7 @@ TEST(NTT, FwdNTT_AVX512_32) {
 // Checks AVX512 and native forward NTT implementations match
 TEST(NTT, FwdNTT_AVX512_64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -339,7 +339,7 @@ TEST(NTT, FwdNTT_AVX512_64) {
 // Checks 32-bit AVX512 and native InvNTT implementations match
 TEST(NTT, InvNTT_AVX512_32) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -391,7 +391,7 @@ TEST(NTT, InvNTT_AVX512_32) {
 // Checks 64-bit AVX512 and native InvNTT implementations match
 TEST(NTT, InvNTT_AVX512_64) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
   std::random_device rd;
   std::mt19937 gen(rd());

@@ -22,7 +22,7 @@ namespace hexl {
 #ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseCmpAdd, AVX512) {
   if (!has_avx512dq) {
-    return;
+    GTEST_SKIP();
   }
 
   uint64_t length = 1025;
