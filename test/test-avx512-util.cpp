@@ -8,8 +8,9 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "test-util.hpp"
+#include "test-util-avx512.hpp"
 #include "util/avx512-util.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -17,18 +18,27 @@ namespace hexl {
 #ifdef HEXL_HAS_AVX512DQ
 
 TEST(AVX512, ExtractValues) {
+  if (!has_avx512dq) {
+    return;
+  }
   __m512i x = _mm512_set_epi64(1, 2, 3, 4, 5, 6, 7, 8);
 
   AssertEqual(ExtractValues(x), std::vector<uint64_t>{8, 7, 6, 5, 4, 3, 2, 1});
 }
 
 TEST(AVX512, ExtractIntValues) {
+  if (!has_avx512dq) {
+    return;
+  }
   __m512i x = _mm512_set_epi64(1, 2, 3, 4, 5, 6, 7, 8);
   AssertEqual(ExtractIntValues(x),
               std::vector<int64_t>{8, 7, 6, 5, 4, 3, 2, 1});
 }
 
 TEST(AVX512, ExtractDoubleValues) {
+  if (!has_avx512dq) {
+    return;
+  }
   __m512d x = _mm512_set_pd(-4.4, -3.3, -2.2, -1.1, 0, 1.1, 2.2, 3.3);
   AssertEqual(ExtractValues(x),
               std::vector<double>{3.3, 2.2, 1.1, 0, -1.1, -2.2, -3.3, -4.4});
@@ -37,6 +47,9 @@ TEST(AVX512, ExtractDoubleValues) {
 
 #ifdef HEXL_HAS_AVX512IFMA
 TEST(AVX512, _mm512_hexl_mulhi_epi52) {
+  if (!has_avx512ifma) {
+    return;
+  }
   __m512i w = _mm512_set_epi64(90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991);
@@ -52,6 +65,10 @@ TEST(AVX512, _mm512_hexl_mulhi_epi52) {
 
 #ifdef HEXL_HAS_AVX512DQ
 TEST(AVX512, _mm512_hexl_cmplt_epu64) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   // Small
   {
     uint64_t match_value = 10;
@@ -93,6 +110,9 @@ TEST(AVX512, _mm512_hexl_cmplt_epu64) {
 }
 
 TEST(AVX512, _mm512_hexl_cmple_epu64) {
+  if (!has_avx512dq) {
+    return;
+  }
   // Small
   {
     uint64_t match_value = 10;
@@ -137,6 +157,10 @@ TEST(AVX512, _mm512_hexl_cmple_epu64) {
 }
 
 TEST(AVX512, _mm512_hexl_cmpge_epu64) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   // Small
   {
     uint64_t match_value = 10;
@@ -180,6 +204,10 @@ TEST(AVX512, _mm512_hexl_cmpge_epu64) {
 }
 
 TEST(AVX512, _mm512_hexl_small_mod_epu64) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   // Small
   {
     __m512i a = _mm512_set_epi64(0, 2, 4, 6, 8, 10, 11, 12);
@@ -219,6 +247,10 @@ TEST(AVX512, _mm512_hexl_small_mod_epu64) {
 }
 
 TEST(AVX512, _mm512_hexl_barrett_reduce64) {
+  if (!has_avx512dq) {
+    return;
+  }
+
   // Small
   {
     __m512i a = _mm512_set_epi64(12, 11, 10, 8, 6, 4, 2, 0);

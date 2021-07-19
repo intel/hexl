@@ -1,21 +1,34 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set(SRC main.cpp
+set(NATIVE_TEST_SRC main.cpp
     test-aligned-vector.cpp
-    test-avx512-util.cpp
     test-number-theory.cpp
-    test-ntt.cpp
-    test-eltwise-mult-mod.cpp
-    test-eltwise-reduce-mod.cpp
     test-eltwise-add-mod.cpp
-    test-eltwise-fma-mod.cpp
     test-eltwise-cmp-add.cpp
     test-eltwise-cmp-sub-mod.cpp
+    test-eltwise-fma-mod.cpp
+    test-eltwise-mult-mod.cpp
+    test-eltwise-reduce-mod.cpp
     test-eltwise-sub-mod.cpp
+    test-ntt.cpp
 )
 
-add_executable(unit-test ${SRC})
+set(AVX512_TEST_SRC
+    test-avx512-util.cpp
+    test-eltwise-add-mod-avx512.cpp
+    test-eltwise-cmp-add-avx512.cpp
+    test-eltwise-cmp-sub-mod-avx512.cpp
+    test-eltwise-fma-mod-avx512.cpp
+    test-eltwise-mult-mod-avx512.cpp
+    test-eltwise-reduce-mod-avx512.cpp
+    test-eltwise-sub-mod-avx512.cpp
+    test-ntt-avx512.cpp
+)
+
+set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")
+
+add_executable(unit-test ${TEST_SRC})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(unit-test PRIVATE -Wall -Wextra -march=native)
