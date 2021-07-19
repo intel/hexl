@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.2.0
+- Large performance improvement in large (N >= 16384) AVX512 NTTs via recursive implementations
+- Slight performance improvements in AVX512IFMA NTT
+- Slight performance improvements in element-wise modular multiplication
+- Implement optimized AVX512DQ NTT for moduli < 32 bits
+- Expands public API to include number theory, NTT twiddle factors
+- Remove HEXL_DEBUG and HEXL_EXPORT options. The behavior now is to always export the cmake configuraion files. HEXL_DEBUG is enabled iff the CMAKE_BUILD_TYPE=Debug
+
 ## Version 1.1.1
 - Fix Google benchmark branch to point to "main" instead of "master"
 

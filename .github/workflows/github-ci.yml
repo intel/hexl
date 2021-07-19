@@ -15,7 +15,7 @@ on:
 # Define env vars #
 ###################
 env:
-  HEXL_VER: 1.1.1
+  HEXL_VER: 1.2.0
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   ICELAKE_CMAKE_TOOLCHAIN_FILE: >
       -DCMAKE_TOOLCHAIN_FILE=/home/github-ci/vcpkg/scripts/buildsystems/vcpkg.cmake
