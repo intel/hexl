@@ -13,6 +13,8 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
 )
+set_source_files_properties(${NATIVE_TEST_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
+
 
 set(AVX512_TEST_SRC
     test-avx512-util.cpp
@@ -25,6 +27,7 @@ set(AVX512_TEST_SRC
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
 )
+set_source_files_properties(${AVX512_TEST_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
 
 set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")
 
