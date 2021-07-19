@@ -189,7 +189,7 @@ To cite Intel HEXL, please use the following BibTeX entry.
     @misc{IntelHEXL,
         title = {{I}ntel {HEXL} (release 1.0)},
         howpublished = {\url{https://arxiv.org/abs/2103.16400}},
-        month = july,
+        month = april,
         year = 2021,
         key = {Intel HEXL}
     }
