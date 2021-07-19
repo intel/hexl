@@ -20,6 +20,9 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
                              const uint64_t* operand2, uint64_t n,
                              uint64_t modulus);
 
+// From Function 18, page 19 of https://arxiv.org/pdf/1407.3383.pdf
+// See also Algorithm 2/3 of
+// https://hal.archives-ouvertes.fr/hal-02552673/document
 template <int InputModFactor>
 void EltwiseMultModAVX512Float(uint64_t* result, const uint64_t* operand1,
                                const uint64_t* operand2, uint64_t n,

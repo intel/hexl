@@ -1,7 +1,7 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set(NATIVE_SRC
+set(HEXL_NATIVE_SRC
     eltwise/eltwise-mult-mod.cpp
     eltwise/eltwise-reduce-mod.cpp
     eltwise/eltwise-sub-mod.cpp
@@ -13,10 +13,10 @@ set(NATIVE_SRC
     number-theory/number-theory.cpp
 )
 
-set_source_files_properties(${NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
+set_source_files_properties(${HEXL_NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
 
 if (HEXL_HAS_AVX512DQ)
-    set(AVX512_SRC
+    set(HEXL_AVX512_SRC
         eltwise/eltwise-mult-mod-avx512.cpp
         eltwise/eltwise-reduce-mod-avx512.cpp
         eltwise/eltwise-add-mod-avx512.cpp
@@ -27,21 +27,20 @@ if (HEXL_HAS_AVX512DQ)
         ntt/fwd-ntt-avx512.cpp
         ntt/inv-ntt-avx512.cpp
     )
-    set_source_files_properties(${AVX512_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
+    set_source_files_properties(${HEXL_AVX512_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
 endif()
 
-set(SRC "${NATIVE_SRC};${AVX512_SRC}")
-message("SRC ${SRC}")
-message("NATIVE_SRC ${NATIVE_SRC}")
+set(HEXL_SRC "${HEXL_NATIVE_SRC};${HEXL_AVX512_SRC}")
+message("HEXL_SRC ${HEXL_SRC}")
 
 if (HEXL_DEBUG)
-    list(APPEND SRC logging/logging.cpp)
+    list(APPEND HEXL_SRC logging/logging.cpp)
 endif()
 
 if (HEXL_SHARED_LIB)
-    add_library(hexl SHARED ${SRC})
+    add_library(hexl SHARED ${HEXL_SRC})
 else()
-     add_library(hexl STATIC ${SRC})
+     add_library(hexl STATIC ${HEXL_SRC})
 endif()
 add_library(HEXL::hexl ALIAS hexl)
 

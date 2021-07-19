@@ -59,7 +59,7 @@ option(HEXL_DOCS "Enable documentation building" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
-option(HEXL_NATIVE_MARCH "Enable -march=native flag for improved native kernel perfromance" OFF)
+option(HEXL_NATIVE_MARCH "Enable -march=native flag for improved native kernel performance" OFF)
 
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE_C_COMPILER:              ${CMAKE_C_COMPILER}")

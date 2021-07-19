@@ -25,7 +25,7 @@ if (HEXL_DEBUG)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -O3) # ${HEXL_MARCH_FLAGS})
+    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -O3)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(bench_hexl PRIVATE /Wall /W4
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
