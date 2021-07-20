@@ -21,7 +21,6 @@ vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     DISABLE_PARALLEL_CONFIGURE
     OPTIONS
-        "-DHEXL_DEBUG=OFF"
         "-DHEXL_BENCHMARK=OFF"
         "-DHEXL_COVERAGE=OFF"
         "-DHEXL_TESTING=OFF"
