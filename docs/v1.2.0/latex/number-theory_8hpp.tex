@@ -1,0 +1,79 @@
+\hypertarget{number-theory_8hpp}{}\doxysection{number-\/theory.hpp File Reference}
+\label{number-theory_8hpp}\index{number-\/theory.hpp@{number-\/theory.hpp}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include \char`\"{}hexl/util/check.\+hpp\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hexl/util/compiler.\+hpp\char`\"{}}\newline
+Include dependency graph for number-\/theory.hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{number-theory_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{number-theory_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classintel_1_1hexl_1_1MultiplyFactor}{intel\+::hexl\+::\+Multiply\+Factor}}
+\begin{DoxyCompactList}\small\item\em Pre-\/computes a Barrett factor with which modular multiplication can be performed more efficiently. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceintel}{intel}}
+\item 
+ \mbox{\hyperlink{namespaceintel_1_1hexl}{intel\+::hexl}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespaceintel_1_1hexl_ada0fe74afb4384b54728cba8ec3f69cd}{intel\+::hexl\+::\+Is\+Power\+Of\+Two}} (uint64\+\_\+t num)
+\begin{DoxyCompactList}\small\item\em Returns whether or not num is a power of two. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a066a83a4b122279313279a58cf440004}{intel\+::hexl\+::\+Log2}} (uint64\+\_\+t x)
+\begin{DoxyCompactList}\small\item\em Returns log2(x) for x a power of 2. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a9975ccaf5ec051c07ff4e3fef5c1fefb}{intel\+::hexl\+::\+Maximum\+Value}} (uint64\+\_\+t bits)
+\begin{DoxyCompactList}\small\item\em Returns the maximum value that can be represented using {\ttfamily bits} bits. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_aa48183a39af615227d5b14c0fdb46105}{intel\+::hexl\+::\+Reverse\+Bits}} (uint64\+\_\+t x, uint64\+\_\+t bit\+\_\+width)
+\begin{DoxyCompactList}\small\item\em Reverses the bits. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_ac949027d43c64d65400c93a148d349c6}{intel\+::hexl\+::\+Inverse\+Mod}} (uint64\+\_\+t x, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns x$^\wedge$\{-\/1\} mod modulus. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a838d9c2d540f99b349546461dee63252}{intel\+::hexl\+::\+Multiply\+Mod}} (uint64\+\_\+t x, uint64\+\_\+t y, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns (x $\ast$ y) mod modulus. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a0b3d06107428b15f58be1680fbf1656d}{intel\+::hexl\+::\+Multiply\+Mod}} (uint64\+\_\+t x, uint64\+\_\+t y, uint64\+\_\+t y\+\_\+precon, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns (x $\ast$ y) mod modulus. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_ad16852e2b8114cd9c22dd25593c76f99}{intel\+::hexl\+::\+Add\+U\+Int\+Mod}} (uint64\+\_\+t x, uint64\+\_\+t y, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns (x + y) mod modulus. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a4411ec648d83bfbc3ecaf96859576054}{intel\+::hexl\+::\+Sub\+U\+Int\+Mod}} (uint64\+\_\+t x, uint64\+\_\+t y, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns (x -\/ y) mod modulus. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_aff7287aeef7fdb27e6ffb254adb40477}{intel\+::hexl\+::\+Pow\+Mod}} (uint64\+\_\+t base, uint64\+\_\+t exp, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns base$^\wedge$exp mod modulus. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespaceintel_1_1hexl_a8b04aa9aed381d3c976d953efbe0a4b6}{intel\+::hexl\+::\+Is\+Primitive\+Root}} (uint64\+\_\+t root, uint64\+\_\+t degree, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns whether or not root is a degree-\/th root of unity mod modulus. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a130d3fb9218c1aaa9fbeb5d143eb288b}{intel\+::hexl\+::\+Generate\+Primitive\+Root}} (uint64\+\_\+t degree, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Tries to return a primitive degree-\/th root of unity. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_adcc30a762adcbbdc9d7ebefa6fffe83b}{intel\+::hexl\+::\+Minimal\+Primitive\+Root}} (uint64\+\_\+t degree, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns whether or not root is a degree-\/th root of unity. \end{DoxyCompactList}\item 
+{\footnotesize template$<$int Bit\+Shift$>$ }\\uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_ad7a9d35f74908eca9240bc7675705976}{intel\+::hexl\+::\+Multiply\+Mod\+Lazy}} (uint64\+\_\+t x, uint64\+\_\+t y\+\_\+operand, uint64\+\_\+t y\+\_\+barrett\+\_\+factor, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Computes (x $\ast$ y) mod modulus, except that the output is in \mbox{[}0, 2 $\ast$ modulus\mbox{]}. \end{DoxyCompactList}\item 
+{\footnotesize template$<$int Bit\+Shift$>$ }\\uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_a8f6c714aff229c45fbba359cc67331a5}{intel\+::hexl\+::\+Multiply\+Mod\+Lazy}} (uint64\+\_\+t x, uint64\+\_\+t y, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Computes (x $\ast$ y) mod modulus, except that the output is in \mbox{[}0, 2 $\ast$ modulus\mbox{]}. \end{DoxyCompactList}\item 
+unsigned char \mbox{\hyperlink{namespaceintel_1_1hexl_a3ecce7e5a5591605703890fb3b2b6d80}{intel\+::hexl\+::\+Add\+U\+Int64}} (uint64\+\_\+t operand1, uint64\+\_\+t operand2, uint64\+\_\+t $\ast$result)
+\begin{DoxyCompactList}\small\item\em Adds two unsigned 64-\/bit integers. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespaceintel_1_1hexl_a1155b31afc84bd8a7080d49b66480395}{intel\+::hexl\+::\+Is\+Prime}} (uint64\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Returns whether or not the input is prime. \end{DoxyCompactList}\item 
+std\+::vector$<$ uint64\+\_\+t $>$ \mbox{\hyperlink{namespaceintel_1_1hexl_a8df91eccfb48c9e2b3f00e76a1edb930}{intel\+::hexl\+::\+Generate\+Primes}} (size\+\_\+t num\+\_\+primes, size\+\_\+t bit\+\_\+size, size\+\_\+t ntt\+\_\+size=1)
+\begin{DoxyCompactList}\small\item\em Generates a list of num\+\_\+primes primes in the range \mbox{[}2$^\wedge$(bit\+\_\+size,. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_aebdaa3e2bf7c73ec0dacd465c69f2969}{intel\+::hexl\+::\+Barrett\+Reduce64}} (uint64\+\_\+t input, uint64\+\_\+t modulus, uint64\+\_\+t q\+\_\+barr)
+\begin{DoxyCompactList}\small\item\em Returns input mod modulus, computed via 64-\/bit Barrett reduction. \end{DoxyCompactList}\item 
+{\footnotesize template$<$int Input\+Mod\+Factor$>$ }\\uint64\+\_\+t \mbox{\hyperlink{namespaceintel_1_1hexl_ab716e0395cbfe58e76f866a9044f2a62}{intel\+::hexl\+::\+Reduce\+Mod}} (uint64\+\_\+t x, uint64\+\_\+t modulus, const uint64\+\_\+t $\ast$twice\+\_\+modulus=nullptr, const uint64\+\_\+t $\ast$four\+\_\+times\+\_\+modulus=nullptr)
+\begin{DoxyCompactList}\small\item\em Returns x mod modulus, assuming x $<$ Input\+Mod\+Factor $\ast$ modulus. \end{DoxyCompactList}\end{DoxyCompactItemize}

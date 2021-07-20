@@ -1,0 +1,1735 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="namespaceintel_1_1hexl" kind="namespace" language="C++">
+    <compoundname>intel::hexl</compoundname>
+    <innerclass refid="classintel_1_1hexl_1_1AlignedAllocator" prot="public">intel::hexl::AlignedAllocator</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1AllocatorBase" prot="public">intel::hexl::AllocatorBase</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1AllocatorInterface" prot="public">intel::hexl::AllocatorInterface</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1MallocStrategy" prot="public">intel::hexl::MallocStrategy</innerclass>
+    <innerclass refid="classintel_1_1hexl_1_1MultiplyFactor" prot="public">intel::hexl::MultiplyFactor</innerclass>
+    <innerclass refid="classintel_1_1hexl_1_1NTT" prot="public">intel::hexl::NTT</innerclass>
+      <sectiondef kind="enum">
+      <memberdef kind="enum" id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" prot="public" static="no" strong="yes">
+        <type></type>
+        <name>CMPINT</name>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47" prot="public">
+          <name>EQ</name>
+          <initializer>= 0</initializer>
+          <briefdescription>
+<para>Equal. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b" prot="public">
+          <name>LT</name>
+          <initializer>= 1</initializer>
+          <briefdescription>
+<para>Less than. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6" prot="public">
+          <name>LE</name>
+          <initializer>= 2</initializer>
+          <briefdescription>
+<para>Less than or equal. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" prot="public">
+          <name>FALSE</name>
+          <initializer>= 3</initializer>
+          <briefdescription>
+<para>False. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0" prot="public">
+          <name>NE</name>
+          <initializer>= 4</initializer>
+          <briefdescription>
+<para>Not equal. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8" prot="public">
+          <name>NLT</name>
+          <initializer>= 5</initializer>
+          <briefdescription>
+<para>Not less than. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57" prot="public">
+          <name>NLE</name>
+          <initializer>= 6</initializer>
+          <briefdescription>
+<para>Not less than or equal. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61" prot="public">
+          <name>TRUE</name>
+          <initializer>= 7</initializer>
+          <briefdescription>
+<para>True. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+<para>Represents binary operations between two boolean values. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" line="16" column="1" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" bodystart="16" bodyend="25"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" prot="public" static="no">
+        <type>std::shared_ptr&lt; <ref refid="structintel_1_1hexl_1_1AllocatorBase" kindref="compound">AllocatorBase</ref> &gt;</type>
+        <definition>using intel::hexl::AllocatorStrategyPtr = typedef std::shared_ptr&lt;AllocatorBase&gt;</definition>
+        <argsstring></argsstring>
+        <name>AllocatorStrategyPtr</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp" line="26" column="1" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" prot="public" static="no">
+        <templateparamlist>
+          <param>
+            <type>typename T</type>
+          </param>
+        </templateparamlist>
+        <type>std::vector&lt; T, <ref refid="classintel_1_1hexl_1_1AlignedAllocator" kindref="compound">AlignedAllocator</ref>&lt; T, 64 &gt; &gt;</type>
+        <definition>using intel::hexl::AlignedVector64 = typedef std::vector&lt;T, AlignedAllocator&lt;T, 64&gt; &gt;</definition>
+        <argsstring></argsstring>
+        <name>AlignedVector64</name>
+        <briefdescription>
+<para>64-byte aligned memory allocator </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp" line="106" column="1" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp" bodystart="106" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="var">
+      <memberdef kind="variable" id="namespaceintel_1_1hexl_1aedc86b34ea92ac34d036acff6d84479a" prot="public" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" kindref="member">AllocatorStrategyPtr</ref></type>
+        <definition>AllocatorStrategyPtr intel::hexl::mallocStrategy</definition>
+        <argsstring></argsstring>
+        <name>mallocStrategy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp" line="27" column="29" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp" declline="27" declcolumn="29"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a319244a133f57825ba7e593ad5c71709" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseAddMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, const uint64_t *operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseAddMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Adds two vectors elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to add. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to add. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="1">$ operand1[i] = (operand1[i] + operand2[i]) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" line="22" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" declline="22" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a8e0884463658eae11b6f1c6dfeb50b40" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseAddMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseAddMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Adds a vector and scalar elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to add. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to add. Must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="3">$ operand1[i] = (operand1[i] + operand2) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" line="36" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" declline="36" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a5c4fd2ceb53b94efa5f5a959d7ee9819" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseCmpAdd</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t n, CMPINT cmp, uint64_t bound, uint64_t diff)</argsstring>
+        <name>EltwiseCmpAdd</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>
+          <declname>cmp</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>bound</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>diff</declname>
+        </param>
+        <briefdescription>
+<para>Computes element-wise conditional addition. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to compare; stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in <computeroutput>operand1</computeroutput> </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">cmp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Comparison operation </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">bound</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to compare against </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">diff</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to conditionally add</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes result[i] = cmp(operand1[i], bound) ? operand1[i] + diff : operand1[i] for all <formula id="4">$i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-cmp-add.hpp" line="22" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-cmp-add.hpp" declline="22" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a78bf86d32140e39d8f99d474ccd0e226" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseCmpSubMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t n, uint64_t modulus, CMPINT cmp, uint64_t bound, uint64_t diff)</argsstring>
+        <name>EltwiseCmpSubMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <param>
+          <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>
+          <declname>cmp</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>bound</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>diff</declname>
+        </param>
+        <briefdescription>
+<para>Computes element-wise conditional modular subtraction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to compare </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in <computeroutput>operand1</computeroutput> </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus to reduce by </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">cmp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Comparison function </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">bound</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to compare against </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">diff</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to subtract by</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <computeroutput>operand1</computeroutput>[i] = (<computeroutput>cmp</computeroutput>(<computeroutput>operand1</computeroutput>, <computeroutput>bound</computeroutput>)) ? (<computeroutput>operand1</computeroutput> - <computeroutput>diff</computeroutput>) mod <computeroutput>modulus</computeroutput> : <computeroutput>operand1</computeroutput> for all i=0, ..., n-1 </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-cmp-sub-mod.hpp" line="23" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-cmp-sub-mod.hpp" declline="23" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a5b65d563391b4a1a5041633aeb118aa5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseFMAMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *arg1, uint64_t arg2, const uint64_t *arg3, uint64_t n, uint64_t modulus, uint64_t input_mod_factor)</argsstring>
+        <name>EltwiseFMAMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>arg1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>arg2</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>arg3</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>input_mod_factor</declname>
+        </param>
+        <briefdescription>
+<para>Computes fused multiply-add (<computeroutput>arg1</computeroutput> * <computeroutput>arg2</computeroutput> + <computeroutput>arg3</computeroutput>) mod <computeroutput>modulus</computeroutput> element-wise, broadcasting scalars to vectors. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector to multiply </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">arg2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scalar to multiply </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">arg3</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector to add. Will not add if <computeroutput>arg3</computeroutput> == nullptr </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="5">$ [2, 2^{61} - 1]$</formula> </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Assumes input elements are in [0, input_mod_factor * modulus). Must be 1, 2, 4, or 8. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-fma-mod.hpp" line="22" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-fma-mod.hpp" declline="22" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a705bc0321d937ae4d1f8d50279e3cff1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseMultMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, const uint64_t *operand2, uint64_t n, uint64_t modulus, uint64_t input_mod_factor)</argsstring>
+        <name>EltwiseMultMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>input_mod_factor</declname>
+        </param>
+        <briefdescription>
+<para>Multiplies two vectors elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Result of element-wise multiplication </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to multiply. Each element must be less than the modulus. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to multiply. Each element must be less than the modulus. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Assumes input elements are in [0, input_mod_factor * p) Must be 1, 2 or 4.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <computeroutput>result</computeroutput>[i] = (<computeroutput>operand1</computeroutput>[i] * <computeroutput>operand2</computeroutput>[i]) mod <computeroutput>modulus</computeroutput> for i=0, ..., <computeroutput>n</computeroutput> - 1 </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-mult-mod.hpp" line="23" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-mult-mod.hpp" declline="23" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1af3ddae165283841d495a322275baf5ee" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseReduceMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand, uint64_t n, uint64_t modulus, uint64_t input_mod_factor, uint64_t output_mod_factor)</argsstring>
+        <name>EltwiseReduceMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>input_mod_factor</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>output_mod_factor</declname>
+        </param>
+        <briefdescription>
+<para>Performs elementwise modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data on which to compute the elementwise modular reduction </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in operand </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Assumes input elements are in [0, input_mod_factor * p) Must be 0, 1, 2 or 4. input_mod_factor=0 means, no knowledge of input range. Barrett reduction will be used in this case. input_mod_factor &gt;= output_mod_factor unless input_mod_factor == 0 </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">output_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>output elements will be in [0, output_mod_factor * modulus) Must be 1 or 2. For input_mod_factor=0, output_mod_factor will be set to 1. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" line="24" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-reduce-mod.hpp" declline="24" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a6a45c30bc21b9b1e1410b23fce5424c8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseSubMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, const uint64_t *operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseSubMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Subtracts two vectors elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to subtract from. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to subtract. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="6">$ operand1[i] = (operand1[i] - operand2[i]) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" line="22" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" declline="22" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1abc13b8f383d3af6471a5261ee2213b40" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::EltwiseSubMod</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand1, uint64_t operand2, uint64_t n, uint64_t modulus)</argsstring>
+        <name>EltwiseSubMod</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Subtracts a scalar from a vector elementwise with modular reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores result </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of elements to subtract from. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Elements to subtract. Each element must be less than the modulus </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements in each vector </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus with which to perform modular reduction. Must be in the range <formula id="0">$[2, 2^{63} - 1]$</formula></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Computes <formula id="7">$ operand1[i] = (operand1[i] - operand2) \mod modulus $</formula> for <formula id="2">$ i=0, ..., n-1$</formula>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" line="36" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-sub-mod.hpp" declline="36" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1ada0fe74afb4384b54728cba8ec3f69cd" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool intel::hexl::IsPowerOfTwo</definition>
+        <argsstring>(uint64_t num)</argsstring>
+        <name>IsPowerOfTwo</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>num</declname>
+        </param>
+        <briefdescription>
+<para>Returns whether or not num is a power of two. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="51" column="13" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="51" bodyend="51"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a066a83a4b122279313279a58cf440004" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::Log2</definition>
+        <argsstring>(uint64_t x)</argsstring>
+        <name>Log2</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <briefdescription>
+<para>Returns log2(x) for x a power of 2. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="54" column="17" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="54" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a9975ccaf5ec051c07ff4e3fef5c1fefb" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MaximumValue</definition>
+        <argsstring>(uint64_t bits)</argsstring>
+        <name>MaximumValue</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>bits</declname>
+        </param>
+        <briefdescription>
+<para>Returns the maximum value that can be represented using <computeroutput>bits</computeroutput> bits. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="60" column="17" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="60" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1aa48183a39af615227d5b14c0fdb46105" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::ReverseBits</definition>
+        <argsstring>(uint64_t x, uint64_t bit_width)</argsstring>
+        <name>ReverseBits</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>bit_width</declname>
+        </param>
+        <briefdescription>
+<para>Reverses the bits. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input to reverse </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">bit_width</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of bits in the input; must be &gt;= MSB(x) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The bit-reversed representation of <computeroutput>x</computeroutput> using <computeroutput>bit_width</computeroutput> bits </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="72" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="72" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1ac949027d43c64d65400c93a148d349c6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::InverseMod</definition>
+        <argsstring>(uint64_t x, uint64_t modulus)</argsstring>
+        <name>InverseMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns x^{-1} mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Requires x % modulus != 0 </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="76" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="76" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a838d9c2d540f99b349546461dee63252" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyMod</definition>
+        <argsstring>(uint64_t x, uint64_t y, uint64_t modulus)</argsstring>
+        <name>MultiplyMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns (x * y) mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Assumes x, y &lt; modulus </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="80" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="80" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a0b3d06107428b15f58be1680fbf1656d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyMod</definition>
+        <argsstring>(uint64_t x, uint64_t y, uint64_t y_precon, uint64_t modulus)</argsstring>
+        <name>MultiplyMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y_precon</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns (x * y) mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">y_precon</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>64-bit precondition factor floor(2**64 / modulus) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="87" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="87" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1ad16852e2b8114cd9c22dd25593c76f99" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::AddUIntMod</definition>
+        <argsstring>(uint64_t x, uint64_t y, uint64_t modulus)</argsstring>
+        <name>AddUIntMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns (x + y) mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Assumes x, y &lt; modulus </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="92" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="92" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a4411ec648d83bfbc3ecaf96859576054" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::SubUIntMod</definition>
+        <argsstring>(uint64_t x, uint64_t y, uint64_t modulus)</argsstring>
+        <name>SubUIntMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns (x - y) mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Assumes x, y &lt; modulus </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="96" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="96" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1aff7287aeef7fdb27e6ffb254adb40477" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::PowMod</definition>
+        <argsstring>(uint64_t base, uint64_t exp, uint64_t modulus)</argsstring>
+        <name>PowMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>base</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>exp</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns base^exp mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="99" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="99" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a8b04aa9aed381d3c976d953efbe0a4b6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool intel::hexl::IsPrimitiveRoot</definition>
+        <argsstring>(uint64_t root, uint64_t degree, uint64_t modulus)</argsstring>
+        <name>IsPrimitiveRoot</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>root</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns whether or not root is a degree-th root of unity mod modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">root</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Root of unity to check </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">degree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Degree of root of unity; must be a power of two </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus of finite field </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="105" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="105" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a130d3fb9218c1aaa9fbeb5d143eb288b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::GeneratePrimitiveRoot</definition>
+        <argsstring>(uint64_t degree, uint64_t modulus)</argsstring>
+        <name>GeneratePrimitiveRoot</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Tries to return a primitive degree-th root of unity. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns 0 or throws an error if no root is found </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="109" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="109" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1adcc30a762adcbbdc9d7ebefa6fffe83b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MinimalPrimitiveRoot</definition>
+        <argsstring>(uint64_t degree, uint64_t modulus)</argsstring>
+        <name>MinimalPrimitiveRoot</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns whether or not root is a degree-th root of unity. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">degree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Must be a power of two </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Modulus of finite field </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="114" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="114" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1ad7a9d35f74908eca9240bc7675705976" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>int</type>
+            <declname>BitShift</declname>
+            <defname>BitShift</defname>
+          </param>
+        </templateparamlist>
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyModLazy</definition>
+        <argsstring>(uint64_t x, uint64_t y_operand, uint64_t y_barrett_factor, uint64_t modulus)</argsstring>
+        <name>MultiplyModLazy</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y_operand</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y_barrett_factor</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Computes (x * y) mod modulus, except that the output is in [0, 2 * modulus]. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">y_operand</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>also denoted y </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">y_barrett_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pre-computed Barrett reduction factor floor((y &lt;&lt; BitShift) / modulus) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="124" column="17" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="124" bodyend="137"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a8f6c714aff229c45fbba359cc67331a5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>int</type>
+            <declname>BitShift</declname>
+            <defname>BitShift</defname>
+          </param>
+        </templateparamlist>
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyModLazy</definition>
+        <argsstring>(uint64_t x, uint64_t y, uint64_t modulus)</argsstring>
+        <name>MultiplyModLazy</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Computes (x * y) mod modulus, except that the output is in [0, 2 * modulus]. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="145" column="17" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="145" bodyend="166"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a3ecce7e5a5591605703890fb3b2b6d80" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>unsigned char</type>
+        <definition>unsigned char intel::hexl::AddUInt64</definition>
+        <argsstring>(uint64_t operand1, uint64_t operand2, uint64_t *result)</argsstring>
+        <name>AddUInt64</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand1</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand2</declname>
+        </param>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <briefdescription>
+<para>Adds two unsigned 64-bit integers. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>operand1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number to add </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>operand2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number to add </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the sum </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The carry bit </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="173" column="22" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="173" bodyend="177"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a1155b31afc84bd8a7080d49b66480395" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool intel::hexl::IsPrime</definition>
+        <argsstring>(uint64_t n)</argsstring>
+        <name>IsPrime</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+<para>Returns whether or not the input is prime. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="180" column="6" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="180" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a8df91eccfb48c9e2b3f00e76a1edb930" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; uint64_t &gt;</type>
+        <definition>std::vector&lt;uint64_t&gt; intel::hexl::GeneratePrimes</definition>
+        <argsstring>(size_t num_primes, size_t bit_size, size_t ntt_size=1)</argsstring>
+        <name>GeneratePrimes</name>
+        <param>
+          <type>size_t</type>
+          <declname>num_primes</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>bit_size</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>ntt_size</declname>
+          <defval>1</defval>
+        </param>
+        <briefdescription>
+<para>Generates a list of num_primes primes in the range [2^(bit_size,. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">num_primes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of primes to generate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">bit_size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bit size of each prime </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">ntt_size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>N such that each prime q satisfies q % (2N) == 1. N must be a power of two </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="189" column="13" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="189" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1aebdaa3e2bf7c73ec0dacd465c69f2969" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::BarrettReduce64</definition>
+        <argsstring>(uint64_t input, uint64_t modulus, uint64_t q_barr)</argsstring>
+        <name>BarrettReduce64</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>input</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>q_barr</declname>
+        </param>
+        <briefdescription>
+<para>Returns input mod modulus, computed via 64-bit Barrett reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">q_barr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>floor(2^64 / modulus) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="196" column="10" declfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" declline="196" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1ab716e0395cbfe58e76f866a9044f2a62" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>int</type>
+            <declname>InputModFactor</declname>
+            <defname>InputModFactor</defname>
+          </param>
+        </templateparamlist>
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::ReduceMod</definition>
+        <argsstring>(uint64_t x, uint64_t modulus, const uint64_t *twice_modulus=nullptr, const uint64_t *four_times_modulus=nullptr)</argsstring>
+        <name>ReduceMod</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>twice_modulus</declname>
+          <defval>nullptr</defval>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>four_times_modulus</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+<para>Returns x mod modulus, assuming x &lt; InputModFactor * modulus. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>also denoted q </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">twice_modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>2 * q; must not be nullptr if InputModFactor == 4 or 8 </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">four_times_modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>4 * q; must not be nullptr if InputModFactor == 8 </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="206" column="10" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="206" bodyend="249"/>
+      </memberdef>
+      <memberdef kind="function" id="namespaceintel_1_1hexl_1a8c654502a5e7fe2cfdd198f0fd920f2a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>
+        <definition>CMPINT intel::hexl::Not</definition>
+        <argsstring>(CMPINT cmp)</argsstring>
+        <name>Not</name>
+        <param>
+          <type><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref></type>
+          <declname>cmp</declname>
+        </param>
+        <briefdescription>
+<para>Returns the logical negation of a binary operation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">cmp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The binary operation to negate </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" line="29" column="15" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/util.hpp" bodystart="29" bodyend="50"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/eltwise/eltwise-add-mod.hpp" line="9" column="1"/>
+  </compounddef>
+</doxygen>

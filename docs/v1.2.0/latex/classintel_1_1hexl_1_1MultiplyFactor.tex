@@ -1,0 +1,72 @@
+\hypertarget{classintel_1_1hexl_1_1MultiplyFactor}{}\doxysection{intel\+::hexl\+::Multiply\+Factor Class Reference}
+\label{classintel_1_1hexl_1_1MultiplyFactor}\index{intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}}
+
+
+Pre-\/computes a Barrett factor with which modular multiplication can be performed more efficiently.  
+
+
+
+
+{\ttfamily \#include $<$number-\/theory.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classintel_1_1hexl_1_1MultiplyFactor_ad7b998b4a54203d6ad83237e3b3f4c51}{Multiply\+Factor}} ()=default
+\item 
+\mbox{\hyperlink{classintel_1_1hexl_1_1MultiplyFactor_a801de0aa37e108b21cdb6452a15f6c76}{Multiply\+Factor}} (uint64\+\_\+t operand, uint64\+\_\+t bit\+\_\+shift, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Computes and stores the Barrett factor floor((operand $<$$<$ bit\+\_\+shift) / modulus) \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{classintel_1_1hexl_1_1MultiplyFactor_aa1708edda697a2ebb93f6b2b9b2967aa}{Barrett\+Factor}} () const
+\begin{DoxyCompactList}\small\item\em Returns the pre-\/computed Barrett factor. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{classintel_1_1hexl_1_1MultiplyFactor_a143d0ed636511f3cd450286b89687822}{Operand}} () const
+\begin{DoxyCompactList}\small\item\em Returns the operand corresponding to the Barrett factor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Pre-\/computes a Barrett factor with which modular multiplication can be performed more efficiently. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1MultiplyFactor_ad7b998b4a54203d6ad83237e3b3f4c51}\label{classintel_1_1hexl_1_1MultiplyFactor_ad7b998b4a54203d6ad83237e3b3f4c51}} 
+\index{intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}!MultiplyFactor@{MultiplyFactor}}
+\index{MultiplyFactor@{MultiplyFactor}!intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}}
+\doxysubsubsection{\texorpdfstring{MultiplyFactor()}{MultiplyFactor()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+Multiply\+Factor\+::\+Multiply\+Factor (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1MultiplyFactor_a801de0aa37e108b21cdb6452a15f6c76}\label{classintel_1_1hexl_1_1MultiplyFactor_a801de0aa37e108b21cdb6452a15f6c76}} 
+\index{intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}!MultiplyFactor@{MultiplyFactor}}
+\index{MultiplyFactor@{MultiplyFactor}!intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}}
+\doxysubsubsection{\texorpdfstring{MultiplyFactor()}{MultiplyFactor()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+Multiply\+Factor\+::\+Multiply\+Factor (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{operand,  }\item[{uint64\+\_\+t}]{bit\+\_\+shift,  }\item[{uint64\+\_\+t}]{modulus }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Computes and stores the Barrett factor floor((operand $<$$<$ bit\+\_\+shift) / modulus) 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1MultiplyFactor_aa1708edda697a2ebb93f6b2b9b2967aa}\label{classintel_1_1hexl_1_1MultiplyFactor_aa1708edda697a2ebb93f6b2b9b2967aa}} 
+\index{intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}!BarrettFactor@{BarrettFactor}}
+\index{BarrettFactor@{BarrettFactor}!intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}}
+\doxysubsubsection{\texorpdfstring{BarrettFactor()}{BarrettFactor()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+Multiply\+Factor\+::\+Barrett\+Factor (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the pre-\/computed Barrett factor. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1MultiplyFactor_a143d0ed636511f3cd450286b89687822}\label{classintel_1_1hexl_1_1MultiplyFactor_a143d0ed636511f3cd450286b89687822}} 
+\index{intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}!Operand@{Operand}}
+\index{Operand@{Operand}!intel::hexl::MultiplyFactor@{intel::hexl::MultiplyFactor}}
+\doxysubsubsection{\texorpdfstring{Operand()}{Operand()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+Multiply\+Factor\+::\+Operand (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the operand corresponding to the Barrett factor. 
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{number-theory_8hpp}{number-\/theory.\+hpp}}\end{DoxyCompactItemize}

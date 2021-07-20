@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['generateprimes_172',['GeneratePrimes',['../namespaceintel_1_1hexl.html#a8df91eccfb48c9e2b3f00e76a1edb930',1,'intel::hexl']]],
+  ['generateprimitiveroot_173',['GeneratePrimitiveRoot',['../namespaceintel_1_1hexl.html#a130d3fb9218c1aaa9fbeb5d143eb288b',1,'intel::hexl']]],
+  ['getavx512precon32rootofunitypowers_174',['GetAVX512Precon32RootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#acf8896d7c5ab8c47fe860f3d5a1be215',1,'intel::hexl::NTT']]],
+  ['getavx512precon52rootofunitypowers_175',['GetAVX512Precon52RootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#aca9903ac08ed7e06d343f85a0ced8b04',1,'intel::hexl::NTT']]],
+  ['getavx512precon64rootofunitypowers_176',['GetAVX512Precon64RootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#afb5b2c6cd1135f708c5e8a4e97d6f7da',1,'intel::hexl::NTT']]],
+  ['getavx512rootofunitypowers_177',['GetAVX512RootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#ac93455767a667ef07aa41f747c77b4ae',1,'intel::hexl::NTT']]],
+  ['getdegree_178',['GetDegree',['../classintel_1_1hexl_1_1NTT.html#a25172ec87ce3cbfe9bbc20cd9c52f2ab',1,'intel::hexl::NTT']]],
+  ['getinvrootofunitypower_179',['GetInvRootOfUnityPower',['../classintel_1_1hexl_1_1NTT.html#a7dd5b59ed992c5466099999ce1eb15d6',1,'intel::hexl::NTT']]],
+  ['getinvrootofunitypowers_180',['GetInvRootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a509f384895cf97ef9cd2edd2902eb82a',1,'intel::hexl::NTT']]],
+  ['getminimalrootofunity_181',['GetMinimalRootOfUnity',['../classintel_1_1hexl_1_1NTT.html#af10476eb10c3b5723052bdf59d7f3d22',1,'intel::hexl::NTT']]],
+  ['getmodulus_182',['GetModulus',['../classintel_1_1hexl_1_1NTT.html#aef2a5afbd559f7e27d5fa7d4e28bd252',1,'intel::hexl::NTT']]],
+  ['getprecon32invrootofunitypowers_183',['GetPrecon32InvRootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a70d5480692fcd13418ae7f4c38345770',1,'intel::hexl::NTT']]],
+  ['getprecon32rootofunitypowers_184',['GetPrecon32RootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a1cbd65fb426faafbd22fcb8b7ee98807',1,'intel::hexl::NTT']]],
+  ['getprecon52invrootofunitypowers_185',['GetPrecon52InvRootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a9314e0edf36095233efaf72dc6cb9d5e',1,'intel::hexl::NTT']]],
+  ['getprecon64invrootofunitypowers_186',['GetPrecon64InvRootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a0f7f195efe5166b0f3a8c9e71f3a405a',1,'intel::hexl::NTT']]],
+  ['getprecon64rootofunitypowers_187',['GetPrecon64RootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a3bddde00a1832f4ac175e71469939e51',1,'intel::hexl::NTT']]],
+  ['getrootofunitypower_188',['GetRootOfUnityPower',['../classintel_1_1hexl_1_1NTT.html#af0ab14a87e3f9e8cf46502c4c766fec5',1,'intel::hexl::NTT']]],
+  ['getrootofunitypowers_189',['GetRootOfUnityPowers',['../classintel_1_1hexl_1_1NTT.html#a71749beadc3fde1d2b80f2d99b739099',1,'intel::hexl::NTT']]]
+];

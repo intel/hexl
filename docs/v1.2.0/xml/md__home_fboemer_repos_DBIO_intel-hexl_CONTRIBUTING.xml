@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="md__home_fboemer_repos_DBIO_intel-hexl_CONTRIBUTING" kind="page">
+    <compoundname>md__home_fboemer_repos_DBIO_intel-hexl_CONTRIBUTING</compoundname>
+    <title>Pull Requests</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Intel HEXL welcomes pull requests from external contributors.</para>
+<para>Before contributing, please run <programlisting filename=".bash"><codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>check<sp/>unittest</highlight></codeline>
+</programlisting></para>
+<para>to make sure the formatting checks and all unit tests pass. </para>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

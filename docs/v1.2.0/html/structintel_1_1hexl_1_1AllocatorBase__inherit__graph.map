@@ -1,0 +1,7 @@
+<map id="intel::hexl::AllocatorBase" name="intel::hexl::AllocatorBase">
+<area shape="rect" id="node1" title="Base class for custom memory allocator." alt="" coords="5,93,191,120"/>
+<area shape="rect" id="node2" href="$structintel_1_1hexl_1_1AllocatorInterface.html" title=" " alt="" coords="239,5,457,61"/>
+<area shape="rect" id="node4" href="$structintel_1_1hexl_1_1AllocatorInterface.html" title="Helper memory allocation struct which delegates implementation to AllocatorImpl." alt="" coords="243,86,453,127"/>
+<area shape="rect" id="node5" href="$structintel_1_1hexl_1_1MallocStrategy.html" title="Allocater implementation using malloc and free." alt="" coords="251,152,445,179"/>
+<area shape="rect" id="node3" href="$structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter.html" title="Helper class for custom memory allocation." alt="" coords="505,13,700,54"/>
+</map>
