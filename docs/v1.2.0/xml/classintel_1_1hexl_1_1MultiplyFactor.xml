@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classintel_1_1hexl_1_1MultiplyFactor" kind="class" language="C++" prot="public">
+    <compoundname>intel::hexl::MultiplyFactor</compoundname>
+    <includes refid="number-theory_8hpp" local="no">number-theory.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1MultiplyFactor_1a118507f8f18e2c8e87a0c1ca9f9b3ae1" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyFactor::m_operand</definition>
+        <argsstring></argsstring>
+        <name>m_operand</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="46" column="12" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="46" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1MultiplyFactor_1a97008cba5f4ba7eb9b29e0398c18f0b6" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyFactor::m_barrett_factor</definition>
+        <argsstring></argsstring>
+        <name>m_barrett_factor</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="47" column="12" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classintel_1_1hexl_1_1MultiplyFactor_1ad7b998b4a54203d6ad83237e3b3f4c51" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::MultiplyFactor::MultiplyFactor</definition>
+        <argsstring>()=default</argsstring>
+        <name>MultiplyFactor</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="22" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1MultiplyFactor_1a801de0aa37e108b21cdb6452a15f6c76" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::MultiplyFactor::MultiplyFactor</definition>
+        <argsstring>(uint64_t operand, uint64_t bit_shift, uint64_t modulus)</argsstring>
+        <name>MultiplyFactor</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>operand</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>bit_shift</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Computes and stores the Barrett factor floor((operand &lt;&lt; bit_shift) / modulus) </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="26" column="3" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="26" bodyend="37"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1MultiplyFactor_1aa1708edda697a2ebb93f6b2b9b2967aa" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyFactor::BarrettFactor</definition>
+        <argsstring>() const</argsstring>
+        <name>BarrettFactor</name>
+        <briefdescription>
+<para>Returns the pre-computed Barrett factor. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="40" column="19" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="40" bodyend="40"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1MultiplyFactor_1a143d0ed636511f3cd450286b89687822" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::MultiplyFactor::Operand</definition>
+        <argsstring>() const</argsstring>
+        <name>Operand</name>
+        <briefdescription>
+<para>Returns the operand corresponding to the Barrett factor. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="43" column="19" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="43" bodyend="43"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Pre-computes a Barrett factor with which modular multiplication can be performed more efficiently. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" line="20" column="1" bodyfile="/home/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/number-theory.hpp" bodystart="20" bodyend="48"/>
+    <listofallmembers>
+      <member refid="classintel_1_1hexl_1_1MultiplyFactor_1aa1708edda697a2ebb93f6b2b9b2967aa" prot="public" virt="non-virtual"><scope>intel::hexl::MultiplyFactor</scope><name>BarrettFactor</name></member>
+      <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a97008cba5f4ba7eb9b29e0398c18f0b6" prot="private" virt="non-virtual"><scope>intel::hexl::MultiplyFactor</scope><name>m_barrett_factor</name></member>
+      <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a118507f8f18e2c8e87a0c1ca9f9b3ae1" prot="private" virt="non-virtual"><scope>intel::hexl::MultiplyFactor</scope><name>m_operand</name></member>
+      <member refid="classintel_1_1hexl_1_1MultiplyFactor_1ad7b998b4a54203d6ad83237e3b3f4c51" prot="public" virt="non-virtual"><scope>intel::hexl::MultiplyFactor</scope><name>MultiplyFactor</name></member>
+      <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a801de0aa37e108b21cdb6452a15f6c76" prot="public" virt="non-virtual"><scope>intel::hexl::MultiplyFactor</scope><name>MultiplyFactor</name></member>
+      <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a143d0ed636511f3cd450286b89687822" prot="public" virt="non-virtual"><scope>intel::hexl::MultiplyFactor</scope><name>Operand</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
