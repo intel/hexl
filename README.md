@@ -41,7 +41,7 @@ For additional functionality, see the public headers, located in `include/hexl`
 
 ## Building Intel HEXL
 
-Intel HEXL can be built in several ways. Intel HEXL has been uploaded to the [Microsoft vcpkg](https://github.com/microsoft/vcpkg) C++ package manager, which supports Linux, macOS, and Windows builds. See the vcpkg repository for instructions to build Intel HEXL with vcpkg, e.g. run `vcpkg install hexl`. There may be some delay in uploading porting the latest release to vcpkg, so please build from source to use the latest change in Intel HEXL.
+Intel HEXL can be built in several ways. Intel HEXL has been uploaded to the [Microsoft vcpkg](https://github.com/microsoft/vcpkg) C++ package manager, which supports Linux, macOS, and Windows builds. See the vcpkg repository for instructions to build Intel HEXL with vcpkg, e.g. run `vcpkg install hexl`. There may be some delay in uploading porting the latest release to vcpkg. Intel HEXL provides port files to build the latest version with vcpkg. Run `vcpkg install hexl --overlay-ports=/path/to/hexl/port/hexl`. For detailed explanation, see instruction for building vcpkg port using overlays provided by vcpkg.
 
 Intel HEXL also supports a build using the CMake build system. See below for the instructions to build Intel HEXL from source using CMake.
 
