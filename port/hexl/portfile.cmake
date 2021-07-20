@@ -22,7 +22,7 @@ vcpkg_cmake_configure(
         "-DHEXL_BENCHMARK=OFF"
         "-DHEXL_COVERAGE=OFF"
         "-DHEXL_TESTING=OFF"
-        "-DHEXL_SHARED_LIB=OFF"
+        "-DHEXL_SHARED_LIB=${HEXL_SHARED}"
 )
 
 vcpkg_cmake_install()
