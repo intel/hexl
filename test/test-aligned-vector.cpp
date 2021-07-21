@@ -47,6 +47,11 @@ TEST(AlignedVector64, move_constructor) {
   ASSERT_EQ(y, (AlignedVector64<uint64_t>{1, 2, 3, 4}));
 }
 
+TEST(AlignedAllocator, assignment) {
+  AlignedAllocator<uint64_t, 64> x;
+  AlignedAllocator<uint64_t, 64> y = x;
+}
+
 struct CustomAllocator {
   using T = size_t;
   T* invoke_allocation(size_t size) { return new T[size]; }
@@ -73,9 +78,9 @@ struct CustomAllocatorAdapter
 TEST(AlignedVectorCustomAllocator64, alloc) {
   std::shared_ptr<AllocatorBase> adapter_allocator;
   {
-    CustomAllocator outter_allocator;
+    CustomAllocator outer_allocator;
     adapter_allocator =
-        std::make_shared<CustomAllocatorAdapter>(std::move(outter_allocator));
+        std::make_shared<CustomAllocatorAdapter>(std::move(outer_allocator));
   }
 
   AlignedAllocator<uint64_t, 64> hexl_alloc(adapter_allocator);
@@ -87,9 +92,9 @@ TEST(AlignedVectorCustomAllocator64, alloc) {
 TEST(AlignedVectorCustomAllocator64, assignment) {
   std::shared_ptr<AllocatorBase> adapter_allocator;
   {
-    CustomAllocator outter_allocator;
+    CustomAllocator outer_allocator;
     adapter_allocator =
-        std::make_shared<CustomAllocatorAdapter>(std::move(outter_allocator));
+        std::make_shared<CustomAllocatorAdapter>(std::move(outer_allocator));
   }
 
   AlignedAllocator<uint64_t, 64> hexl_alloc(adapter_allocator);
@@ -104,9 +109,9 @@ TEST(AlignedVectorCustomAllocator64, assignment) {
 TEST(AlignedVectorCustomAllocator64, move_assignment) {
   std::shared_ptr<AllocatorBase> adapter_allocator;
   {
-    CustomAllocator outter_allocator;
+    CustomAllocator outer_allocator;
     adapter_allocator =
-        std::make_shared<CustomAllocatorAdapter>(std::move(outter_allocator));
+        std::make_shared<CustomAllocatorAdapter>(std::move(outer_allocator));
   }
 
   AlignedAllocator<uint64_t, 64> hexl_alloc(adapter_allocator);
@@ -121,9 +126,9 @@ TEST(AlignedVectorCustomAllocator64, move_assignment) {
 TEST(AlignedVectorCustomAllocator64, copy_constructor) {
   std::shared_ptr<AllocatorBase> adapter_allocator;
   {
-    CustomAllocator outter_allocator;
+    CustomAllocator outer_allocator;
     adapter_allocator =
-        std::make_shared<CustomAllocatorAdapter>(std::move(outter_allocator));
+        std::make_shared<CustomAllocatorAdapter>(std::move(outer_allocator));
   }
 
   AlignedAllocator<uint64_t, 64> hexl_alloc(adapter_allocator);
@@ -137,9 +142,9 @@ TEST(AlignedVectorCustomAllocator64, copy_constructor) {
 TEST(AlignedVectorCustomAllocator64, move_constructor) {
   std::shared_ptr<AllocatorBase> adapter_allocator;
   {
-    CustomAllocator outter_allocator;
+    CustomAllocator outer_allocator;
     adapter_allocator =
-        std::make_shared<CustomAllocatorAdapter>(std::move(outter_allocator));
+        std::make_shared<CustomAllocatorAdapter>(std::move(outer_allocator));
   }
 
   AlignedAllocator<uint64_t, 64> hexl_alloc(adapter_allocator);
