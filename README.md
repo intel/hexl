@@ -165,8 +165,9 @@ To cite Intel HEXL, please use the following BibTeX entry.
 ### Version 1.2
 ```tex
     @misc{IntelHEXL,
+        author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.2)},
-        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        howpublished = {\url{https://github.com/intel/hexl}},
         month = july,
         year = 2021,
         key = {Intel HEXL}
@@ -176,8 +177,9 @@ To cite Intel HEXL, please use the following BibTeX entry.
 ### Version 1.1
 ```tex
     @misc{IntelHEXL,
+        author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.1)},
-        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        howpublished = {\url{https://github.com/intel/hexl}},
         month = may,
         year = 2021,
         key = {Intel HEXL}
@@ -187,8 +189,9 @@ To cite Intel HEXL, please use the following BibTeX entry.
 ### Version 1.0
 ```tex
     @misc{IntelHEXL,
+        author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.0)},
-        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        howpublished = {\url{https://github.com/intel/hexl}},
         month = april,
         year = 2021,
         key = {Intel HEXL}
