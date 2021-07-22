@@ -58,8 +58,7 @@ Intel HEXL requires the following dependencies:
 | CMake       | >= 3.5.1                                     |
 | Compiler    | gcc >= 7.0, clang++ >= 5.0, MSVC >= 2019     |
 
-For best performance, we recommend using a processor with AVX512-IFMA52 support, and a recent compiler (gcc >= 8.0, clang++ >= 6.0). To determine if your process supports AVX512-IFMA52, simply look for `HEXL_HAS_AVX512IFMA` during the configure step (see [Compiling Intel HEXL](#compiling-hexl)).
-
+For best performance, we recommend compiling with clang++-12. We also recommend using a processor with Intel AVX512DQ support, with best performance on processors supporting Intel AVX512-IFMA52. To determine if your processor supports AVX512-IFMA52, simply look for `HEXL_HAS_AVX512IFMA` during the configure step (see [Compiling Intel HEXL](#compiling-hexl)).
 
 ### Compile-time options
 In addition to the standard CMake build options, Intel HEXL supports several compile-time flags to configure the build.
