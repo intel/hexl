@@ -41,7 +41,7 @@ For additional functionality, see the public headers, located in `include/hexl`
 
 ## Building Intel HEXL
 
-Intel HEXL can be built in several ways. Intel HEXL has been uploaded to the [Microsoft vcpkg](https://github.com/microsoft/vcpkg) C++ package manager, which supports Linux, macOS, and Windows builds. See the vcpkg repository for instructions to build Intel HEXL with vcpkg, e.g. run `vcpkg install hexl`. There may be some delay in uploading porting the latest release to vcpkg, so please build from source to use the latest change in Intel HEXL.
+Intel HEXL can be built in several ways. Intel HEXL has been uploaded to the [Microsoft vcpkg](https://github.com/microsoft/vcpkg) C++ package manager, which supports Linux, macOS, and Windows builds. See the vcpkg repository for instructions to build Intel HEXL with vcpkg, e.g. run `vcpkg install hexl`. There may be some delay in uploading latest release ports to vcpkg. Intel HEXL provides port files to build the latest version with vcpkg. For a static build, run `vcpkg install hexl --overlay-ports=/path/to/hexl/port/hexl --head`. For dynamic build, use the custom triplet file and run `vcpkg install hexl:hexl-dynamic-build --overlay-ports=/path/to/hexl/port/hexl --head --overlay-triplets=/path/to/hexl/port/hexl`. For detailed explanation, see [instruction](https://devblogs.microsoft.com/cppblog/registries-bring-your-own-libraries-to-vcpkg/) for building vcpkg port using overlays and use of [custom triplet](https://github.com/microsoft/vcpkg/blob/master/docs/examples/overlay-triplets-linux-dynamic.md#building-dynamic-libraries-on-linux) provided by vcpkg.
 
 Intel HEXL also supports a build using the CMake build system. See below for the instructions to build Intel HEXL from source using CMake.
 
@@ -58,8 +58,7 @@ Intel HEXL requires the following dependencies:
 | CMake       | >= 3.5.1                                     |
 | Compiler    | gcc >= 7.0, clang++ >= 5.0, MSVC >= 2019     |
 
-For best performance, we recommend using a processor with AVX512-IFMA52 support, and a recent compiler (gcc >= 8.0, clang++ >= 6.0). To determine if your process supports AVX512-IFMA52, simply look for `HEXL_HAS_AVX512IFMA` during the configure step (see [Compiling Intel HEXL](#compiling-hexl)).
-
+For best performance, we recommend compiling with clang++-12. We also recommend using a processor with Intel AVX512DQ support, with best performance on processors supporting Intel AVX512-IFMA52. To determine if your processor supports AVX512-IFMA52, simply look for `HEXL_HAS_AVX512IFMA` during the configure step (see [Compiling Intel HEXL](#compiling-intel-hexl)).
 
 ### Compile-time options
 In addition to the standard CMake build options, Intel HEXL supports several compile-time flags to configure the build.
@@ -165,8 +164,9 @@ To cite Intel HEXL, please use the following BibTeX entry.
 ### Version 1.2
 ```tex
     @misc{IntelHEXL,
+        author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.2)},
-        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        howpublished = {\url{https://github.com/intel/hexl}},
         month = july,
         year = 2021,
         key = {Intel HEXL}
@@ -176,8 +176,9 @@ To cite Intel HEXL, please use the following BibTeX entry.
 ### Version 1.1
 ```tex
     @misc{IntelHEXL,
+        author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.1)},
-        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        howpublished = {\url{https://github.com/intel/hexl}},
         month = may,
         year = 2021,
         key = {Intel HEXL}
@@ -187,8 +188,9 @@ To cite Intel HEXL, please use the following BibTeX entry.
 ### Version 1.0
 ```tex
     @misc{IntelHEXL,
+        author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.0)},
-        howpublished = {\url{https://arxiv.org/abs/2103.16400}},
+        howpublished = {\url{https://github.com/intel/hexl}},
         month = april,
         year = 2021,
         key = {Intel HEXL}
