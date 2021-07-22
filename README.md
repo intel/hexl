@@ -9,6 +9,8 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
     - [Dependencies](#dependencies)
     - [Compile-time options](#compile-time-options)
     - [Compiling Intel HEXL](#compiling-intel-hexl)
+      - [Linux and Mac](#linux-and-mac)
+      - [Windows](#windows)
   - [Testing Intel HEXL](#testing-intel-hexl)
   - [Benchmarking Intel HEXL](#benchmarking-intel-hexl)
   - [Using Intel HEXL](#using-intel-hexl)
@@ -18,7 +20,7 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
 - [Documentation](#documentation)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
-  - [Citing Intel HEXL](#citing-intel-hexl)
+- [Citing Intel HEXL](#citing-intel-hexl)
     - [Version 1.2](#version-12)
     - [Version 1.1](#version-11)
     - [Version 1.0](#version-10)
@@ -74,9 +76,11 @@ For convenience, they are listed below:
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
 
 ### Compiling Intel HEXL
-The instructions to build Intel HEXL are common between Linux, MacOS, and Windows.
+To compile Intel HEXL from source code, first clone the repository and change directories to the where the source has been cloned.
+#### Linux and Mac
+The instructions to build Intel HEXL are common to Linux and MacOS.
 
-To compile Intel HEXL from source code, first clone the repository into your current directory. Then, to configure the build, call
+Then, to configure the build, call
 ```bash
 cmake -S . -B build
 ```
@@ -98,6 +102,25 @@ cmake --install build
 To use a non-standard installation directory, configure the build with
 ```bash
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
+```
+before proceeding with the build and installation directions above.
+
+#### Windows
+To compile Intel HEXL on Windows using Visual Studio, configure the build via
+```bash
+cmake -S . -B build -G "Visual Studio 16 2019"
+```
+adding the desired compile-time options with a `-D` flag (see [Compile-time options](#compile-time-options)).
+
+To specify the desired build configuration, pass either `--config Debug` or `--config Release` to the build step and install steps. For instance, to build Intel HEXL in Release mode, call
+```bash
+cmake --build build --config Release
+```
+This will build the Intel HEXL library in the `build/hexl/lib/` or `build/hexl/Release/lib` directory.
+
+To install Intel HEXL to the installation directory, run
+```bash
+cmake --install build --config Release
 ```
 
 ## Testing Intel HEXL

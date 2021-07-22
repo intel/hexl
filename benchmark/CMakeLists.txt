@@ -27,5 +27,7 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(bench_hexl PRIVATE -Wall -Wextra -march=native -O3)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(bench_hexl PRIVATE /Wall /W4 /Zc:preprocessor)
+    target_compile_options(bench_hexl PRIVATE /Wall /W4 /Zc:preprocessor
+        /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support constexpr
+    )
 endif()
