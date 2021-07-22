@@ -142,7 +142,7 @@ The benchmark executable itself is located at `build/benchmark/bench_hexl`
 The `example` folder has an example of using Intel HEXL in a third-party project.
 
 ## Debugging
-For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl.a`, that can be used to debug the execution.
+For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution. In Debug mode, Intel HEXL will also link against [Address Sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer).
 
 **Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
 ## Threading
