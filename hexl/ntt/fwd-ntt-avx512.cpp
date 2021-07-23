@@ -372,7 +372,7 @@ void ForwardTransformToBitReverseAVX512(
   } else {
     // Perform depth-first NTT via recursive call
     size_t t = (n >> 1);
-    size_t W_idx = (1 << recursion_depth) + recursion_half;
+    size_t W_idx = (1ULL << recursion_depth) + recursion_half;
     const uint64_t* W_op = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 

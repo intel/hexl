@@ -9,6 +9,8 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
     - [Dependencies](#dependencies)
     - [Compile-time options](#compile-time-options)
     - [Compiling Intel HEXL](#compiling-intel-hexl)
+      - [Linux and Mac](#linux-and-mac)
+      - [Windows](#windows)
   - [Testing Intel HEXL](#testing-intel-hexl)
   - [Benchmarking Intel HEXL](#benchmarking-intel-hexl)
   - [Using Intel HEXL](#using-intel-hexl)
@@ -18,7 +20,7 @@ Intel:registered: HEXL is an open-source library which provides efficient implem
 - [Documentation](#documentation)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
-  - [Citing Intel HEXL](#citing-intel-hexl)
+- [Citing Intel HEXL](#citing-intel-hexl)
     - [Version 1.2](#version-12)
     - [Version 1.1](#version-11)
     - [Version 1.0](#version-10)
@@ -74,9 +76,11 @@ For convenience, they are listed below:
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF (default OFF) | Set to ON to treat all warnings as error                                 |
 
 ### Compiling Intel HEXL
-The instructions to build Intel HEXL are common between Linux, MacOS, and Windows.
+To compile Intel HEXL from source code, first clone the repository and change directories to the where the source has been cloned.
+#### Linux and Mac
+The instructions to build Intel HEXL are common to Linux and MacOS.
 
-To compile Intel HEXL from source code, first clone the repository into your current directory. Then, to configure the build, call
+Then, to configure the build, call
 ```bash
 cmake -S . -B build
 ```
@@ -99,6 +103,30 @@ To use a non-standard installation directory, configure the build with
 ```bash
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
 ```
+before proceeding with the build and installation directions above.
+
+#### Windows
+To compile Intel HEXL on Windows using Visual Studio in Release mode, configure the build via
+```bash
+cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
+```
+adding the desired compile-time options with a `-D` flag (see [Compile-time options](#compile-time-options)).
+
+To specify the desired build configuration, pass either `--config Debug` or `--config Release` to the build step and install steps. For instance, to build Intel HEXL in Release mode, call
+```bash
+cmake --build build --config Release
+```
+This will build the Intel HEXL library in the `build/hexl/lib/` or `build/hexl/Release/lib` directory.
+
+To install Intel HEXL to the installation directory, run
+```bash
+cmake --build build --target install --config Release
+```
+To use a non-standard installation directory, configure the build with
+```bash
+cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install
+```
+before proceeding with the build and installation directions above.
 
 ## Testing Intel HEXL
 To run a set of unit tests via Googletest, configure and build Intel HEXL with `-DHEXL_TESTING=ON` (see [Compile-time options](#compile-time-options)).
@@ -119,7 +147,7 @@ The benchmark executable itself is located at `build/benchmark/bench_hexl`
 The `example` folder has an example of using Intel HEXL in a third-party project.
 
 ## Debugging
-For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl.a`, that can be used to debug the execution.
+For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution. In Debug mode, Intel HEXL will also link against [Address Sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer).
 
 **Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
 ## Threading

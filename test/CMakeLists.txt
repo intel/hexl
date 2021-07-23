@@ -38,7 +38,11 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         target_link_libraries(unit-test PRIVATE gflags)
     endif()
     # Disable inline, due to incorect optimization in ExtractValues, causing failing tests in Windows AVX512 in Release mode with HEXL_DEBUG=OFF
-    target_compile_options(unit-test PRIVATE /Wall /W4 /Zc:preprocessor /Ob0)
+    target_compile_options(unit-test PRIVATE /Wall /W4 /Zc:preprocessor /Ob0
+        /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support constexpr
+        /wd4389 # warning C4389: signed/unsigned mismatch from gtest
+    )
+    target_compile_definitions(unit-test PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 target_include_directories(unit-test PRIVATE
