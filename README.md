@@ -122,6 +122,11 @@ To install Intel HEXL to the installation directory, run
 ```bash
 cmake --build build --target install --config Release
 ```
+To use a non-standard installation directory, configure the build with
+```bash
+cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install
+```
+before proceeding with the build and installation directions above.
 
 ## Testing Intel HEXL
 To run a set of unit tests via Googletest, configure and build Intel HEXL with `-DHEXL_TESTING=ON` (see [Compile-time options](#compile-time-options)).
