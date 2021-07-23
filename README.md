@@ -106,9 +106,9 @@ cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
 before proceeding with the build and installation directions above.
 
 #### Windows
-To compile Intel HEXL on Windows using Visual Studio, configure the build via
+To compile Intel HEXL on Windows using Visual Studio in Release mode, configure the build via
 ```bash
-cmake -S . -B build -G "Visual Studio 16 2019"
+cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
 ```
 adding the desired compile-time options with a `-D` flag (see [Compile-time options](#compile-time-options)).
 
@@ -120,7 +120,7 @@ This will build the Intel HEXL library in the `build/hexl/lib/` or `build/hexl/R
 
 To install Intel HEXL to the installation directory, run
 ```bash
-cmake --install build --config Release
+cmake --build build --target install --config Release
 ```
 
 ## Testing Intel HEXL
