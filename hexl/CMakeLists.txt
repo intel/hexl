@@ -78,7 +78,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # so we disable it here
     target_compile_options(hexl PRIVATE /Wall /W4 /Zc:preprocessor /Ob0
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support constexpr
-     )
+    )
     target_compile_definitions(hexl PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
