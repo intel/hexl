@@ -240,5 +240,3 @@ The Intel contributors to this project, sorted by last name, are
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
-
-dummy
