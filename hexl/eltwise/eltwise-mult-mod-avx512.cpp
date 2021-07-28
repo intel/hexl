@@ -219,22 +219,22 @@ void EltwiseMultModAVX512IntLoopUnroll(__m512i* vp_result,
     __m512i c15 = _mm512_hexl_shrdi_epi64<BitShift - 1>(zlo15, zhi15);
     __m512i c16 = _mm512_hexl_shrdi_epi64<BitShift - 1>(zlo16, zhi16);
 
-    c1 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
-    c2 = _mm512_hexl_mulhi_epi<64>(c2, vbarr_lo);
-    c3 = _mm512_hexl_mulhi_epi<64>(c3, vbarr_lo);
-    c4 = _mm512_hexl_mulhi_epi<64>(c4, vbarr_lo);
-    c5 = _mm512_hexl_mulhi_epi<64>(c5, vbarr_lo);
-    c6 = _mm512_hexl_mulhi_epi<64>(c6, vbarr_lo);
-    c7 = _mm512_hexl_mulhi_epi<64>(c7, vbarr_lo);
-    c8 = _mm512_hexl_mulhi_epi<64>(c8, vbarr_lo);
-    c9 = _mm512_hexl_mulhi_epi<64>(c9, vbarr_lo);
-    c10 = _mm512_hexl_mulhi_epi<64>(c10, vbarr_lo);
-    c11 = _mm512_hexl_mulhi_epi<64>(c11, vbarr_lo);
-    c12 = _mm512_hexl_mulhi_epi<64>(c12, vbarr_lo);
-    c13 = _mm512_hexl_mulhi_epi<64>(c13, vbarr_lo);
-    c14 = _mm512_hexl_mulhi_epi<64>(c14, vbarr_lo);
-    c15 = _mm512_hexl_mulhi_epi<64>(c15, vbarr_lo);
-    c16 = _mm512_hexl_mulhi_epi<64>(c16, vbarr_lo);
+    c1 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
+    c2 = _mm512_hexl_mulhi_approx_epi<64>(c2, vbarr_lo);
+    c3 = _mm512_hexl_mulhi_approx_epi<64>(c3, vbarr_lo);
+    c4 = _mm512_hexl_mulhi_approx_epi<64>(c4, vbarr_lo);
+    c5 = _mm512_hexl_mulhi_approx_epi<64>(c5, vbarr_lo);
+    c6 = _mm512_hexl_mulhi_approx_epi<64>(c6, vbarr_lo);
+    c7 = _mm512_hexl_mulhi_approx_epi<64>(c7, vbarr_lo);
+    c8 = _mm512_hexl_mulhi_approx_epi<64>(c8, vbarr_lo);
+    c9 = _mm512_hexl_mulhi_approx_epi<64>(c9, vbarr_lo);
+    c10 = _mm512_hexl_mulhi_approx_epi<64>(c10, vbarr_lo);
+    c11 = _mm512_hexl_mulhi_approx_epi<64>(c11, vbarr_lo);
+    c12 = _mm512_hexl_mulhi_approx_epi<64>(c12, vbarr_lo);
+    c13 = _mm512_hexl_mulhi_approx_epi<64>(c13, vbarr_lo);
+    c14 = _mm512_hexl_mulhi_approx_epi<64>(c14, vbarr_lo);
+    c15 = _mm512_hexl_mulhi_approx_epi<64>(c15, vbarr_lo);
+    c16 = _mm512_hexl_mulhi_approx_epi<64>(c16, vbarr_lo);
 
     __m512i vr1 = _mm512_hexl_mullo_epi<64>(c1, v_modulus);
     __m512i vr2 = _mm512_hexl_mullo_epi<64>(c2, v_modulus);
@@ -270,22 +270,22 @@ void EltwiseMultModAVX512IntLoopUnroll(__m512i* vp_result,
     vr15 = _mm512_sub_epi64(zlo15, vr15);
     vr16 = _mm512_sub_epi64(zlo16, vr16);
 
-    vr1 = _mm512_hexl_small_mod_epu64(vr1, v_modulus);
-    vr2 = _mm512_hexl_small_mod_epu64(vr2, v_modulus);
-    vr3 = _mm512_hexl_small_mod_epu64(vr3, v_modulus);
-    vr4 = _mm512_hexl_small_mod_epu64(vr4, v_modulus);
-    vr5 = _mm512_hexl_small_mod_epu64(vr5, v_modulus);
-    vr6 = _mm512_hexl_small_mod_epu64(vr6, v_modulus);
-    vr7 = _mm512_hexl_small_mod_epu64(vr7, v_modulus);
-    vr8 = _mm512_hexl_small_mod_epu64(vr8, v_modulus);
-    vr9 = _mm512_hexl_small_mod_epu64(vr9, v_modulus);
-    vr10 = _mm512_hexl_small_mod_epu64(vr10, v_modulus);
-    vr11 = _mm512_hexl_small_mod_epu64(vr11, v_modulus);
-    vr12 = _mm512_hexl_small_mod_epu64(vr12, v_modulus);
-    vr13 = _mm512_hexl_small_mod_epu64(vr13, v_modulus);
-    vr14 = _mm512_hexl_small_mod_epu64(vr14, v_modulus);
-    vr15 = _mm512_hexl_small_mod_epu64(vr15, v_modulus);
-    vr16 = _mm512_hexl_small_mod_epu64(vr16, v_modulus);
+    vr1 = _mm512_hexl_small_mod_epu64<4>(vr1, v_modulus, &v_twice_mod);
+    vr2 = _mm512_hexl_small_mod_epu64<4>(vr2, v_modulus, &v_twice_mod);
+    vr3 = _mm512_hexl_small_mod_epu64<4>(vr3, v_modulus, &v_twice_mod);
+    vr4 = _mm512_hexl_small_mod_epu64<4>(vr4, v_modulus, &v_twice_mod);
+    vr5 = _mm512_hexl_small_mod_epu64<4>(vr5, v_modulus, &v_twice_mod);
+    vr6 = _mm512_hexl_small_mod_epu64<4>(vr6, v_modulus, &v_twice_mod);
+    vr7 = _mm512_hexl_small_mod_epu64<4>(vr7, v_modulus, &v_twice_mod);
+    vr8 = _mm512_hexl_small_mod_epu64<4>(vr8, v_modulus, &v_twice_mod);
+    vr9 = _mm512_hexl_small_mod_epu64<4>(vr9, v_modulus, &v_twice_mod);
+    vr10 = _mm512_hexl_small_mod_epu64<4>(vr10, v_modulus, &v_twice_mod);
+    vr11 = _mm512_hexl_small_mod_epu64<4>(vr11, v_modulus, &v_twice_mod);
+    vr12 = _mm512_hexl_small_mod_epu64<4>(vr12, v_modulus, &v_twice_mod);
+    vr13 = _mm512_hexl_small_mod_epu64<4>(vr13, v_modulus, &v_twice_mod);
+    vr14 = _mm512_hexl_small_mod_epu64<4>(vr14, v_modulus, &v_twice_mod);
+    vr15 = _mm512_hexl_small_mod_epu64<4>(vr15, v_modulus, &v_twice_mod);
+    vr16 = _mm512_hexl_small_mod_epu64<4>(vr16, v_modulus, &v_twice_mod);
 
     _mm512_storeu_si512(vp_result++, vr1);
     _mm512_storeu_si512(vp_result++, vr2);
@@ -330,10 +330,13 @@ void EltwiseMultModAVX512IntLoopDefault(__m512i* vp_result,
     __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
 
     __m512i c1 = _mm512_hexl_shrdi_epi64<BitShift - 1>(vprod_lo, vprod_hi);
-    __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
+    __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
     __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+    // Computes result in [0, 4q)
     vresult = _mm512_sub_epi64(vprod_lo, vresult);
-    vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
+
+    // Reduce result to [0, q)
+    vresult = _mm512_hexl_small_mod_epu64<4>(vresult, v_modulus, &v_twice_mod);
     _mm512_storeu_si512(vp_result, vresult);
 
     ++vp_operand1;
@@ -564,15 +567,32 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
               vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
 
           // L - N + 1 == 64, so we only need high 64 bits
-          __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
+          __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
 
           // C4 = prod_lo - (p * c3)_lo
           __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+          // Computes result in [0, 4q)
           vresult = _mm512_sub_epi64(vprod_lo, vresult);
 
-          // Conditional subtraction
-          vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
+          // Reduce result to [0, q)
+          vresult =
+              _mm512_hexl_small_mod_epu64<4>(vresult, v_modulus, &v_twice_mod);
           _mm512_storeu_si512(vp_result, vresult);
+
+          HEXL_CHECK_BOUNDS((uint64_t*)(vp_result), 8, modulus,
+                            "result exceeds bound");
+
+          // L - N + 1 == 64, so we only need high 64 bits
+          // __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
+
+          // // C4 = prod_lo - (p * c3)_lo
+          // __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+          // // Computes result in [0, 2q)
+          // vresult = _mm512_sub_epi64(vprod_lo, vresult);
+
+          // // Conditional subtraction to reduce result to [0, q)
+          // vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
+          // _mm512_storeu_si512(vp_result, vresult);
 
           ++vp_operand1;
           ++vp_operand2;
