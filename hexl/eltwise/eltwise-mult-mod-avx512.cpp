@@ -582,18 +582,6 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
           HEXL_CHECK_BOUNDS((uint64_t*)(vp_result), 8, modulus,
                             "result exceeds bound");
 
-          // L - N + 1 == 64, so we only need high 64 bits
-          // __m512i c3 = _mm512_hexl_mulhi_epi<64>(c1, vbarr_lo);
-
-          // // C4 = prod_lo - (p * c3)_lo
-          // __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
-          // // Computes result in [0, 2q)
-          // vresult = _mm512_sub_epi64(vprod_lo, vresult);
-
-          // // Conditional subtraction to reduce result to [0, q)
-          // vresult = _mm512_hexl_small_mod_epu64(vresult, v_modulus);
-          // _mm512_storeu_si512(vp_result, vresult);
-
           ++vp_operand1;
           ++vp_operand2;
           ++vp_result;
