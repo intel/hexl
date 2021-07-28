@@ -41,8 +41,5 @@ void InverseTransformFromBitReverse64(
     const uint64_t* precon_inv_root_of_unity_powers,
     uint64_t input_mod_factor = 1, uint64_t output_mod_factor = 1);
 
-// Returns true if arguments satisfy constraints for negacyclic NTT
-bool CheckNTTArguments(uint64_t degree, uint64_t modulus);
-
 }  // namespace hexl
 }  // namespace intel

@@ -243,7 +243,7 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half) {
-  HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(CheckArguments(n, modulus), "");
   HEXL_CHECK(modulus < MaximumValue(BitShift) / 4,
              "modulus " << modulus << " too large for BitShift " << BitShift
                         << " => maximum value " << MaximumValue(BitShift) / 4);

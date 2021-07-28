@@ -83,6 +83,9 @@ class NTT {
                 std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
+  // Returns true if arguments satisfy constraints for negacyclic NTT
+  bool CheckArguments(uint64_t degree, uint64_t modulus);
+
   /// @brief Compute forward NTT. Results are bit-reversed.
   /// @param[out] result Stores the result
   /// @param[in] operand Data on which to compute the NTT

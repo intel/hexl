@@ -40,7 +40,7 @@ NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
       m_precon52_inv_root_of_unity_powers(m_aligned_alloc),
       m_precon64_inv_root_of_unity_powers(m_aligned_alloc),
       m_inv_root_of_unity_powers(m_aligned_alloc) {
-  HEXL_CHECK(CheckNTTArguments(degree, q), "");
+  HEXL_CHECK(CheckArguments(degree, q), "");
   HEXL_CHECK(IsPrimitiveRoot(m_w, 2 * degree, q),
              m_w << " is not a primitive 2*" << degree << "'th root of unity");
 
@@ -169,6 +169,20 @@ void NTT::ComputeRootOfUnityPowers() {
   // 64-bit preconditioned inverse root of unity powers
   m_precon64_inv_root_of_unity_powers =
       compute_barrett_vector(m_inv_root_of_unity_powers, 64);
+}
+
+bool NTT::CheckArguments(uint64_t degree, uint64_t modulus) {
+  // Avoid unused parameter warnings
+  (void)degree;
+  (void)modulus;
+  HEXL_CHECK(IsPowerOfTwo(degree),
+             "degree " << degree << " is not a power of 2");
+  HEXL_CHECK(degree <= (1 << NTT::s_max_degree_bits),
+             "degree should be less than 2^" << NTT::s_max_degree_bits
+                                             << " got " << degree);
+
+  HEXL_CHECK(modulus % (2 * degree) == 1, "modulus mod 2n != 1");
+  return true;
 }
 
 void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
@@ -310,7 +324,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
                                     const uint64_t* precon_root_of_unity_powers,
                                     uint64_t input_mod_factor,
                                     uint64_t output_mod_factor) {
-  HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(CheckArguments(n, modulus), "");
   HEXL_CHECK_BOUNDS(operand, n, modulus * input_mod_factor,
                     "operand exceeds bound " << modulus * input_mod_factor);
   HEXL_CHECK(root_of_unity_powers != nullptr,
@@ -379,7 +393,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
 void ReferenceForwardTransformToBitReverse(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers) {
-  HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(CheckArguments(n, modulus), "");
   HEXL_CHECK(root_of_unity_powers != nullptr,
              "root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
@@ -411,7 +425,7 @@ void InverseTransformFromBitReverse64(
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor) {
-  HEXL_CHECK(CheckNTTArguments(n, modulus), "");
+  HEXL_CHECK(CheckArguments(n, modulus), "");
   HEXL_CHECK(inv_root_of_unity_powers != nullptr,
              "inv_root_of_unity_powers == nullptr");
   HEXL_CHECK(precon_inv_root_of_unity_powers != nullptr,
@@ -483,20 +497,6 @@ void InverseTransformFromBitReverse64(
                                            << operand[i] << " >= " << modulus);
     }
   }
-}
-
-bool CheckNTTArguments(uint64_t degree, uint64_t modulus) {
-  // Avoid unused parameter warnings
-  (void)degree;
-  (void)modulus;
-  HEXL_CHECK(IsPowerOfTwo(degree),
-             "degree " << degree << " is not a power of 2");
-  HEXL_CHECK(degree <= (1 << NTT::s_max_degree_bits),
-             "degree should be less than 2^" << NTT::s_max_degree_bits
-                                             << " got " << degree);
-
-  HEXL_CHECK(modulus % (2 * degree) == 1, "modulus mod 2n != 1");
-  return true;
 }
 
 }  // namespace hexl
