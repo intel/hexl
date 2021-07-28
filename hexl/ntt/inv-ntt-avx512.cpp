@@ -85,6 +85,8 @@ inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
     __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
     *Y = _mm512_hexl_mullo_add_lo_epi<BitShift>(Q_p, W_op, T);
   } else if (BitShift == 64) {
+    // Perform approximate computation of Q, as described in page 7 of
+    // https://arxiv.org/pdf/2003.04510.pdf
     __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, T);
     __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
     // Compute Y in range [0, 4q)

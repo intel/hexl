@@ -567,6 +567,8 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
               vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
 
           // L - N + 1 == 64, so we only need high 64 bits
+          // Perform approximate computation of high bits, as described on page
+          // 7 of https://arxiv.org/pdf/2003.04510.pdf
           __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
 
           // C4 = prod_lo - (p * c3)_lo
