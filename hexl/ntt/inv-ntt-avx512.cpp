@@ -81,20 +81,16 @@ inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
     __m512i Q_p = _mm512_hexl_mullo_epi<64>(Q, neg_modulus);
     *Y = _mm512_hexl_mullo_add_lo_epi<64>(Q_p, W_op, T);
   } else if (BitShift == 52) {
-    __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
-    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
-    T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
-  } else if (BitShift == 64) {
     __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, T);
     __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
     *Y = _mm512_hexl_mullo_add_lo_epi<BitShift>(Q_p, W_op, T);
-
-    // __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, T);
-    // __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
-    // // Compute Y in range [0, 4q)
-    // *Y = _mm512_hexl_mullo_add_lo_epi<BitShift>(Q_p, W_op, T);
-    // // Reduce Y to range [0, 2q)
-    // *Y = _mm512_hexl_small_mod_epu64<2>(*Y, twice_modulus);
+  } else if (BitShift == 64) {
+    __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, T);
+    __m512i Q_p = _mm512_hexl_mullo_epi<BitShift>(Q, neg_modulus);
+    // Compute Y in range [0, 4q)
+    *Y = _mm512_hexl_mullo_add_lo_epi<BitShift>(Q_p, W_op, T);
+    // Reduce Y to range [0, 2q)
+    *Y = _mm512_hexl_small_mod_epu64<2>(*Y, twice_modulus);
   } else {
     HEXL_CHECK(false, "Invalid BitShift " << BitShift);
   }

@@ -75,18 +75,16 @@ void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
     __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
     T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
   } else if (BitShift == 64) {
-    __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
-    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
-    T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
-
-    // __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, *Y);
+    // __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
     // __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
-    // // Compute T in range [0, 4q)
     // T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
-    // // Reduce T to range [0, 2q)
-    // T = _mm512_hexl_small_mod_epu64<2>(T, twice_modulus);
 
-    LOG(INFO) << "T " << ExtractValues(T);
+    __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, *Y);
+    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
+    // Compute T in range [0, 4q)
+    T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
+    // Reduce T to range [0, 2q)
+    T = _mm512_hexl_small_mod_epu64<2>(T, twice_modulus);
   } else {
     HEXL_CHECK(false, "Invalid BitShift " << BitShift);
   }

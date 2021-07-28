@@ -17,8 +17,6 @@ inline void CheckClose(const std::vector<uint64_t>& x,
                        const std::vector<uint64_t>& y, uint64_t tolerance) {
   EXPECT_EQ(x.size(), y.size());
   uint64_t N = x.size();
-  LOG(INFO) << "Checking x " << x << "vs y " << y;
-
   for (size_t i = 0; i < N; ++i) {
     EXPECT_LE(std::max(x[i], y[i]) - std::min(x[i], y[i]), tolerance)
         << "Mismatch at index " << i;
@@ -36,8 +34,6 @@ inline void AssertClose(const std::vector<T>& x, const std::vector<T>& y,
                         uint64_t tolerance) {
   ASSERT_EQ(x.size(), y.size());
   uint64_t N = x.size();
-  LOG(INFO) << "Checking x " << x;
-  LOG(INFO) << "Checking y " << y;
   for (size_t i = 0; i < N; ++i) {
     ASSERT_LE(std::max(x[i], y[i]) - std::min(x[i], y[i]), tolerance)
         << "Mismatch at index " << i;
