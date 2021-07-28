@@ -100,8 +100,8 @@ TEST(AVX512, _mm512_hexl_mulhi_epi64) {
   }
 
   {
-    __m512i z = _mm512_hexl_mulhi_epi<64>(w, y);
-    CheckEqual(z, expected);
+    __m512i z = _mm512_hexl_mulhi_approx_epi<64>(w, y);
+    CheckClose(z, expected, 1);
   }
 }
 #endif

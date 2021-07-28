@@ -110,11 +110,11 @@ inline __m512i _mm512_hexl_mulhi_epi<52>(__m512i x, __m512i y) {
 // Returns the high BitShift-bit unsigned integer from the intermediate result,
 // with approximation error at most 1
 template <int BitShift>
-inline __m512i _mm512_hexl_mulhi_epi_approx(__m512i x, __m512i y);
+inline __m512i _mm512_hexl_mulhi_approx_epi(__m512i x, __m512i y);
 
 // Dummy implementation to avoid template substitution errors
 template <>
-inline __m512i _mm512_hexl_mulhi_epi_approx<32>(__m512i x, __m512i y) {
+inline __m512i _mm512_hexl_mulhi_approx_epi<32>(__m512i x, __m512i y) {
   HEXL_CHECK(false, "Unimplemented");
   (void)x;  // Avoid unused variable warning
   (void)y;  // Avoid unused variable warning
@@ -122,20 +122,20 @@ inline __m512i _mm512_hexl_mulhi_epi_approx<32>(__m512i x, __m512i y) {
 }
 
 template <>
-inline __m512i _mm512_hexl_mulhi_epi_approx<64>(__m512i x, __m512i y) {
+inline __m512i _mm512_hexl_mulhi_approx_epi<64>(__m512i x, __m512i y) {
   // https://stackoverflow.com/questions/28807341/simd-signed-with-unsigned-multiplication-for-64-bit-64-bit-to-128-bit
-  __m512i lomask = _mm512_set1_epi64(0x00000000ffffffff);
+  __m512i lo_mask = _mm512_set1_epi64(0x00000000ffffffff);
   __m512i xh =
       _mm512_shuffle_epi32(x, (_MM_PERM_ENUM)0xB1);  // x0l, x0h, x1l, x1h
   __m512i yh =
       _mm512_shuffle_epi32(y, (_MM_PERM_ENUM)0xB1);  // y0l, y0h, y1l, y1h
-  __m512i w0 = _mm512_mul_epu32(x, y);               // x0l*y0l, x1l*y1l
-  __m512i w1 = _mm512_mul_epu32(x, yh);              // x0l*y0h, x1l*y1h
-  __m512i w2 = _mm512_mul_epu32(xh, y);              // x0h*y0l, x1h*y0l
-  __m512i w3 = _mm512_mul_epu32(xh, yh);             // x0h*y0h, x1h*y1h
-  __m512i w0h = _mm512_srli_epi64(w0, 32);
-  __m512i s1 = _mm512_add_epi64(w1, w0h);
-  __m512i s1l = _mm512_and_si512(s1, lomask);
+  // __m512i w0 = _mm512_mul_epu32(x, y);               // x0l*y0l, x1l*y1l
+  __m512i w1 = _mm512_mul_epu32(x, yh);   // x0l*y0h, x1l*y1h
+  __m512i w2 = _mm512_mul_epu32(xh, y);   // x0h*y0l, x1h*y0l
+  __m512i w3 = _mm512_mul_epu32(xh, yh);  // x0h*y0h, x1h*y1h
+  // __m512i w0h = _mm512_srli_epi64(w0, 32);
+  __m512i s1 = w1;  // _mm512_add_epi64(w1, w0h);
+  __m512i s1l = _mm512_and_si512(s1, lo_mask);
   __m512i s1h = _mm512_srli_epi64(s1, 32);
   __m512i s2 = _mm512_add_epi64(w2, s1l);
   __m512i s2h = _mm512_srli_epi64(s2, 32);
@@ -145,7 +145,7 @@ inline __m512i _mm512_hexl_mulhi_epi_approx<64>(__m512i x, __m512i y) {
 
 #ifdef HEXL_HAS_AVX512IFMA
 template <>
-inline __m512i _mm512_hexl_mulhi_epi_approx<52>(__m512i x, __m512i y) {
+inline __m512i _mm512_hexl_mulhi_approx_epi<52>(__m512i x, __m512i y) {
   __m512i zero = _mm512_set1_epi64(0);
   return _mm512_madd52hi_epu64(zero, x, y);
 }
