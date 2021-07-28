@@ -4,7 +4,7 @@ vcpkg_fail_port_install(ON_ARCH "x86" "arm" "arm64")
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO intel/hexl
-    HEAD_REF 1.2.0
+    HEAD_REF main
 )
 
 set(VCPKG_BUILD_TYPE release)
