@@ -83,7 +83,10 @@ class NTT {
                 std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
-  // Returns true if arguments satisfy constraints for negacyclic NTT
+  /// @brief Returns true if arguments satisfy constraints for negacyclic NTT
+  /// @param[in] degree Size of the transform, i.e. the polynomial degree. Must
+  /// be a power of two.
+  /// @param[in] modulus Prime modulus. Must satisfy
   static bool CheckArguments(uint64_t degree, uint64_t modulus);
 
   /// @brief Compute forward NTT. Results are bit-reversed.

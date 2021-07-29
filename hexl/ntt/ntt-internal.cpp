@@ -183,8 +183,9 @@ bool NTT::CheckArguments(uint64_t degree, uint64_t modulus) {
   HEXL_CHECK(modulus <= (1ULL << NTT::MaxModulusBits()),
              "modulus should be less than 2^" << NTT::MaxModulusBits()
                                               << " got " << modulus);
-
   HEXL_CHECK(modulus % (2 * degree) == 1, "modulus mod 2n != 1");
+  HEXL_CHECK(IsPrime(modulus), "modulus is not prime");
+
   return true;
 }
 
