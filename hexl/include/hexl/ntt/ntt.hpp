@@ -220,7 +220,7 @@ class NTT {
 
   /// @brief Maximum modulus to use AVX512-IFMA acceleration for the inverse
   /// transform
-  static const size_t s_max_inv_ifma_modulus{1ULL << (s_ifma_shift_bits - 1)};
+  static const size_t s_max_inv_ifma_modulus{1ULL << (s_ifma_shift_bits - 2)};
 
  private:
   void ComputeRootOfUnityPowers();

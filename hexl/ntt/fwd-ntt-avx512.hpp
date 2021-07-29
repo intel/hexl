@@ -14,7 +14,7 @@ namespace hexl {
 /// @param[in, out] operand Input data. Overwritten with NTT output
 /// @param[in] n Size of the transfrom, i.e. the polynomial degree. Must be a
 /// power of two.
-/// @param[in] modulus Prime modulus. Must satisfy q == 1 mod 2n
+/// @param[in] modulus Prime modulus. Must satisfy q == 1 mod 2n and q < 2^50.
 /// @param[in] root_of_unity_powers Powers of 2n'th root of unity in F_q. In
 /// bit-reversed order.
 /// @param[in] precon_root_of_unity_powers Pre-conditioned Powers of 2n'th root
