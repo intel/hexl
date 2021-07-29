@@ -228,7 +228,7 @@ TEST(NTT, root_of_unity2) {
 }
 
 // Parameters = (degree, modulus, input, expected_output)
-class NTTAPITest
+class NTTTest
     : public ::testing::TestWithParam<std::tuple<
           uint64_t, uint64_t, std::vector<uint64_t>, std::vector<uint64_t>>> {
  protected:
@@ -240,7 +240,7 @@ class NTTAPITest
 };
 
 // Test different parts of the API
-TEST_P(NTTAPITest, Fwd) {
+TEST_P(NTTTest, API) {
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus = std::get<1>(GetParam());
 
@@ -296,7 +296,7 @@ TEST_P(NTTAPITest, Fwd) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    NTTAPITest, NTTAPITest,
+    NTTTest, NTTTest,
     ::testing::Values(
         std::make_tuple(2, 281474976710897, std::vector<uint64_t>{0, 0},
                         std::vector<uint64_t>{0, 0}),

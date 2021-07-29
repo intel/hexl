@@ -58,8 +58,8 @@ template void ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
 /// assumes \p X, \p Y < 4*\p q
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
 template <int BitShift, bool InputLessThanMod>
-inline void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
-                         __m512i neg_modulus, __m512i twice_modulus) {
+void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
+                  __m512i neg_modulus, __m512i twice_modulus) {
   if (!InputLessThanMod) {
     *X = _mm512_hexl_small_mod_epu64(*X, twice_modulus);
   }
@@ -70,10 +70,21 @@ inline void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
     Q = _mm512_srli_epi64(Q, 32);
     __m512i W_Y = _mm512_hexl_mullo_epi<64>(W_op, *Y);
     T = _mm512_hexl_mullo_add_lo_epi<64>(W_Y, Q, neg_modulus);
-  } else {
+  } else if (BitShift == 52) {
     __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
     __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
     T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
+  } else if (BitShift == 64) {
+    // Perform approximate computation of Q, as described in page 7 of
+    // https://arxiv.org/pdf/2003.04510.pdf
+    __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, *Y);
+    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
+    // Compute T in range [0, 4q)
+    T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
+    // Reduce T to range [0, 2q)
+    T = _mm512_hexl_small_mod_epu64<2>(T, twice_modulus);
+  } else {
+    HEXL_CHECK(false, "Invalid BitShift " << BitShift);
   }
 
   __m512i twice_mod_minus_T = _mm512_sub_epi64(twice_modulus, T);

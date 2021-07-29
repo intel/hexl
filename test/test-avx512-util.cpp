@@ -50,16 +50,59 @@ TEST(AVX512, _mm512_hexl_mulhi_epi52) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
-  __m512i w = _mm512_set_epi64(90774764920991, 90774764920991, 90774764920991,
+  __m512i x = _mm512_set_epi64(90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991, 90774764920991,
                                90774764920991, 90774764920991);
   __m512i y = _mm512_set_epi64(424, 635, 757, 457, 280, 624, 353, 496);
 
   __m512i expected = _mm512_set_epi64(8, 12, 15, 9, 5, 12, 7, 9);
 
-  __m512i z = _mm512_hexl_mulhi_epi<52>(w, y);
+  __m512i z = _mm512_hexl_mulhi_epi<52>(x, y);
 
   CheckEqual(z, expected);
+}
+#endif
+
+#ifdef HEXL_HAS_AVX512DQ
+TEST(AVX512, _mm512_hexl_mulhi_epi64) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+  __m512i w = _mm512_set_epi64(90774764920991,    //
+                               1ULL << 63,        //
+                               1ULL << 63,        //
+                               1ULL << 63,        //
+                               1ULL << 63,        //
+                               1ULL << 63,        //
+                               (1ULL << 60) + 1,  //
+                               (1ULL << 62) + 2);
+  __m512i y = _mm512_set_epi64(1ULL << 63,        //
+                               1ULL << 63,        //
+                               (1ULL << 63) + 1,  //
+                               (1ULL << 63) + 2,  //
+                               (1ULL << 63) + 3,  //
+                               (1ULL << 63) + 4,  //
+                               (1ULL << 60) + 3,  //
+                               (1ULL << 63) + 4);
+
+  __m512i expected = _mm512_set_epi64(90774764920991 >> 1,  //
+                                      1ULL << 62,           //
+                                      1ULL << 62,           //
+                                      (1ULL << 62) + 1,     //
+                                      (1ULL << 62) + 1,     //
+                                      (1ULL << 62) + 2,     //
+                                      1ULL << 56,           //
+                                      (1ULL << 61) + 2);
+
+  {
+    __m512i z = _mm512_hexl_mulhi_epi<64>(w, y);
+    CheckEqual(z, expected);
+  }
+
+  {
+    __m512i z = _mm512_hexl_mulhi_approx_epi<64>(w, y);
+    CheckClose(z, expected, 1);
+  }
 }
 #endif
 
