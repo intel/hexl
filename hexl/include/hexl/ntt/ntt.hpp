@@ -83,6 +83,12 @@ class NTT {
                 std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
+  /// @brief Returns true if arguments satisfy constraints for negacyclic NTT
+  /// @param[in] degree N. Size of the transform, i.e. the polynomial degree.
+  /// Must be a power of two.
+  /// @param[in] modulus Prime modulus q. Must satisfy q mod 2N = 1
+  static bool CheckArguments(uint64_t degree, uint64_t modulus);
+
   /// @brief Compute forward NTT. Results are bit-reversed.
   /// @param[out] result Stores the result
   /// @param[in] operand Data on which to compute the NTT
@@ -188,10 +194,10 @@ class NTT {
   }
 
   /// @brief Maximum power of 2 in degree
-  static const size_t s_max_degree_bits{20};
+  static size_t MaxDegreeBits() { return 20; }
 
   /// @brief Maximum number of bits in modulus;
-  static const size_t s_max_modulus_bits{62};
+  static size_t MaxModulusBits() { return 62; }
 
   /// @brief Default bit shift used in Barrett precomputation
   static const size_t s_default_shift_bits{64};
