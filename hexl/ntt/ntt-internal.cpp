@@ -177,9 +177,12 @@ bool NTT::CheckArguments(uint64_t degree, uint64_t modulus) {
   (void)modulus;
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
-  HEXL_CHECK(degree <= (1 << NTT::s_max_degree_bits),
-             "degree should be less than 2^" << NTT::s_max_degree_bits
-                                             << " got " << degree);
+  HEXL_CHECK(degree <= (1ULL << NTT::MaxDegreeBits()),
+             "degree should be less than 2^" << NTT::MaxDegreeBits() << " got "
+                                             << degree);
+  HEXL_CHECK(modulus <= (1ULL << NTT::MaxModulusBits()),
+             "modulus should be less than 2^" << NTT::MaxModulusBits()
+                                              << " got " << modulus);
 
   HEXL_CHECK(modulus % (2 * degree) == 1, "modulus mod 2n != 1");
   return true;
@@ -324,7 +327,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
                                     const uint64_t* precon_root_of_unity_powers,
                                     uint64_t input_mod_factor,
                                     uint64_t output_mod_factor) {
-  HEXL_CHECK(CheckArguments(n, modulus), "");
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
   HEXL_CHECK_BOUNDS(operand, n, modulus * input_mod_factor,
                     "operand exceeds bound " << modulus * input_mod_factor);
   HEXL_CHECK(root_of_unity_powers != nullptr,
@@ -393,7 +396,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
 void ReferenceForwardTransformToBitReverse(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers) {
-  HEXL_CHECK(CheckArguments(n, modulus), "");
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
   HEXL_CHECK(root_of_unity_powers != nullptr,
              "root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
@@ -425,7 +428,7 @@ void InverseTransformFromBitReverse64(
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor) {
-  HEXL_CHECK(CheckArguments(n, modulus), "");
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
   HEXL_CHECK(inv_root_of_unity_powers != nullptr,
              "inv_root_of_unity_powers == nullptr");
   HEXL_CHECK(precon_inv_root_of_unity_powers != nullptr,

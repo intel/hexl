@@ -244,7 +244,7 @@ void InverseTransformFromBitReverseAVX512(
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half) {
-  HEXL_CHECK(CheckArguments(n, modulus), "");
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
   HEXL_CHECK(n >= 16,
              "InverseTransformFromBitReverseAVX512 doesn't support small "
              "transforms. Need n >= 16, got n = "

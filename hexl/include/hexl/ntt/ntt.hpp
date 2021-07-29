@@ -84,7 +84,7 @@ class NTT {
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
   // Returns true if arguments satisfy constraints for negacyclic NTT
-  bool CheckArguments(uint64_t degree, uint64_t modulus);
+  static bool CheckArguments(uint64_t degree, uint64_t modulus);
 
   /// @brief Compute forward NTT. Results are bit-reversed.
   /// @param[out] result Stores the result
@@ -191,10 +191,10 @@ class NTT {
   }
 
   /// @brief Maximum power of 2 in degree
-  static const size_t s_max_degree_bits{20};
+  static size_t MaxDegreeBits() { return 20; }
 
   /// @brief Maximum number of bits in modulus;
-  static const size_t s_max_modulus_bits{62};
+  static size_t MaxModulusBits() { return 62; }
 
   /// @brief Default bit shift used in Barrett precomputation
   static const size_t s_default_shift_bits{64};
