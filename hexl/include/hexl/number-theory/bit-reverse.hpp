@@ -3,10 +3,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace intel {
 namespace hexl {
 
-void BitReversalNative(uint64_t* input, uint64_t size);
+void BitReverse(uint64_t* input, uint64_t size);
 
 }  // namespace hexl
 }  // namespace intel

@@ -11,7 +11,7 @@ set(NATIVE_SRC
     eltwise/eltwise-cmp-sub-mod.cpp
     ntt/ntt-internal.cpp
     number-theory/number-theory.cpp
-    number-theory/bit-reversal.cpp
+    number-theory/bit-reverse.cpp
 )
 
 if (HEXL_HAS_AVX512DQ)

@@ -1,26 +1,26 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "hexl/number-theory/bit-reversal.hpp"
+#include "hexl/number-theory/bit-reverse.hpp"
 
 #include <unordered_set>
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
-#include "number-theory/bit-reversal-internal.hpp"
+#include "number-theory/bit-reverse-internal.hpp"
 
 namespace intel {
 namespace hexl {
 
-void BitReversal(uint64_t* input, uint64_t size) {
+void BitReverse(uint64_t* input, uint64_t size) {
   HEXL_CHECK(input != nullptr, "Input cannot be nullptr");
   HEXL_CHECK(IsPowerOfTwo(size), "Size " << size << " must be a power of two");
 
-  BitReversalNative(input, size);
+  BitReverseNative(input, size);
 }
 
-void BitReversalNative(uint64_t* input, uint64_t size) {
+void BitReverseNative(uint64_t* input, uint64_t size) {
   std::unordered_set<uint64_t> swapped_indices;
 
   for (size_t i = 0; i < size; ++i) {

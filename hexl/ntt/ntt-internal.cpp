@@ -190,8 +190,8 @@ bool NTT::CheckArguments(uint64_t degree, uint64_t modulus) {
 }
 
 void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
-                         uint64_t input_mod_factor, uint64_t output_mod_factor,
-                         BitOrdering output_bit_ordering) {
+                         uint64_t input_mod_factor,
+                         uint64_t output_mod_factor) {
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
   HEXL_CHECK(
@@ -258,8 +258,8 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
 }
 
 void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
-                         uint64_t input_mod_factor, uint64_t output_mod_factor,
-                         BitOrdering output_bit_ordering) {
+                         uint64_t input_mod_factor,
+                         uint64_t output_mod_factor) {
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
   HEXL_CHECK(input_mod_factor == 1 || input_mod_factor == 2,

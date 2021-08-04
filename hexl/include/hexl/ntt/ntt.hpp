@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-#include "hexl/number-theory/bit-reversal.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/allocator.hpp"
 
@@ -90,29 +89,25 @@ class NTT {
   /// @param[in] modulus Prime modulus q. Must satisfy q mod 2N = 1
   static bool CheckArguments(uint64_t degree, uint64_t modulus);
 
-  /// @brief Compute forward NTT.
+  /// @brief Compute forward NTT. Results are bit-reversed.
   /// @param[out] result Stores the result
-  /// @param[in] operand Data on which to compute the NTT; in normal bit order
+  /// @param[in] operand Data on which to compute the NTT
   /// @param[in] input_mod_factor Assume input \p operand are in [0,
   /// input_mod_factor * q). Must be 1, 2 or 4.
   /// @param[in] output_mod_factor Returns output \p result in [0,
   /// output_mod_factor * q). Must be 1 or 4.
-  /// @param[in] output_bit_ordering Bit ordering of the output
   void ComputeForward(uint64_t* result, const uint64_t* operand,
-                      uint64_t input_mod_factor, uint64_t output_mod_factor,
-                      BitOrdering output_bit_ordering);
+                      uint64_t input_mod_factor, uint64_t output_mod_factor);
 
-  /// Compute inverse NTT.
+  /// Compute inverse NTT. Results are bit-reversed.
   /// @param[out] result Stores the result
-  /// @param[in] operand Data on which to compute the NTT; in normal bit order
+  /// @param[in] operand Data on which to compute the NTT
   /// @param[in] input_mod_factor Assume input \p operand are in [0,
   /// input_mod_factor * q). Must be 1 or 2.
   /// @param[in] output_mod_factor Returns output \p result in [0,
   /// output_mod_factor * q). Must be 1 or 2.
-  /// @param[in] output_bit_ordering Bit ordering of the output
   void ComputeInverse(uint64_t* result, const uint64_t* operand,
-                      uint64_t input_mod_factor, uint64_t output_mod_factor,
-                      BitOrdering output_bit_ordering);
+                      uint64_t input_mod_factor, uint64_t output_mod_factor);
 
   /// @brief Returns the minimal 2N'th root of unity
   uint64_t GetMinimalRootOfUnity() const { return m_w; }
