@@ -32,19 +32,15 @@ void BitReverse(uint64_t* input, uint64_t size) {
   HEXL_CHECK(input != nullptr, "Input cannot be nullptr");
   HEXL_CHECK(IsPowerOfTwo(size), "Size " << size << " must be a power of two");
 
-  BitReverseNative(input, size);
+  BitReverseReference(input, size);
 }
 
-void BitReverseNative(uint64_t* input, uint64_t size) {
-  std::unordered_set<uint64_t> swapped_indices;
-
+void BitReverseReference(uint64_t* input, uint64_t size) {
+  uint64_t log2_size = Log2(size);
   for (size_t i = 0; i < size; ++i) {
-    if (swapped_indices.find(i) == swapped_indices.end()) {
-      uint64_t bit_reversed_idx = BitReverseScalar(i, Log2(size));
-      // LOG(INFO) << "Swapping " << i << " / " << bit_reversed_idx;
+    uint64_t bit_reversed_idx = BitReverseScalar(i, log2_size);
+    if (i < bit_reversed_idx) {
       std::swap(input[i], input[bit_reversed_idx]);
-      swapped_indices.insert(bit_reversed_idx);
-      swapped_indices.insert(i);
     }
   }
 }

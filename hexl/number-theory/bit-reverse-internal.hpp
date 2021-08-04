@@ -8,5 +8,7 @@ namespace hexl {
 
 void BitReverseNative(uint64_t* input, uint64_t size);
 
+void BitReverseReference(uint64_t* input, uint64_t size);
+
 }  // namespace hexl
 }  // namespace intel
