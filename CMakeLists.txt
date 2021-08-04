@@ -129,7 +129,7 @@ endif()
 
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512dq.cpp" HEXL_HAS_AVX512DQ)
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512ifma.cpp" HEXL_HAS_AVX512IFMA)
-# hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
+hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx512vbmi2.cpp" HEXL_HAS_AVX512VBMI2)
 hexl_check_compile_flag("${HEXL_CMAKE_PATH}/test-avx256.cpp" HEXL_HAS_AVX256)
 
 # ------------------------------------------------------------------------------

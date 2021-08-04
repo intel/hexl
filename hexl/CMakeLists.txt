@@ -30,7 +30,14 @@ if (HEXL_HAS_AVX512DQ)
     set_source_files_properties(${HEXL_AVX512_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
 endif()
 
-set(HEXL_SRC "${HEXL_NATIVE_SRC};${HEXL_AVX512_SRC}")
+if (HEXL_HAS_AVX512VBMI2)
+    set(HEXL_AVX512VBMI2_SRC
+        eltwise/eltwise-mult-mod-avx512vbmi2.cpp
+    )
+    set_source_files_properties(${HEXL_HAS_AVX512VBMI2} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
+endif()
+
+set(HEXL_SRC "${HEXL_NATIVE_SRC};${HEXL_AVX512_SRC};${HEXL_HAS_AVX512VBMI2}")
 message("HEXL_SRC ${HEXL_SRC}")
 
 if (HEXL_DEBUG)
