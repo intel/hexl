@@ -39,56 +39,75 @@ TEST(NTT, bad_input) {
   // Forward transform
   // Bad input
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), nullptr, 1, 1));
+  EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), nullptr, 1, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeForward(nullptr, input.data(), 1, 1));
+  EXPECT_ANY_THROW(ntt.ComputeForward(nullptr, input.data(), 1, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_NO_THROW(ntt.ComputeForward(input.data(), input.data(), 1, 1));
+  EXPECT_NO_THROW(ntt.ComputeForward(input.data(), input.data(), 1, 1,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_NO_THROW(ntt.ComputeForward(p_input.data(), p_input.data(), 4, 4));
+  EXPECT_NO_THROW(ntt.ComputeForward(p_input.data(), p_input.data(), 4, 4,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(
-      ntt.ComputeForward(p_times_2_input.data(), p_times_2_input.data(), 2, 1));
+  EXPECT_ANY_THROW(ntt.ComputeForward(p_times_2_input.data(),
+                                      p_times_2_input.data(), 2, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_NO_THROW(
-      ntt.ComputeForward(p_times_2_input.data(), p_times_2_input.data(), 4, 4));
+  EXPECT_NO_THROW(ntt.ComputeForward(p_times_2_input.data(),
+                                     p_times_2_input.data(), 4, 4,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(
-      ntt.ComputeForward(p_times_4_input.data(), p_times_4_input.data(), 4, 4));
+  EXPECT_ANY_THROW(ntt.ComputeForward(p_times_4_input.data(),
+                                      p_times_4_input.data(), 4, 4,
+                                      BitOrdering::BitReversed));
   init_inputs();
 
   // Bad mod factors
-  EXPECT_NO_THROW(ntt.ComputeForward(input.data(), input.data(), 2, 1));
+  EXPECT_NO_THROW(ntt.ComputeForward(input.data(), input.data(), 2, 1,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), input.data(), 123, 1));
+  EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), input.data(), 123, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), input.data(), 2, 123));
+  EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), input.data(), 2, 123,
+                                      BitOrdering::BitReversed));
   init_inputs();
 
   // Inverse tranform
 
   // Bad input
-  EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), nullptr, 1, 1));
+  EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), nullptr, 1, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeInverse(nullptr, input.data(), 1, 1));
+  EXPECT_ANY_THROW(ntt.ComputeInverse(nullptr, input.data(), 1, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
 
-  EXPECT_NO_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 1));
+  EXPECT_NO_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 1,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeInverse(p_input.data(), p_input.data(), 1, 1));
+  EXPECT_ANY_THROW(ntt.ComputeInverse(p_input.data(), p_input.data(), 1, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_NO_THROW(ntt.ComputeInverse(p_input.data(), p_input.data(), 2, 2));
+  EXPECT_NO_THROW(ntt.ComputeInverse(p_input.data(), p_input.data(), 2, 2,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(
-      ntt.ComputeInverse(p_times_2_input.data(), p_times_2_input.data(), 2, 2));
+  EXPECT_ANY_THROW(ntt.ComputeInverse(p_times_2_input.data(),
+                                      p_times_2_input.data(), 2, 2,
+                                      BitOrdering::BitReversed));
   init_inputs();
 
   // Bad mod factors
-  EXPECT_NO_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 1));
+  EXPECT_NO_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 1,
+                                     BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), input.data(), 123, 1));
+  EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), input.data(), 123, 1,
+                                      BitOrdering::BitReversed));
   init_inputs();
-  EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 123));
+  EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 123,
+                                      BitOrdering::BitReversed));
   init_inputs();
 }
 #endif
@@ -184,13 +203,17 @@ TEST(NTT, root_of_unity_with_allocator) {
     std::allocator<int> s;
     NTT ntt4(N, modulus, root_of_unity, std::move(s));
 
-    ntt1.ComputeForward(input.data(), input.data(), 1, 1);
-    ntt2.ComputeForward(input2.data(), input2.data(), 1, 1);
+    ntt1.ComputeForward(input.data(), input.data(), 1, 1,
+                        BitOrdering::BitReversed);
+    ntt2.ComputeForward(input2.data(), input2.data(), 1, 1,
+                        BitOrdering::BitReversed);
 
     ASSERT_NE(allocators::CustomAllocator::number_allocations, 0);
 
-    ntt3.ComputeForward(input3.data(), input3.data(), 1, 1);
-    ntt3.ComputeForward(input4.data(), input4.data(), 1, 1);
+    ntt3.ComputeForward(input3.data(), input3.data(), 1, 1,
+                        BitOrdering::BitReversed);
+    ntt3.ComputeForward(input4.data(), input4.data(), 1, 1,
+                        BitOrdering::BitReversed);
   }
 
   ASSERT_NE(allocators::CustomAllocator::number_deallocations, 0);
@@ -210,8 +233,10 @@ TEST(NTT, root_of_unity) {
   NTT ntt1(N, modulus);
   NTT ntt2(N, modulus, root_of_unity);
 
-  ntt1.ComputeForward(input.data(), input.data(), 1, 1);
-  ntt2.ComputeForward(input2.data(), input2.data(), 1, 1);
+  ntt1.ComputeForward(input.data(), input.data(), 1, 1,
+                      BitOrdering::BitReversed);
+  ntt2.ComputeForward(input2.data(), input2.data(), 1, 1,
+                      BitOrdering::BitReversed);
 
   AssertEqual(input, input2);
 }
@@ -251,12 +276,14 @@ TEST_P(NTTTest, API) {
 
   // In-place Fwd NTT
   NTT ntt(N, modulus);
-  ntt.ComputeForward(input.data(), input.data(), 1, 1);
+  ntt.ComputeForward(input.data(), input.data(), 1, 1,
+                     BitOrdering::BitReversed);
   AssertEqual(input, exp_output);
 
   // In-place lazy NTT
   input = input_copy;
-  ntt.ComputeForward(input.data(), input.data(), 2, 4);
+  ntt.ComputeForward(input.data(), input.data(), 2, 4,
+                     BitOrdering::BitReversed);
   for (auto& elem : input) {
     elem = elem % modulus;
   }
@@ -270,25 +297,32 @@ TEST_P(NTTTest, API) {
 
   // Test round-trip
   input = input_copy;
-  ntt.ComputeForward(out_buffer.data(), input.data(), 1, 1);
-  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
+  ntt.ComputeForward(out_buffer.data(), input.data(), 1, 1,
+                     BitOrdering::BitReversed);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1,
+                     BitOrdering::BitReversed);
   AssertEqual(input, input_copy);
 
   // Test out-of-place forward
   input = input_copy;
-  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1,
+                     BitOrdering::BitReversed);
   AssertEqual(out_buffer, exp_output);
 
   // Test out-of-place inverse
   input = input_copy;
-  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1,
+                     BitOrdering::BitReversed);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1,
+                     BitOrdering::BitReversed);
   AssertEqual(input, input_copy);
 
   // Test out-of-place inverse lazy
   input = input_copy;
-  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2);
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1,
+                     BitOrdering::BitReversed);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2,
+                     BitOrdering::BitReversed);
   for (auto& elem : input) {
     elem = elem % modulus;
   }
@@ -363,7 +397,8 @@ TEST_P(FwdNTTZerosTest, Zeros) {
   std::vector<uint64_t> exp_output(N, 0);
 
   NTT ntt(N, modulus);
-  ntt.ComputeForward(input.data(), input.data(), 1, 1);
+  ntt.ComputeForward(input.data(), input.data(), 1, 1,
+                     BitOrdering::BitReversed);
 
   AssertEqual(input, exp_output);
 }
@@ -400,7 +435,8 @@ TEST_P(InvNTTZerosTest, Zeros) {
   std::vector<uint64_t> exp_output(N, 0);
 
   NTT ntt(N, modulus);
-  ntt.ComputeInverse(input.data(), input.data(), 1, 1);
+  ntt.ComputeInverse(input.data(), input.data(), 1, 1,
+                     BitOrdering::BitReversed);
 
   AssertEqual(input, exp_output);
 }

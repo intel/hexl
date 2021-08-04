@@ -181,7 +181,7 @@ static void BM_FwdNTTInPlace(benchmark::State& state) {  //  NOLINT
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
-    ntt.ComputeForward(input.data(), input.data(), 1, 1);
+    ntt.ComputeForward(input.data(), input.data(), 1, 1, BitOrdering::Normal);
   }
 }
 
@@ -203,7 +203,7 @@ static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
-    ntt.ComputeForward(input.data(), output.data(), 1, 1);
+    ntt.ComputeForward(input.data(), output.data(), 1, 1, BitOrdering::Normal);
   }
 }
 

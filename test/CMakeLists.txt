@@ -3,6 +3,7 @@
 
 set(NATIVE_TEST_SRC main.cpp
     test-aligned-vector.cpp
+    test-bit-reversal.cpp
     test-number-theory.cpp
     test-eltwise-add-mod.cpp
     test-eltwise-cmp-add.cpp
