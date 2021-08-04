@@ -40,5 +40,26 @@ TEST(BitReverse, 8) {
   EXPECT_EQ(x, expected_out);
 }
 
+TEST(BitReverseScalar, simple) {
+  ASSERT_EQ(0ULL, BitReverseScalar(0ULL, 0));
+  ASSERT_EQ(0ULL, BitReverseScalar(0ULL, 1));
+  ASSERT_EQ(0ULL, BitReverseScalar(0ULL, 32));
+  ASSERT_EQ(0ULL, BitReverseScalar(0ULL, 64));
+
+  ASSERT_EQ(0ULL, BitReverseScalar(1ULL, 0));
+  ASSERT_EQ(1ULL, BitReverseScalar(1ULL, 1));
+  ASSERT_EQ(1ULL << 31, BitReverseScalar(1ULL, 32));
+  ASSERT_EQ(1ULL << 63, BitReverseScalar(1ULL, 64));
+
+  ASSERT_EQ(1ULL, BitReverseScalar(1ULL << 31, 32));
+  ASSERT_EQ(1ULL << 32, BitReverseScalar(1ULL << 31, 64));
+
+  ASSERT_EQ(0xFFFFULL, BitReverseScalar(0xFFFFULL << 16, 32));
+  ASSERT_EQ(0xFFFFULL << 32, BitReverseScalar(0xFFFFULL << 16, 64));
+
+  ASSERT_EQ(0x0000FFFFFFFF0000ULL, BitReverseScalar(0x0000FFFFFFFF0000ULL, 64));
+  ASSERT_EQ(0x0000FFFF0000FFFFULL, BitReverseScalar(0xFFFF0000FFFF0000ULL, 64));
+}
+
 }  // namespace hexl
 }  // namespace intel

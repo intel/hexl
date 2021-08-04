@@ -197,27 +197,6 @@ TEST(NumberTheory, InverseMod) {
   ASSERT_EQ(5ULL, InverseMod(input, modulus));
 }
 
-TEST(NumberTheory, ReverseBits64) {
-  ASSERT_EQ(0ULL, ReverseBits(0ULL, 0));
-  ASSERT_EQ(0ULL, ReverseBits(0ULL, 1));
-  ASSERT_EQ(0ULL, ReverseBits(0ULL, 32));
-  ASSERT_EQ(0ULL, ReverseBits(0ULL, 64));
-
-  ASSERT_EQ(0ULL, ReverseBits(1ULL, 0));
-  ASSERT_EQ(1ULL, ReverseBits(1ULL, 1));
-  ASSERT_EQ(1ULL << 31, ReverseBits(1ULL, 32));
-  ASSERT_EQ(1ULL << 63, ReverseBits(1ULL, 64));
-
-  ASSERT_EQ(1ULL, ReverseBits(1ULL << 31, 32));
-  ASSERT_EQ(1ULL << 32, ReverseBits(1ULL << 31, 64));
-
-  ASSERT_EQ(0xFFFFULL, ReverseBits(0xFFFFULL << 16, 32));
-  ASSERT_EQ(0xFFFFULL << 32, ReverseBits(0xFFFFULL << 16, 64));
-
-  ASSERT_EQ(0x0000FFFFFFFF0000ULL, ReverseBits(0x0000FFFFFFFF0000ULL, 64));
-  ASSERT_EQ(0x0000FFFF0000FFFFULL, ReverseBits(0xFFFF0000FFFF0000ULL, 64));
-}
-
 TEST(NumberTheory, MultiplyModLazy64) {
   uint64_t modulus = 2;
   uint64_t y = 0;

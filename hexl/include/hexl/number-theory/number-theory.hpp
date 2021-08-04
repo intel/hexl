@@ -65,12 +65,6 @@ inline uint64_t MaximumValue(uint64_t bits) {
   return (1ULL << bits) - 1;
 }
 
-/// @brief Reverses the bits
-/// @param[in] x Input to reverse
-/// @param[in] bit_width Number of bits in the input; must be >= MSB(x)
-/// @return The bit-reversed representation of \p x using \p bit_width bits
-uint64_t ReverseBits(uint64_t x, uint64_t bit_width);
-
 /// @brief Returns x^{-1} mod modulus
 /// @details Requires x % modulus != 0
 uint64_t InverseMod(uint64_t x, uint64_t modulus);

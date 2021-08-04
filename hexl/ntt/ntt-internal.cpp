@@ -10,6 +10,7 @@
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
+#include "hexl/number-theory/bit-reverse.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
@@ -62,17 +63,13 @@ void NTT::ComputeRootOfUnityPowers() {
   // 64-bit preconditioned inverse and root of unity powers
   root_of_unity_powers[0] = 1;
   inv_root_of_unity_powers[0] = InverseMod(1, m_q);
-  uint64_t idx = 0;
-  uint64_t prev_idx = idx;
-
   for (size_t i = 1; i < m_degree; i++) {
-    idx = ReverseBits(i, m_degree_bits);
-    root_of_unity_powers[idx] =
-        MultiplyMod(root_of_unity_powers[prev_idx], m_w, m_q);
-    inv_root_of_unity_powers[idx] = InverseMod(root_of_unity_powers[idx], m_q);
-
-    prev_idx = idx;
+    root_of_unity_powers[i] =
+        MultiplyMod(root_of_unity_powers[i - 1], m_w, m_q);
+    inv_root_of_unity_powers[i] = InverseMod(root_of_unity_powers[i], m_q);
   }
+  BitReverse(root_of_unity_powers.data(), m_degree);
+  BitReverse(inv_root_of_unity_powers.data(), m_degree);
 
   m_root_of_unity_powers = root_of_unity_powers;
   m_avx512_root_of_unity_powers = m_root_of_unity_powers;
@@ -143,10 +140,10 @@ void NTT::ComputeRootOfUnityPowers() {
 
   // Inverse root of unity powers
 
-  // Reordering inv_root_of_powers
+  // Reordering inv_root_of_powers for sequential access in inverse transform
   AlignedVector64<uint64_t> temp(m_degree, 0, m_aligned_alloc);
   temp[0] = inv_root_of_unity_powers[0];
-  idx = 1;
+  uint64_t idx = 1;
 
   for (size_t m = (m_degree >> 1); m > 0; m >>= 1) {
     for (size_t i = 0; i < m; i++) {
