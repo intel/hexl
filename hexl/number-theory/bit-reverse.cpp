@@ -35,7 +35,7 @@ void BitReverse(uint64_t* input, uint64_t size) {
 
   uint64_t log2_size = Log2(size);
 
-  BitReverseNative(input, size);
+  BitReverseNative(input, size, log2_size);
   // switch (log2_size) {
   //   case 3: {
   //     BitReverseNative<3>(input);
