@@ -34,7 +34,7 @@ struct BitReversePairBitwiseHelper {
 
     uint64_t start_idx = 1ULL << RecursionDepth;
     uint64_t block_size = start_idx;
-    uint64_t increment = block_size + 1;
+    uint64_t increment = 1ULL << start_idx;
 
     LOG(INFO) << "block_size " << block_size;
     LOG(INFO) << "increment " << increment;
