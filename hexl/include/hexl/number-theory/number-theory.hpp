@@ -242,5 +242,15 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
   return x;
 }
 
+// Sets the bit-lowest bit value in "x" to "value".
+inline uint64_t SetBit(uint64_t x, uint64_t bit, uint64_t value) {
+  HEXL_CHECK(value == 0 || value == 1, "value must be 0 or 1. Got " << value);
+
+  return x = (x & ~(1 << bit)) | (value << bit);
+}
+
+/// Returns the value of x at bit "bit".
+inline uint64_t GetBit(uint64_t x, uint64_t bit) { return (x >> bit) & 1ULL; }
+
 }  // namespace hexl
 }  // namespace intel

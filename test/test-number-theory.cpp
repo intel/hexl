@@ -403,5 +403,17 @@ TEST(NumberTheory, MSB) {
   EXPECT_EQ(0ULL, MSB(1));
 }
 
+TEST(NumberTheory, SetBit) {
+  EXPECT_EQ(0b0001, SetBit(0b0000, 0, 1));
+  EXPECT_EQ(0b0010, SetBit(0b0000, 1, 1));
+  EXPECT_EQ(0b0100, SetBit(0b0000, 2, 1));
+  EXPECT_EQ(0b1000, SetBit(0b0000, 3, 1));
+
+  EXPECT_EQ(0b1110, SetBit(0b1111, 0, 0));
+  EXPECT_EQ(0b1110, SetBit(0b1111, 1, 0));
+  EXPECT_EQ(0b1011, SetBit(0b1111, 2, 0));
+  EXPECT_EQ(0b0111, SetBit(0b1111, 3, 0));
+}
+
 }  // namespace hexl
 }  // namespace intel
