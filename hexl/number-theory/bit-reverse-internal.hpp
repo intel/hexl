@@ -20,7 +20,7 @@ struct BitReversePairBitwiseHelper {
   static inline void Reverse(uint64_t* input) {
     // uint64_t bit_width = Log2(size);
 
-    LOG(INFO) << "Reverse BitWidth " << BitWidth;
+    // LOG(INFO) << "Reverse BitWidth " << BitWidth;
 
     // Base case
     if (BitWidth <= RecursionDepth) {
@@ -34,10 +34,10 @@ struct BitReversePairBitwiseHelper {
 
     uint64_t start_idx = 1ULL << RecursionDepth;
     uint64_t block_size = start_idx;
-    uint64_t increment = 1ULL << start_idx;
+    uint64_t increment = 1ULL << (RecursionDepth + 1);
 
-    LOG(INFO) << "block_size " << block_size;
-    LOG(INFO) << "increment " << increment;
+    // LOG(INFO) << "block_size " << block_size;
+    // LOG(INFO) << "increment " << increment;
 
     // First index doesn't need to be swapped
     for (size_t i = start_idx; i < size_div_two; i += increment) {
@@ -59,7 +59,7 @@ struct BitReversePairBitwiseHelper {
         // LOG(INFO) << "new_index " << new_index;
 
         // if (index < new_index) {
-        LOG(INFO) << "Swapping " << index << " / " << new_index;
+        // LOG(INFO) << "Swapping " << index << " / " << new_index;
         std::swap(input[index], input[new_index]);
         // }
       }
@@ -79,7 +79,7 @@ struct BitReversePairBitwiseHelper<0, RecursionDepth> {
 
 template <uint64_t BitWidth>
 inline void BitReversePairBitwise(uint64_t* input) {
-  LOG(INFO) << "BitReversePairBitwise< " << BitWidth << ">";
+  // LOG(INFO) << "BitReversePairBitwise< " << BitWidth << ">";
   BitReversePairBitwiseHelper<BitWidth, 0>::Reverse(input);
 }
 
