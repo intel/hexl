@@ -409,10 +409,26 @@ TEST(NumberTheory, SetBit) {
   EXPECT_EQ(0b0100, SetBit(0b0000, 2, 1));
   EXPECT_EQ(0b1000, SetBit(0b0000, 3, 1));
 
-  EXPECT_EQ(0b1110, SetBit(0b1111, 0, 0));
-  EXPECT_EQ(0b1110, SetBit(0b1111, 1, 0));
-  EXPECT_EQ(0b1011, SetBit(0b1111, 2, 0));
-  EXPECT_EQ(0b0111, SetBit(0b1111, 3, 0));
+  EXPECT_EQ(0b111110, SetBit(0b111111, 0, 0));
+  EXPECT_EQ(0b111101, SetBit(0b111111, 1, 0));
+  EXPECT_EQ(0b111011, SetBit(0b111111, 2, 0));
+  EXPECT_EQ(0b110111, SetBit(0b111111, 3, 0));
+  EXPECT_EQ(0b101111, SetBit(0b111111, 4, 0));
+  EXPECT_EQ(0b011111, SetBit(0b111111, 5, 0));
+}
+
+TEST(NumberTheory, GetBit) {
+  EXPECT_EQ(0, GetBit(0b0000, 0));
+  EXPECT_EQ(0, GetBit(0b0000, 1));
+  EXPECT_EQ(0, GetBit(0b0000, 2));
+  EXPECT_EQ(0, GetBit(0b0000, 3));
+
+  EXPECT_EQ(1, GetBit(0b010101, 0));
+  EXPECT_EQ(0, GetBit(0b010101, 1));
+  EXPECT_EQ(1, GetBit(0b010101, 2));
+  EXPECT_EQ(0, GetBit(0b010101, 3));
+  EXPECT_EQ(1, GetBit(0b010101, 4));
+  EXPECT_EQ(0, GetBit(0b010101, 5));
 }
 
 }  // namespace hexl

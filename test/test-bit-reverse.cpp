@@ -5,7 +5,9 @@
 
 #include "gtest/gtest.h"
 #include "hexl/number-theory/bit-reverse.hpp"
+#include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/compiler.hpp"
+#include "number-theory/bit-reverse-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -38,6 +40,32 @@ TEST(BitReverse, 8) {
   BitReverse(x.data(), x.size());
 
   EXPECT_EQ(x, expected_out);
+}
+
+TEST(BitReverse, 16) {
+  std::vector<uint64_t> x{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  std::vector<uint64_t> expected_out{0, 8, 4, 12, 2, 10, 6, 14,
+                                     1, 9, 5, 13, 3, 11, 7, 15};
+
+  BitReverse(x.data(), x.size());
+
+  EXPECT_EQ(x, expected_out);
+}
+
+TEST(BitReverse, native_matches_reference) {
+  for (size_t bits = 4; bits <= 4; ++bits) {
+    uint64_t n = 1ULL << bits;
+    AlignedVector64<uint64_t> x(n, 0);
+    for (size_t i = 0; i < n; ++i) {
+      x[i] = i;
+    }
+    auto y = x;
+
+    BitReverse(x.data(), x.size());
+    BitReverseReference(y.data(), y.size());
+
+    ASSERT_EQ(x, y);
+  }
 }
 
 TEST(BitReverseScalar, simple) {
