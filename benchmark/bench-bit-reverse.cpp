@@ -36,25 +36,25 @@ static void BM_BitReverseNative(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> op1(input_size, 1);
 
   for (auto _ : state) {
-    BitReverseNative(op1.data(), op1.size(), bit_size);
-    // switch (bit_size) {
-    //   case 10: {
-    //     BitReverseNative<10>(op1.data());
-    //     break;
-    //   }
-    //   case 12: {
-    //     BitReverseNative<12>(op1.data());
-    //     break;
-    //   }
-    //   case 14: {
-    //     BitReverseNative<14>(op1.data());
-    //     break;
-    //   }
-    //   case 15: {
-    //     BitReverseNative<15>(op1.data());
-    //     break;
-    //   }
-    // }
+    // BitReverseNative(op1.data(), op1.size(), bit_size);
+    switch (bit_size) {
+      case 10: {
+        BitReversePairBitwise<10>(op1.data());
+        break;
+      }
+      case 12: {
+        BitReversePairBitwise<12>(op1.data());
+        break;
+      }
+      case 14: {
+        BitReversePairBitwise<14>(op1.data());
+        break;
+      }
+      case 15: {
+        BitReversePairBitwise<15>(op1.data());
+        break;
+      }
+    }
   }
 }
 

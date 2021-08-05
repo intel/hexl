@@ -35,60 +35,59 @@ void BitReverse(uint64_t* input, uint64_t size) {
 
   uint64_t log2_size = Log2(size);
 
-  BitReverseNative(input, size, log2_size);
-  // switch (log2_size) {
-  //   case 3: {
-  //     BitReverseNative<3>(input);
-  //     break;
-  //   }
-  //   case 4: {
-  //     BitReverseNative<4>(input);
-  //     break;
-  //   }
-  //   case 5: {
-  //     BitReverseNative<5>(input);
-  //     break;
-  //   }
-  //   case 10: {
-  //     BitReverseNative<10>(input);
-  //     break;
-  //   }
-  //   case 11: {
-  //     BitReverseNative<11>(input);
-  //     break;
-  //   }
-  //   case 12: {
-  //     BitReverseNative<12>(input);
-  //     break;
-  //   }
-  //   case 13: {
-  //     BitReverseNative<13>(input);
-  //     break;
-  //   }
-  //   case 14: {
-  //     BitReverseNative<14>(input);
-  //     break;
-  //   }
-  //   case 15: {
-  //     BitReverseNative<15>(input);
-  //     break;
-  //   }
-  //   case 16: {
-  //     BitReverseNative<16>(input);
-  //     break;
-  //   }
-  //   case 17: {
-  //     BitReverseNative<17>(input);
-  //     break;
-  //   }
-  //   case 18: {
-  //     BitReverseNative<18>(input);
-  //     break;
-  //   }
-  //   default: {
-  //     BitReverseReference(input, size);
-  //   }
-  // }
+  switch (log2_size) {
+    case 3: {
+      BitReversePairBitwise<3>(input);
+      break;
+    }
+    case 4: {
+      BitReversePairBitwise<4>(input);
+      break;
+    }
+    case 5: {
+      BitReversePairBitwise<5>(input);
+      break;
+    }
+    case 10: {
+      BitReversePairBitwise<10>(input);
+      break;
+    }
+    case 11: {
+      BitReversePairBitwise<11>(input);
+      break;
+    }
+    case 12: {
+      BitReversePairBitwise<12>(input);
+      break;
+    }
+    case 13: {
+      BitReversePairBitwise<13>(input);
+      break;
+    }
+    case 14: {
+      BitReversePairBitwise<14>(input);
+      break;
+    }
+    case 15: {
+      BitReversePairBitwise<15>(input);
+      break;
+    }
+    case 16: {
+      BitReversePairBitwise<16>(input);
+      break;
+    }
+    case 17: {
+      BitReversePairBitwise<17>(input);
+      break;
+    }
+    case 18: {
+      BitReversePairBitwise<18>(input);
+      break;
+    }
+    default: {
+      BitReverseReference(input, size);
+    }
+  }
 }
 
 void BitReverseReference(uint64_t* input, uint64_t size) {

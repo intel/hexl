@@ -53,7 +53,7 @@ TEST(BitReverse, 16) {
 }
 
 TEST(BitReverse, native_matches_reference) {
-  for (size_t bits = 4; bits <= 4; ++bits) {
+  for (size_t bits = 4; bits <= 20; ++bits) {
     uint64_t n = 1ULL << bits;
     AlignedVector64<uint64_t> x(n, 0);
     for (size_t i = 0; i < n; ++i) {
