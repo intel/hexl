@@ -19,6 +19,7 @@
 
 #undef TRUE
 #undef FALSE
+#define NOMINMAX  // Avoid erors with min/max
 
 namespace intel {
 namespace hexl {
