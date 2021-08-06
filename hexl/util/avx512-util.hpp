@@ -9,6 +9,7 @@
 
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
+#include "hexl/util/defines.hpp"
 #include "hexl/util/util.hpp"
 
 namespace intel {
@@ -70,8 +71,8 @@ inline __m512i _mm512_hexl_mulhi_epi(__m512i x, __m512i y);
 template <>
 inline __m512i _mm512_hexl_mulhi_epi<32>(__m512i x, __m512i y) {
   HEXL_CHECK(false, "Unimplemented");
-  (void)x;  // Avoid unused variable warning
-  (void)y;  // Avoid unused variable warning
+  HEXL_UNUSED(x);
+  HEXL_UNUSED(y);
   return x;
 }
 
@@ -139,8 +140,8 @@ inline __m512i _mm512_hexl_mulhi_approx_epi(__m512i x, __m512i y);
 template <>
 inline __m512i _mm512_hexl_mulhi_approx_epi<32>(__m512i x, __m512i y) {
   HEXL_CHECK(false, "Unimplemented");
-  (void)x;  // Avoid unused variable warning
-  (void)y;  // Avoid unused variable warning
+  HEXL_UNUSED(x);
+  HEXL_UNUSED(y);
   return x;
 }
 
@@ -197,8 +198,8 @@ inline __m512i _mm512_hexl_mullo_epi(__m512i x, __m512i y);
 template <>
 inline __m512i _mm512_hexl_mullo_epi<32>(__m512i x, __m512i y) {
   HEXL_CHECK(false, "Unimplemented");
-  (void)x;  // Avoid unused variable warning
-  (void)y;  // Avoid unused variable warning
+  HEXL_UNUSED(x);
+  HEXL_UNUSED(y);
   return x;
 }
 
@@ -240,9 +241,9 @@ template <>
 inline __m512i _mm512_hexl_mullo_add_lo_epi<32>(__m512i x, __m512i y,
                                                 __m512i z) {
   HEXL_CHECK(false, "Unimplemented");
-  (void)x;  // Avoid unused variable warning
-  (void)y;  // Avoid unused variable warning
-  (void)z;  // Avoid unused variable warning
+  HEXL_UNUSED(x);
+  HEXL_UNUSED(y);
+  HEXL_UNUSED(z);
   return x;
 }
 

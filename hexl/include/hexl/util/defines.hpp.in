@@ -8,3 +8,6 @@
 #cmakedefine HEXL_USE_CLANG
 
 #cmakedefine HEXL_DEBUG
+
+// Avoid unused variable warnings
+#define HEXL_UNUSED(x) (void)(x)
