@@ -130,8 +130,8 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
           t_poly_lazy_ptr[t_poly_idx] = sum_lo;
           t_poly_lazy_ptr[t_poly_idx + 1] = sum_hi;
 
-          //   LOG(INFO) << "sum_lo " << sum_lo;
-          //   LOG(INFO) << "sum_lo " << sum_hi;
+          LOG(INFO) << "sum_lo " << sum_lo;
+          LOG(INFO) << "sum_lo " << sum_hi;
         }
       }
     }
