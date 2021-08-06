@@ -163,6 +163,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
         &t_poly_prod[key_component * coeff_count * rns_modulus_size];
     uint64_t* t_last = &t_poly_prod_it[decomp_modulus_size * coeff_count];
 
+    LOG(INFO) << "before inverse " << std::vector<uint64_t>(t_last, t_last + n);
     NTT(n, moduli[key_modulus_size - 1]).ComputeInverse(t_last, t_last, 2, 2);
     LOG(INFO) << "after inverse " << std::vector<uint64_t>(t_last, t_last + n);
 
