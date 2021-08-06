@@ -141,6 +141,11 @@ Then, run
 ```bash
 cmake --build build --target bench
 ```
+On Windows, run
+```bash
+cmake --build build --target bench --config Release
+```
+
 The benchmark executable itself is located at `build/benchmark/bench_hexl` on Linux and Mac, and at `build\benchmark\Debug\bench_hexl.exe` or `build\benchmark\Release\bench_hexl.exe` on Windows.
 
 ## Using Intel HEXL
