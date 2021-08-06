@@ -9,13 +9,19 @@ set(NATIVE_SRC
     eltwise/eltwise-fma-mod.cpp
     eltwise/eltwise-cmp-add.cpp
     eltwise/eltwise-cmp-sub-mod.cpp
-    experimental/seal/ckks-multiply.cpp
-    experimental/seal/ckks-switch-key.cpp
+
     ntt/ntt-internal.cpp
     ntt/ntt-default.cpp
     ntt/ntt-radix-4.cpp
     number-theory/number-theory.cpp
 )
+
+if (HEXL_EXPERIMENTAL)
+    list(APPEND NATIVE_SRC
+        experimental/seal/ckks-multiply.cpp
+        experimental/seal/ckks-switch-key.cpp
+    )
+endif()
 
 if (HEXL_HAS_AVX512DQ)
     set(AVX512_SRC

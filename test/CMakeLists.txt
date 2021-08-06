@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set(NATIVE_TEST_SRC main.cpp
-    experimental/seal/test-ckks-multiply.cpp
-    experimental/seal/test-ckks-switch-key.cpp
     test-aligned-vector.cpp
     test-number-theory.cpp
     test-eltwise-add-mod.cpp
@@ -15,6 +13,13 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
 )
+
+if (HEXL_EXPERIMENTAL)
+    list(APPEND NATIVE_TEST_SRC
+        experimental/seal/test-ckks-multiply.cpp
+        experimental/seal/test-ckks-switch-key.cpp
+    )
+endif()
 
 set(AVX512_TEST_SRC
     test-avx512-util.cpp

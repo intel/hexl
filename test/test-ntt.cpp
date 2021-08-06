@@ -252,49 +252,48 @@ TEST_P(NTTTest, API) {
 
   // In-place Fwd NTT
   NTT ntt(N, modulus);
-  ntt.ComputeForward(input.data(), input.data(), 1, 4);
-  LOG(INFO) << "input after NTT " << input;
+  ntt.ComputeForward(input.data(), input.data(), 1, 1);
   AssertEqual(input, exp_output);
 
   // In-place lazy NTT
-  // input = input_copy;
-  // ntt.ComputeForward(input.data(), input.data(), 2, 4);
-  // for (auto& elem : input) {
-  //   elem = elem % modulus;
-  // }
-  // AssertEqual(input, exp_output);
+  input = input_copy;
+  ntt.ComputeForward(input.data(), input.data(), 2, 4);
+  for (auto& elem : input) {
+    elem = elem % modulus;
+  }
+  AssertEqual(input, exp_output);
 
-  // // Compute reference
-  // input = input_copy;
-  // ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
-  //                                       ntt.GetRootOfUnityPowers().data());
-  // AssertEqual(input, exp_output);
+  // Compute reference
+  input = input_copy;
+  ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
+                                        ntt.GetRootOfUnityPowers().data());
+  AssertEqual(input, exp_output);
 
-  // // Test round-trip
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 1, 1);
-  // ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
-  // AssertEqual(input, input_copy);
+  // Test round-trip
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 1, 1);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
+  AssertEqual(input, input_copy);
 
-  // // Test out-of-place forward
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  // AssertEqual(out_buffer, exp_output);
+  // Test out-of-place forward
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  AssertEqual(out_buffer, exp_output);
 
-  // // Test out-of-place inverse
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  // ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
-  // AssertEqual(input, input_copy);
+  // Test out-of-place inverse
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
+  AssertEqual(input, input_copy);
 
-  // // Test out-of-place inverse lazy
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  // ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2);
-  // for (auto& elem : input) {
-  //   elem = elem % modulus;
-  // }
-  // AssertEqual(input, input_copy);
+  // Test out-of-place inverse lazy
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2);
+  for (auto& elem : input) {
+    elem = elem % modulus;
+  }
+  AssertEqual(input, input_copy);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -336,22 +335,6 @@ INSTANTIATE_TEST_SUITE_P(
                         std::vector<uint64_t>{132171, 4062184, 2675172, 1519183,
                                               462763, 3731592, 1824324,
                                               2370031}),
-        std::make_tuple(
-            16, 1152921504606844417,
-            std::vector<uint64_t>{
-                96046728857246715, 1087174245393842548, 1100693743452129972,
-                386669727200820431, 873519857157698393, 163212521025771467,
-                539406580920013660, 465452313388474572, 580974875091803261,
-                539829207629704343, 980677547131502617, 770416215541007786,
-                1119415231571297852, 1020957897917930780, 779630141217306036,
-                590517767668927566},
-            std::vector<uint64_t>{
-                2864949383991421955, 3072633028744911013, 1375870108264023396,
-                1966989563725620644, 2191205245071740576, 3365076903846921758,
-                2581789005907106231, 3074997501587209135, 1726831297891203079,
-                3103641678921030477, 2540569287547858584, 3183193317955781916,
-                2041054163262545129, 3914383123290048695, 2358416657547526303,
-                3680321560007397561}),
         std::make_tuple(
             32, 769,
             std::vector<uint64_t>{401, 203, 221, 352, 487, 151, 405, 356,
