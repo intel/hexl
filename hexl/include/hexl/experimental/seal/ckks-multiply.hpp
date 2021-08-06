@@ -13,7 +13,7 @@ namespace hexl {
 /// (2 * n * num_moduli) elements
 /// @param[in] operand1 First ciphertext argument. Has (2 * n * num_moduli)
 /// elements.
-/// @param[in] operand1 Second ciphertext argument. Has (2 * n * num_moduli)
+/// @param[in] operand2 Second ciphertext argument. Has (2 * n * num_moduli)
 /// elements.
 /// @param[in] n Number of coefficients in each polynomial
 /// @param[in] moduli Pointer to contiguous array of num_moduli word-sized
