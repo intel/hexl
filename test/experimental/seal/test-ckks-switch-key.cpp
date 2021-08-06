@@ -86,7 +86,6 @@ TEST(CkksSwitchKey, small) {
   std::vector<uint64_t> moduli{1152921504606844417, 1152921504606844513,
                                1152921504606845473};
 
-  // size decomp_modulus_size
   std::vector<uint64_t> modswitch_factors{1047018677005647534,
                                           1036428394245527932};
   size_t decomp_modulus_size = 2;
