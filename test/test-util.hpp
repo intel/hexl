@@ -9,6 +9,7 @@
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/check.hpp"
+#include "hexl/util/compiler.hpp"
 
 namespace intel {
 namespace hexl {

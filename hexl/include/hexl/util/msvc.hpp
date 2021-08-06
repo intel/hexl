@@ -4,6 +4,7 @@
 #pragma once
 
 #ifdef HEXL_USE_MSVC
+#include <Windows.h>
 #include <immintrin.h>
 #include <intrin.h>
 #include <stdint.h>
