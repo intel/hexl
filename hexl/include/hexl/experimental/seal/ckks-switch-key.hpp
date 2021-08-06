@@ -19,16 +19,15 @@ namespace hexl {
 /// level, including one auxiliary prime.
 /// @param[in] rns_modulus_size Number of moduli in the ciphertext at its
 /// current level, including one auxiliary prime. rns_modulus_size ==
-/// decomp_modulus_size + 1. TODO(fboemer): check
-/// @param[in] key_component_count TODO(fboemer). Always 2?
+/// decomp_modulus_size + 1
+/// @param[in] key_component_count TODO(fboemer)
 /// @param[in] moduli Array of word-sized coefficient moduli. There must be
 /// key_modulus_size moduli in the array
 /// @param[in] kswitch_keys Array of evaluation key data. Has
 /// decomp_modulus_size entries, each with
 /// coeff_count * ((key_modulus_size - 1)+ (key_component_count - 1) *
 /// (key_modulus_size) + 1) entries
-/// TODO(fboemer): check
-/// @param[in] modswitch_factors TODO(fboemer)
+/// @param[in] modswitch_factors Array of modulus switch factors
 
 void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
                    uint64_t n, uint64_t decomp_modulus_size,
