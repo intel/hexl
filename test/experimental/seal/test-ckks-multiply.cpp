@@ -15,7 +15,7 @@
 namespace intel {
 namespace hexl {
 
-TEST(CKKSMultiply, small_one_mod) {
+TEST(CkksMultiply, small_one_mod) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10};
 
@@ -31,13 +31,13 @@ TEST(CKKSMultiply, small_one_mod) {
       (4 * 8 % 10),         (5 * 1 % 10),         (6 * 3 % 10)           //
   };
 
-  CKKSMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
+  CkksMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
                moduli.size());
 
   CheckEqual(out, exp_out);
 }
 
-TEST(CKKSMultiply, small_one_mod_inplace) {
+TEST(CkksMultiply, small_one_mod_inplace) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10};
 
@@ -56,13 +56,13 @@ TEST(CKKSMultiply, small_one_mod_inplace) {
       (4 * 8 % 10),         (5 * 1 % 10),         (6 * 3 % 10)           //
   };
 
-  CKKSMultiply(op1.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
+  CkksMultiply(op1.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
                moduli.size());
 
   CheckEqual(op1, exp_out);
 }
 
-TEST(CKKSMultiply, small_two_mod) {
+TEST(CkksMultiply, small_two_mod) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10, 20};
 
@@ -99,7 +99,7 @@ TEST(CKKSMultiply, small_two_mod) {
                                 (15 * 11 % 20),
                                 (16 * 13 % 20)};
 
-  CKKSMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
+  CkksMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
                moduli.size());
 
   CheckEqual(out, exp_out);

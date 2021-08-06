@@ -10,6 +10,7 @@ set(NATIVE_SRC
     eltwise/eltwise-cmp-add.cpp
     eltwise/eltwise-cmp-sub-mod.cpp
     experimental/seal/ckks-multiply.cpp
+    experimental/seal/ckks-switch-key.cpp
     ntt/ntt-internal.cpp
     ntt/ntt-default.cpp
     ntt/ntt-radix-4.cpp
