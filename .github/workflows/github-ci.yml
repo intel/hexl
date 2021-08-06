@@ -110,7 +110,7 @@ jobs:
         run: |
           set -x
           # Build library
-          cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./
+          cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./ -DGFLAGS_INTTYPE_FORMAT=C99
           cmake --build build --config Debug
           cmake --build build --target install --config Debug
           cmake --build build --target unittest
