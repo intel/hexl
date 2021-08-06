@@ -59,425 +59,444 @@ env:
 # Ubuntu 20.04 #
 ################
 jobs:
-  format:
-    name: Format
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    steps:
-      - uses: actions/checkout@v2
-      # Required for pre-commit
-      - run: pip3 install cpplint
-      # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
+  # format:
+  #   name: Format
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     # Required for pre-commit
+  #     - run: pip3 install cpplint
+  #     # NOTE: This is deprecated in favor of pre-commit.ci
+  #     - uses: pre-commit/action@v2.0.2
+  #       with:
+  #         extra_args: --all-files
 
-  default-build:
-    name: Default build and test
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
-
-      - name: Default Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-          cmake --build build -j4
-          cmake --install build
-
-          # Build example
-          cd example/cmake;
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build -j4
-
-          # Run example
-          build/example
-          cd ../..
-
-          # Run tests
-          build/test/unit-test
-          set +x
-
-  shared-build:
-    name: Shared build and test
-    needs: [format]
-    runs-on: ubuntu-20.04
+  windows-build:
+    name: Build and test on Windows
+    runs-on: windows-latest
     environment: intel_workflow
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
-
-      - name: Shared Build
+      - name: Default build
         run: |
           set -x
           # Build library
-          cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
-          cmake --build build -j4
-          cmake --install build
+          cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./
+          cmake --build build --config Release
+          cmake --build build --target install --config Release
+          cmake --build build --target unittest
+          cmake --build build --target bench
 
-          # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build -j4
-          build/example
-          set +x
+  # default-build:
+  #   name: Default build and test
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-  debug-build:
-    name: Debug build and test
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-     run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  #     - name: Default Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
+  #         cmake --build build -j4
+  #         cmake --install build
 
-      - name: Debug Build
-        run: |
-          set -x
-          # Install doxygen and dependencies
-          sudo apt-get install -y doxygen graphviz
+  #         # Build example
+  #         cd example/cmake;
+  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         cmake --build build -j4
 
-          # Build library
-          cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all docs
-          cmake --install build
-          build/test/unit-test
+  #         # Run example
+  #         build/example
+  #         cd ../..
 
-          # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build -j4
-          build/example
-          set +x
+  #         # Run tests
+  #         build/test/unit-test
+  #         set +x
 
-  coverage-build:
-    name: Coverage build, test, and benchmark
-    needs: [format]
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-     run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  # shared-build:
+  #   name: Shared build and test
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Coverage Build
-        run: |
-          set -x
-          # Install doxygen and dependencies
-          sudo apt-get install -y doxygen graphviz
+  #     - name: Shared Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
+  #         cmake --build build -j4
+  #         cmake --install build
 
-          # Build library
-          cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all docs
-          cmake --install build
-          set +x
+  #         # Build and run example
+  #         cd example/cmake;
+  #         cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         cmake --build build -j4
+  #         build/example
+  #         set +x
 
-      - name: Test
-        run: |
-          set -x
-          # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
-          pwd
-          ls
-          echo ${CI_PROJECT_DIR}
-          build/test/unit-test
-          HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
-          HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
-          set +x
+  # debug-build:
+  #   name: Debug build and test
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #    run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: lcov
-        run: |
-          set -x
-          # Install lcov
-          sudo apt-get install -y lcov
-          lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
+  #     - name: Debug Build
+  #       run: |
+  #         set -x
+  #         # Install doxygen and dependencies
+  #         sudo apt-get install -y doxygen graphviz
 
-          # Remove unwanted directories
-          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+  #         # Build library
+  #         cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
+  #         cmake --build build -j4 --target all docs
+  #         cmake --install build
+  #         build/test/unit-test
 
-          # Report overall summary to be parsed by gitlab CI
-          lcov --list cov_test.info
+  #         # Build and run example
+  #         cd example/cmake;
+  #         cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         cmake --build build -j4
+  #         build/example
+  #         set +x
 
-          # Generate coverage html
-          genhtml --branch-coverage cov_test.info --output-directory coverage
-          set +x
+  # coverage-build:
+  #   name: Coverage build, test, and benchmark
+  #   needs: [format]
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #    run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Benchmark
-        run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
-      - name: Archive benchmark results
-        uses: actions/upload-artifact@v2
-        with:
-          name: bench_hexl_${{github.sha}}.csv
-          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
-          retention-days: 90 # Maximum for free version
+  #     - name: Coverage Build
+  #       run: |
+  #         set -x
+  #         # Install doxygen and dependencies
+  #         sudo apt-get install -y doxygen graphviz
 
-  ###############
-  # Ice-lake CI #
-  ###############
-  format-icelake:
-    name: Format (IceLake)
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
-    steps:
-      - uses: actions/checkout@v2
-      - run: pre-commit run --all-files
+  #         # Build library
+  #         cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
+  #         cmake --build build -j4 --target all docs
+  #         cmake --install build
+  #         set +x
 
-  default-build-icelake:
-    name: Default build and test (IceLake)
-    needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
-          # export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          # echo $PKG_CONFIG_PATH
+  #     - name: Test
+  #       run: |
+  #         set -x
+  #         # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
+  #         pwd
+  #         ls
+  #         echo ${CI_PROJECT_DIR}
+  #         build/test/unit-test
+  #         HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
+  #         HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+  #         set +x
 
-      - name: Default Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-          cmake --build build -j4
-          cmake --install build
+  #     - name: lcov
+  #       run: |
+  #         set -x
+  #         # Install lcov
+  #         sudo apt-get install -y lcov
+  #         lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
 
-          # Build example
-          cd example/cmake;
-          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build -j4
+  #         # Remove unwanted directories
+  #         lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
 
-          # Run example
-          build/example
+  #         # Report overall summary to be parsed by gitlab CI
+  #         lcov --list cov_test.info
 
-          # Build example using pkg-config
-          cd ../pkg-config;
-          # Set PKG_CONFIG_PATH to locate hexl.pc
-          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          cmake -S . -B build
-          cmake --build build -j4
+  #         # Generate coverage html
+  #         genhtml --branch-coverage cov_test.info --output-directory coverage
+  #         set +x
 
-          # Run example
-          build/example
+  #     - name: Benchmark
+  #       run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
+  #     - name: Archive benchmark results
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: bench_hexl_${{github.sha}}.csv
+  #         path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
+  #         retention-days: 90 # Maximum for free version
 
-          # Build example using vcpkg
-          cd ../vcpkg;
-          cmake -S . -B build ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
-          cmake --build build -j4
+  # ###############
+  # # Ice-lake CI #
+  # ###############
+  # format-icelake:
+  #   name: Format (IceLake)
+  #   runs-on: [self-hosted, Linux, X64, ice-lake]
+  #   # Use environment protection (require review)
+  #   environment: intel_workflow
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - run: pre-commit run --all-files
 
-          # Run example
-          build/example
+  # default-build-icelake:
+  #   name: Default build and test (IceLake)
+  #   needs: [format-icelake]
+  #   runs-on: [self-hosted, Linux, X64, ice-lake]
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
+  #         # export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+  #         # echo $PKG_CONFIG_PATH
 
-          cd ../..
+  #     - name: Default Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
+  #         cmake --build build -j4
+  #         cmake --install build
 
-          # Run tests
-          build/test/unit-test
-          set +x
+  #         # Build example
+  #         cd example/cmake;
+  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         cmake --build build -j4
 
-  shared-build-icelake:
-    name: Shared build and test (IceLake)
-    needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  #         # Run example
+  #         build/example
 
-      - name: Shared Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
-          cmake --build build -j4
-          cmake --install build
+  #         # Build example using pkg-config
+  #         cd ../pkg-config;
+  #         # Set PKG_CONFIG_PATH to locate hexl.pc
+  #         export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+  #         cmake -S . -B build
+  #         cmake --build build -j4
 
-          # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build -j4
-          build/example
+  #         # Run example
+  #         build/example
 
-          # Build example using pkg-config
-          cd ../pkg-config;
-          # Set PKG_CONFIG_PATH to locate hexl.pc
-          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          cmake -S . -B build
-          cmake --build build -j4
-          set +x
+  #         # Build example using vcpkg
+  #         cd ../vcpkg;
+  #         cmake -S . -B build ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
+  #         cmake --build build -j4
 
-  debug-build-icelake:
-    name: Debug build and test (IceLake)
-    needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    environment: intel_workflow
-    defaults:
-     run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  #         # Run example
+  #         build/example
 
-      - name: Debug Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all docs
-          cmake --install build
-          build/test/unit-test
+  #         cd ../..
 
-          # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build -j4
-          build/example
-          set +x
+  #         # Run tests
+  #         build/test/unit-test
+  #         set +x
 
-  coverage-build-icelake:
-    name: Coverage build, test, and benchmark (IceLake)
-    needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    environment: intel_workflow
-    defaults:
-     run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REFH
-          cmake --version
-          pwd
-          ls
+  # shared-build-icelake:
+  #   name: Shared build and test (IceLake)
+  #   needs: [format-icelake]
+  #   runs-on: [self-hosted, Linux, X64, ice-lake]
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-      - name: Coverage Build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all docs
-          cmake --install build
-          set +x
+  #     - name: Shared Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
+  #         cmake --build build -j4
+  #         cmake --install build
 
-      - name: Test
-        run: |
-          set -x
-          # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
-          pwd
-          ls
-          echo ${CI_PROJECT_DIR}
-          build/test/unit-test
-          HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
-          HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
-          set +x
+  #         # Build and run example
+  #         cd example/cmake;
+  #         cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         cmake --build build -j4
+  #         build/example
 
-      - name: lcov
-        run: |
-          set -x
-          lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
+  #         # Build example using pkg-config
+  #         cd ../pkg-config;
+  #         # Set PKG_CONFIG_PATH to locate hexl.pc
+  #         export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+  #         cmake -S . -B build
+  #         cmake --build build -j4
+  #         set +x
 
-          # Remove unwanted directories
-          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+  # debug-build-icelake:
+  #   name: Debug build and test (IceLake)
+  #   needs: [format-icelake]
+  #   runs-on: [self-hosted, Linux, X64, ice-lake]
+  #   environment: intel_workflow
+  #   defaults:
+  #    run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
 
-          # Report overall summary to be parsed by gitlab CI
-          lcov --list cov_test.info
+  #     - name: Debug Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
+  #         cmake --build build -j4 --target all docs
+  #         cmake --install build
+  #         build/test/unit-test
 
-          # Generate coverage html
-          genhtml --branch-coverage cov_test.info --output-directory coverage
-          set +x
+  #         # Build and run example
+  #         cd example/cmake;
+  #         cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         cmake --build build -j4
+  #         build/example
+  #         set +x
 
-      - name: Benchmark
-        run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
-      - name: Archive benchmark results
-        uses: actions/upload-artifact@v2
-        with:
-          name: bench_hexl_${{github.sha}}.csv
-          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
-          retention-days: 90 # Maximum for free version
+  # coverage-build-icelake:
+  #   name: Coverage build, test, and benchmark (IceLake)
+  #   needs: [format-icelake]
+  #   runs-on: [self-hosted, Linux, X64, ice-lake]
+  #   environment: intel_workflow
+  #   defaults:
+  #    run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Validate paths
+  #       run: |
+  #         whoami
+  #         echo $HOME
+  #         echo $GITHUB_WORKSPACE
+  #         echo "Testing from branch:"
+  #         echo $GITHUB_REFH
+  #         cmake --version
+  #         pwd
+  #         ls
+
+  #     - name: Coverage Build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
+  #         cmake --build build -j4 --target all docs
+  #         cmake --install build
+  #         set +x
+
+  #     - name: Test
+  #       run: |
+  #         set -x
+  #         # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
+  #         pwd
+  #         ls
+  #         echo ${CI_PROJECT_DIR}
+  #         build/test/unit-test
+  #         HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
+  #         HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+  #         set +x
+
+  #     - name: lcov
+  #       run: |
+  #         set -x
+  #         lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
+
+  #         # Remove unwanted directories
+  #         lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+
+  #         # Report overall summary to be parsed by gitlab CI
+  #         lcov --list cov_test.info
+
+  #         # Generate coverage html
+  #         genhtml --branch-coverage cov_test.info --output-directory coverage
+  #         set +x
+
+  #     - name: Benchmark
+  #       run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
+  #     - name: Archive benchmark results
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: bench_hexl_${{github.sha}}.csv
+  #         path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
+  #         retention-days: 90 # Maximum for free version
