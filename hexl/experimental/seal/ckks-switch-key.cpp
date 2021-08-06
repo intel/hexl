@@ -153,14 +153,18 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
     }
   }
 
+  LOG(INFO) << "Second half";
+
   uint64_t* data_array = result;
   for (size_t key_component = 0; key_component < key_component_count;
        ++key_component) {
+    LOG(INFO) << "key_component " << key_component << "\n";
     uint64_t* t_poly_prod_it =
         &t_poly_prod[key_component * coeff_count * rns_modulus_size];
     uint64_t* t_last = &t_poly_prod_it[decomp_modulus_size * coeff_count];
 
     NTT(n, moduli[key_modulus_size - 1]).ComputeInverse(t_last, t_last, 2, 2);
+    LOG(INFO) << "after inverse " << std::vector<uint64_t>(t_last, t_last + n);
 
     uint64_t qk = moduli[key_modulus_size - 1];
     uint64_t qk_half = qk >> 1;
@@ -182,6 +186,8 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
       if (qk > qi) {
         intel::hexl::EltwiseReduceMod(t_ntt_ptr, t_last, coeff_count, moduli[i],
                                       input_mod_factor, 1);
+        LOG(INFO) << "After EltwiseReduceMod "
+                  << std::vector<uint64_t>(t_last, t_last + n);
       } else {
         for (size_t coeff_idx = 0; coeff_idx < coeff_count; ++coeff_idx) {
           t_ntt_ptr[coeff_idx] = t_last[coeff_idx];
