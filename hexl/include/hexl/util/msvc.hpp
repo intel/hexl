@@ -6,7 +6,6 @@
 #ifdef HEXL_USE_MSVC
 
 #define NOMINMAX  // Avoid erors with std::min/std::max
-#include <Windows.h>
 #undef min
 #undef max
 
