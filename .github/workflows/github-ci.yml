@@ -98,29 +98,29 @@ jobs:
           build/example
 
   windows-debug-build:
-  name: Windows debug
-  runs-on: windows-latest
-  environment: intel_workflow
-  defaults:
-    run:
-      shell: bash
-  steps:
-    - uses: actions/checkout@v2
-    - name: Default build
-      run: |
-        set -x
-        # Build library
-        cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./
-        cmake --build build --config Debug
-        cmake --build build --target install --config Debug
-        cmake --build build --target unittest
-        cmake --build build --target bench
+    name: Windows debug
+    runs-on: windows-latest
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: Default build
+        run: |
+          set -x
+          # Build library
+          cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./
+          cmake --build build --config Debug
+          cmake --build build --target install --config Debug
+          cmake --build build --target unittest
+          cmake --build build --target bench
 
-        # Build and run examples
-        cd example/cmake
-        cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-        cmake --build build
-        build/example
+          # Build and run examples
+          cd example/cmake
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build build
+          build/example
 
   # default-build:
   #   name: Default build and test
