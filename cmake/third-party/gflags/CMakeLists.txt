@@ -7,8 +7,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-conversion -Wno-shadow -Wno-ca
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-fallthrough")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning -Wno-unknown-warning-option")
 
-set(GFLAGS_INTTYPES_FORMAT C99)
-set(INTTYPES_FORMAT C99)
+add_definitions(-DGFLAGS_INTTYPES_FORMAT=C99)
+add_definitions(-DINTTYPES_FORMAT=C99)
 
 configure_file(CMakeLists.txt.in gflags-download/CMakeLists.txt)
 set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .)
