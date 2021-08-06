@@ -149,6 +149,8 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
         t_poly_prod_iter_ptr[poly_iter_idx] = BarrettReduce128(
             accumulator_ptr[accumulator_idx + 1],
             accumulator_ptr[accumulator_idx], moduli[key_index]);
+        LOG(INFO) << "t_poly_prod_iter_ptr[" << poly_iter_idx
+                  << "] = " << t_poly_prod_iter_ptr[poly_iter_idx];
       }
     }
   }
