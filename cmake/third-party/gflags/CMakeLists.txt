@@ -7,6 +7,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-conversion -Wno-shadow -Wno-ca
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-fallthrough")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning -Wno-unknown-warning-option")
 
+set(GFLAGS_INTTYPES_FORMAT C99)
+set(INTTYPES_FORMAT C99)
+
 configure_file(CMakeLists.txt.in gflags-download/CMakeLists.txt)
 set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .)
 execute_process(COMMAND ${CONFIGURE_COMMAND}
@@ -21,6 +24,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build .
 if(result)
   message(FATAL_ERROR "Build step for gflags failed: ${result}")
 endif()
+
 
 # Add gflags directly to our build. This defines the gflags target.
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gflags-src
