@@ -36,9 +36,6 @@ struct BitReversePairBitwiseHelper {
     uint64_t block_size = start_idx;
     uint64_t increment = 1ULL << (RecursionDepth + 1);
 
-    // LOG(INFO) << "block_size " << block_size;
-    // LOG(INFO) << "increment " << increment;
-
     // First index doesn't need to be swapped
     for (size_t i = start_idx; i < size_div_two; i += increment) {
       // Loop only through indices with first bit zero and last bit one,
@@ -47,21 +44,11 @@ struct BitReversePairBitwiseHelper {
         uint64_t index = i + j;
 
         // XOR temporary
-        // LOG(INFO) << "index " << index;
-        // LOG(INFO) << "bottom_swap_idx " << bottom_swap_idx;
-        // LOG(INFO) << "top_swap_idx " << top_swap_idx;
         uint64_t x =
             ((index >> bottom_swap_idx) ^ (index >> top_swap_idx)) & 1ULL;
         uint64_t new_index =
             index ^ ((x << bottom_swap_idx) | (x << top_swap_idx));
-
-        // LOG(INFO) << "index " << index;
-        // LOG(INFO) << "new_index " << new_index;
-
-        // if (index < new_index) {
-        // LOG(INFO) << "Swapping " << index << " / " << new_index;
         std::swap(input[index], input[new_index]);
-        // }
       }
     }
 
