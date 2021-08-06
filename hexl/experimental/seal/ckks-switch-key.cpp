@@ -117,6 +117,9 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
 
           LOG(INFO) << "j " << j << ", mult_op2_idx " << mult_op2_idx;
 
+          LOG(INFO) << "k_switch_keys[" << j << "][" << mult_op2_idx
+                    << "] = " << k_switch_keys[j][mult_op2_idx];
+
           uint128_t prod =
               MultiplyUInt64(t_operand[l], k_switch_keys[j][mult_op2_idx]);
 
@@ -131,7 +134,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
           t_poly_lazy_ptr[t_poly_idx + 1] = sum_hi;
 
           LOG(INFO) << "sum_lo " << sum_lo;
-          LOG(INFO) << "sum_lo " << sum_hi;
+          LOG(INFO) << "sum_hi " << sum_hi;
         }
       }
     }
