@@ -9,7 +9,6 @@ set(NATIVE_SRC
     eltwise/eltwise-fma-mod.cpp
     eltwise/eltwise-cmp-add.cpp
     eltwise/eltwise-cmp-sub-mod.cpp
-
     ntt/ntt-internal.cpp
     ntt/ntt-default.cpp
     ntt/ntt-radix-4.cpp

@@ -78,7 +78,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
         }
 
         // NTT conversion lazy outputs in [0, 4q)
-        NTT(n, moduli[key_index]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 1);
+        NTT(n, moduli[key_index]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
 
         t_operand = t_ntt_ptr;
       }
