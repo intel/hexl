@@ -4,7 +4,12 @@
 #pragma once
 
 #ifdef HEXL_USE_MSVC
+
+#define NOMINMAX  // Avoid erors with min/max
 #include <Windows.h>
+#undef min
+#undef max
+
 #include <immintrin.h>
 #include <intrin.h>
 #include <stdint.h>
@@ -19,7 +24,6 @@
 
 #undef TRUE
 #undef FALSE
-#define NOMINMAX  // Avoid erors with min/max
 
 namespace intel {
 namespace hexl {
