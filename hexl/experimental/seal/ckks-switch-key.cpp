@@ -200,6 +200,8 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
       uint64_t qi_lazy = qi << 1;  // some multiples of qi
 
       NTT(n, moduli[i]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
+      LOG(INFO) << "FwdNTT output "
+                << std::vector<uint64_t>(t_ntt_ptr, t_ntt_ptr + n);
       // Since SEAL uses at most 60bit
       // moduli, 8*qi < 2^63.
       qi_lazy = qi << 2;
@@ -219,6 +221,8 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
       uint64_t* data_ptr = &data_array[data_ptr_offset];
       intel::hexl::EltwiseAddMod(data_ptr, data_ptr, t_ith_poly, coeff_count,
                                  moduli[i]);
+      LOG(INFO) << "EltwiseAddMod output "
+                << std::vector<uint64_t>(data_ptr, data_ptr + n);
     }
   }
 
