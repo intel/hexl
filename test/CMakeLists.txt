@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set(NATIVE_TEST_SRC main.cpp
+    experimental/seal/test-ckks-multiply.cpp
     test-aligned-vector.cpp
     test-number-theory.cpp
     test-eltwise-add-mod.cpp
