@@ -94,7 +94,7 @@ jobs:
           # Build and run examples
           cd example/cmake
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build
+          cmake --build build --config Release
           build/example
 
   windows-debug-build:
@@ -119,7 +119,7 @@ jobs:
           # Build and run examples
           cd example/cmake
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build
+          cmake --build build --config Debug
           build/example
 
   # default-build:

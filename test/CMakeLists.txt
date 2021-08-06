@@ -41,6 +41,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(unit-test PRIVATE /Wall /W4 /Zc:preprocessor /Ob0
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
         /wd4389 # warning C4389: signed/unsigned mismatch from gtest
+        /wd5105 # warning C5105: macro expansion prooducing 'defined' has undefined behavior
     )
     target_compile_definitions(unit-test PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
