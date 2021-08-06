@@ -10,7 +10,7 @@
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
 #include "hexl/eltwise/eltwise-sub-mod.hpp"
-#include "hexl/experimental/ckks-multiply.hpp"
+#include "hexl/experimental/seal/ckks-multiply.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"

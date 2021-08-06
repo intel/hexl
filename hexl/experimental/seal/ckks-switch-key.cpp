@@ -23,6 +23,13 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
                    uint64_t key_component_count, uint64_t* moduli,
                    const uint64_t** k_switch_keys,
                    uint64_t* modswitch_factors) {
+  LOG(INFO) << "CkksSwitchKey";
+  LOG(INFO) << "decomp_modulus_size " << decomp_modulus_size;
+  LOG(INFO) << "n " << n;
+  LOG(INFO) << "key_modulus_size " << key_modulus_size;
+  LOG(INFO) << "rns_modulus_size " << rns_modulus_size;
+  LOG(INFO) << "key_component_count " << key_component_count;
+
   uint64_t coeff_count = n;
 
   // Create a copy of target_iter
@@ -44,7 +51,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
   for (size_t j = 0; j < decomp_modulus_size; ++j) {
     NTT(n, moduli[j])
         .ComputeInverse(&t_target_ptr[j * coeff_count],
-                        &t_target_ptr[j * coeff_count], 2, 2);
+                        &t_target_ptr[j * coeff_count], 2, 1);
   }
 
   LOG(INFO) << "t_target after invnTT " << t_target;
@@ -69,22 +76,35 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
       } else {
         // Perform RNS-NTT conversion
         // No need to perform RNS conversion (modular reduction)
+        // LOG(INFO) << "j " << j;
+        // LOG(INFO) << "key_index " << key_index;
+        LOG(INFO) << "moduli[j] " << moduli[j];
+        LOG(INFO) << "moduli[key_index] " << moduli[key_index];
         if (moduli[j] <= moduli[key_index]) {
           for (size_t l = 0; l < coeff_count; ++l) {
             t_ntt_ptr[l] = t_target_ptr[j * coeff_count + l];
           }
         } else {
           // Perform RNS conversion (modular reduction)
+          LOG(INFO) << "EltwiseReduceMod";
           intel::hexl::EltwiseReduceMod(t_ntt_ptr,
                                         &t_target_ptr[j * coeff_count],
                                         coeff_count, moduli[key_index], 0, 1);
+          LOG(INFO) << "EltwiseReduceMod output"
+                    << std::vector<uint64_t>(t_ntt_ptr, t_ntt_ptr + n);
         }
 
         // NTT conversion lazy outputs in [0, 4q)
-        NTT(n, moduli[key_index]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
+        LOG(INFO) << "FwdNTT input"
+                  << std::vector<uint64_t>(t_ntt_ptr, t_ntt_ptr + n);
+        LOG(INFO) << "ntt modulus " << moduli[key_index];
+        NTT(n, moduli[key_index]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 1);
+        LOG(INFO) << "FwdNTT output"
+                  << std::vector<uint64_t>(t_ntt_ptr, t_ntt_ptr + n);
 
         t_operand = t_ntt_ptr;
       }
+      LOG(INFO) << "i " << i << " j " << j << " t_operand " << t_operand[0];
 
       // Multiply with keys and modular accumulate products in a lazy fashion
       for (size_t k = 0; k < key_component_count; ++k) {
@@ -94,6 +114,8 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
 
           uint64_t mult_op2_idx =
               coeff_count * key_index + k * key_modulus_size * coeff_count + l;
+
+          //   LOG(INFO) << "j " << j << ", mult_op2_idx " << mult_op2_idx;
 
           uint128_t prod =
               MultiplyUInt64(t_operand[l], k_switch_keys[j][mult_op2_idx]);
@@ -107,6 +129,9 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
           uint64_t sum_lo = static_cast<uint64_t>(sum);
           t_poly_lazy_ptr[t_poly_idx] = sum_lo;
           t_poly_lazy_ptr[t_poly_idx + 1] = sum_hi;
+
+          LOG(INFO) << "sum_lo " << sum_lo;
+          LOG(INFO) << "sum_lo " << sum_hi;
         }
       }
     }
