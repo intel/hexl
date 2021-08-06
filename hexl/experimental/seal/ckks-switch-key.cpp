@@ -37,7 +37,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
   for (size_t i = 0; i < coeff_count * decomp_modulus_size; ++i) {
     t_target[i] = t_target_iter_ptr[i];
   }
-  //   LOG(INFO) << "t_target " << t_target;
+  LOG(INFO) << "t_target " << t_target;
 
   uint64_t* t_target_ptr = &t_target[0];
 
@@ -54,7 +54,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
                         &t_target_ptr[j * coeff_count], 2, 1);
   }
 
-  //   LOG(INFO) << "t_target after invnTT " << t_target;
+  LOG(INFO) << "t_target after invnTT " << t_target;
 
   std::vector<uint64_t> t_poly_prod(
       key_component_count * coeff_count * rns_modulus_size, 0);
