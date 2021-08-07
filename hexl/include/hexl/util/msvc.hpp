@@ -5,7 +5,7 @@
 
 #ifdef HEXL_USE_MSVC
 
-#define NOMINMAX  // Avoid erors with std::min/std::max
+#define NOMINMAX  // Avoid errors with std::min/std::max
 #undef min
 #undef max
 
