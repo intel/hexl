@@ -90,7 +90,7 @@ jobs:
           set -x
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j4 --target all docs
+          cmake --build build -j --target all docs
           cmake --install build
           # Test
           build/test/unit-test
@@ -150,7 +150,7 @@ jobs:
           cd $GITHUB_WORKSPACE/example/pkgconfig
           # Set PKG_CONFIG_PATH to locate hexl.pc
           export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          cmake -S pkgconfig -B build
+          cmake -S . -B build
           cmake --build build
           build/example
 
