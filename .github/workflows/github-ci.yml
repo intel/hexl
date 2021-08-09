@@ -113,10 +113,10 @@ jobs:
         include:
           - os: ubuntu-20.04
             cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
-            c_compiler: "-DCMAKE_CXX_COMPILER=clang-10"
+            c_compiler: "-DCMAKE_C_COMPILER=clang-10"
           - os: macos-latest
             cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
-            c_compiler: "-DCMAKE_CXX_COMPILER=clang-10"
+            c_compiler: "-DCMAKE_C_COMPILER=clang-10"
 
     steps:
       - uses: actions/checkout@v2
