@@ -79,11 +79,7 @@ void FwdButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
     // Perform approximate computation of Q, as described in page 7 of
     // https://arxiv.org/pdf/2003.04510.pdf
     __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, *Y);
-<<<<<<< HEAD
     __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W, *Y);
-=======
-    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
->>>>>>> 4bfc1fc9... Add HEXL_EXPERIMETAL flag; cleanup
     // Compute T in range [0, 4q)
     T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
     // Reduce T to range [0, 2q)

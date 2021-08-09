@@ -48,7 +48,6 @@ TEST(CkksMultiply, small_one_mod_inplace) {
   };
   std::vector<uint64_t> op2{2, 4, 6,  //
                             8, 1, 3};
-  // std::vector<uint64_t> out(3 * coeff_count * moduli.size(), 0);
 
   std::vector<uint64_t> exp_out{
       (1 * 2 % 10),         (2 * 4 % 10),         (3 * 6 % 10),          //

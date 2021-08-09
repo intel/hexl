@@ -94,7 +94,7 @@ TEST(CkksSwitchKey, small) {
   size_t key_component_count = 2;
 
   std::vector<const uint64_t*> hexl_key_vectors;
-  for (auto& each_key : key_vector) {
+  for (const auto& each_key : key_vector) {
     hexl_key_vectors.push_back(&each_key.data()[0]);
   }
 
