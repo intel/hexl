@@ -20,7 +20,7 @@ env:
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   ICELAKE_CMAKE_TOOLCHAIN_FILE: >
       -DCMAKE_TOOLCHAIN_FILE=/home/github-ci/vcpkg/scripts/buildsystems/vcpkg.cmake
-  DEFAULT_EXAMPLE_FLAGS: >
+  HEXL_HINT_DIR: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   DEFAULT_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Release
@@ -28,20 +28,6 @@ env:
       -DCMAKE_C_COMPILER=clang-10
       -DHEXL_BENCHMARK=ON
       -DHEXL_TESTING=ON
-      -DCMAKE_INSTALL_PREFIX=./
-  SHARED_LIB_COMPILER_FLAGS: >
-      -DHEXL_SHARED_LIB=ON
-      -DHEXL_TESTING=ON
-      -DHEXL_BENCHMARK=ON
-      -DCMAKE_INSTALL_PREFIX=./
-  DEBUG_COMPILER_FLAGS: >
-      -DCMAKE_BUILD_TYPE=Debug
-      -DCMAKE_CXX_COMPILER=g++-9
-      -DCMAKE_C_COMPILER=gcc-9
-      -DHEXL_BENCHMARK=ON
-      -DHEXL_TESTING=ON
-      -DHEXL_DOCS=ON
-      -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./
   COVERAGE_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
@@ -55,9 +41,6 @@ env:
       -DCMAKE_INSTALL_PREFIX=./
   GCOV_BIN: /usr/bin/gcov-9
 
-################
-# Ubuntu 20.04 #
-################
 jobs:
   format:
     name: Format
@@ -121,11 +104,16 @@ jobs:
         # TODO: add Linux/ice-lake tag to self-hosted runner
         os: [self-hosted, macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
-        benchmark_min_time: [""]
         shared_lib: ["ON", "OFF"]
+        cxx_compiler: [""]
+        c_compiler: [""]
         exclude: # Skip debug on Mac
           - os: macos-latest
             build_type: Debug
+        include:
+          - os: [ubuntu-20.04, self-hosted]
+            cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
+            c_compiler: "-DCMAKE_CXX_COMPILER=clang-10"
 
     steps:
       - uses: actions/checkout@v2
@@ -134,16 +122,18 @@ jobs:
           set -x
           sudo apt-get install locate || true # Try to install locate
           # Build library
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} -DCMAKE_INSTALL_PREFIX=./
+          # cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
+            ${{ matrix.cxx_compiler }} ${{ matrix.c_compiler }} -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
+            -DCMAKE_INSTALL_PREFIX=./
           cmake --build build -j
           cmake --build build --target install
           cmake --build build --target unittest
           # cmake --build build --target bench
-          ./build/benchmark/bench_hexl # ${{ matrix.benchmark_min_time }}
+          ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
 
           # Build and run examples
           cd $GITHUB_WORKSPACE/example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ env.HEXL_HINT_DIR }}
           cmake --build build
           build/example
 
@@ -156,14 +146,22 @@ jobs:
           build/example
 
           # Build example using vcpkg
-          vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
-          cd $GITHUB_WORKSPACE/example/vcpkg
-          vcpkg_toolchain=$(locate vcpkg.cmake)
-          echo $vcpkg_toolchain
-          cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain
-          cmake --build build
-          build/example
-          set +x
+          # TODO: fix vcpkg example CI
+          # vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
+          # cd $GITHUB_WORKSPACE/example/vcpkg
+          # vcpkg_toolchain=$(locate vcpkg.cmake)
+          # echo $vcpkg_toolchain
+          # cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain
+          # cmake --build build
+          # build/example
+          # set +x
+
+      - name: Archive benchmark results
+        uses: actions/upload-artifact@v2
+        with:
+          name: bench_hexl_${{github.sha}}.csv
+          path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
+          retention-days: 90 # Maximum for free version
 
   windows-build:
     name: '${{ matrix.os }} ${{ matrix.build_type }}'
@@ -175,7 +173,6 @@ jobs:
     strategy:
       matrix:
         build_type: [Release] # Skip Debug in Windows
-        # shared_lib: [ON, OFF]
 
     steps:
       - uses: actions/checkout@v2
@@ -191,515 +188,25 @@ jobs:
 
           # Build and run examples
           cd example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.CMAKE_EXAMPLE_FLAGS }}
           cmake --build build --config ${{ matrix.build_type}}
           build/${{ matrix.build_type}}/example.exe
 
+          # Build example using pkgconfig
+          cd $GITHUB_WORKSPACE/example/pkgconfig
+          # Set PKG_CONFIG_PATH to locate hexl.pc
+          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}}
+          cmake --build build
+          build/example
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Default build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./
-  #         cmake --build build -j
-  #         cmake --build build --target install
-  #         cmake --build build --target unittest
-  #         cmake --build build --target bench
-
-  #         # Build and run examples
-  #         cd example/cmake
-  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=Release ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build
-  #         build/example
-
-  # mac-debug-build:
-  #   name: Mac debug
-  #   # needs: [format]
-  #   runs-on: macos-latest
-  #   environment: intel_workflow
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Default build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./
-  #         cmake --build build -j
-  #         cmake --build build --target install
-  #         cmake --build build --target unittest
-  #         # Fast benchmarks on debug mode
-  #         ./build/benchmark/bench_hexl --benchmark_min_time=0.001
-
-  #         # Build and run examples
-  #         cd example/cmake
-  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build
-  #         build/example
-
-  # windows-release-build:
-  #   name: Windows release
-  #   needs: [format]
-  #   runs-on: windows-latest
-  #   environment: intel_workflow
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Default build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./
-  #         cmake --build build --config Release
-  #         cmake --build build --target install --config Release
-  #         cmake --build build --target unittest --config Release
-  #         cmake --build build --target bench --config Release
-
-  #         # Build and run examples
-  #         cd example/cmake
-  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build --config Release
-  #         build/Release/example.exe
-
-  # # windows-debug-build:
-  # #   name: Windows debug
-  # #   needs: [format]
-  # #   runs-on: windows-latest
-  # #   environment: intel_workflow
-  # #   defaults:
-  # #     run:
-  # #       shell: bash
-  # #   steps:
-  # #     - uses: actions/checkout@v2
-  # #     - name: Default build
-  # #       run: |
-  # #         set -x
-  # #         # Build library
-  # #         cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./ -DGFLAGS_INTTYPE_FORMAT=C99
-  # #         cmake --build build --config Debug
-  # #         cmake --build build --target install --config Debug
-  # #         cmake --build build --target unittest --config Debug
-  # #         cmake --build build --target bench --config Debug
-
-  # #         # Build and run examples
-  # #         # TODO(fboemer): Fix gflags linking
-  # #         # cd example/cmake
-  # #         # cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  # #         # cmake --build build --config Debug
-  # #         # build/Debug/example.exe
-
-  # linux-default-build:
-  #   name: Default build and test
-  #   needs: [format]
-  #   runs-on: ubuntu-20.04
-  #   environment: intel_workflow
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Linux Default Build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-  #         cmake --build build -j4
-  #         cmake --install build
-
-  #         # Build example
-  #         cd example/cmake
-  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build -j4
-
-  #         # Run example
-  #         build/example
-  #         cd ../..
-
-  #         # Run tests
-  #         build/test/unit-test
-  #         set +x
-
-  # linux-shared-build:
-  #   name: Linux shared build and test
-  #   needs: [format]
-  #   runs-on: ubuntu-20.04
-  #   environment: intel_workflow
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Linux Shared Build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
-  #         cmake --build build -j4
-  #         cmake --install build
-
-  #         # Build and run example
-  #         cd example/cmake
-  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build -j4
-  #         build/example
-  #         set +x
-
-  # linux-debug-build:
-  #   name: Debug build and test
-  #   needs: [format]
-  #   runs-on: ubuntu-20.04
-  #   environment: intel_workflow
-  #   defaults:
-  #    run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Linux Debug Build
-  #       run: |
-  #         set -x
-  #         # Install doxygen and dependencies
-  #         sudo apt-get install -y doxygen graphviz
-
-  #         # Build library
-  #         cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-  #         cmake --build build -j4 --target all docs
-  #         cmake --install build
-  #         build/test/unit-test
-
-  #         # Build and run example
-  #         cd example/cmake
-  #         cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build -j4
-  #         build/example
-  #         set +x
-
-  # linux-coverage-build:
-  #   name: Coverage build, test, and benchmark
-  #   needs: [format]
-  #   runs-on: ubuntu-20.04
-  #   environment: intel_workflow
-  #   defaults:
-  #    run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Linux Coverage Build
-  #       run: |
-  #         set -x
-  #         # Install doxygen and dependencies
-  #         sudo apt-get install -y doxygen graphviz
-
-  #         # Build library
-  #         cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-  #         cmake --build build -j4 --target all docs
-  #         cmake --install build
-  #         set +x
-
-  #     - name: Test
-  #       run: |
-  #         set -x
-  #         # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
-  #         pwd
-  #         ls
-  #         echo ${CI_PROJECT_DIR}
-  #         build/test/unit-test
-  #         HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
-  #         HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
-  #         set +x
-
-  #     - name: lcov
-  #       run: |
-  #         set -x
-  #         # Install lcov
-  #         sudo apt-get install -y lcov
-  #         lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
-
-  #         # Remove unwanted directories
-  #         lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
-
-  #         # Report overall summary to be parsed by gitlab CI
-  #         lcov --list cov_test.info
-
-  #         # Generate coverage html
-  #         genhtml --branch-coverage cov_test.info --output-directory coverage
-  #         set +x
-
-  #     - name: Benchmark
-  #       run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
-  #     - name: Archive benchmark results
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: bench_hexl_${{github.sha}}.csv
-  #         path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
-  #         retention-days: 90 # Maximum for free version
-
-  # ###############
-  # # Ice-lake CI #
-  # ###############
-  # linux-format-icelake:
-  #   name: Format (IceLake)
-  #   runs-on: [self-hosted, Linux, X64, ice-lake]
-  #   # Use environment protection (require review)
-  #   environment: intel_workflow
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - run: pre-commit run --all-files
-
-  # linux-default-build-icelake:
-  #   name: Default build and test (IceLake)
-  #   needs: [linux-format-icelake]
-  #   runs-on: [self-hosted, Linux, X64, ice-lake]
-  #   environment: intel_workflow
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-  #         # export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-  #         # echo $PKG_CONFIG_PATH
-
-  #     - name: Default Build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build ${{ env.DEFAULT_COMPILER_FLAGS }}
-  #         cmake --build build -j4
-  #         cmake --install build
-
-  #         # Build example
-  #         cd example/cmake
-  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build -j4
-
-  #         # Run example
-  #         build/example
-
-  #         # Build example using pkg-config
-  #         cd ../pkg-config
-  #         # Set PKG_CONFIG_PATH to locate hexl.pc
-  #         export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-  #         cmake -S . -B build
-  #         cmake --build build -j4
-
-  #         # Run example
-  #         build/example
-
-  #         # Build example using vcpkg
-  #         cd ../vcpkg
-  #         cmake -S . -B build ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
-  #         cmake --build build -j4
-
-  #         # Run example
-  #         build/example
-
-  #         cd ../..
-
-  #         # Run tests
-  #         build/test/unit-test
-  #         set +x
-
-  # linux-shared-build-icelake:
-  #   name: Shared build and test (IceLake)
-  #   needs: [linux-format-icelake]
-  #   runs-on: [self-hosted, Linux, X64, ice-lake]
-  #   environment: intel_workflow
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Shared Build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build ${{ env.SHARED_LIB_COMPILER_FLAGS }}
-  #         cmake --build build -j4
-  #         cmake --install build
-
-  #         # Build and run example
-  #         cd example/cmake
-  #         cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build -j4
-  #         build/example
-
-  #         # Build example using pkg-config
-  #         cd ../pkg-config
-  #         # Set PKG_CONFIG_PATH to locate hexl.pc
-  #         export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-  #         cmake -S . -B build
-  #         cmake --build build -j4
-  #         set +x
-
-  # linux-debug-build-icelake:
-  #   name: Debug build and test (IceLake)
-  #   needs: [linux-format-icelake]
-  #   runs-on: [self-hosted, Linux, X64, ice-lake]
-  #   environment: intel_workflow
-  #   defaults:
-  #    run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Debug Build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build ${{ env.DEBUG_COMPILER_FLAGS }}
-  #         cmake --build build -j4 --target all docs
-  #         cmake --install build
-  #         build/test/unit-test
-
-  #         # Build and run example
-  #         cd example/cmake
-  #         cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-  #         cmake --build build -j4
-  #         build/example
-  #         set +x
-
-  # linux-coverage-build-icelake:
-  #   name: Coverage build, test, and benchmark (IceLake)
-  #   needs: [linux-format-icelake]
-  #   runs-on: [self-hosted, Linux, X64, ice-lake]
-  #   environment: intel_workflow
-  #   defaults:
-  #    run:
-  #       shell: bash
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Validate paths
-  #       run: |
-  #         whoami
-  #         echo $HOME
-  #         echo $GITHUB_WORKSPACE
-  #         echo "Testing from branch:"
-  #         echo $GITHUB_REFH
-  #         cmake --version
-  #         pwd
-  #         ls
-
-  #     - name: Coverage Build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-  #         cmake --build build -j4 --target all docs
-  #         cmake --install build
-  #         set +x
-
-  #     - name: Test
-  #       run: |
-  #         set -x
-  #         # Avoid putting tests in separate stage, since uploading/downloading artifacts takes a long time
-  #         pwd
-  #         ls
-  #         echo ${CI_PROJECT_DIR}
-  #         build/test/unit-test
-  #         HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
-  #         HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
-  #         set +x
-
-  #     - name: lcov
-  #       run: |
-  #         set -x
-  #         lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
-
-  #         # Remove unwanted directories
-  #         lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
-
-  #         # Report overall summary to be parsed by gitlab CI
-  #         lcov --list cov_test.info
-
-  #         # Generate coverage html
-  #         genhtml --branch-coverage cov_test.info --output-directory coverage
-  #         set +x
-
-  #     - name: Benchmark
-  #       run: ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
-  #     - name: Archive benchmark results
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: bench_hexl_${{github.sha}}.csv
-  #         path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
-  #         retention-days: 90 # Maximum for free version
+          # Build example using vcpkg
+          # TODO: fix vcpkg example CI
+          # vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
+          # cd $GITHUB_WORKSPACE/example/vcpkg
+          # vcpkg_toolchain=$(locate vcpkg.cmake)
+          # echo $vcpkg_toolchain
+          # cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain
+          # cmake --build build
+          # build/example
+          # set +x
