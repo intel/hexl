@@ -125,7 +125,7 @@ jobs:
           set -x
 
           # Build library
-          # cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
             ${{ matrix.cxx_compiler }} ${{ matrix.c_compiler }} -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
             -DCMAKE_INSTALL_PREFIX=./
           cmake --build build -j
