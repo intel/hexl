@@ -104,29 +104,25 @@ jobs:
         # TODO: add Linux/ice-lake tag to self-hosted runner
         os: [self-hosted, macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
-        shared_lib: ["ON", "OFF"]
+        shared_lib: [ON, OFF]
         cxx_compiler: [""]
         c_compiler: [""]
         exclude: # Skip debug on Mac
           - os: macos-latest
             build_type: Debug
-        include:
-          - os: self-hosted
-            cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
-            c_compiler: "-DCMAKE_C_COMPILER=clang-10"
-          - os: ubuntu-20.04
-            cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
-            c_compiler: "-DCMAKE_C_COMPILER=clang-10"
-
     steps:
       - uses: actions/checkout@v2
       - name: Default build
         run: |
           set -x
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            export CC=clang-10
+            export CXX=clang++-10
+          fi
 
           # Build library
           cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
-            ${{ matrix.cxx_compiler }} ${{ matrix.c_compiler }} -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
+            -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
             -DCMAKE_INSTALL_PREFIX=./
           cmake --build build -j
           cmake --build build --target install
