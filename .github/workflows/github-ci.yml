@@ -150,12 +150,13 @@ jobs:
           # Set PKG_CONFIG_PATH to locate hexl.pc
           export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
           cmake -S pkg-config -B pkg-config/build
-          cmake --build build -j4
+          cmake --build pkg-config/build
           pkg-config/build/example
 
           # Build example using vcpkg
           vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
           cmake -S vcpkg -B vcpkg/build
+          cmake --build vcpkg/build
           vcpkg/build/example
           set +x
 
