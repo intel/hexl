@@ -111,7 +111,10 @@ jobs:
           - os: macos-latest
             build_type: Debug
         include:
-          - os: [ubuntu-20.04, self-hosted]
+          - os: ubuntu-20.04
+            cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
+            c_compiler: "-DCMAKE_CXX_COMPILER=clang-10"
+          - os: macos-latest
             cxx_compiler: "-DCMAKE_CXX_COMPILER=clang++-10"
             c_compiler: "-DCMAKE_CXX_COMPILER=clang-10"
 
