@@ -74,6 +74,7 @@ jobs:
 
   windows-release-build:
     name: Windows release
+    needs: [format]
     runs-on: windows-latest
     environment: intel_workflow
     defaults:
@@ -99,6 +100,7 @@ jobs:
 
   # windows-debug-build:
   #   name: Windows debug
+  #   needs: [format]
   #   runs-on: windows-latest
   #   environment: intel_workflow
   #   defaults:
