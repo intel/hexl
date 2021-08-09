@@ -109,9 +109,8 @@ jobs:
           genhtml --branch-coverage cov_test.info --output-directory coverage
           set +x
 
-
   nix-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }}'
+    name: '${{ matrix.os }} ${{ matrix.shared_lib }} ${{ matrix.build_type }}'
     runs-on: '${{ matrix.os }}'
     environment: intel_workflow
     defaults:
@@ -142,10 +141,23 @@ jobs:
           ./build/benchmark/bench_hexl # ${{ matrix.benchmark_min_time }}
 
           # Build and run examples
-          cd example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
-          cmake --build build
-          build/example
+          cd example
+          cmake -S cmake -B cmake/build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build cmake/build
+          cmake/build/example
+
+          # Build example using pkg-config
+          # Set PKG_CONFIG_PATH to locate hexl.pc
+          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
+          cmake -S pkg-config -B pkg-config/build
+          cmake --build build -j4
+          pkg-config/build/example
+
+          # Build example using vcpkg
+          vcpkg install hexl --overlay-ports=/path/to/hexl/port/hexl --head
+          cmake -S vcpkg -B vcpkg/build
+          vcpkg/build/example
+          set +x
 
   windows-build:
     name: '${{ matrix.os }} ${{ matrix.build_type }}'
