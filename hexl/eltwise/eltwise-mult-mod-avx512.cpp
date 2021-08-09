@@ -13,6 +13,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/compiler.hpp"
+#include "hexl/util/defines.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -66,7 +67,7 @@ void EltwiseMultModAVX512IntLoopUnroll(__m512i* vp_result,
                 "CoeffCount must be a factor of manual_unroll_factor * "
                 "avx512_64bit_count");
 
-  (void)v_twice_mod;  // Avoid unused variable
+  HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = loop_count; i > 0; --i) {
     __m512i x1 = _mm512_loadu_si512(vp_operand1++);
@@ -314,7 +315,7 @@ void EltwiseMultModAVX512IntLoopDefault(__m512i* vp_result,
                                         const __m512i* vp_operand2,
                                         __m512i vbarr_lo, __m512i v_modulus,
                                         __m512i v_twice_mod, uint64_t n) {
-  (void)v_twice_mod;  // Avoid unused variable
+  HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
     __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
@@ -601,7 +602,7 @@ template <int InputModFactor>
 inline void EltwiseMultModAVX512FloatLoopDefault(
     __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
     __m512d u, __m512d p, __m512i v_modulus, __m512i v_twice_mod, uint64_t n) {
-  (void)v_twice_mod;  // Avoid unused variable
+  HEXL_UNUSED(v_twice_mod);
 
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 
