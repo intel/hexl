@@ -74,10 +74,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     )
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # Inling causes some tests to fail on MSVC with AVX512 in Release mode, HEXL_DEBUG=OFF,
+    # Inlining causes some tests to fail on MSVC with AVX512 in Release mode, HEXL_DEBUG=OFF,
     # so we disable it here
     target_compile_options(hexl PRIVATE /Wall /W4 /Zc:preprocessor /Ob0
-        /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support constexpr
+        /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
+        /wd5105 # warning C5105: macro expansion producing 'defined' has undefined behavior
+
     )
     target_compile_definitions(hexl PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()

@@ -134,14 +134,19 @@ Then, run
 ```bash
 cmake --build build --target unittest
 ```
-The unit-test executable itself is located at `build/test/unit-test`
+The unit-test executable itself is located at `build/test/unit-test` on Linux and Mac, and at `build\test\Release\unit-test.exe` or `build\test\Debug\unit-test.exe` on Windows.
 ## Benchmarking Intel HEXL
 To run a set of benchmarks via Google benchmark, configure and build Intel HEXL with `-DHEXL_BENCHMARK=ON` (see [Compile-time options](#compile-time-options)).
 Then, run
 ```bash
 cmake --build build --target bench
 ```
-The benchmark executable itself is located at `build/benchmark/bench_hexl`
+On Windows, run
+```bash
+cmake --build build --target bench --config Release
+```
+
+The benchmark executable itself is located at `build/benchmark/bench_hexl` on Linux and Mac, and at `build\benchmark\Debug\bench_hexl.exe` or `build\benchmark\Release\bench_hexl.exe` on Windows.
 
 ## Using Intel HEXL
 The `example` folder has an example of using Intel HEXL in a third-party project.

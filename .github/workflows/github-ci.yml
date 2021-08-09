@@ -72,7 +72,60 @@ jobs:
         with:
           extra_args: --all-files
 
-  default-build:
+  windows-release-build:
+    name: Windows release
+    needs: [format]
+    runs-on: windows-latest
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: Default build
+        run: |
+          set -x
+          # Build library
+          cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./
+          cmake --build build --config Release
+          cmake --build build --target install --config Release
+          cmake --build build --target unittest --config Release
+          cmake --build build --target bench --config Release
+
+          # Build and run examples
+          cd example/cmake
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cmake --build build --config Release
+          build/Release/example.exe
+
+  # windows-debug-build:
+  #   name: Windows debug
+  #   needs: [format]
+  #   runs-on: windows-latest
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Default build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./ -DGFLAGS_INTTYPE_FORMAT=C99
+  #         cmake --build build --config Debug
+  #         cmake --build build --target install --config Debug
+  #         cmake --build build --target unittest --config Debug
+  #         cmake --build build --target bench --config Debug
+
+  #         # Build and run examples
+  #         # TODO(fboemer): Fix gflags linking
+  #         # cd example/cmake
+  #         # cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+  #         # cmake --build build --config Debug
+  #         # build/Debug/example.exe
+
+  linux-default-build:
     name: Default build and test
     needs: [format]
     runs-on: ubuntu-20.04
@@ -93,7 +146,7 @@ jobs:
           pwd
           ls
 
-      - name: Default Build
+      - name: Linux Default Build
         run: |
           set -x
           # Build library
@@ -102,7 +155,7 @@ jobs:
           cmake --install build
 
           # Build example
-          cd example/cmake;
+          cd example/cmake
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
 
@@ -114,8 +167,8 @@ jobs:
           build/test/unit-test
           set +x
 
-  shared-build:
-    name: Shared build and test
+  linux-shared-build:
+    name: Linux shared build and test
     needs: [format]
     runs-on: ubuntu-20.04
     environment: intel_workflow
@@ -135,7 +188,7 @@ jobs:
           pwd
           ls
 
-      - name: Shared Build
+      - name: Linux Shared Build
         run: |
           set -x
           # Build library
@@ -144,13 +197,13 @@ jobs:
           cmake --install build
 
           # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cd example/cmake
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
 
-  debug-build:
+  linux-debug-build:
     name: Debug build and test
     needs: [format]
     runs-on: ubuntu-20.04
@@ -171,7 +224,7 @@ jobs:
           pwd
           ls
 
-      - name: Debug Build
+      - name: Linux Debug Build
         run: |
           set -x
           # Install doxygen and dependencies
@@ -184,13 +237,13 @@ jobs:
           build/test/unit-test
 
           # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cd example/cmake
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
 
-  coverage-build:
+  linux-coverage-build:
     name: Coverage build, test, and benchmark
     needs: [format]
     runs-on: ubuntu-20.04
@@ -211,7 +264,7 @@ jobs:
           pwd
           ls
 
-      - name: Coverage Build
+      - name: Linux Coverage Build
         run: |
           set -x
           # Install doxygen and dependencies
@@ -264,7 +317,7 @@ jobs:
   ###############
   # Ice-lake CI #
   ###############
-  format-icelake:
+  linux-format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
@@ -273,9 +326,9 @@ jobs:
       - uses: actions/checkout@v2
       - run: pre-commit run --all-files
 
-  default-build-icelake:
+  linux-default-build-icelake:
     name: Default build and test (IceLake)
-    needs: [format-icelake]
+    needs: [linux-format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
@@ -305,7 +358,7 @@ jobs:
           cmake --install build
 
           # Build example
-          cd example/cmake;
+          cd example/cmake
           cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
 
@@ -313,7 +366,7 @@ jobs:
           build/example
 
           # Build example using pkg-config
-          cd ../pkg-config;
+          cd ../pkg-config
           # Set PKG_CONFIG_PATH to locate hexl.pc
           export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
           cmake -S . -B build
@@ -323,7 +376,7 @@ jobs:
           build/example
 
           # Build example using vcpkg
-          cd ../vcpkg;
+          cd ../vcpkg
           cmake -S . -B build ${{env.ICELAKE_CMAKE_TOOLCHAIN_FILE}}
           cmake --build build -j4
 
@@ -336,9 +389,9 @@ jobs:
           build/test/unit-test
           set +x
 
-  shared-build-icelake:
+  linux-shared-build-icelake:
     name: Shared build and test (IceLake)
-    needs: [format-icelake]
+    needs: [linux-format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
@@ -366,22 +419,22 @@ jobs:
           cmake --install build
 
           # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DHEXL_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cd example/cmake
+          cmake -S . -B build ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
 
           # Build example using pkg-config
-          cd ../pkg-config;
+          cd ../pkg-config
           # Set PKG_CONFIG_PATH to locate hexl.pc
           export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
           cmake -S . -B build
           cmake --build build -j4
           set +x
 
-  debug-build-icelake:
+  linux-debug-build-icelake:
     name: Debug build and test (IceLake)
-    needs: [format-icelake]
+    needs: [linux-format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
@@ -410,15 +463,15 @@ jobs:
           build/test/unit-test
 
           # Build and run example
-          cd example/cmake;
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_INSTALL_PREFIX=./ ${{ env.DEFAULT_EXAMPLE_FLAGS }}
+          cd example/cmake
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9 ${{ env.DEFAULT_EXAMPLE_FLAGS }}
           cmake --build build -j4
           build/example
           set +x
 
-  coverage-build-icelake:
+  linux-coverage-build-icelake:
     name: Coverage build, test, and benchmark (IceLake)
-    needs: [format-icelake]
+    needs: [linux-format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     environment: intel_workflow
     defaults:
