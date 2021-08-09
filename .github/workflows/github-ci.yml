@@ -154,7 +154,7 @@ jobs:
           pkg-config/build/example
 
           # Build example using vcpkg
-          vcpkg install hexl --overlay-ports=/path/to/hexl/port/hexl --head
+          vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
           cmake -S vcpkg -B vcpkg/build
           vcpkg/build/example
           set +x
