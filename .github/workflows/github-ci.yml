@@ -132,6 +132,7 @@ jobs:
       - name: Default build
         run: |
           set -x
+          sudo apt-get install locate || true # Try to install locate
           # Build library
           cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} -DCMAKE_INSTALL_PREFIX=./
           cmake --build build -j
