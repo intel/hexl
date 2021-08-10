@@ -18,8 +18,6 @@ on:
 env:
   HEXL_VER: 1.2.0
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
-  ICELAKE_CMAKE_TOOLCHAIN_FILE: >
-      -DCMAKE_TOOLCHAIN_FILE=/home/github-ci/vcpkg/scripts/buildsystems/vcpkg.cmake
   HEXL_HINT_DIR: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   COVERAGE_COMPILER_FLAGS: >
@@ -189,7 +187,7 @@ jobs:
 
           # Build and run examples
           cd example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.CMAKE_EXAMPLE_FLAGS }}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.HEXL_HINT_DIR }}
           cmake --build build --config ${{ matrix.build_type}}
           build/${{ matrix.build_type}}/example.exe
 
