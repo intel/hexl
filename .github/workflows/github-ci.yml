@@ -30,7 +30,6 @@ env:
       -DHEXL_DOCS=ON
       -DHEXL_TREAT_WARNING_AS_ERROR=ON
       -DCMAKE_INSTALL_PREFIX=./
-  GCOV_BIN: /usr/bin/gcov-9
 
 jobs:
   format:
@@ -55,7 +54,7 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - name: build
+      - name: Coverage build
         run: |
           # Install doxygen and dependencies
           sudo apt-get install -y doxygen graphviz lcov
@@ -98,9 +97,7 @@ jobs:
         os: [self-hosted, macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
         shared_lib: [ON, OFF]
-        cxx_compiler: [""]
-        c_compiler: [""]
-        exclude: # Skip debug on Mac
+        exclude: # Skip debug on Mac. TODO: add Debug mode
           - os: macos-latest
             build_type: Debug
     steps:
