@@ -32,57 +32,57 @@ env:
       -DCMAKE_INSTALL_PREFIX=./
 
 jobs:
-  format:
-    name: Format
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    steps:
-      - uses: actions/checkout@v2
-      # Required for pre-commit
-      - run: pip3 install cpplint
-      # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
+  # format:
+  #   name: Format
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     # Required for pre-commit
+  #     - run: pip3 install cpplint
+  #     # NOTE: This is deprecated in favor of pre-commit.ci
+  #     - uses: pre-commit/action@v2.0.2
+  #       with:
+  #         extra_args: --all-files
 
-  coverage-build:
-    name: coverage-build
-    runs-on: ubuntu-20.04
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-      - name: Coverage build
-        run: |
-          # Install doxygen and dependencies
-          sudo apt-get install -y doxygen graphviz lcov
-          sudo apt-get install -y lcov
+  # coverage-build:
+  #   name: coverage-build
+  #   runs-on: ubuntu-20.04
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Coverage build
+  #       run: |
+  #         # Install doxygen and dependencies
+  #         sudo apt-get install -y doxygen graphviz lcov
+  #         sudo apt-get install -y lcov
 
-          set -x
-          # Build library
-          cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
-          cmake --build build -j --target all docs
-          cmake --install build
-          # Test
-          build/test/unit-test
-          HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
-          HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
+  #         cmake --build build -j --target all docs
+  #         cmake --install build
+  #         # Test
+  #         build/test/unit-test
+  #         HEXL_DISABLE_AVX512IFMA=1 build/test/unit-test
+  #         HEXL_DISABLE_AVX512DQ=1 build/test/unit-test
 
-          lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
+  #         lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
 
-          # Remove unwanted directories
-          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+  #         # Remove unwanted directories
+  #         lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
 
-          # Report overall summary to be parsed by github CI
-          lcov --list cov_test.info
+  #         # Report overall summary to be parsed by github CI
+  #         lcov --list cov_test.info
 
-          # Generate coverage html
-          genhtml --branch-coverage cov_test.info --output-directory coverage
-          set +x
+  #         # Generate coverage html
+  #         genhtml --branch-coverage cov_test.info --output-directory coverage
+  #         set +x
 
-          # TODO: report/parse coverage in github CI
+  #         # TODO: report/parse coverage in github CI
 
   nix-build:
     name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }} '
@@ -94,12 +94,12 @@ jobs:
     strategy:
       matrix:
         # TODO: add Linux/ice-lake tag to self-hosted runner
-        os: [self-hosted, macos-latest, ubuntu-20.04]
+        os: [macos-latest]
         build_type: [Release, Debug]
         shared_lib: [ON, OFF]
-        exclude: # Skip debug on Mac. TODO: add Debug mode
-          - os: macos-latest
-            build_type: Debug
+        # exclude: # Skip debug on Mac. TODO: add Debug mode
+        #   - os: macos-latest
+        #     build_type: Debug
     steps:
       - uses: actions/checkout@v2
       - name: Default build
@@ -161,35 +161,35 @@ jobs:
           path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
           retention-days: 90 # Maximum for free version
 
-  windows-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }}'
-    runs-on: windows-latest
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      matrix:
-        # TODO: add Debug in Windows
-        # TODO: add shared lib in Windows
-        build_type: [Release]
+  # windows-build:
+  #   name: '${{ matrix.os }} ${{ matrix.build_type }}'
+  #   runs-on: windows-latest
+  #   environment: intel_workflow
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   strategy:
+  #     matrix:
+  #       # TODO: add Debug in Windows
+  #       # TODO: add shared lib in Windows
+  #       build_type: [Release]
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Default build
-        run: |
-          set -x
-          # Build library
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} -DCMAKE_INSTALL_PREFIX=./
-          cmake --build build -j --config ${{ matrix.build_type}}
-          cmake --build build --target install --config ${{ matrix.build_type}}
-          cmake --build build --target unittest --config ${{ matrix.build_type}}
-          cmake --build build --target bench --config ${{ matrix.build_type}}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Default build
+  #       run: |
+  #         set -x
+  #         # Build library
+  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} -DCMAKE_INSTALL_PREFIX=./
+  #         cmake --build build -j --config ${{ matrix.build_type}}
+  #         cmake --build build --target install --config ${{ matrix.build_type}}
+  #         cmake --build build --target unittest --config ${{ matrix.build_type}}
+  #         cmake --build build --target bench --config ${{ matrix.build_type}}
 
-          # Build and run examples
-          cd example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.HEXL_HINT_DIR }}
-          cmake --build build --config ${{ matrix.build_type}}
-          build/${{ matrix.build_type}}/example.exe
+  #         # Build and run examples
+  #         cd example/cmake
+  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.HEXL_HINT_DIR }}
+  #         cmake --build build --config ${{ matrix.build_type}}
+  #         build/${{ matrix.build_type}}/example.exe
 
-          # TODO: add pkgconfig and vcpkg examples
+  #         # TODO: add pkgconfig and vcpkg examples
