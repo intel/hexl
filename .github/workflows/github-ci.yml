@@ -171,7 +171,9 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        build_type: [Release] # Skip Debug in Windows
+        # TODO: add Debug in Windows
+        # TODO: add shared lib in Windows
+        build_type: [Release]
 
     steps:
       - uses: actions/checkout@v2
@@ -191,21 +193,4 @@ jobs:
           cmake --build build --config ${{ matrix.build_type}}
           build/${{ matrix.build_type}}/example.exe
 
-          # Build example using pkgconfig
-          cd $GITHUB_WORKSPACE/example/pkgconfig
-          # Set PKG_CONFIG_PATH to locate hexl.pc
-          export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}}
-          cmake --build build
-          build/example
-
-          # Build example using vcpkg
-          # TODO: fix vcpkg example CI
-          # vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
-          # cd $GITHUB_WORKSPACE/example/vcpkg
-          # vcpkg_toolchain=$(locate vcpkg.cmake)
-          # echo $vcpkg_toolchain
-          # cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain
-          # cmake --build build
-          # build/example
-          # set +x
+          # TODO: add pkgconfig and vcpkg examples
