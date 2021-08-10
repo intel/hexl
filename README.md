@@ -155,6 +155,9 @@ The `example` folder has an example of using Intel HEXL in a third-party project
 For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution. In Debug mode, Intel HEXL will also link against [Address Sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer).
 
 **Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
+
+To enable verbose logging for the benchmarks or unit-tests, add the log level as a command-line argument, e.g. `--v=9` flag. See [easyloggingpp's documentation](https://github.com/amrayn/easyloggingpp#application-arguments) for more details.
+
 ## Threading
 Intel HEXL is single-threaded and thread-safe.
 
