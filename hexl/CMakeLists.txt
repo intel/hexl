@@ -187,7 +187,6 @@ else ()
                     COMMAND rm -f *.o
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     DEPENDS hexl
-
             )
             else()
                 add_custom_command(TARGET hexl POST_BUILD
@@ -206,7 +205,6 @@ else ()
                         $<TARGET_FILE:hexl>
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     DEPENDS hexl
-
                 )
             else()
                 add_custom_command(TARGET hexl POST_BUILD
@@ -267,3 +265,15 @@ install(FILES ${HEXL_CONFIG_FILENAME}
 
 export(EXPORT HEXLTargets
         FILE ${HEXL_TARGET_FILENAME})
+
+# Pkgconfig
+get_target_property(HEXL_TARGET_NAME hexl OUTPUT_NAME)
+
+configure_file(${HEXL_ROOT_DIR}/pkgconfig/hexl.pc.in
+    ${HEXL_ROOT_DIR}/pkgconfig/hexl.pc @ONLY)
+
+if(EXISTS ${HEXL_ROOT_DIR}/pkgconfig/hexl.pc)
+  install(
+      FILES ${HEXL_ROOT_DIR}/pkgconfig/hexl.pc
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()

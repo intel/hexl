@@ -132,14 +132,6 @@ message(STATUS "CMAKE_INSTALL_LIBDIR:     ${CMAKE_INSTALL_LIBDIR}")
 message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR}")
 message(STATUS "CMAKE_INSTALL_PREFIX:     ${CMAKE_INSTALL_PREFIX}")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc.in ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc @ONLY)
-
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc)
-    install(
-        FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/hexl.pc
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-endif()
-
 #------------------------------------------------------------------------------
 # Third-party code...
 #------------------------------------------------------------------------------
@@ -155,7 +147,6 @@ else()
     CpuFeatures::cpu_features
     INTERFACE_INCLUDE_DIRECTORIES)
 endif()
-
 
 if (HEXL_TESTING OR HEXL_BENCHMARK OR HEXL_DEBUG)
   if(NOT TARGET Threads::Threads)

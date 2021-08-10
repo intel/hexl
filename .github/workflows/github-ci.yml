@@ -22,13 +22,6 @@ env:
       -DCMAKE_TOOLCHAIN_FILE=/home/github-ci/vcpkg/scripts/buildsystems/vcpkg.cmake
   HEXL_HINT_DIR: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
-  DEFAULT_COMPILER_FLAGS: >
-      -DCMAKE_BUILD_TYPE=Release
-      -DCMAKE_CXX_COMPILER=clang++-10
-      -DCMAKE_C_COMPILER=clang-10
-      -DHEXL_BENCHMARK=ON
-      -DHEXL_TESTING=ON
-      -DCMAKE_INSTALL_PREFIX=./
   COVERAGE_COMPILER_FLAGS: >
       -DCMAKE_BUILD_TYPE=Debug
       -DCMAKE_CXX_COMPILER=g++-9
@@ -119,6 +112,15 @@ jobs:
             export CC=clang-10
             export CXX=clang++-10
           fi
+
+          # Print information useful for debugging
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REFH
+          cmake --version
+          pwd
 
           # Build library
           cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
