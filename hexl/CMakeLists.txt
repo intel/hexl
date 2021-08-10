@@ -50,6 +50,8 @@ set_target_properties(hexl PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(hexl PROPERTIES VERSION ${HEXL_VERSION})
 if (HEXL_DEBUG)
     set_target_properties(hexl PROPERTIES OUTPUT_NAME "hexl_debug")
+else()
+    set_target_properties(hexl PROPERTIES OUTPUT_NAME "hexl")
 endif()
 
 target_include_directories(hexl
