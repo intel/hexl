@@ -76,12 +76,14 @@ jobs:
           # Remove unwanted directories
           lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
 
-          # Report overall summary to be parsed by gitlab CI
+          # Report overall summary to be parsed by github CI
           lcov --list cov_test.info
 
           # Generate coverage html
           genhtml --branch-coverage cov_test.info --output-directory coverage
           set +x
+
+          # TODO: report/parse coverage in github CI
 
   nix-build:
     name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }} '
