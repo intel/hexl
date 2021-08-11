@@ -36,9 +36,13 @@ endif()
 if (HEXL_SHARED_LIB)
     add_library(hexl SHARED ${HEXL_SRC})
     if(MSVC)
-        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
         include(GenerateExportHeader)
-        generate_export_header(hexl)
+        generate_export_header(hexl
+            EXPORT_MACRO_NAME shared_EXPORTS
+            EXPORT_FILE_NAME shared_EXPORTS.h
+            STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC
+        )
     endif()
 else()
      add_library(hexl STATIC ${HEXL_SRC})
