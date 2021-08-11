@@ -37,10 +37,10 @@ class NTT {
   };
 
   /// @brief Initializes an empty NTT object
-  NTT();
+  NTT() = default;
 
   /// @brief Destructs the NTT object
-  ~NTT();
+  ~NTT() = default;
 
   /// @brief Initializes an NTT object with degree \p degree and modulus \p q.
   /// @param[in] degree also known as N. Size of the NTT transform. Must be a
