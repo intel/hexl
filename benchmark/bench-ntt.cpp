@@ -196,7 +196,7 @@ BENCHMARK(BM_FwdNTTInPlace)
 // state[0] is the degree
 static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
-  size_t modulus = GeneratePrimes(1, 61, ntt_size)[0];
+  size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
 
   AlignedVector64<uint64_t> input(ntt_size, 1);
   AlignedVector64<uint64_t> output(ntt_size, 1);
@@ -208,6 +208,26 @@ static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
 }
 
 BENCHMARK(BM_FwdNTTCopy)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+// state[0] is the degree
+static void BM_InvNTTCopy(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
+
+  AlignedVector64<uint64_t> input(ntt_size, 1);
+  AlignedVector64<uint64_t> output(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  for (auto _ : state) {
+    ntt.ComputeInverse(input.data(), output.data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_InvNTTCopy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
