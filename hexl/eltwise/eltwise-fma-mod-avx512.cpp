@@ -46,6 +46,8 @@ template void EltwiseFMAModAVX512<64, 8>(uint64_t* result, const uint64_t* arg1,
 
 #ifdef HEXL_HAS_AVX512DQ
 
+/// uses Shoup's modular multiplication. See Algorithm 4 of
+/// https://arxiv.org/pdf/2012.01968.pdf
 template <int BitShift, int InputModFactor>
 void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
                          const uint64_t* arg3, uint64_t n, uint64_t modulus) {
@@ -110,12 +112,13 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
       __m512i va_times_b = _mm512_hexl_mullo_epi<BitShift>(varg1, varg2);
       __m512i vq = _mm512_hexl_mulhi_epi<BitShift>(varg1, varg2_barr);
 
-      // Compute vq in [0, 2 * modulus)
+      // Compute vq in [0, 2 * p) where p is the modulus
+      // a * b - q * p
       vq = _mm512_hexl_mullo_add_lo_epi<BitShift>(va_times_b, vq, vneg_modulus);
 
-      // Add arg3, bringing vq to [0, 3 * modulus)
+      // Add arg3, bringing vq to [0, 3 * p)
       vq = _mm512_add_epi64(vq, varg3);
-      // Reduce to [0, modulus)
+      // Reduce to [0, p)
       vq = _mm512_hexl_small_mod_epu64<4>(vq, vmodulus, &v2_modulus);
 
       _mm512_storeu_si512(vp_result, vq);
@@ -134,6 +137,8 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
       __m512i va_times_b = _mm512_hexl_mullo_epi<BitShift>(varg1, varg2);
       __m512i vq = _mm512_hexl_mulhi_epi<BitShift>(varg1, varg2_barr);
 
+      // Compute vq in [0, 2 * p) where p is the modulus
+      // a * b - q * p
       vq = _mm512_hexl_mullo_add_lo_epi<BitShift>(va_times_b, vq, vneg_modulus);
       // Conditional Barrett subtraction
       vq = _mm512_hexl_small_mod_epu64(vq, vmodulus);
