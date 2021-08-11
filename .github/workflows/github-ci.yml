@@ -126,7 +126,8 @@ jobs:
           cmake --build build -j
           cmake --build build --target install
           cmake --build build --target unittest
-          # cmake --build build --target bench
+          # Instead of calling cmake --build build --target bench, we run the executable directly to pass command-line arguments
+
           ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
 
           # Build and run examples
