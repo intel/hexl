@@ -35,7 +35,8 @@ endif()
 
 if (HEXL_SHARED_LIB)
     add_library(hexl SHARED ${HEXL_SRC})
-    if(MSVC)
+    if(HEXL_USE_MSVC)
+        message("Setting export symbols")
         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
         include(GenerateExportHeader)
         generate_export_header(hexl
