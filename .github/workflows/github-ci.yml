@@ -162,7 +162,7 @@ jobs:
   #         retention-days: 90 # Maximum for free version
 
   windows-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }}'
+    name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }} '
     runs-on: windows-latest
     environment: intel_workflow
     defaults:
@@ -170,9 +170,9 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        # TODO: add Debug in Windows
         # TODO: add shared lib in Windows
         build_type: [Release, Debug]
+        shared_lib: [ON, OFF]
 
     steps:
       - uses: actions/checkout@v2
@@ -180,7 +180,9 @@ jobs:
         run: |
           set -x
           # Build library
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} -DCMAKE_INSTALL_PREFIX=./
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
+          -DCMAKE_INSTALL_PREFIX=./ \
+          -DHEXL_SHARED_LIB=${{ matrix.shared_lib }}
           cmake --build build -j --config ${{ matrix.build_type}}
           cmake --build build --target install --config ${{ matrix.build_type}}
           cmake --build build --target unittest --config ${{ matrix.build_type}}
