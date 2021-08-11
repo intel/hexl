@@ -217,7 +217,7 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 
 // Checks AVX512IFMA and native eltwise FMA implementations match
 #ifdef HEXL_HAS_AVX512IFMA
-TEST(EltwiseFMAMod, AVX512) {
+TEST(EltwiseFMAMod, AVX512IFMA) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
