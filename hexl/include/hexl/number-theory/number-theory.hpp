@@ -25,7 +25,7 @@ class MultiplyFactor {
   /// / modulus). This is useful when modular multiplication of the form
   /// (x * operand) mod modulus is performed with same modulus and operand
   /// several times. Note, passing operand=1 can be used to pre-compute a
-  /// Barrett factor for multipliations of the form (x * y) mod modulus, where
+  /// Barrett factor for multiplications of the form (x * y) mod modulus, where
   /// only the modulus is re-used across calls to modular multiplication.
   MultiplyFactor(uint64_t operand, uint64_t bit_shift, uint64_t modulus)
       : m_operand(operand) {
