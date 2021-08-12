@@ -156,7 +156,7 @@ For optimal performance, Intel HEXL does not perform input validation. In many c
 
 **Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
 
-To enable verbose logging for the benchmarks or unit-tests, add the log level as a command-line argument, e.g. `--v=9` flag. See [easyloggingpp's documentation](https://github.com/amrayn/easyloggingpp#application-arguments) for more details.
+To enable verbose logging for the benchmarks or unit-tests in a Debug build, add the log level as a command-line argument, e.g. `build/benchmark/bench_hexl --v=9`. See [easyloggingpp's documentation](https://github.com/amrayn/easyloggingpp#application-arguments) for more details.
 
 ## Threading
 Intel HEXL is single-threaded and thread-safe.

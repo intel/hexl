@@ -168,7 +168,7 @@ jobs:
           retention-days: 90 # Maximum for free version
 
   windows-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
+    name: 'Windows ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: windows-latest
     environment: intel_workflow
     defaults:
