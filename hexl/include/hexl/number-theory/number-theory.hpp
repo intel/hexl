@@ -22,7 +22,11 @@ class MultiplyFactor {
   MultiplyFactor() = default;
 
   /// @brief Computes and stores the Barrett factor floor((operand << bit_shift)
-  /// / modulus)
+  /// / modulus). This is useful when modular multiplication of the form
+  /// (x * operand) mod modulus is performed with same modulus and operand
+  /// several times. Note, passing operand=1 can be used to pre-compute a
+  /// Barrett factor for multiplications of the form (x * y) mod modulus, where
+  /// only the modulus is re-used across calls to modular multiplication.
   MultiplyFactor(uint64_t operand, uint64_t bit_shift, uint64_t modulus)
       : m_operand(operand) {
     HEXL_CHECK(operand <= modulus, "operand " << operand
@@ -152,16 +156,8 @@ inline uint64_t MultiplyModLazy(uint64_t x, uint64_t y, uint64_t modulus) {
   HEXL_CHECK(
       modulus <= MaximumValue(BitShift),
       "Modulus " << modulus << " exceeds bound " << MaximumValue(BitShift));
-  uint64_t y_hi{0};
-  uint64_t y_lo{0};
-  if (BitShift == 64) {
-    y_hi = y;
-    y_lo = 0;
-  } else if (BitShift == 52) {
-    y_hi = y >> 12;
-    y_lo = y << 52;
-  }
-  uint64_t y_barrett = DivideUInt128UInt64Lo(y_hi, y_lo, modulus);
+
+  uint64_t y_barrett = MultiplyFactor(y, BitShift, modulus).BarrettFactor();
   return MultiplyModLazy<BitShift>(x, y, y_barrett, modulus);
 }
 

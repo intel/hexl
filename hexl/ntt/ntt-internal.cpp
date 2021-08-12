@@ -371,7 +371,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
         Y[j] = tx + twice_mod - T;
 
         HEXL_CHECK(tx + T < modulus * 4,
-                   "ouput X " << (tx + T) << " too large");
+                   "output X " << (tx + T) << " too large");
         HEXL_CHECK(tx + twice_mod - T < modulus * 4,
                    "output Y " << (tx + twice_mod - T) << " too large");
       }
@@ -472,7 +472,10 @@ void InverseTransformFromBitReverse64(
 
   const uint64_t W_op = inv_root_of_unity_powers[root_index];
   const uint64_t inv_n = InverseMod(n, modulus);
+  uint64_t inv_n_precon = MultiplyFactor(inv_n, 64, modulus).BarrettFactor();
   const uint64_t inv_n_w = MultiplyMod(inv_n, W_op, modulus);
+  uint64_t inv_n_w_precon =
+      MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
 
   uint64_t* X = operand;
   uint64_t* Y = X + (n >> 1);
@@ -485,8 +488,8 @@ void InverseTransformFromBitReverse64(
       tx -= twice_mod;
     }
     ty = X[j] + twice_mod - Y[j];
-    X[j] = MultiplyModLazy<64>(tx, inv_n, modulus);
-    Y[j] = MultiplyModLazy<64>(ty, inv_n_w, modulus);
+    X[j] = MultiplyModLazy<64>(tx, inv_n, inv_n_precon, modulus);
+    Y[j] = MultiplyModLazy<64>(ty, inv_n_w, inv_n_w_precon, modulus);
   }
 
   if (output_mod_factor == 1) {

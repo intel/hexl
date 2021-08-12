@@ -433,9 +433,8 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
   // modulus < 2**N
   const uint64_t N = logmod + 1;
   uint64_t L = 63 + N;  // Ensures L-N+1 == 64
-  uint64_t op_hi = uint64_t(1) << (L - 64);
-  uint64_t op_lo = uint64_t(0);
-  uint64_t barr_lo = DivideUInt128UInt64Lo(op_hi, op_lo, modulus);
+  uint64_t barr_lo =
+      MultiplyFactor(uint64_t(1) << (L - 64), 64, modulus).BarrettFactor();
 
   // Let d be the product operand1 * operand2.
   // To ensure d >> (N - 1) < (1ULL << 64), we need
