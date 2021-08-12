@@ -79,7 +79,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(hexl PRIVATE /Wall /W4 /Ob0
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
         /wd5105 # warning C5105: macro expansion producing 'defined' has undefined behavior
-
     )
     target_compile_definitions(hexl PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
