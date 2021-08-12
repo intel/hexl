@@ -86,8 +86,7 @@ jobs:
           # TODO: report/parse coverage in github CI
 
   nix-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}
-    '
+    name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: '${{ matrix.os }}'
     environment: intel_workflow
     defaults:
