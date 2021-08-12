@@ -33,12 +33,8 @@ add_executable(unit-test ${TEST_SRC})
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(unit-test PRIVATE -Wall -Wextra -march=native)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # Workaround for unresolved symbols, shouldn't be needed
-    if (HEXL_DEBUG)
-        target_link_libraries(unit-test PRIVATE gflags)
-    endif()
     # Disable inline, due to incorrect optimization in ExtractValues, causing failing tests in Windows AVX512 in Release mode with HEXL_DEBUG=OFF
-    target_compile_options(unit-test PRIVATE /Wall /W4 /Zc:preprocessor /Ob0
+    target_compile_options(unit-test PRIVATE /Wall /W4 /Ob0
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
         /wd4389 # warning C4389: signed/unsigned mismatch from gtest
         /wd5105 # warning C5105: macro expansion producing 'defined' has undefined behavior

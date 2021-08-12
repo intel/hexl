@@ -69,8 +69,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     )
     # Avoid 3rd-party dependency warnings when including HEXL as a dependency
     target_compile_options(hexl PUBLIC
-        -Wno-sign-conversion         # avoid warnings in gflags headers
-        -Wno-implicit-int-conversion # avoid warnings in gflags headers
         -Wno-unknown-warning
         -Wno-unknown-warning-option
     )
@@ -78,10 +76,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Inlining causes some tests to fail on MSVC with AVX512 in Release mode, HEXL_DEBUG=OFF,
     # so we disable it here
-    target_compile_options(hexl PRIVATE /Wall /W4 /Zc:preprocessor /Ob0
+    target_compile_options(hexl PRIVATE /Wall /W4 /Ob0
         /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
         /wd5105 # warning C5105: macro expansion producing 'defined' has undefined behavior
-
     )
     target_compile_definitions(hexl PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
@@ -100,7 +97,6 @@ if (HEXL_SHARED_LIB)
         target_include_directories(hexl
             PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
         )
-        target_link_libraries(hexl PRIVATE gflags)
     endif()
 else ()
     # For static library, we include all the dependencies for Intel HEXL in
@@ -116,17 +112,11 @@ else ()
     endif()
 
     if (HEXL_DEBUG)
-        add_dependencies(hexl gflags)
         add_dependencies(hexl easyloggingpp)
-
         # Manually add logging include directory
         target_include_directories(hexl
             PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
         )
-
-        # Manually add gflags include directory
-        target_include_directories(hexl
-            PRIVATE $<TARGET_PROPERTY:gflags,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
 
     # Manually add cpu_features include directory
@@ -134,28 +124,26 @@ else ()
       PRIVATE $<TARGET_PROPERTY:cpu_features,INTERFACE_INCLUDE_DIRECTORIES>)
 
     # Export logging only if we are debugging
-    if (${HEXL_DEBUG})
+    if (HEXL_DEBUG)
         if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             if(CpuFeatures_FOUND)
                 add_custom_command(TARGET hexl POST_BUILD
                     COMMAND ar -x $<TARGET_FILE:hexl>
-                    COMMAND ar -x $<TARGET_FILE:gflags>
                     COMMAND ar -x $<TARGET_FILE:easyloggingpp>
                     COMMAND ar -qcs $<TARGET_FILE:hexl> *.o
                     COMMAND rm -f *.o
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl gflags easyloggingpp
+                    DEPENDS hexl easyloggingpp
                 )
             else()
                 add_custom_command(TARGET hexl POST_BUILD
                     COMMAND ar -x $<TARGET_FILE:hexl>
                     COMMAND ar -x $<TARGET_FILE:cpu_features>
-                    COMMAND ar -x $<TARGET_FILE:gflags>
                     COMMAND ar -x $<TARGET_FILE:easyloggingpp>
                     COMMAND ar -qcs $<TARGET_FILE:hexl> *.o
                     COMMAND rm -f *.o
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl cpu_features gflags easyloggingpp
+                    DEPENDS hexl cpu_features easyloggingpp
             )
             endif()
         elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -163,21 +151,19 @@ else ()
                 add_custom_command(TARGET hexl POST_BUILD
                     COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
                         $<TARGET_FILE:hexl>
-                        $<TARGET_FILE:gflags>
                         $<TARGET_FILE:easyloggingpp>
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl gflags easyloggingpp
+                    DEPENDS hexl easyloggingpp
                 )
             else()
                 add_custom_command(TARGET hexl POST_BUILD
                     COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
                         $<TARGET_FILE:hexl>
                         $<TARGET_FILE:cpu_features>
-                        $<TARGET_FILE:gflags>
                         $<TARGET_FILE:easyloggingpp>
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl cpu_features gflags easyloggingpp
-             )
+                    DEPENDS hexl cpu_features easyloggingpp
+                )
             endif()
         endif()
     else()
@@ -198,7 +184,7 @@ else ()
                     COMMAND rm -f *.o
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     DEPENDS hexl cpu_features
-        )
+                )
             endif()
         elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             if(CpuFeatures_FOUND)
@@ -215,7 +201,7 @@ else ()
                         $<TARGET_FILE:cpu_features>
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     DEPENDS hexl cpu_features
-            )
+                )
             endif()
       endif()
     endif()

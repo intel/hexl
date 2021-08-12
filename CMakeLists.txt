@@ -165,7 +165,6 @@ endif()
 
 if (HEXL_DEBUG)
   add_subdirectory(cmake/third-party/easylogging)
-  add_subdirectory(cmake/third-party/gflags)
 endif()
 
 #------------------------------------------------------------------------------

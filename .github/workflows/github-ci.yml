@@ -73,7 +73,8 @@ jobs:
           lcov --capture --directory build/hexl --directory build/test/ --output-file cov_test.info
 
           # Remove unwanted directories
-          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
+          lcov --remove cov_test.info '/usr/include/*' '/usr/lib/*' -o cov_test.info
+          lcov --remove cov_test.info '*/test/*' '*/build/*' '*/benchmark/*' -o cov_test.info
 
           # Report overall summary to be parsed by github CI
           lcov --list cov_test.info
@@ -85,7 +86,7 @@ jobs:
           # TODO: report/parse coverage in github CI
 
   nix-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }} '
+    name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: '${{ matrix.os }}'
     environment: intel_workflow
     defaults:
@@ -126,13 +127,16 @@ jobs:
           cmake --build build -j
           cmake --build build --target install
           cmake --build build --target unittest
-          # Instead of calling cmake --build build --target bench, we run the executable directly to pass command-line arguments
-
-          ./build/benchmark/bench_hexl --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" --benchmark_out_format=csv
+          # Instead of calling cmake --build build --target bench,
+          # we run the executable directly to pass command-line arguments
+          ./build/benchmark/bench_hexl \
+            --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" \
+            --benchmark_out_format=csv
 
           # Build and run examples
           cd $GITHUB_WORKSPACE/example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ env.HEXL_HINT_DIR }}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            ${{ env.HEXL_HINT_DIR }}
           cmake --build build
           build/example
 
@@ -163,7 +167,7 @@ jobs:
           retention-days: 90 # Maximum for free version
 
   windows-build:
-    name: '${{ matrix.os }} ${{ matrix.build_type }}'
+    name: 'Windows ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: windows-latest
     environment: intel_workflow
     defaults:
@@ -171,9 +175,9 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        # TODO: add Debug in Windows
-        # TODO: add shared lib in Windows
-        build_type: [Release]
+        build_type: [Release, Debug]
+        # Shared lib in Windows requires exporting symbols
+        shared_lib: [OFF]
 
     steps:
       - uses: actions/checkout@v2
@@ -181,7 +185,9 @@ jobs:
         run: |
           set -x
           # Build library
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} -DCMAKE_INSTALL_PREFIX=./
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
+            -DCMAKE_INSTALL_PREFIX=./ \
+            -DHEXL_SHARED_LIB=${{ matrix.shared_lib }}
           cmake --build build -j --config ${{ matrix.build_type}}
           cmake --build build --target install --config ${{ matrix.build_type}}
           cmake --build build --target unittest --config ${{ matrix.build_type}}
@@ -189,7 +195,8 @@ jobs:
 
           # Build and run examples
           cd example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} ${{ env.HEXL_HINT_DIR }}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
+            ${{ env.HEXL_HINT_DIR }}
           cmake --build build --config ${{ matrix.build_type}}
           build/${{ matrix.build_type}}/example.exe
 
