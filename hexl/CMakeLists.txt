@@ -35,16 +35,6 @@ endif()
 
 if (HEXL_SHARED_LIB)
     add_library(hexl SHARED ${HEXL_SRC})
-    if(HEXL_USE_MSVC)
-        message("Setting export symbols")
-        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-        include(GenerateExportHeader)
-        generate_export_header(hexl
-            EXPORT_MACRO_NAME shared_EXPORTS
-            EXPORT_FILE_NAME shared_EXPORTS.h
-            STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC
-        )
-    endif()
 else()
      add_library(hexl STATIC ${HEXL_SRC})
 endif()
@@ -109,40 +99,6 @@ if (HEXL_SHARED_LIB)
             PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
         )
     endif()
-
-    # Get all propreties that cmake supports
-    execute_process(COMMAND cmake --help-property-list OUTPUT_VARIABLE CMAKE_PROPERTY_LIST)
-
-    # Convert command output into a CMake list
-    STRING(REGEX REPLACE ";" "\\\\;" CMAKE_PROPERTY_LIST "${CMAKE_PROPERTY_LIST}")
-    STRING(REGEX REPLACE "\n" ";" CMAKE_PROPERTY_LIST "${CMAKE_PROPERTY_LIST}")
-
-    function(print_properties)
-        message ("CMAKE_PROPERTY_LIST = ${CMAKE_PROPERTY_LIST}")
-    endfunction(print_properties)
-
-    function(print_target_properties tgt)
-        if(NOT TARGET ${tgt})
-        message("There is no target named '${tgt}'")
-        return()
-        endif()
-
-        foreach (prop ${CMAKE_PROPERTY_LIST})
-            string(REPLACE "<CONFIG>" "${CMAKE_BUILD_TYPE}" prop ${prop})
-        # Fix https://stackoverflow.com/questions/32197663/how-can-i-remove-the-the-location-property-may-not-be-read-from-target-error-i
-        if(prop STREQUAL "LOCATION" OR prop MATCHES "^LOCATION_" OR prop MATCHES "_LOCATION$")
-            continue()
-        endif()
-            # message ("Checking ${prop}")
-            get_property(propval TARGET ${tgt} PROPERTY ${prop} SET)
-            if (propval)
-                get_target_property(propval ${tgt} ${prop})
-                message ("${tgt} ${prop} = ${propval}")
-            endif()
-        endforeach(prop)
-    endfunction(print_target_properties)
-
-    print_target_properties(hexl)
 else ()
     # For static library, we include all the dependencies for Intel HEXL in
     # the libhexl.a.
