@@ -371,7 +371,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
         Y[j] = tx + twice_mod - T;
 
         HEXL_CHECK(tx + T < modulus * 4,
-                   "ouput X " << (tx + T) << " too large");
+                   "output X " << (tx + T) << " too large");
         HEXL_CHECK(tx + twice_mod - T < modulus * 4,
                    "output Y " << (tx + twice_mod - T) << " too large");
       }
