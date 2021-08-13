@@ -3,10 +3,10 @@
 
 # Checks if SOURCE_FILE can be compiled and returns 0 upon running
 # If so, adds OUTPUT_FLAG to compile definitions
-function(hexl_check_compile_flag SOURCE_FILE OUTPUT_FLAG)
+function(hexl_check_compile_flag SOURCE_FILE MARCH_FLAGS OUTPUT_FLAG)
     try_run(CAN_RUN CAN_COMPILE ${CMAKE_BINARY_DIR}
         "${SOURCE_FILE}"
-        COMPILE_DEFINITIONS ${HEXL_MARCH_FLAGS}
+        COMPILE_DEFINITIONS ${MARCH_FLAGS}
         OUTPUT_VARIABLE TRY_COMPILE_OUTPUT
     )
     # Uncomment below to debug

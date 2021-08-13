@@ -122,14 +122,6 @@ inline __m512i _mm512_hexl_mulhi_epi<64>(__m512i x, __m512i y) {
   return _mm512_add_epi64(sum_hi, sum_mid2_hi);
 }
 
-#ifdef HEXL_HAS_AVX512IFMA
-template <>
-inline __m512i _mm512_hexl_mulhi_epi<52>(__m512i x, __m512i y) {
-  __m512i zero = _mm512_set1_epi64(0);
-  return _mm512_madd52hi_epu64(zero, x, y);
-}
-#endif
-
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of x
 // and y to form a 2*BitShift-bit intermediate result.
 // Returns the high BitShift-bit unsigned integer from the intermediate result,
@@ -181,14 +173,6 @@ inline __m512i _mm512_hexl_mulhi_approx_epi<64>(__m512i x, __m512i y) {
   return _mm512_add_epi64(sum_hi, sum_mid2_hi);
 }
 
-#ifdef HEXL_HAS_AVX512IFMA
-template <>
-inline __m512i _mm512_hexl_mulhi_approx_epi<52>(__m512i x, __m512i y) {
-  __m512i zero = _mm512_set1_epi64(0);
-  return _mm512_madd52hi_epu64(zero, x, y);
-}
-#endif
-
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of x
 // and y to form a 2*BitShift-bit intermediate result.
 // Returns the low BitShift-bit unsigned integer from the intermediate result
@@ -209,33 +193,12 @@ inline __m512i _mm512_hexl_mullo_epi<64>(__m512i x, __m512i y) {
   return _mm512_mullo_epi64(x, y);
 }
 
-#ifdef HEXL_HAS_AVX512IFMA
-template <>
-inline __m512i _mm512_hexl_mullo_epi<52>(__m512i x, __m512i y) {
-  __m512i zero = _mm512_set1_epi64(0);
-  return _mm512_madd52lo_epu64(zero, x, y);
-}
-#endif
-
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of y
 // and z to form a 2*BitShift-bit intermediate result. The low BitShift bits of
 // the result are added to x, then the low BitShift bits of the result are
 // returned.
 template <int BitShift>
 inline __m512i _mm512_hexl_mullo_add_lo_epi(__m512i x, __m512i y, __m512i z);
-
-#ifdef HEXL_HAS_AVX512IFMA
-template <>
-inline __m512i _mm512_hexl_mullo_add_lo_epi<52>(__m512i x, __m512i y,
-                                                __m512i z) {
-  __m512i result = _mm512_madd52lo_epu64(x, y, z);
-
-  // Clear high 12 bits from result
-  const __m512i two_pow52_min1 = _mm512_set1_epi64((1ULL << 52) - 1);
-  result = _mm512_and_epi64(result, two_pow52_min1);
-  return result;
-}
-#endif
 
 // Dummy implementation to avoid template substitution errors
 template <>

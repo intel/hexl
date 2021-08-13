@@ -39,6 +39,7 @@ void EltwiseMultModAVX512VBMI2Int(uint64_t* result, const uint64_t* operand1,
   EltwiseMultModAVX512Int<InputModFactor>(result, operand1, operand2, n,
                                           modulus);
 }
+#endif
 
 }  // namespace hexl
 }  // namespace intel

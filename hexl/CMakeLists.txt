@@ -16,28 +16,36 @@ set(HEXL_NATIVE_SRC
 set_source_files_properties(${HEXL_NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
 
 if (HEXL_HAS_AVX512DQ)
-    set(HEXL_AVX512_SRC
+    set(HEXL_AVX512DQ_SRC
         eltwise/eltwise-mult-mod-avx512.cpp
         eltwise/eltwise-reduce-mod-avx512.cpp
         eltwise/eltwise-add-mod-avx512.cpp
         eltwise/eltwise-cmp-sub-mod-avx512.cpp
-        eltwise/eltwise-cmp-add-avx512.cpp
+        # eltwise/eltwise-cmp-add-avx512-dq.cpp
         eltwise/eltwise-sub-mod-avx512.cpp
-        eltwise/eltwise-fma-mod-avx512.cpp
+        eltwise/eltwise-fma-mod-avx512dq.cpp
         ntt/fwd-ntt-avx512.cpp
-        ntt/inv-ntt-avx512.cpp
+        ntt/inv-ntt-avx512dq.cpp
     )
-    set_source_files_properties(${HEXL_AVX512_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
+    set_source_files_properties(${HEXL_AVX512DQ_SRC} PROPERTIES COMPILE_FLAGS "${HEXL_AVX512DQ_MARCH_FLAGS}")
+endif()
+
+if (HEXL_HAS_AVX512IFMA)
+    set(HEXL_AVX512IFMA_SRC
+        eltwise/eltwise-fma-mod-avx512ifma.cpp
+        ntt/inv-ntt-avx512ifma.cpp
+    )
+    set_source_files_properties(${HEXL_AVX512IFMA_SRC} PROPERTIES COMPILE_FLAGS "${HEXL_AVX512IFMA_MARCH_FLAGS}")
 endif()
 
 if (HEXL_HAS_AVX512VBMI2)
     set(HEXL_AVX512VBMI2_SRC
         eltwise/eltwise-mult-mod-avx512vbmi2.cpp
     )
-    set_source_files_properties(${HEXL_HAS_AVX512VBMI2} PROPERTIES COMPILE_FLAGS ${HEXL_MARCH_FLAGS})
+    set_source_files_properties(${HEXL_AVX512VBMI2_SRC} PROPERTIES COMPILE_FLAGS "${HEXL_AVX512VBMI2_MARCH_FLAGS}")
 endif()
 
-set(HEXL_SRC "${HEXL_NATIVE_SRC};${HEXL_AVX512_SRC};${HEXL_HAS_AVX512VBMI2}")
+set(HEXL_SRC "${HEXL_NATIVE_SRC};${HEXL_AVX512DQ_SRC};${HEXL_AVX512IFMA_SRC};${HEXL_AVX512VBMI2_SRC}")
 message("HEXL_SRC ${HEXL_SRC}")
 
 if (HEXL_DEBUG)

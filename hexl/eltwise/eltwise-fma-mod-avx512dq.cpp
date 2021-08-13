@@ -1,10 +1,9 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "eltwise/eltwise-fma-mod-avx512.hpp"
-
 #include <immintrin.h>
 
+#include "eltwise/eltwise-fma-mod-avx512.hpp"
 #include "hexl/eltwise/eltwise-fma-mod.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"

@@ -53,16 +53,16 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
     else if (has_avx512vbmi2) {  // NOLINT(readability/braces)
       switch (input_mod_factor) {
         case 1:
-          EltwiseMultModAX512VBMI2Int<1>(result, operand1, operand2, n,
-                                         modulus);
+          EltwiseMultModAVX512VBMI2Int<1>(result, operand1, operand2, n,
+                                          modulus);
           break;
         case 2:
-          EltwiseMultModAX512VBMI2Int<2>(result, operand1, operand2, n,
-                                         modulus);
+          EltwiseMultModAVX512VBMI2Int<2>(result, operand1, operand2, n,
+                                          modulus);
           break;
         case 4:
-          EltwiseMultModAX512VBMI2Int<4>(result, operand1, operand2, n,
-                                         modulus);
+          EltwiseMultModAVX512VBMI2Int<4>(result, operand1, operand2, n,
+                                          modulus);
           break;
       }
       return;
