@@ -18,7 +18,6 @@
 namespace intel {
 namespace hexl {
 
-// Free functions
 void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
                                     uint64_t modulus,
                                     const uint64_t* root_of_unity_powers,
@@ -35,7 +34,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
   HEXL_CHECK(
       input_mod_factor == 1 || input_mod_factor == 2 || input_mod_factor == 4,
       "input_mod_factor must be 1, 2, or 4; got " << input_mod_factor);
-  (void)(input_mod_factor);  // Avoid unused parameter warning
+  HEXL_UNUSED(input_mod_factor);
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
              "output_mod_factor must be 1 or 4; got " << output_mod_factor);
 
@@ -170,8 +169,8 @@ void ReferenceForwardTransformToBitReverse(
       uint64_t* X = operand + j1;
       uint64_t* Y = X + t;
       for (size_t j = j1; j < j2; j++) {
-        uint64_t tx = *X;
         // X', Y' = X + WY, X - WY (mod q).
+        uint64_t tx = *X;
         uint64_t W_x_Y = MultiplyMod(*Y, W, modulus);
         *X++ = AddUIntMod(tx, W_x_Y, modulus);
         *Y++ = SubUIntMod(tx, W_x_Y, modulus);
@@ -195,7 +194,7 @@ void InverseTransformFromBitReverse64(
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
   HEXL_CHECK(input_mod_factor == 1 || input_mod_factor == 2,
              "input_mod_factor must be 1 or 2; got " << input_mod_factor);
-  (void)(input_mod_factor);  // Avoid unused parameter warning
+  HEXL_UNUSED(input_mod_factor);
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
 

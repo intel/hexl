@@ -13,6 +13,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
+#include "hexl/util/defines.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
 #include "util/cpu-features.hpp"
@@ -170,7 +171,8 @@ void NTT::ComputeRootOfUnityPowers() {
 }
 
 bool NTT::CheckArguments(uint64_t degree, uint64_t modulus) {
-  // Avoid unused parameter warnings
+  HEXL_UNUSED(degree);
+  HEXL_UNUSED(modulus);
   (void)degree;
   (void)modulus;
   HEXL_CHECK(IsPowerOfTwo(degree),
