@@ -4,6 +4,7 @@
 #include <immintrin.h>
 
 #include "eltwise/eltwise-fma-mod-avx512.tpp"
+#include "util/avx512ifma-util.hpp"
 
 namespace intel {
 namespace hexl {

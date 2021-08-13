@@ -21,10 +21,10 @@ if (HEXL_HAS_AVX512DQ)
         eltwise/eltwise-reduce-mod-avx512.cpp
         eltwise/eltwise-add-mod-avx512.cpp
         eltwise/eltwise-cmp-sub-mod-avx512.cpp
-        # eltwise/eltwise-cmp-add-avx512-dq.cpp
+        eltwise/eltwise-cmp-add-avx512.cpp
         eltwise/eltwise-sub-mod-avx512.cpp
         eltwise/eltwise-fma-mod-avx512dq.cpp
-        ntt/fwd-ntt-avx512.cpp
+        ntt/fwd-ntt-avx512dq.cpp
         ntt/inv-ntt-avx512dq.cpp
     )
     set_source_files_properties(${HEXL_AVX512DQ_SRC} PROPERTIES COMPILE_FLAGS "${HEXL_AVX512DQ_MARCH_FLAGS}")
@@ -33,6 +33,7 @@ endif()
 if (HEXL_HAS_AVX512IFMA)
     set(HEXL_AVX512IFMA_SRC
         eltwise/eltwise-fma-mod-avx512ifma.cpp
+        ntt/fwd-ntt-avx512ifma.cpp
         ntt/inv-ntt-avx512ifma.cpp
     )
     set_source_files_properties(${HEXL_AVX512IFMA_SRC} PROPERTIES COMPILE_FLAGS "${HEXL_AVX512IFMA_MARCH_FLAGS}")

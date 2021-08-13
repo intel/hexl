@@ -16,7 +16,7 @@ set(NATIVE_TEST_SRC main.cpp
 set_source_files_properties(${NATIVE_TEST_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
 
 
-set(AVX512_TEST_SRC
+set(AVX512DQ_TEST_SRC
     test-avx512-util.cpp
     test-eltwise-add-mod-avx512.cpp
     test-eltwise-cmp-add-avx512.cpp
@@ -27,9 +27,14 @@ set(AVX512_TEST_SRC
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
 )
-set_source_files_properties(${AVX512_TEST_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_AVX512DQ_MARCH_FLAGS})
+set_source_files_properties(${AVX512DQ_TEST_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_AVX512DQ_MARCH_FLAGS})
 
-set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")
+set(AVX512IFMA_TEST_SRC
+    test-avx512ifma-util.cpp
+)
+set_source_files_properties(${AVX512IFMA_TEST_SRC} PROPERTIES COMPILE_FLAGS ${HEXL_AVX512IFMA_MARCH_FLAGS})
+
+set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512DQ_TEST_SRC}")
 
 add_executable(unit-test ${TEST_SRC})
 
