@@ -39,7 +39,7 @@ set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512DQ_TEST_SRC};${AVX512IFMA_TEST_SRC}")
 add_executable(unit-test ${TEST_SRC})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(unit-test PRIVATE -Wall -Wextra -march=native)
+    target_compile_options(unit-test PRIVATE -Wall -Wextra) # i-march=native)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Disable inline, due to incorrect optimization in ExtractValues, causing failing tests in Windows AVX512 in Release mode with HEXL_DEBUG=OFF
     target_compile_options(unit-test PRIVATE /Wall /W4 /Ob0
