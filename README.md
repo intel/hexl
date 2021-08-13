@@ -248,3 +248,6 @@ The Intel contributors to this project, sorted by last name, are
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
+
+In addition to the Intel contributors listed, we are also grateful to contributions to this project that are not reflected in the Git history:
+  - [Antonis Papadimitriou](https://www.linkedin.com/in/apapadimitriou/)
