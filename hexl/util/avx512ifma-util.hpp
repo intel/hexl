@@ -11,7 +11,7 @@
 #include "hexl/util/check.hpp"
 #include "hexl/util/defines.hpp"
 #include "hexl/util/util.hpp"
-#include "util/cpu-features.hpp"
+#include "util/avx512-util.hpp"
 
 namespace intel {
 namespace hexl {

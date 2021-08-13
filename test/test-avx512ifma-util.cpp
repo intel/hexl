@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "test-util-avx512.hpp"
 #include "util/avx512ifma-util.hpp"
 #include "util/cpu-features.hpp"
 

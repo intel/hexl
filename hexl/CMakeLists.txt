@@ -13,7 +13,7 @@ set(HEXL_NATIVE_SRC
     number-theory/number-theory.cpp
 )
 
-set_source_files_properties(${HEXL_NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64)
+set_source_files_properties(${HEXL_NATIVE_SRC} PROPERTIES COMPILE_FLAGS -march=x86-64 -avx -avx2)
 
 if (HEXL_HAS_AVX512DQ)
     set(HEXL_AVX512DQ_SRC
