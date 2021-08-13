@@ -1,6 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include "ntt/ntt-internal.hpp"
+
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -13,7 +15,6 @@
 #include "hexl/util/check.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
-#include "ntt/ntt-internal.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
