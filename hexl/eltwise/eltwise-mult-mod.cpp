@@ -48,7 +48,9 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
           break;
       }
       return;
-    } else if (has_avx512vbmi2) {
+    }
+#ifdef HEXL_HAS_AVX512VBMI2
+    else if (has_avx512vbmi2) {  // NOLINT(readability/braces)
       switch (input_mod_factor) {
         case 1:
           EltwiseMultModAX512VBMI2Int<1>(result, operand1, operand2, n,
@@ -64,7 +66,9 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
           break;
       }
       return;
-    } else {
+    }
+#endif
+    else {  // NOLINT(readability/braces)
       switch (input_mod_factor) {
         case 1:
           EltwiseMultModAVX512Int<1>(result, operand1, operand2, n, modulus);

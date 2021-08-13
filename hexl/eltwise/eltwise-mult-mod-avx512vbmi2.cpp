@@ -36,7 +36,7 @@ template <int InputModFactor>
 void EltwiseMultModAVX512VBMI2Int(uint64_t* result, const uint64_t* operand1,
                                   const uint64_t* operand2, uint64_t n,
                                   uint64_t modulus) {
-  EltwiseMultModAVX512Int<InputModFactor>(result, operand1, operadn2, n,
+  EltwiseMultModAVX512Int<InputModFactor>(result, operand1, operand2, n,
                                           modulus);
 }
 

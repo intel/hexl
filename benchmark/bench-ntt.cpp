@@ -12,6 +12,7 @@
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-internal.hpp"
+#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
@@ -34,12 +35,6 @@ static void BM_FwdNTTNative(benchmark::State& state) {  //  NOLINT
         ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
   }
 }
-
-BENCHMARK(BM_FwdNTTNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 //=================================================================
 
 #ifdef HEXL_HAS_AVX512IFMA
@@ -64,12 +59,6 @@ static void BM_FwdNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTT_AVX512IFMA)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 // state[0] is the degree
@@ -92,14 +81,6 @@ static void BM_FwdNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
         precon_root_of_unity.data(), 4, 4);
   }
 }
-
-BENCHMARK(BM_FwdNTT_AVX512IFMALazy)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
-//=================================================================
 
 #endif
 
@@ -128,15 +109,6 @@ static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTT_AVX512DQ_32)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 4});
-
 // state[0] is the degree
 // state[1] is the output modulus factor
 static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
@@ -158,16 +130,6 @@ static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
         precon_root_of_unity.data(), 4, output_mod_factor);
   }
 }
-
-BENCHMARK(BM_FwdNTT_AVX512DQ_64)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 4});
-
 #endif
 
 //=================================================================
@@ -185,18 +147,12 @@ static void BM_FwdNTTInPlace(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTTInPlace)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 // state[0] is the degree
 static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
-  size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
+  size_t modulus = GeneratePrimes(1, 61, ntt_size)[0];
 
   AlignedVector64<uint64_t> input(ntt_size, 1);
   AlignedVector64<uint64_t> output(ntt_size, 1);
@@ -206,32 +162,6 @@ static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
     ntt.ComputeForward(input.data(), output.data(), 1, 1);
   }
 }
-
-BENCHMARK(BM_FwdNTTCopy)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
-// state[0] is the degree
-static void BM_InvNTTCopy(benchmark::State& state) {  //  NOLINT
-  size_t ntt_size = state.range(0);
-  size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
-
-  AlignedVector64<uint64_t> input(ntt_size, 1);
-  AlignedVector64<uint64_t> output(ntt_size, 1);
-  NTT ntt(ntt_size, modulus);
-
-  for (auto _ : state) {
-    ntt.ComputeInverse(input.data(), output.data(), 2, 1);
-  }
-}
-
-BENCHMARK(BM_InvNTTCopy)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 
 //=================================================================
 
@@ -255,12 +185,6 @@ static void BM_InvNTTNative(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTTNative)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 #ifdef HEXL_HAS_AVX512IFMA
@@ -282,12 +206,6 @@ static void BM_InvNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTT_AVX512IFMA)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
-
 //=================================================================
 
 // state[0] is the degree
@@ -307,12 +225,6 @@ static void BM_InvNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
         precon_root_of_unity.data(), 2, 2);
   }
 }
-
-BENCHMARK(BM_InvNTT_AVX512IFMALazy)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
-    ->Args({4096})
-    ->Args({16384});
 
 #endif
 
@@ -339,15 +251,6 @@ static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTT_AVX512DQ_32)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({16384, 1})
-    ->Args({16384, 2});
-
 static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   uint64_t output_mod_factor = state.range(1);
@@ -367,17 +270,96 @@ static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTT_AVX512DQ_64)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({16384, 1})
-    ->Args({16384, 2});
 #endif
 
 //=================================================================
+
+void register_ntt_benchmarks() {
+  benchmark::RegisterBenchmark("BM_FwdNTTNative", BM_FwdNTTNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+  benchmark::RegisterBenchmark("BM_FwdNTTInPlace", BM_FwdNTTInPlace)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+  benchmark::RegisterBenchmark("BM_FwdNTTCopy", BM_FwdNTTCopy)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+  benchmark::RegisterBenchmark("BM_InvNTTNative", BM_InvNTTNative)
+      ->Unit(benchmark::kMicrosecond)
+      ->Args({1024})
+      ->Args({4096})
+      ->Args({16384});
+
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq) {
+    benchmark::RegisterBenchmark("BM_FwdNTT_AVX512DQ_32", BM_FwdNTT_AVX512DQ_32)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024, 1})
+        ->Args({1024, 4})
+        ->Args({4096, 1})
+        ->Args({4096, 4})
+        ->Args({16384, 1})
+        ->Args({16384, 4});
+    benchmark::RegisterBenchmark("BM_FwdNTT_AVX512DQ_64", BM_FwdNTT_AVX512DQ_64)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024, 1})
+        ->Args({1024, 4})
+        ->Args({4096, 1})
+        ->Args({4096, 4})
+        ->Args({16384, 1})
+        ->Args({16384, 4});
+    benchmark::RegisterBenchmark("BM_InvNTT_AVX512DQ_32", BM_InvNTT_AVX512DQ_32)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024, 1})
+        ->Args({1024, 2})
+        ->Args({4096, 1})
+        ->Args({4096, 2})
+        ->Args({16384, 1})
+        ->Args({16384, 2});
+    benchmark::RegisterBenchmark("BM_InvNTT_AVX512DQ_64", BM_InvNTT_AVX512DQ_64)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024, 1})
+        ->Args({1024, 2})
+        ->Args({4096, 1})
+        ->Args({4096, 2})
+        ->Args({16384, 1})
+        ->Args({16384, 2});
+  }
+#endif  // HEXL_HAS_AVX512DQ
+
+#ifdef HEXL_HAS_AVX512IFMA
+  if (has_avx512ifma) {
+    benchmark::RegisterBenchmark("BM_FwdNTT_AVX512IFMA", BM_FwdNTT_AVX512IFMA)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+    benchmark::RegisterBenchmark("BM_FwdNTT_AVX512IFMALazy",
+                                 BM_FwdNTT_AVX512IFMALazy)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+    benchmark::RegisterBenchmark("BM_InvNTT_AVX512IFMA", BM_InvNTT_AVX512IFMA)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+    benchmark::RegisterBenchmark("BM_InvNTT_AVX512IFMALazy",
+                                 BM_InvNTT_AVX512IFMALazy)
+        ->Unit(benchmark::kMicrosecond)
+        ->Args({1024})
+        ->Args({4096})
+        ->Args({16384});
+  }
+#endif
+}
 
 }  // namespace hexl
 }  // namespace intel
