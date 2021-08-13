@@ -10,6 +10,7 @@ set(NATIVE_SRC
     eltwise/eltwise-cmp-add.cpp
     eltwise/eltwise-cmp-sub-mod.cpp
     ntt/ntt-internal.cpp
+    ntt/ntt-default.cpp
     number-theory/number-theory.cpp
 )
 

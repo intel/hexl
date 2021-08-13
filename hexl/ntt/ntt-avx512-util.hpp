@@ -193,12 +193,11 @@ inline void WriteInvInterleavedT4(__m512i arg1, __m512i arg2, __m512i* out) {
 inline __m512i LoadWOpT2(const void* arg) {
   const __m512i vperm_w_idx = _mm512_set_epi64(3, 3, 2, 2, 1, 1, 0, 0);
 
-  __m256i v_W_op_256 =
-      _mm256_loadu_si256(reinterpret_cast<const __m256i*>(arg));
-  __m512i v_W_op = _mm512_broadcast_i64x4(v_W_op_256);
-  v_W_op = _mm512_permutexvar_epi64(vperm_w_idx, v_W_op);
+  __m256i v_W_256 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(arg));
+  __m512i v_W = _mm512_broadcast_i64x4(v_W_256);
+  v_W = _mm512_permutexvar_epi64(vperm_w_idx, v_W);
 
-  return v_W_op;
+  return v_W;
 }
 
 // Returns _mm512_set_epi64(arg[1], arg[1], arg[1], arg[1],
@@ -206,11 +205,11 @@ inline __m512i LoadWOpT2(const void* arg) {
 inline __m512i LoadWOpT4(const void* arg) {
   const __m512i vperm_w_idx = _mm512_set_epi64(1, 1, 1, 1, 0, 0, 0, 0);
 
-  __m128i v_W_op_128 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arg));
-  __m512i v_W_op = _mm512_broadcast_i64x2(v_W_op_128);
-  v_W_op = _mm512_permutexvar_epi64(vperm_w_idx, v_W_op);
+  __m128i v_W_128 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(arg));
+  __m512i v_W = _mm512_broadcast_i64x2(v_W_128);
+  v_W = _mm512_permutexvar_epi64(vperm_w_idx, v_W);
 
-  return v_W_op;
+  return v_W;
 }
 
 #endif  // HEXL_HAS_AVX512DQ

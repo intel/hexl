@@ -47,18 +47,19 @@ template void ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
 /// in [0, 4q) such that X', Y' = X + WY, X - WY (mod q).
 /// @param[in,out] X Input representing 8 64-bit signed integers in SIMD form
 /// @param[in,out] Y Input representing 8 64-bit signed integers in SIMD form
-/// @param[in] W_op Input representing 8 64-bit signed integers in SIMD form
-/// @param[in] W_precon Preconditioned \p W_op for BitShift-bit Barrett
+/// @param[in] W Root of unity represented as 8 64-bit signed integers in
+/// SIMD form
+/// @param[in] W_precon Preconditioned \p W for BitShift-bit Barrett
 /// reduction
 /// @param[in] neg_modulus Negative modulus, i.e. (-q) represented as 8 64-bit
 /// signed integers in SIMD form
 /// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
-/// @param InputLessThanMod If true, assumes \p X, \p Y < \p qp. Otherwise,
+/// @param InputLessThanMod If true, assumes \p X, \p Y < \p q. Otherwise,
 /// assumes \p X, \p Y < 4*\p q
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
 template <int BitShift, bool InputLessThanMod>
-void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
+void FwdButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
                   __m512i neg_modulus, __m512i twice_modulus) {
   if (!InputLessThanMod) {
     *X = _mm512_hexl_small_mod_epu64(*X, twice_modulus);
@@ -68,17 +69,17 @@ void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
   if (BitShift == 32) {
     __m512i Q = _mm512_hexl_mullo_epi<64>(W_precon, *Y);
     Q = _mm512_srli_epi64(Q, 32);
-    __m512i W_Y = _mm512_hexl_mullo_epi<64>(W_op, *Y);
+    __m512i W_Y = _mm512_hexl_mullo_epi<64>(W, *Y);
     T = _mm512_hexl_mullo_add_lo_epi<64>(W_Y, Q, neg_modulus);
   } else if (BitShift == 52) {
     __m512i Q = _mm512_hexl_mulhi_epi<BitShift>(W_precon, *Y);
-    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
+    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W, *Y);
     T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
   } else if (BitShift == 64) {
     // Perform approximate computation of Q, as described in page 7 of
     // https://arxiv.org/pdf/2003.04510.pdf
     __m512i Q = _mm512_hexl_mulhi_approx_epi<BitShift>(W_precon, *Y);
-    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W_op, *Y);
+    __m512i W_Y = _mm512_hexl_mullo_epi<BitShift>(W, *Y);
     // Compute T in range [0, 4q)
     T = _mm512_hexl_mullo_add_lo_epi<BitShift>(W_Y, Q, neg_modulus);
     // Reduce T to range [0, 2q)
@@ -94,8 +95,8 @@ void FwdButterfly(__m512i* X, __m512i* Y, __m512i W_op, __m512i W_precon,
 
 template <int BitShift>
 void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t m, const uint64_t* W_op, const uint64_t* W_precon) {
-  const __m512i* v_W_op_pt = reinterpret_cast<const __m512i*>(W_op);
+           uint64_t m, const uint64_t* W, const uint64_t* W_precon) {
+  const __m512i* v_W_pt = reinterpret_cast<const __m512i*>(W);
   const __m512i* v_W_precon_pt = reinterpret_cast<const __m512i*>(W_precon);
   size_t j1 = 0;
 
@@ -108,10 +109,10 @@ void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     __m512i v_X;
     __m512i v_Y;
     LoadFwdInterleavedT1(X, &v_X, &v_Y);
-    __m512i v_W_op = _mm512_loadu_si512(v_W_op_pt++);
+    __m512i v_W = _mm512_loadu_si512(v_W_pt++);
     __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
 
-    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W_op, v_W_precon, v_neg_modulus,
+    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
                                   v_twice_mod);
     WriteFwdInterleavedT1(v_X, v_Y, v_X_pt);
 
@@ -121,8 +122,8 @@ void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift>
 void FwdT2(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t m, const uint64_t* W_op, const uint64_t* W_precon) {
-  const __m512i* v_W_op_pt = reinterpret_cast<const __m512i*>(W_op);
+           uint64_t m, const uint64_t* W, const uint64_t* W_precon) {
+  const __m512i* v_W_pt = reinterpret_cast<const __m512i*>(W);
   const __m512i* v_W_precon_pt = reinterpret_cast<const __m512i*>(W_precon);
 
   size_t j1 = 0;
@@ -136,14 +137,14 @@ void FwdT2(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     __m512i v_Y;
     LoadFwdInterleavedT2(X, &v_X, &v_Y);
 
-    __m512i v_W_op = _mm512_loadu_si512(v_W_op_pt++);
+    __m512i v_W = _mm512_loadu_si512(v_W_pt++);
     __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
 
-    HEXL_CHECK(ExtractValues(v_W_op)[0] == ExtractValues(v_W_op)[1],
-               "bad v_W_op " << ExtractValues(v_W_op));
+    HEXL_CHECK(ExtractValues(v_W)[0] == ExtractValues(v_W)[1],
+               "bad v_W " << ExtractValues(v_W));
     HEXL_CHECK(ExtractValues(v_W_precon)[0] == ExtractValues(v_W_precon)[1],
                "bad v_W_precon " << ExtractValues(v_W_precon));
-    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W_op, v_W_precon, v_neg_modulus,
+    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
                                   v_twice_mod);
 
     _mm512_storeu_si512(v_X_pt++, v_X);
@@ -155,9 +156,9 @@ void FwdT2(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift>
 void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t m, const uint64_t* W_op, const uint64_t* W_precon) {
+           uint64_t m, const uint64_t* W, const uint64_t* W_precon) {
   size_t j1 = 0;
-  const __m512i* v_W_op_pt = reinterpret_cast<const __m512i*>(W_op);
+  const __m512i* v_W_pt = reinterpret_cast<const __m512i*>(W);
   const __m512i* v_W_precon_pt = reinterpret_cast<const __m512i*>(W_precon);
 
   // 2 | m guaranteed by n >= 16
@@ -170,9 +171,9 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     __m512i v_Y;
     LoadFwdInterleavedT4(X, &v_X, &v_Y);
 
-    __m512i v_W_op = _mm512_loadu_si512(v_W_op_pt++);
+    __m512i v_W = _mm512_loadu_si512(v_W_pt++);
     __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
-    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W_op, v_W_precon, v_neg_modulus,
+    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
                                   v_twice_mod);
 
     _mm512_storeu_si512(v_X_pt++, v_X);
@@ -184,7 +185,7 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift, bool InputLessThanMod>
 void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t t, uint64_t m, const uint64_t* W_op,
+           uint64_t t, uint64_t m, const uint64_t* W,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
@@ -193,7 +194,7 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     uint64_t* X = operand + j1;
     uint64_t* Y = X + t;
 
-    __m512i v_W_op = _mm512_set1_epi64(static_cast<int64_t>(*W_op++));
+    __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
     __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
     __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
@@ -204,7 +205,7 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
       __m512i v_X = _mm512_loadu_si512(v_X_pt);
       __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
 
-      FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W_op, v_W_precon,
+      FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
                                                v_neg_modulus, v_twice_mod);
 
       _mm512_storeu_si512(v_X_pt++, v_X);
@@ -214,28 +215,6 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   }
 }
 
-/// @brief AVX512 implementation of the forward NTT
-/// @param[in, out] operand Input data. Overwritten with NTT output
-/// @param[in] n Size of the transfrom, i.e. the polynomial degree. Must be a
-/// power of two.
-/// @param[in] modulus Prime modulus. Must satisfy q == 1 mod 2n
-/// @param[in] root_of_unity_powers Powers of 2n'th root of unity in F_q. In
-/// bit-reversed order.
-/// @param[in] precon_root_of_unity_powers Pre-conditioned Powers of 2n'th root
-/// of unity in F_q. In bit-reversed order.
-/// @param[in] input_mod_factor Upper bound for inputs; inputs must be in [0,
-/// input_mod_factor * modulus)
-/// @param[in] output_mod_factor Upper bound for result; result must be in [0,
-/// output_mod_factor * modulus)
-/// @param[in] recursion_depth Depth of recursive call
-/// @param[in] recursion_half Helper for indexing roots of unity
-/// @details The implementation is recursive. The base case is a breadth-first
-/// NTT, where all the butterflies in a given stage are processed before any
-/// butteflies in the next stage. The base case is small enough to fit in the
-/// smallest cache. Larger NTTs are processed recursively in a depth-first
-/// manner, such that an entire subtransform is completed before moving to the
-/// next subtransform. This reduces the number of cache misses, improving
-/// performance on larger transform sizes.
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512(
     uint64_t* operand, uint64_t n, uint64_t modulus,
@@ -284,14 +263,14 @@ void ForwardTransformToBitReverseAVX512(
     size_t W_idx = (m << recursion_depth) + (recursion_half * m);
     // First iteration assumes input in [0,p)
     if (m < (n >> 3)) {
-      const uint64_t* W_op = &root_of_unity_powers[W_idx];
+      const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
       if (input_mod_factor <= 2) {
-        FwdT8<BitShift, true>(operand, v_neg_modulus, v_twice_mod, t, m, W_op,
+        FwdT8<BitShift, true>(operand, v_neg_modulus, v_twice_mod, t, m, W,
                               W_precon);
       } else {
-        FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, m, W_op,
+        FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, m, W,
                                W_precon);
       }
 
@@ -300,9 +279,9 @@ void ForwardTransformToBitReverseAVX512(
       W_idx <<= 1;
     }
     for (; m < (n >> 3); m <<= 1) {
-      const uint64_t* W_op = &root_of_unity_powers[W_idx];
+      const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
-      FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, m, W_op,
+      FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, m, W,
                              W_precon);
       t >>= 1;
       W_idx <<= 1;
@@ -342,23 +321,23 @@ void ForwardTransformToBitReverseAVX512(
       };
 
       size_t new_W_idx = compute_new_W_idx(W_idx);
-      const uint64_t* W_op = &root_of_unity_powers[new_W_idx];
+      const uint64_t* W = &root_of_unity_powers[new_W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[new_W_idx];
-      FwdT4<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
+      FwdT4<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W, W_precon);
 
       m <<= 1;
       W_idx <<= 1;
       new_W_idx = compute_new_W_idx(W_idx);
-      W_op = &root_of_unity_powers[new_W_idx];
+      W = &root_of_unity_powers[new_W_idx];
       W_precon = &precon_root_of_unity_powers[new_W_idx];
-      FwdT2<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
+      FwdT2<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W, W_precon);
 
       m <<= 1;
       W_idx <<= 1;
       new_W_idx = compute_new_W_idx(W_idx);
-      W_op = &root_of_unity_powers[new_W_idx];
+      W = &root_of_unity_powers[new_W_idx];
       W_precon = &precon_root_of_unity_powers[new_W_idx];
-      FwdT1<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W_op, W_precon);
+      FwdT1<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W, W_precon);
     }
 
     if (output_mod_factor == 1) {
@@ -384,10 +363,10 @@ void ForwardTransformToBitReverseAVX512(
     // Perform depth-first NTT via recursive call
     size_t t = (n >> 1);
     size_t W_idx = (1ULL << recursion_depth) + recursion_half;
-    const uint64_t* W_op = &root_of_unity_powers[W_idx];
+    const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-    FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, 1, W_op,
+    FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, 1, W,
                            W_precon);
 
     ForwardTransformToBitReverseAVX512<BitShift>(

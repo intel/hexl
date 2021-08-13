@@ -401,8 +401,9 @@ template <int BitShift>
 inline __m512i _mm512_hexl_shrdi_epi64(__m512i x, __m512i y) {
 #ifdef HEXL_HAS_AVX512VBMI2
   return _mm512_shrdi_epi64(x, y, BitShift);
-#endif
+#else
   return _mm512_hexl_shrdi_epi64(x, y, BitShift);
+#endif
 }
 
 #endif  // HEXL_HAS_AVX512DQ

@@ -17,6 +17,19 @@
 namespace intel {
 namespace hexl {
 
+/// @brief Default C++ NTT implementation of the forward NTT
+/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[in] n Size of the transfrom, i.e. the polynomial degree. Must be a
+/// power of two.
+/// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
+/// @param[in] root_of_unity_powers Powers of 2n'th root of unity in F_q. In
+/// bit-reversed order
+/// @param[in] precon_root_of_unity_powers Pre-conditioned Powers of 2n'th root
+/// of unity in F_q. In bit-reversed order.
+/// @param[in] input_mod_factor Upper bound for inputs; inputs must be in [0,
+/// input_mod_factor * q)
+/// @param[in] output_mod_factor Upper bound for result; result must be in [0,
+/// output_mod_factor * q)
 void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
                                     uint64_t modulus,
                                     const uint64_t* root_of_unity_powers,
@@ -35,6 +48,19 @@ void ReferenceForwardTransformToBitReverse(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers);
 
+/// @brief Default C++ NTT implementation of the inverse NTT
+/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[in] n Size of the transfrom, i.e. the polynomial degree. Must be a
+/// power of two.
+/// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
+/// @param[in] inv_root_of_unity_powers Powers of inverse 2n'th root of unity in
+/// F_q. In bit-reversed order.
+/// @param[in] precon_root_of_unity_powers Pre-conditioned powers of inverse
+/// 2n'th root of unity in F_q. In bit-reversed order.
+/// @param[in] input_mod_factor Upper bound for inputs; inputs must be in [0,
+/// input_mod_factor * q)
+/// @param[in] output_mod_factor Upper bound for result; result must be in [0,
+/// output_mod_factor * q)
 void InverseTransformFromBitReverse64(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
