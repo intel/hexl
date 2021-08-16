@@ -572,6 +572,9 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
 
         __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
 
+        LOG(INFO) << "\n\n";
+        LOG(INFO) << "EltwiseMultModAVX512 default";
+
         LOG(INFO) << " modulus " << modulus;
         LOG(INFO) << " N " << N;
         LOG(INFO) << " L " << L;
@@ -582,7 +585,12 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
         HEXL_LOOP_UNROLL_4
         for (size_t i = n / 8; i > 0; --i) {
           __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
+          v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+              v_operand1, v_modulus, &v_twice_mod);
+
           __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
+          v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+              v_operand2, v_modulus, &v_twice_mod);
 
           // LOG(INFO) << "v_operand1 " << ExtractValues(v_operand1);
           // LOG(INFO) << "v_operand2 " << ExtractValues(v_operand2);
@@ -627,6 +635,7 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
           vresult =
               _mm512_hexl_small_mod_epu64<2>(vresult, v_modulus, &v_twice_mod);
           _mm512_storeu_si512(vp_result, vresult);
+          // LOG(INFO) << "vresult " << ExtractValues(vresult);
 
           HEXL_CHECK_BOUNDS((uint64_t*)(vp_result), 8, modulus,
                             "result exceeds bound");

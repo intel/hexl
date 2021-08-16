@@ -124,7 +124,7 @@ TEST(EltwiseMultMod, AVX512Big) {
   std::random_device rd;
   std::mt19937 gen(42);  // )rd());
 
-  for (size_t length = 1024; length <= 32768; length *= 2) {
+  for (size_t length = 1024; length <= 1024; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> rs1(length, 0);
@@ -139,7 +139,11 @@ TEST(EltwiseMultMod, AVX512Big) {
         std::uniform_int_distribution<uint64_t> distrib(
             0, input_mod_factor * modulus - 1);
 
-        bool use_avx512_float = (input_mod_factor * modulus < MaximumValue(50));
+        LOG(INFO) << "bits " << bits;
+        LOG(INFO) << "input_mod_factor " << input_mod_factor;
+
+        bool use_avx512_float =
+            false;  // (input_mod_factor * modulus < MaximumValue(50));
 
 #ifdef HEXL_DEBUG
         size_t num_trials = 1;
