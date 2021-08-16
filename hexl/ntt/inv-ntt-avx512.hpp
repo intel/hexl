@@ -27,7 +27,7 @@ namespace hexl {
 /// @param[in] recursion_half Helper for indexing roots of unity
 /// @details The implementation is recursive. The base case is a breadth-first
 /// NTT, where all the butterflies in a given stage are processed before any
-/// butterflies in the next stage. The base case is small enough to fit in the
+/// butteflies in the next stage. The base case is small enough to fit in the
 /// smallest cache. Larger NTTs are processed recursively in a depth-first
 /// manner, such that an entire subtransform is completed before moving to the
 /// next subtransform. This reduces the number of cache misses, improving
