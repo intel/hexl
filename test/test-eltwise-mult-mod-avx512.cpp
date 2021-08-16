@@ -46,8 +46,8 @@ TEST(EltwiseMultMod, avx512_int2) {
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<uint64_t> exp_out{12, 1, 1, 1, 1, 1, 1, 1};
 
-  EltwiseMultModAVX512Int<2>(result.data(), op1.data(), op2.data(), op1.size(),
-                             modulus);
+  EltwiseMultModAVX512DQInt<2>(result.data(), op1.data(), op2.data(),
+                               op1.size(), modulus);
   CheckEqual(result, exp_out);
 }
 
@@ -72,8 +72,8 @@ TEST(EltwiseMultMod, Big) {
       409735411065439, 25680427818594,  950138933882289,
       554128714280822, 1465109636753,   1};
 
-  EltwiseMultModAVX512Int<4>(result.data(), op1.data(), op2.data(), op1.size(),
-                             modulus);
+  EltwiseMultModAVX512DQInt<4>(result.data(), op1.data(), op2.data(),
+                               op1.size(), modulus);
 
   CheckEqual(result, exp_out);
 }
@@ -102,8 +102,8 @@ TEST(EltwiseMultMod, AVX512Int) {
       op2[i] = distrib(gen);
     }
 
-    EltwiseMultModAVX512Int<1>(out_avx.data(), op1.data(), op2.data(),
-                               op1.size(), modulus);
+    EltwiseMultModAVX512DQInt<1>(out_avx.data(), op1.data(), op2.data(),
+                                 op1.size(), modulus);
 
     EltwiseMultModNative<1>(out_native.data(), op1.data(), op2.data(),
                             op1.size(), modulus);
@@ -124,7 +124,7 @@ TEST(EltwiseMultMod, AVX512Big) {
   std::random_device rd;
   std::mt19937 gen(42);  // )rd());
 
-  for (size_t length = 1024; length <= 1024; length *= 2) {
+  for (size_t length = 8; length <= 8; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> rs1(length, 0);
@@ -138,9 +138,6 @@ TEST(EltwiseMultMod, AVX512Big) {
         uint64_t modulus = (1ULL << bits) + 7;
         std::uniform_int_distribution<uint64_t> distrib(
             0, input_mod_factor * modulus - 1);
-
-        LOG(INFO) << "bits " << bits;
-        LOG(INFO) << "input_mod_factor " << input_mod_factor;
 
         bool use_avx512_float =
             false;  // (input_mod_factor * modulus < MaximumValue(50));
@@ -166,8 +163,8 @@ TEST(EltwiseMultMod, AVX512Big) {
                 EltwiseMultModAVX512Float<1>(rs2.data(), op1.data(), op2.data(),
                                              op1.size(), modulus);
               } else {
-                EltwiseMultModAVX512Int<1>(rs3.data(), op1.data(), op2.data(),
-                                           op1.size(), modulus);
+                EltwiseMultModAVX512DQInt<1>(rs3.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
               }
               break;
             case 2:
@@ -177,8 +174,8 @@ TEST(EltwiseMultMod, AVX512Big) {
                 EltwiseMultModAVX512Float<2>(rs2.data(), op1.data(), op2.data(),
                                              op1.size(), modulus);
               } else {
-                EltwiseMultModAVX512Int<2>(rs3.data(), op1.data(), op2.data(),
-                                           op1.size(), modulus);
+                EltwiseMultModAVX512DQInt<2>(rs3.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
               }
               break;
             case 4:
@@ -188,8 +185,8 @@ TEST(EltwiseMultMod, AVX512Big) {
                 EltwiseMultModAVX512Float<4>(rs2.data(), op1.data(), op2.data(),
                                              op1.size(), modulus);
               } else {
-                EltwiseMultModAVX512Int<4>(rs3.data(), op1.data(), op2.data(),
-                                           op1.size(), modulus);
+                EltwiseMultModAVX512DQInt<4>(rs3.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
               }
               break;
           }

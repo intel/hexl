@@ -16,7 +16,8 @@ set(NATIVE_SRC
 
 if (HEXL_HAS_AVX512DQ)
     set(AVX512_SRC
-        eltwise/eltwise-mult-mod-avx512.cpp
+        eltwise/eltwise-mult-mod-avx512dq.cpp
+        eltwise/eltwise-mult-mod-avx512ifma.cpp
         eltwise/eltwise-reduce-mod-avx512.cpp
         eltwise/eltwise-add-mod-avx512.cpp
         eltwise/eltwise-cmp-sub-mod-avx512.cpp
