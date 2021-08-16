@@ -12,7 +12,7 @@ namespace hexl {
 
 /// @brief AVX512 implementation of the inverse NTT
 /// @param[in, out] operand Input data. Overwritten with NTT output
-/// @param[in] n Size of the transfrom, i.e. the polynomial degree. Must be a
+/// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
 /// @param[in] inv_root_of_unity_powers Powers of inverse 2n'th root of unity in

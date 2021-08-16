@@ -173,8 +173,6 @@ void NTT::ComputeRootOfUnityPowers() {
 bool NTT::CheckArguments(uint64_t degree, uint64_t modulus) {
   HEXL_UNUSED(degree);
   HEXL_UNUSED(modulus);
-  (void)degree;
-  (void)modulus;
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
   HEXL_CHECK(degree <= (1ULL << NTT::MaxDegreeBits()),
