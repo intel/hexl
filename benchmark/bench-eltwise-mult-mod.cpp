@@ -95,15 +95,7 @@ static void BM_EltwiseMultModAVX512Float(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512Float)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 2})
-    ->Args({16384, 4});
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
 #endif
 
 //=================================================================
@@ -140,15 +132,7 @@ static void BM_EltwiseMultModAVX512Int(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512Int)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 2})
-    ->Args({16384, 4});
+    ->ArgsProduct({{1024, 4096, 16384, 16385}, {1, 2, 4}});
 #endif
 
 //=================================================================
