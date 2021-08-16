@@ -333,7 +333,7 @@ void EltwiseMultModAVX512IntLoopDefault(__m512i* vp_result,
 
     __m512i c1 = _mm512_hexl_shrdi_epi64<BitShift - 1>(vprod_lo, vprod_hi);
     __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
-    __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_neg_modulus);
+    __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_neg_mod);
     // Computes result in [0, 4q)
     vresult = _mm512_add_epi64(vprod_lo, vresult);
 
@@ -353,41 +353,41 @@ void EltwiseMultModAVX512IntLoop(__m512i* vp_result, const __m512i* vp_operand1,
                                  __m512i v_modulus, __m512i v_neg_mod,
                                  __m512i v_twice_mod, uint64_t n) {
   switch (n) {
-    case 1024:
-      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 1024>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-          v_twice_mod);
-      break;
+      // case 1024:
+      //   EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 1024>(
+      //       vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+      //       v_twice_mod);
+      //   break;
 
-    case 2048:
-      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 2048>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-          v_twice_mod);
-      break;
+      // case 2048:
+      //   EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 2048>(
+      //       vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+      //       v_twice_mod);
+      //   break;
 
-    case 4096:
-      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 4096>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-          v_twice_mod);
-      break;
+      // case 4096:
+      //   EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 4096>(
+      //       vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+      //       v_twice_mod);
+      //   break;
 
-    case 8192:
-      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 8192>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-          v_twice_mod);
-      break;
+      // case 8192:
+      //   EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 8192>(
+      //       vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+      //       v_twice_mod);
+      //   break;
 
-    case 16384:
-      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 16384>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-          v_twice_mod);
-      break;
+      // case 16384:
+      //   EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 16384>(
+      //       vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+      //       v_twice_mod);
+      //   break;
 
-    case 32768:
-      EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 32768>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-          v_twice_mod);
-      break;
+      // case 32768:
+      //   EltwiseMultModAVX512IntLoopUnroll<BitShift, InputModFactor, 32768>(
+      //       vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+      //       v_twice_mod);
+      //   break;
 
     default:
       EltwiseMultModAVX512IntLoopDefault<BitShift, InputModFactor>(
@@ -403,8 +403,8 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
                              uint64_t modulus) {
   HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 || InputModFactor == 4,
              "Require InputModFactor = 1, 2, or 4")
-  HEXL_CHECK(InputModFactor * modulus > (1ULL << 50),
-             "Require InputModFactor * modulus > (1ULL << 50)")
+  // HEXL_CHECK(InputModFactor * modulus > (1ULL << 50),
+  //  "Require InputModFactor * modulus > (1ULL << 50)")
   HEXL_CHECK(InputModFactor * modulus < (1ULL << 63),
              "Require InputModFactor * modulus < (1ULL << 63)");
   HEXL_CHECK(modulus < (1ULL << 62), "Require  modulus < (1ULL << 62)");
@@ -566,6 +566,17 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
         break;
       }
       default: {
+        uint64_t L = 51 + N;  // Ensures L-N+1 == 52
+        uint64_t barr_lo = MultiplyFactor(uint64_t(1) << (L - 52), 52, modulus)
+                               .BarrettFactor();
+
+        __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
+
+        LOG(INFO) << " modulus " << modulus;
+        LOG(INFO) << " N " << N;
+        LOG(INFO) << " L " << L;
+
+        // std::cout << "default\n";
         // Algorithm 1 from
         // https://hal.archives-ouvertes.fr/hal-01215845/document
         HEXL_LOOP_UNROLL_4
@@ -573,26 +584,48 @@ void EltwiseMultModAVX512Int(uint64_t* result, const uint64_t* operand1,
           __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
           __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
 
-          // Compute product
-          __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
-          __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+          // LOG(INFO) << "v_operand1 " << ExtractValues(v_operand1);
+          // LOG(INFO) << "v_operand2 " << ExtractValues(v_operand2);
 
-          __m512i c1 = _mm512_hexl_shrdi_epi64(
-              vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
+          // Compute product
+          __m512i vprod_hi = _mm512_hexl_mulhi_epi<52>(v_operand1, v_operand2);
+          __m512i vprod_lo = _mm512_hexl_mullo_epi<52>(v_operand1, v_operand2);
+
+          // LOG(INFO) << "vprod_hi " << ExtractValues(vprod_hi);
+          // LOG(INFO) << "vprod_lo " << ExtractValues(vprod_lo);
+
+          // __m512i c1 = _mm512_hexl_shrdi_epi64(
+          // vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
+
+          __m512i c1_lo = _mm512_srli_epi64(vprod_lo, N - 1);
+          // LOG(INFO) << "c1_lo " << ExtractValues(c1_lo);
+
+          __m512i c1_hi = _mm512_slli_epi64(vprod_hi, 52 - (N - 1));
+          // LOG(INFO) << "c1_hi " << ExtractValues(c1_hi);
+          __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
+
+          // LOG(INFO) << "c1 " << ExtractValues(c1);
+
+          // LOG(INFO) << "vbarr_lo " << ExtractValues(vbarr_lo);
 
           // L - N + 1 == 64, so we only need high 64 bits
           // Perform approximate computation of high bits, as described on page
           // 7 of https://arxiv.org/pdf/2003.04510.pdf
-          __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
+          __m512i c3 = _mm512_hexl_mulhi_epi<52>(c1, vbarr_lo);
+
+          // LOG(INFO) << "c3 " << ExtractValues(c3);
 
           // C4 = prod_lo - (p * c3)_lo
-          __m512i vresult = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+          __m512i vresult =
+              _mm512_hexl_mullo_add_lo_epi<52>(vprod_lo, c3, v_neg_mod);
+
+          // LOG(INFO) << "vresult " << ExtractValues(vresult);
           // Computes result in [0, 4q)
-          vresult = _mm512_sub_epi64(vprod_lo, vresult);
+          // vresult = _mm512_add_epi64(vprod_lo, vresult);
 
           // Reduce result to [0, q)
           vresult =
-              _mm512_hexl_small_mod_epu64<4>(vresult, v_modulus, &v_twice_mod);
+              _mm512_hexl_small_mod_epu64<2>(vresult, v_modulus, &v_twice_mod);
           _mm512_storeu_si512(vp_result, vresult);
 
           HEXL_CHECK_BOUNDS((uint64_t*)(vp_result), 8, modulus,

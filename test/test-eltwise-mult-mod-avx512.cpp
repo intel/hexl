@@ -122,7 +122,7 @@ TEST(EltwiseMultMod, AVX512Big) {
   }
 
   std::random_device rd;
-  std::mt19937 gen(rd());
+  std::mt19937 gen(42);  // )rd());
 
   for (size_t length = 1024; length <= 32768; length *= 2) {
     std::vector<uint64_t> op1(length, 0);

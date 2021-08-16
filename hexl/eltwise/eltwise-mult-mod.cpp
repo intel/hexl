@@ -35,7 +35,7 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
-    if (modulus < (1ULL << 50)) {
+    if (false && modulus < (1ULL << 50)) {
       switch (input_mod_factor) {
         case 1:
           EltwiseMultModAVX512Float<1>(result, operand1, operand2, n, modulus);
