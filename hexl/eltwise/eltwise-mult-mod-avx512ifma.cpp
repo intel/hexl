@@ -188,20 +188,6 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
     __m512i zlo15 = _mm512_hexl_mullo_epi<52>(x15, y15);
     __m512i zlo16 = _mm512_hexl_mullo_epi<52>(x16, y16);
 
-    // __m512i vprod_hi = _mm512_hexl_mulhi_epi<52>(v_operand1, v_operand2);
-    // __m512i vprod_lo = _mm512_hexl_mullo_epi<52>(v_operand1, v_operand2);
-    // __m512i c1_lo = _mm512_srli_epi64(vprod_lo,static_cast<unsigned int>(N
-    // - 1ULL));
-    // __m512i c1_hi = _mm512_slli_epi64(vprod_hi, 52 - (N - 1));
-    // __m512i c1 = _mm512_add_epi64(c1_lo, c1_hi);
-    // __m512i c3 = _mm512_hexl_mulhi_epi<52>(c1, vbarr_lo);
-    // // C4 = prod_lo - (p * c3)_lo
-    // __m512i c4 =
-    //     _mm512_hexl_mullo_add_lo_epi<52>(vprod_lo, c3, v_neg_mod);
-    // v_result =
-    //     _mm512_hexl_small_mod_epu64<2>(c4, v_modulus, &v_twice_mod);
-    // _mm512_storeu_si512(vp_result, v_result);
-
     __m512i c1_lo1 =
         _mm512_srli_epi64(zlo1, static_cast<unsigned int>(N - 1ULL));
     __m512i c1_lo2 =
@@ -268,22 +254,22 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
     __m512i c1_hi16 =
         _mm512_srli_epi64(zhi16, static_cast<unsigned int>(52ULL - (N - 1ULL)));
 
-    __m512i c1_1 = _mm512_add_epi64(c1_lo1, c1_hi1);
-    __m512i c1_2 = _mm512_add_epi64(c1_lo2, c1_hi2);
-    __m512i c1_3 = _mm512_add_epi64(c1_lo3, c1_hi3);
-    __m512i c1_4 = _mm512_add_epi64(c1_lo4, c1_hi4);
-    __m512i c1_5 = _mm512_add_epi64(c1_lo5, c1_hi5);
-    __m512i c1_6 = _mm512_add_epi64(c1_lo6, c1_hi6);
-    __m512i c1_7 = _mm512_add_epi64(c1_lo7, c1_hi7);
-    __m512i c1_8 = _mm512_add_epi64(c1_lo8, c1_hi8);
-    __m512i c1_9 = _mm512_add_epi64(c1_lo9, c1_hi9);
-    __m512i c1_10 = _mm512_add_epi64(c1_lo10, c1_hi10);
-    __m512i c1_11 = _mm512_add_epi64(c1_lo11, c1_hi11);
-    __m512i c1_12 = _mm512_add_epi64(c1_lo12, c1_hi12);
-    __m512i c1_13 = _mm512_add_epi64(c1_lo13, c1_hi13);
-    __m512i c1_14 = _mm512_add_epi64(c1_lo14, c1_hi14);
-    __m512i c1_15 = _mm512_add_epi64(c1_lo15, c1_hi15);
-    __m512i c1_16 = _mm512_add_epi64(c1_lo16, c1_hi16);
+    __m512i c1_1 = _mm512_or_epi64(c1_lo1, c1_hi1);
+    __m512i c1_2 = _mm512_or_epi64(c1_lo2, c1_hi2);
+    __m512i c1_3 = _mm512_or_epi64(c1_lo3, c1_hi3);
+    __m512i c1_4 = _mm512_or_epi64(c1_lo4, c1_hi4);
+    __m512i c1_5 = _mm512_or_epi64(c1_lo5, c1_hi5);
+    __m512i c1_6 = _mm512_or_epi64(c1_lo6, c1_hi6);
+    __m512i c1_7 = _mm512_or_epi64(c1_lo7, c1_hi7);
+    __m512i c1_8 = _mm512_or_epi64(c1_lo8, c1_hi8);
+    __m512i c1_9 = _mm512_or_epi64(c1_lo9, c1_hi9);
+    __m512i c1_10 = _mm512_or_epi64(c1_lo10, c1_hi10);
+    __m512i c1_11 = _mm512_or_epi64(c1_lo11, c1_hi11);
+    __m512i c1_12 = _mm512_or_epi64(c1_lo12, c1_hi12);
+    __m512i c1_13 = _mm512_or_epi64(c1_lo13, c1_hi13);
+    __m512i c1_14 = _mm512_or_epi64(c1_lo14, c1_hi14);
+    __m512i c1_15 = _mm512_or_epi64(c1_lo15, c1_hi15);
+    __m512i c1_16 = _mm512_or_epi64(c1_lo16, c1_hi16);
 
     __m512i c3_1 = _mm512_hexl_mulhi_epi<52>(c1_1, vbarr_lo);
     __m512i c3_2 = _mm512_hexl_mulhi_epi<52>(c1_2, vbarr_lo);
@@ -319,29 +305,29 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
     __m512i c4_15 = _mm512_hexl_mullo_add_lo_epi<52>(zlo15, c3_15, v_neg_mod);
     __m512i c4_16 = _mm512_hexl_mullo_add_lo_epi<52>(zlo16, c3_16, v_neg_mod);
 
-    __m512i vr1 = _mm512_hexl_small_mod_epu64<4>(c4_1, v_modulus, &v_twice_mod);
-    __m512i vr2 = _mm512_hexl_small_mod_epu64<4>(c4_2, v_modulus, &v_twice_mod);
-    __m512i vr3 = _mm512_hexl_small_mod_epu64<4>(c4_3, v_modulus, &v_twice_mod);
-    __m512i vr4 = _mm512_hexl_small_mod_epu64<4>(c4_4, v_modulus, &v_twice_mod);
-    __m512i vr5 = _mm512_hexl_small_mod_epu64<4>(c4_5, v_modulus, &v_twice_mod);
-    __m512i vr6 = _mm512_hexl_small_mod_epu64<4>(c4_6, v_modulus, &v_twice_mod);
-    __m512i vr7 = _mm512_hexl_small_mod_epu64<4>(c4_7, v_modulus, &v_twice_mod);
-    __m512i vr8 = _mm512_hexl_small_mod_epu64<4>(c4_8, v_modulus, &v_twice_mod);
-    __m512i vr9 = _mm512_hexl_small_mod_epu64<4>(c4_9, v_modulus, &v_twice_mod);
+    __m512i vr1 = _mm512_hexl_small_mod_epu64<2>(c4_1, v_modulus, &v_twice_mod);
+    __m512i vr2 = _mm512_hexl_small_mod_epu64<2>(c4_2, v_modulus, &v_twice_mod);
+    __m512i vr3 = _mm512_hexl_small_mod_epu64<2>(c4_3, v_modulus, &v_twice_mod);
+    __m512i vr4 = _mm512_hexl_small_mod_epu64<2>(c4_4, v_modulus, &v_twice_mod);
+    __m512i vr5 = _mm512_hexl_small_mod_epu64<2>(c4_5, v_modulus, &v_twice_mod);
+    __m512i vr6 = _mm512_hexl_small_mod_epu64<2>(c4_6, v_modulus, &v_twice_mod);
+    __m512i vr7 = _mm512_hexl_small_mod_epu64<2>(c4_7, v_modulus, &v_twice_mod);
+    __m512i vr8 = _mm512_hexl_small_mod_epu64<2>(c4_8, v_modulus, &v_twice_mod);
+    __m512i vr9 = _mm512_hexl_small_mod_epu64<2>(c4_9, v_modulus, &v_twice_mod);
     __m512i vr10 =
-        _mm512_hexl_small_mod_epu64<4>(c4_10, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_10, v_modulus, &v_twice_mod);
     __m512i vr11 =
-        _mm512_hexl_small_mod_epu64<4>(c4_11, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_11, v_modulus, &v_twice_mod);
     __m512i vr12 =
-        _mm512_hexl_small_mod_epu64<4>(c4_12, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_12, v_modulus, &v_twice_mod);
     __m512i vr13 =
-        _mm512_hexl_small_mod_epu64<4>(c4_13, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_13, v_modulus, &v_twice_mod);
     __m512i vr14 =
-        _mm512_hexl_small_mod_epu64<4>(c4_14, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_14, v_modulus, &v_twice_mod);
     __m512i vr15 =
-        _mm512_hexl_small_mod_epu64<4>(c4_15, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_15, v_modulus, &v_twice_mod);
     __m512i vr16 =
-        _mm512_hexl_small_mod_epu64<4>(c4_16, v_modulus, &v_twice_mod);
+        _mm512_hexl_small_mod_epu64<2>(c4_16, v_modulus, &v_twice_mod);
 
     _mm512_storeu_si512(vp_result++, vr1);
     _mm512_storeu_si512(vp_result++, vr2);
@@ -392,7 +378,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(__m512i* vp_result,
         _mm512_srli_epi64(vprod_lo, static_cast<unsigned int>(N - 1ULL));
     __m512i c1_hi = _mm512_slli_epi64(
         vprod_hi, static_cast<unsigned int>(52ULL - (N - 1ULL)));
-    __m512i c1 = _mm512_add_epi64(c1_lo, c1_hi);
+    __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
     // L - N + 1 == 52, so we only need high 52 bits
     __m512i c3 = _mm512_hexl_mulhi_epi<52>(c1, vbarr_lo);
@@ -487,7 +473,6 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   }
 
   const uint64_t logmod = MSB(modulus);
-  uint64_t log2_input_mod_factor = Log2(InputModFactor);  // 0;
 
   // modulus < 2**N
   const uint64_t N = logmod + 1;
@@ -501,7 +486,7 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   // This happens when 2 * log_2(input_mod_factor) + N < 51
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * log2_input_mod_factor + N >= 51;
+  bool reduce_mod = 2 * Log2(InputModFactor) + N >= 51;
 
   __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
@@ -607,7 +592,7 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
             _mm512_srli_epi64(vprod_lo, static_cast<unsigned int>(N - 1ULL));
         __m512i c1_hi = _mm512_slli_epi64(
             vprod_hi, static_cast<unsigned int>(52ULL - (N - 1ULL)));
-        __m512i c1 = _mm512_add_epi64(c1_lo, c1_hi);
+        __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
         // L - N + 1 == 52, so we only need high 52 bits
         // Perform approximate computation of high bits, as described on page

@@ -426,12 +426,6 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   }
 
   const uint64_t logmod = MSB(modulus);
-  uint64_t log2_input_mod_factor = 0;
-  if (InputModFactor == 2) {
-    log2_input_mod_factor = 1;
-  } else if (InputModFactor == 4) {
-    log2_input_mod_factor = 2;
-  }
 
   // modulus < 2**N
   const uint64_t N = logmod + 1;
@@ -445,7 +439,7 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   // This happens when 2 * log_2(input_mod_factor) + N < 63
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * log2_input_mod_factor + N >= 63;
+  bool reduce_mod = 2 * Log2(InputModFactor) + N >= 63;
 
   __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
@@ -575,12 +569,6 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
         for (size_t i = n / 8; i > 0; --i) {
           __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
           __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
-
-          // v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-          //     v_operand1, v_modulus, &v_twice_mod);
-
-          // v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-          //     v_operand2, v_modulus, &v_twice_mod);
 
           __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
           __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
