@@ -438,11 +438,6 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   uint64_t L = 63 + N;  // Ensures L-N+1 == 64
   uint64_t barr_lo =
       MultiplyFactor(uint64_t(1) << (L - 64), 64, modulus).BarrettFactor();
-  if (N <= 52) {  // TODO(fboemer): check
-    L = 51 + N;   // Ensures L-N+1 == 52
-    barr_lo =
-        MultiplyFactor(uint64_t(1) << (L - 52), 52, modulus).BarrettFactor();
-  }
 
   // Let d be the product operand1 * operand2.
   // To ensure d >> (N - 1) < (1ULL << 64), we need
@@ -574,17 +569,18 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
         break;
       }
       default: {
-        // TODO(fboemer)
+        // Algorithm 1 from
+        // https://hal.archives-ouvertes.fr/hal-01215845/document
         HEXL_LOOP_UNROLL_4
         for (size_t i = n / 8; i > 0; --i) {
           __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
           __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
 
-          v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-              v_operand1, v_modulus, &v_twice_mod);
+          // v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+          //     v_operand1, v_modulus, &v_twice_mod);
 
-          v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-              v_operand2, v_modulus, &v_twice_mod);
+          // v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+          //     v_operand2, v_modulus, &v_twice_mod);
 
           __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
           __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
