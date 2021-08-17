@@ -37,6 +37,12 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
                                     uint64_t input_mod_factor = 1,
                                     uint64_t output_mod_factor = 1);
 
+void ForwardTransformToBitReverseRadix4(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
+    uint64_t output_mod_factor = 1);
+
 /// @brief Reference NTT which is written for clarity rather than performance
 /// @param[in, out] operand Input data. Overwritten with NTT output
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a

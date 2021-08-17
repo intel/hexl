@@ -60,6 +60,10 @@ inline uint64_t Log2(uint64_t x) {
   return MSB(x);
 }
 
+inline bool IsPowerOfFour(uint64_t num) {
+  return IsPowerOfTwo(num) && (Log2(num) % 2 == 0);
+}
+
 /// @brief Returns the maximum value that can be represented using \p bits bits
 inline uint64_t MaximumValue(uint64_t bits) {
   HEXL_CHECK(bits <= 64, "MaximumValue requires bits <= 64; got " << bits);
