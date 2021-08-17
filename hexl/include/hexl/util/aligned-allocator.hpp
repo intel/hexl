@@ -9,6 +9,7 @@
 
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/allocator.hpp"
+#include "hexl/util/defines.hpp"
 
 namespace intel {
 namespace hexl {
@@ -18,7 +19,7 @@ struct MallocStrategy : AllocatorBase {
   void* allocate(size_t bytes_count) final { return std::malloc(bytes_count); }
 
   void deallocate(void* p, size_t n) final {
-    (void)n;
+    HEXL_UNUSED(n);
     std::free(p);
   }
 };

@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "hexl/util/defines.hpp"
 #include "hexl/util/types.hpp"
 #include "test-util.hpp"
 
@@ -68,7 +69,7 @@ struct CustomAllocatorAdapter
     return a.invoke_allocation(bytes_count);
   }
   void deallocate_impl(void* p, size_t n) {
-    (void)n;
+    HEXL_UNUSED(n);
     a.lets_deallocate(static_cast<CustomAllocator::T*>(p));
   }
 

@@ -41,12 +41,12 @@ struct AllocatorInterface : public AllocatorBase {
   // in case AllocatorImpl doesn't provide implementations, use default null
   // behavior
   void* allocate_impl(size_t bytes_count) {
-    (void)bytes_count;
+    HEXL_UNUSED(bytes_count);
     return nullptr;
   }
   void deallocate_impl(void* p, size_t n) {
-    (void)p;
-    (void)n;
+    HEXL_UNUSED(p);
+    HEXL_UNUSED(n);
   }
 };
 }  // namespace hexl

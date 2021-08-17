@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/defines.hpp"
 #include "ntt/ntt-internal.hpp"
 #include "test-util.hpp"
 #include "util/cpu-features.hpp"
@@ -146,7 +147,7 @@ struct NTT::AllocatorAdapter<allocators::CustomAllocator>
     return a.invoke_allocation(bytes_count);
   }
   void deallocate(void* p, size_t n) {
-    (void)n;
+    HEXL_UNUSED(n);
     a.lets_deallocate(static_cast<allocators::CustomAllocator::T*>(p));
   }
 
