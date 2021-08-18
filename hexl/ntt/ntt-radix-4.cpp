@@ -72,12 +72,13 @@ void ForwardTransformToBitReverseRadix4(
     for (size_t j = 0; j < t; j++) {
       FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
     }
+    // Data in [0, 4q)
   }
 
   HEXL_VLOG(3, "after radix 2 outputs "
                    << std::vector<uint64_t>(operand, operand + n));
 
-  for (size_t ldm = log_n; ldm >= 2; ldm -= 2) {
+  for (size_t ldm = is_power_of_4 ? log_n : (log_n - 1); ldm >= 2; ldm -= 2) {
     // for (size_t ldm = 2 + size_t(!is_power_of_4); ldm <= ldn; ldm += 2) {
     size_t m = 1UL << ldm;
     size_t m4 = m >> 2;  // 4;
@@ -113,10 +114,10 @@ void ForwardTransformToBitReverseRadix4(
                          operand[X0_ind], operand[X1_ind], operand[X2_ind],
                          operand[X3_ind]}));
 
-        uint64_t X0 = operand[X0_ind];
-        uint64_t X1 = operand[X1_ind];
-        uint64_t X2 = operand[X2_ind];
-        uint64_t X3 = operand[X3_ind];
+        uint64_t X0 = operand[X0_ind] % modulus;
+        uint64_t X1 = operand[X1_ind] % modulus;
+        uint64_t X2 = operand[X2_ind] % modulus;
+        uint64_t X3 = operand[X3_ind] % modulus;
 
         FwdButterflyRadix4(&X0, &X1, &X2, &X3, W1, W2, W3, modulus,
                            2 * modulus);
