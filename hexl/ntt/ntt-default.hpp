@@ -30,16 +30,72 @@ namespace hexl {
 inline void FwdButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
                          uint64_t W_precon, uint64_t modulus,
                          uint64_t twice_modulus) {
+  HEXL_VLOG(3, "FwdButterfly with W " << W << ", W_precon " << W_precon);
   uint64_t tx = (*X >= twice_modulus) ? (*X - twice_modulus) : *X;
   uint64_t T = MultiplyModLazy<64>(*Y, W, W_precon, modulus);
   *X = tx + T;
   *Y = tx + twice_modulus - T;
 }
 
+// Assume X, Y in [0, np] and return X', Y' in [0, (n+2)p]
+// such that X' = X + WY mod p and Y' = X - WY mod p
+inline void FwdButterflyLazy(uint64_t* X, uint64_t* Y, uint64_t W,
+                             uint64_t W_precon, uint64_t modulus,
+                             uint64_t twice_modulus) {
+  HEXL_VLOG(3, "FwdButterflyLazy");
+  HEXL_VLOG(3, "Inputs: X " << *X << ", Y " << *Y << ", W " << W << ", modulus "
+                            << modulus);
+
+  uint64_t tx = *X;
+  uint64_t T = MultiplyModLazy<64>(*Y, W, W_precon, modulus);
+  HEXL_VLOG(3, "T " << T);
+  *X = tx + T;
+  *Y = tx + twice_modulus - T;
+
+  HEXL_VLOG(3, "Outputs: X " << *X << ", Y " << *Y);
+}
+
+// Assume X0, X1, X2, X3 in [0, 4q] and return X0, X1, X2, X3 in [0, 4q)
 inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
                                uint64_t* X3, uint64_t W1, uint64_t W2,
                                uint64_t W3, uint64_t modulus,
                                uint64_t twice_modulus) {
+  HEXL_VLOG(3, "FwdButterflyRadix4");
+  HEXL_VLOG(3, "Xs " << (std::vector<uint64_t>{*X0, *X1, *X2, *X3}));
+
+  if (std::getenv("TEST") != nullptr) {
+    // {
+    uint64_t W1_precon = MultiplyFactor(W1, 64, modulus).BarrettFactor();
+    uint64_t W2_precon = MultiplyFactor(W2, 64, modulus).BarrettFactor();
+    uint64_t W3_precon = MultiplyFactor(W3, 64, modulus).BarrettFactor();
+
+    // Returns Xs in [0, 4p)
+    FwdButterflyLazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
+    FwdButterflyLazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
+
+    HEXL_VLOG(3, "W1_precon " << W1_precon);
+
+    HEXL_VLOG(3, "tmp0 " << *X0);
+    HEXL_VLOG(3, "tmp1 " << *X1);
+    HEXL_VLOG(3, "tmp2 " << *X2);
+    HEXL_VLOG(3, "tmp3 " << *X3);
+
+    // Returns Xs in [0, 8p)
+    FwdButterflyLazy(X0, X1, W2, W2_precon, modulus, twice_modulus);
+    FwdButterflyLazy(X2, X3, W3, W3_precon, modulus, twice_modulus);
+
+    HEXL_VLOG(3, "Xs after second round "
+                     << (std::vector<uint64_t>{*X0, *X1, *X2, *X3}));
+
+    // Reduce Xs to [0, 4p)
+    *X0 = ReduceMod<2>(*X0, 4 * modulus);
+    *X1 = ReduceMod<2>(*X1, 4 * modulus);
+    *X2 = ReduceMod<2>(*X2, 4 * modulus);
+    *X3 = ReduceMod<2>(*X3, 4 * modulus);
+
+    return;
+  }
+
   uint64_t a0 = *X0;
   uint64_t a1 = MultiplyMod(*X1, W1, modulus);
   uint64_t a2 = MultiplyMod(*X2, W2, modulus);

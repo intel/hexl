@@ -162,6 +162,21 @@ const uint64_t W = root_of_unity_powers[m + i];
                      << std::vector<uint64_t>(operand, operand + n));
   }
 
+  uint64_t twice_modulus = modulus * 2;
+
+  if (output_mod_factor == 1) {
+    for (size_t i = 0; i < n; ++i) {
+      if (operand[i] >= twice_modulus) {
+        operand[i] -= twice_modulus;
+      }
+      if (operand[i] >= modulus) {
+        operand[i] -= modulus;
+      }
+      HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in NTT "
+                                           << operand[i] << " >= " << modulus);
+    }
+  }
+
   HEXL_VLOG(3, "outputs " << std::vector<uint64_t>(operand, operand + n));
 }
 
