@@ -50,6 +50,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
             j1 += (t << 1);
           }
           const uint64_t W = root_of_unity_powers[m + i];
+          HEXL_VLOG(3, "W_idx " << (m + i));
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
           uint64_t* X = operand + j1;
@@ -72,6 +73,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          HEXL_VLOG(3, "W_idx " << (m + i));
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -89,6 +91,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          HEXL_VLOG(3, "W_idx " << (m + i));
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -104,6 +107,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          HEXL_VLOG(3, "W_idx " << (m + i));
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -118,6 +122,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          HEXL_VLOG(3, "W_idx " << (m + i));
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;

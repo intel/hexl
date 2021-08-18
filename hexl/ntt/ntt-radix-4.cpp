@@ -78,48 +78,72 @@ void ForwardTransformToBitReverseRadix4(
   HEXL_VLOG(3, "after radix 2 outputs "
                    << std::vector<uint64_t>(operand, operand + n));
 
-  uint64_t w_idx = is_power_of_4 ? 0 : 1;
-  for (size_t ldm = is_power_of_4 ? log_n : (log_n - 1); ldm >= 2; ldm -= 2) {
-    // for (size_t ldm = 2 + size_t(!is_power_of_4); ldm <= ldn; ldm += 2) {
-    size_t m = 1UL << ldm;
+  uint64_t w_idx = is_power_of_4 ? 1 : 2;
+  size_t t = (n >> w_idx) >> 1;
+  // for (size_t ldm = is_power_of_4 ? log_n : (log_n - 1); ldm >= 2; ldm -= 2)
+  // {
+
+  for (size_t m = is_power_of_4 ? 1 : 2; m < n; m <<= 2) {
+    // size_t m = 1UL << ldm;
     size_t m4 = m >> 2;  // 4;
+    // HEXL_VLOG(3, "ldm " << ldm);
     HEXL_VLOG(3, "m " << m);
     HEXL_VLOG(3, "m4 " << m4);
 
-    uint64_t imag = root_of_unity_powers[1];
-    HEXL_VLOG(3, "imag " << imag);
+    size_t j1 = 0;
 
-    for (size_t j = 0; j < m4; j++) {
-      HEXL_VLOG(3, "j " << j);
-      // LOG(INFO) << "r1 " << r1;
+    size_t gap = n >> Log2(m);
+    gap >>= 2;
+    HEXL_VLOG(3, "gap " << gap);
 
-      for (size_t r = 0; r < n; r += m) {
-        HEXL_VLOG(3, "r " << r);
+    for (size_t i = 0; i < m; i++) {
+      HEXL_VLOG(3, "i " << i << " up to " << m);
+
+      HEXL_VLOG(3, "t " << t);
+
+      for (size_t j = 0; j < t; j++) {
+        HEXL_VLOG(3, "j " << j << " up to " << t);
+        HEXL_VLOG(3, "j1 " << j1);
+
+        // for (size_t j = 0; j < m4; j++) {
+
+        // LOG(INFO) << "r1 " << r1;
+
+        // for (size_t r = 0; r < n; r += m) {
+        // HEXL_VLOG(3, "r " << r << " up to " << n << " incrementing by " <<
+        // m);
 
         // 4-point NTT butterfly
-        uint64_t X0_ind = r + j;
-        uint64_t X1_ind = X0_ind + m4;
-        uint64_t X2_ind = X0_ind + 2 * m4;
-        uint64_t X3_ind = X0_ind + 3 * m4;
-
-        uint64_t W1_ind = w_idx + 1;
-        uint64_t W2_ind = 2 * W1_ind;
-        uint64_t W3_ind = 2 * W1_ind + 1;
-        ++w_idx;
-
-        const uint64_t W1 = root_of_unity_powers[W1_ind];
-        const uint64_t W2 = root_of_unity_powers[W2_ind];
-        const uint64_t W3 = root_of_unity_powers[W3_ind];
-        HEXL_VLOG(3,
-                  "Winds " << (std::vector<uint64_t>{W1_ind, W2_ind, W3_ind}));
-        HEXL_VLOG(3, "Ws " << (std::vector<uint64_t>{W1, W2, W3}));
+        uint64_t X0_ind = j + 4 * i * t;
+        uint64_t X1_ind = X0_ind + gap;
+        uint64_t X2_ind = X0_ind + 2 * gap;
+        uint64_t X3_ind = X0_ind + 3 * gap;
 
         HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind, X2_ind,
                                                         X3_ind}));
 
-        HEXL_VLOG(3, "Xs " << (std::vector<uint64_t>{
-                         operand[X0_ind], operand[X1_ind], operand[X2_ind],
-                         operand[X3_ind]}));
+        uint64_t W1_ind = m + i;  // * m4 + j;
+        // uint64_t W1_ind = w_idx;
+        uint64_t W2_ind = 2 * W1_ind;
+        uint64_t W3_ind = 2 * W1_ind + 1;
+        ++w_idx;
+
+        HEXL_VLOG(3,
+                  "Winds " << (std::vector<uint64_t>{W1_ind, W2_ind, W3_ind}));
+
+        const uint64_t W1 = root_of_unity_powers[W1_ind];
+        const uint64_t W2 = root_of_unity_powers[W2_ind];
+        const uint64_t W3 = root_of_unity_powers[W3_ind];
+
+        // HEXL_VLOG(3, "Ws " << (std::vector<uint64_t>{W1, W2, W3}));
+
+        // HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind,
+        // X2_ind,
+        //                                                 X3_ind}));
+
+        // HEXL_VLOG(3, "Xs " << (std::vector<uint64_t>{
+        //                  operand[X0_ind], operand[X1_ind], operand[X2_ind],
+        //                  operand[X3_ind]}));
 
         uint64_t X0 = operand[X0_ind] % modulus;
         uint64_t X1 = operand[X1_ind] % modulus;
@@ -134,12 +158,15 @@ void ForwardTransformToBitReverseRadix4(
         operand[X2_ind] = X2;
         operand[X3_ind] = X3;
       }
+      w_idx = w_idx * 2;
+      j1 += (t << 2);
 
-      HEXL_VLOG(3, "inner Intermediate values "
-                       << std::vector<uint64_t>(operand, operand + n));
+      // HEXL_VLOG(3, "inner Intermediate values "
+      //                  << std::vector<uint64_t>(operand, operand + n));
     }
-    HEXL_VLOG(3, "outer Intermediate values "
-                     << std::vector<uint64_t>(operand, operand + n));
+    t >>= 2;
+    // HEXL_VLOG(3, "outer Intermediate values "
+    //                  << std::vector<uint64_t>(operand, operand + n));
   }
 
   uint64_t twice_modulus = modulus * 2;
