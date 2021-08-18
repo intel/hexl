@@ -84,7 +84,6 @@ void ForwardTransformToBitReverseRadix4(
 
     for (size_t i = 0; i < m; i++) {
       HEXL_VLOG(3, "i " << i << " up to " << m);
-
       HEXL_VLOG(3, "t " << t);
 
       HEXL_LOOP_UNROLL_4
@@ -113,13 +112,21 @@ void ForwardTransformToBitReverseRadix4(
         const uint64_t W2 = root_of_unity_powers[W2_ind];
         const uint64_t W3 = root_of_unity_powers[W3_ind];
 
-        uint64_t X0 = operand[X0_ind] % modulus;
-        uint64_t X1 = operand[X1_ind] % modulus;
-        uint64_t X2 = operand[X2_ind] % modulus;
-        uint64_t X3 = operand[X3_ind] % modulus;
+        MultiplyFactor W1_factor(W1, 64, modulus);
+        MultiplyFactor W2_factor(W2, 64, modulus);
+        MultiplyFactor W3_factor(W3, 64, modulus);
 
-        FwdButterflyRadix4(&X0, &X1, &X2, &X3, W1, W2, W3, modulus,
-                           2 * modulus);
+        // uint64_t W1_precon = MultiplyFactor(W1, 64, modulus).BarrettFactor();
+        // uint64_t W2_precon = MultiplyFactor(W2, 64, modulus).BarrettFactor();
+        // uint64_t W3_precon = MultiplyFactor(W3, 64, modulus).BarrettFactor();
+
+        uint64_t X0 = operand[X0_ind];  //% modulus;
+        uint64_t X1 = operand[X1_ind];  //% modulus;
+        uint64_t X2 = operand[X2_ind];  //% modulus;
+        uint64_t X3 = operand[X3_ind];  // % modulus;
+
+        FwdButterflyRadix4(&X0, &X1, &X2, &X3, W1_factor, W2_factor, W3_factor,
+                           modulus, 2 * modulus);
 
         operand[X0_ind] = X0;
         operand[X1_ind] = X1;
