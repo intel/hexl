@@ -90,7 +90,7 @@ size_t j1 = 0;
 for (size_t i = 0; i < m; i++) {
 HEXL_VLOG(3, "i " << i);
 size_t j2 = j1 + t;
-const uint64_t W_op = root_of_unity_powers[m + i];
+const uint64_t W = root_of_unity_powers[m + i];
 */
 
   for (size_t ldm = ldn; ldm >= 2; ldm -= 2) {
@@ -100,9 +100,9 @@ const uint64_t W_op = root_of_unity_powers[m + i];
     HEXL_VLOG(3, "m " << m);
     HEXL_VLOG(3, "m4 " << m4);
 
-    // uint64_t W_op1 = 1;
-    // uint64_t W_op2 = 1;
-    // uint64_t W_op3 = 1;
+    // uint64_t W1 = 1;
+    // uint64_t W2 = 1;
+    // uint64_t W3 = 1;
     // uint64_t dw = 18;
 
     uint64_t imag = root_of_unity_powers[1];
@@ -124,12 +124,11 @@ const uint64_t W_op = root_of_unity_powers[m + i];
         uint64_t X2_ind = X0_ind + 2 * m4;
         uint64_t X3_ind = X0_ind + 3 * m4;
 
-        const uint64_t W_op0 = root_of_unity_powers[X0_ind];
-        const uint64_t W_op1 = root_of_unity_powers[X1_ind];
-        const uint64_t W_op2 = root_of_unity_powers[X2_ind];
-        const uint64_t W_op3 = root_of_unity_powers[X3_ind];
-        HEXL_VLOG(
-            3, "W_ops " << (std::vector<uint64_t>{W_op0, W_op1, W_op2, W_op3}));
+        const uint64_t W0 = root_of_unity_powers[X0_ind];
+        const uint64_t W1 = root_of_unity_powers[X1_ind];
+        const uint64_t W2 = root_of_unity_powers[X2_ind];
+        const uint64_t W3 = root_of_unity_powers[X3_ind];
+        HEXL_VLOG(3, "Ws " << (std::vector<uint64_t>{W0, W1, W2, W3}));
 
         HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind, X2_ind,
                                                         X3_ind}));
@@ -143,52 +142,21 @@ const uint64_t W_op = root_of_unity_powers[m + i];
         uint64_t X2 = operand[X2_ind];
         uint64_t X3 = operand[X3_ind];
 
-        // continue;
+        FwdButterflyRadix4(&X0, &X1, &X2, &X3, W1, W2, W3, modulus,
+                           2 * modulus);
 
-        uint64_t a0 = operand[X0_ind];
-        uint64_t a1 = MultiplyMod(operand[X1_ind], W_op1, modulus);
-        uint64_t a2 = MultiplyMod(operand[X2_ind], W_op2, modulus);
-        uint64_t a3 = MultiplyMod(operand[X3_ind], W_op3, modulus);
-
-        HEXL_VLOG(3, "as " << (std::vector<uint64_t>{a0, a1, a2, a3}));
-
-        uint64_t W1_x_x2 = MultiplyMod(W_op1, X2, modulus);
-        uint64_t tmp0 = AddUIntMod(X0, W1_x_x2, modulus);
-        uint64_t tmp2 = SubUIntMod(X0, W1_x_x2, modulus);
-        HEXL_VLOG(3, "W1_x_x2 " << W1_x_x2);
-        HEXL_VLOG(3, "tmp0 " << tmp0);
-        HEXL_VLOG(3, "tmp2 " << tmp2);
-
-        uint64_t W1_x_x3 = MultiplyMod(W_op1, X3, modulus);
-        HEXL_VLOG(3, "W1_x_x4 " << W1_x_x3);
-
-        uint64_t tmp1 = AddUIntMod(X1, W1_x_x3, modulus);
-        uint64_t tmp3 = SubUIntMod(X1, W1_x_x3, modulus);
-        HEXL_VLOG(3, "tmp1 " << tmp1);
-        HEXL_VLOG(3, "tmp3 " << tmp3);
-
-        uint64_t tmp1_x_W2 = MultiplyMod(tmp1, W_op2, modulus);
-        uint64_t Y0 = AddUIntMod(tmp0, tmp1_x_W2, modulus);
-        uint64_t Y1 = SubUIntMod(tmp0, tmp1_x_W2, modulus);
-
-        uint64_t tmp3_x_W2 = MultiplyMod(tmp3, W_op3, modulus);
-        uint64_t Y2 = AddUIntMod(tmp2, tmp3_x_W2, modulus);
-        uint64_t Y3 = SubUIntMod(tmp2, tmp3_x_W2, modulus);
-
-        HEXL_VLOG(3, "Ys " << (std::vector<uint64_t>{Y0, Y1, Y2, Y3}));
-
-        operand[X0_ind] = Y0;
-        operand[X1_ind] = Y1;
-        operand[X2_ind] = Y2;
-        operand[X3_ind] = Y3;
+        operand[X0_ind] = X0;
+        operand[X1_ind] = X1;
+        operand[X2_ind] = X2;
+        operand[X3_ind] = X3;
       }
 
       HEXL_VLOG(3, "inner Intermediate values "
                        << std::vector<uint64_t>(operand, operand + n));
 
-      // W_op1 = (W_op1 * dw) % mod;
-      // W_op2 = (W_op1 * W_op1) % mod;
-      // W_op3 = (W_op1 * W_op2) % mod;
+      // W1 = (W1 * dw) % mod;
+      // W2 = (W1 * W1) % mod;
+      // W3 = (W1 * W2) % mod;
     }
     HEXL_VLOG(3, "outer Intermediate values "
                      << std::vector<uint64_t>(operand, operand + n));
