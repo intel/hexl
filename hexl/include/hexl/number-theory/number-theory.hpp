@@ -140,12 +140,7 @@ inline uint64_t MultiplyModLazy(uint64_t x, uint64_t y_operand,
   HEXL_CHECK(x <= MaximumValue(BitShift),
              "Operand " << x << " exceeds bound " << MaximumValue(BitShift));
 
-  HEXL_VLOG(3, "MultiplyModLazy x " << x << " y_operand " << y_operand
-                                    << " y_barrett_factor "
-                                    << y_barrett_factor);
-
   uint64_t Q = MultiplyUInt64Hi<BitShift>(x, y_barrett_factor);
-  HEXL_VLOG(3, "Q " << Q);
   return y_operand * x - Q * modulus;
 }
 

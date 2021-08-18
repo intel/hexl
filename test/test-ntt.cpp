@@ -256,44 +256,44 @@ TEST_P(NTTTest, API) {
   AssertEqual(input, exp_output);
 
   // In-place lazy NTT
-  // input = input_copy;
-  // ntt.ComputeForward(input.data(), input.data(), 2, 4);
-  // for (auto& elem : input) {
-  //   elem = elem % modulus;
-  // }
-  // // AssertEqual(input, exp_output);
-
-  // // Compute reference
-  // input = input_copy;
-  // ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
-  //                                       ntt.GetRootOfUnityPowers().data());
+  input = input_copy;
+  ntt.ComputeForward(input.data(), input.data(), 2, 4);
+  for (auto& elem : input) {
+    elem = elem % modulus;
+  }
   // AssertEqual(input, exp_output);
 
-  // // Test round-trip
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 1, 1);
-  // ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
-  // AssertEqual(input, input_copy);
+  // Compute reference
+  input = input_copy;
+  ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
+                                        ntt.GetRootOfUnityPowers().data());
+  AssertEqual(input, exp_output);
 
-  // // Test out-of-place forward
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  // AssertEqual(out_buffer, exp_output);
+  // Test round-trip
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 1, 1);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
+  AssertEqual(input, input_copy);
 
-  // // Test out-of-place inverse
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  // ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
-  // AssertEqual(input, input_copy);
+  // Test out-of-place forward
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  AssertEqual(out_buffer, exp_output);
 
-  // // Test out-of-place inverse lazy
-  // input = input_copy;
-  // ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
-  // ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2);
-  // for (auto& elem : input) {
-  //   elem = elem % modulus;
-  // }
-  // AssertEqual(input, input_copy);
+  // Test out-of-place inverse
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 1);
+  AssertEqual(input, input_copy);
+
+  // Test out-of-place inverse lazy
+  input = input_copy;
+  ntt.ComputeForward(out_buffer.data(), input.data(), 2, 1);
+  ntt.ComputeInverse(input.data(), out_buffer.data(), 1, 2);
+  for (auto& elem : input) {
+    elem = elem % modulus;
+  }
+  AssertEqual(input, input_copy);
 }
 
 INSTANTIATE_TEST_SUITE_P(

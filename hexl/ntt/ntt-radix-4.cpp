@@ -51,12 +51,6 @@ void ForwardTransformToBitReverseRadix4(
 
   bool is_power_of_4 = IsPowerOfFour(n);
 
-  LOG(INFO) << "radix 4";
-  // auto n = n;
-  // ReverseVectorBits(operand, n);
-  // HEXL_VLOG(3, "bit-reversed inputs "
-  //                  << std::vector<uint64_t>(operand, operand + n));
-
   // Radix-2 step for non-powers of 4
   if (!is_power_of_4) {
     HEXL_VLOG(3, "Radix 2 step");
@@ -69,6 +63,7 @@ void ForwardTransformToBitReverseRadix4(
 
     uint64_t* X = operand;
     uint64_t* Y = X + t;
+    HEXL_LOOP_UNROLL_4
     for (size_t j = 0; j < t; j++) {
       FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
     }
@@ -92,6 +87,7 @@ void ForwardTransformToBitReverseRadix4(
 
       HEXL_VLOG(3, "t " << t);
 
+      HEXL_LOOP_UNROLL_4
       for (size_t j = 0; j < t; j++) {
         HEXL_VLOG(3, "j " << j << " up to " << t);
         HEXL_VLOG(3, "j1 " << j1);

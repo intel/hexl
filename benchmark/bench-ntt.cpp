@@ -20,7 +20,6 @@ namespace hexl {
 
 //=================================================================
 
-// state[0] is the degree
 static void BM_FwdNTTNative(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
@@ -36,6 +35,27 @@ static void BM_FwdNTTNative(benchmark::State& state) {  //  NOLINT
 }
 
 BENCHMARK(BM_FwdNTTNative)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+//=================================================================
+
+static void BM_FwdNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
+
+  AlignedVector64<uint64_t> input(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  for (auto _ : state) {
+    ForwardTransformToBitReverseRadix4(
+        input.data(), ntt_size, modulus, ntt.GetRootOfUnityPowers().data(),
+        ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_FwdNTTNativeRadix4)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
