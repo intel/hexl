@@ -62,34 +62,32 @@ inline void FwdButterflyLazy(uint64_t* X, uint64_t* Y, uint64_t W,
 
 // Assume X0, X1, X2, X3 in [0, 4q) and return X0, X1, X2, X3 in [0, 4q)
 inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
-                               uint64_t* X3, MultiplyFactor W1,
-                               MultiplyFactor W2, MultiplyFactor W3,
-                               uint64_t modulus, uint64_t twice_modulus) {
+                               uint64_t* X3, uint64_t W1, uint64_t W1_precon,
+                               uint64_t W2, uint64_t W2_precon, uint64_t W3,
+                               uint64_t W3_precon, uint64_t modulus,
+                               uint64_t twice_modulus,
+                               uint64_t four_times_modulus) {
   HEXL_VLOG(3, "FwdButterflyRadix4");
   // HEXL_VLOG(3, "Xs " << (std::vector<uint64_t>{*X0, *X1, *X2, *X3}));
 
   // if (std::getenv("TEST") != nullptr) {
   {
     // Returns Xs in [0, 4p)
-    FwdButterflyLazy(X0, X2, W1.Operand(), W1.BarrettFactor(), modulus,
-                     twice_modulus);
-    FwdButterflyLazy(X1, X3, W1.Operand(), W1.BarrettFactor(), modulus,
-                     twice_modulus);
+    FwdButterflyLazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
+    FwdButterflyLazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
 
     // Returns Xs in [0, 8p)
-    FwdButterflyLazy(X0, X1, W2.Operand(), W2.BarrettFactor(), modulus,
-                     twice_modulus);
-    FwdButterflyLazy(X2, X3, W3.Operand(), W3.BarrettFactor(), modulus,
-                     twice_modulus);
+    FwdButterflyLazy(X0, X1, W2, W2_precon, modulus, twice_modulus);
+    FwdButterflyLazy(X2, X3, W3, W3_precon, modulus, twice_modulus);
 
     // HEXL_VLOG(3, "Xs after second round "
     //                  << (std::vector<uint64_t>{*X0, *X1, *X2, *X3}));
 
     // Reduce Xs to [0, 4p)
-    *X0 = ReduceMod<2>(*X0, 4 * modulus);
-    *X1 = ReduceMod<2>(*X1, 4 * modulus);
-    *X2 = ReduceMod<2>(*X2, 4 * modulus);
-    *X3 = ReduceMod<2>(*X3, 4 * modulus);
+    *X0 = ReduceMod<2>(*X0, four_times_modulus);
+    *X1 = ReduceMod<2>(*X1, four_times_modulus);
+    *X2 = ReduceMod<2>(*X2, four_times_modulus);
+    *X3 = ReduceMod<2>(*X3, four_times_modulus);
 
     return;
   }

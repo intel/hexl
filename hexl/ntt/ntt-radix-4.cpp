@@ -51,10 +51,13 @@ void ForwardTransformToBitReverseRadix4(
 
   bool is_power_of_4 = IsPowerOfFour(n);
 
+  uint64_t twice_modulus = modulus << 1;
+  uint64_t four_times_modulus = modulus << 2;
+
   // Radix-2 step for non-powers of 4
   if (!is_power_of_4) {
     HEXL_VLOG(3, "Radix 2 step");
-    uint64_t twice_modulus = modulus << 1;
+
     size_t t = (n >> 1);
     size_t root_index = 1;
 
@@ -82,67 +85,64 @@ void ForwardTransformToBitReverseRadix4(
     gap >>= 2;
     HEXL_VLOG(3, "gap " << gap);
 
-    for (size_t i = 0; i < m; i++) {
-      HEXL_VLOG(3, "i " << i << " up to " << m);
-      HEXL_VLOG(3, "t " << t);
+    // std::cout << "t " << t << "\n";
 
-      HEXL_LOOP_UNROLL_4
-      for (size_t j = 0; j < t; j++) {
-        HEXL_VLOG(3, "j " << j << " up to " << t);
-        HEXL_VLOG(3, "j1 " << j1);
+    switch (t) {
+      default: {
+        for (size_t i = 0; i < m; i++) {
+          HEXL_VLOG(3, "i " << i << " up to " << m);
+          HEXL_VLOG(3, "t " << t);
 
-        // 4-point NTT butterfly
-        uint64_t X0_ind = j + 4 * i * t;
-        uint64_t X1_ind = X0_ind + gap;
-        uint64_t X2_ind = X0_ind + 2 * gap;
-        uint64_t X3_ind = X0_ind + 3 * gap;
+          HEXL_LOOP_UNROLL_4
+          for (size_t j = 0; j < t; j++) {
+            HEXL_VLOG(3, "j " << j << " up to " << t);
+            HEXL_VLOG(3, "j1 " << j1);
 
-        HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind, X2_ind,
-                                                        X3_ind}));
+            // 4-point NTT butterfly
+            uint64_t X0_ind = j + 4 * i * t;
+            uint64_t X1_ind = X0_ind + gap;
+            uint64_t X2_ind = X0_ind + 2 * gap;
+            uint64_t X3_ind = X0_ind + 3 * gap;
 
-        uint64_t W1_ind = m + i;
-        uint64_t W2_ind = 2 * W1_ind;
-        uint64_t W3_ind = 2 * W1_ind + 1;
-        ++w_idx;
+            HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind,
+                                                            X2_ind, X3_ind}));
 
-        HEXL_VLOG(3,
-                  "Winds " << (std::vector<uint64_t>{W1_ind, W2_ind, W3_ind}));
+            uint64_t W1_ind = m + i;
+            uint64_t W2_ind = 2 * W1_ind;
+            uint64_t W3_ind = 2 * W1_ind + 1;
+            ++w_idx;
 
-        const uint64_t W1 = root_of_unity_powers[W1_ind];
-        const uint64_t W2 = root_of_unity_powers[W2_ind];
-        const uint64_t W3 = root_of_unity_powers[W3_ind];
+            HEXL_VLOG(
+                3, "Winds " << (std::vector<uint64_t>{W1_ind, W2_ind, W3_ind}));
 
-        MultiplyFactor W1_factor(W1, 64, modulus);
-        MultiplyFactor W2_factor(W2, 64, modulus);
-        MultiplyFactor W3_factor(W3, 64, modulus);
+            const uint64_t W1 = root_of_unity_powers[W1_ind];
+            const uint64_t W2 = root_of_unity_powers[W2_ind];
+            const uint64_t W3 = root_of_unity_powers[W3_ind];
 
-        // uint64_t W1_precon = MultiplyFactor(W1, 64, modulus).BarrettFactor();
-        // uint64_t W2_precon = MultiplyFactor(W2, 64, modulus).BarrettFactor();
-        // uint64_t W3_precon = MultiplyFactor(W3, 64, modulus).BarrettFactor();
+            const uint64_t W1_precon = precon_root_of_unity_powers[W1_ind];
+            const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
+            const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
 
-        uint64_t X0 = operand[X0_ind];  //% modulus;
-        uint64_t X1 = operand[X1_ind];  //% modulus;
-        uint64_t X2 = operand[X2_ind];  //% modulus;
-        uint64_t X3 = operand[X3_ind];  // % modulus;
+            // MultiplyFactor W1_factor(W1, 64, modulus);
+            // MultiplyFactor W2_factor(W2, 64, modulus);
+            // MultiplyFactor W3_factor(W3, 64, modulus);
 
-        FwdButterflyRadix4(&X0, &X1, &X2, &X3, W1_factor, W2_factor, W3_factor,
-                           modulus, 2 * modulus);
+            uint64_t* X0 = &operand[X0_ind];
+            uint64_t* X1 = &operand[X1_ind];
+            uint64_t* X2 = &operand[X2_ind];
+            uint64_t* X3 = &operand[X3_ind];
 
-        operand[X0_ind] = X0;
-        operand[X1_ind] = X1;
-        operand[X2_ind] = X2;
-        operand[X3_ind] = X3;
+            FwdButterflyRadix4(X0, X1, X2, X3, W1, W1_precon, W2, W2_precon, W3,
+                               W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+          }
+          w_idx <<= 1;
+        }
       }
-      w_idx = w_idx * 2;
-      // HEXL_VLOG(3, "inner Intermediate values "
-      //                  << std::vector<uint64_t>(operand, operand + n));
     }
-    t >>= 2;
-    // HEXL_VLOG(3, "outer Intermediate values "
-    //                  << std::vector<uint64_t>(operand, operand + n));
-  }
 
-  uint64_t twice_modulus = modulus * 2;
+    t >>= 2;
+  }
 
   if (output_mod_factor == 1) {
     for (size_t i = 0; i < n; ++i) {
