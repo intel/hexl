@@ -78,6 +78,7 @@ void ForwardTransformToBitReverseRadix4(
   HEXL_VLOG(3, "after radix 2 outputs "
                    << std::vector<uint64_t>(operand, operand + n));
 
+  uint64_t w_idx = is_power_of_4 ? 0 : 1;
   for (size_t ldm = is_power_of_4 ? log_n : (log_n - 1); ldm >= 2; ldm -= 2) {
     // for (size_t ldm = 2 + size_t(!is_power_of_4); ldm <= ldn; ldm += 2) {
     size_t m = 1UL << ldm;
@@ -101,11 +102,17 @@ void ForwardTransformToBitReverseRadix4(
         uint64_t X2_ind = X0_ind + 2 * m4;
         uint64_t X3_ind = X0_ind + 3 * m4;
 
-        const uint64_t W0 = root_of_unity_powers[X0_ind];
-        const uint64_t W1 = root_of_unity_powers[X1_ind];
-        const uint64_t W2 = root_of_unity_powers[X2_ind];
-        const uint64_t W3 = root_of_unity_powers[X3_ind];
-        HEXL_VLOG(3, "Ws " << (std::vector<uint64_t>{W0, W1, W2, W3}));
+        uint64_t W1_ind = w_idx + 1;
+        uint64_t W2_ind = 2 * W1_ind;
+        uint64_t W3_ind = 2 * W1_ind + 1;
+        ++w_idx;
+
+        const uint64_t W1 = root_of_unity_powers[W1_ind];
+        const uint64_t W2 = root_of_unity_powers[W2_ind];
+        const uint64_t W3 = root_of_unity_powers[W3_ind];
+        HEXL_VLOG(3,
+                  "Winds " << (std::vector<uint64_t>{W1_ind, W2_ind, W3_ind}));
+        HEXL_VLOG(3, "Ws " << (std::vector<uint64_t>{W1, W2, W3}));
 
         HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind, X2_ind,
                                                         X3_ind}));
