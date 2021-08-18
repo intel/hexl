@@ -80,17 +80,8 @@ void ForwardTransformToBitReverseRadix4(
 
   uint64_t w_idx = is_power_of_4 ? 1 : 2;
   size_t t = (n >> w_idx) >> 1;
-  // for (size_t ldm = is_power_of_4 ? log_n : (log_n - 1); ldm >= 2; ldm -= 2)
-  // {
-
   for (size_t m = is_power_of_4 ? 1 : 2; m < n; m <<= 2) {
-    // size_t m = 1UL << ldm;
-    size_t m4 = m >> 2;  // 4;
-    // HEXL_VLOG(3, "ldm " << ldm);
     HEXL_VLOG(3, "m " << m);
-    HEXL_VLOG(3, "m4 " << m4);
-
-    size_t j1 = 0;
 
     size_t gap = n >> Log2(m);
     gap >>= 2;
@@ -105,14 +96,6 @@ void ForwardTransformToBitReverseRadix4(
         HEXL_VLOG(3, "j " << j << " up to " << t);
         HEXL_VLOG(3, "j1 " << j1);
 
-        // for (size_t j = 0; j < m4; j++) {
-
-        // LOG(INFO) << "r1 " << r1;
-
-        // for (size_t r = 0; r < n; r += m) {
-        // HEXL_VLOG(3, "r " << r << " up to " << n << " incrementing by " <<
-        // m);
-
         // 4-point NTT butterfly
         uint64_t X0_ind = j + 4 * i * t;
         uint64_t X1_ind = X0_ind + gap;
@@ -122,8 +105,7 @@ void ForwardTransformToBitReverseRadix4(
         HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind, X2_ind,
                                                         X3_ind}));
 
-        uint64_t W1_ind = m + i;  // * m4 + j;
-        // uint64_t W1_ind = w_idx;
+        uint64_t W1_ind = m + i;
         uint64_t W2_ind = 2 * W1_ind;
         uint64_t W3_ind = 2 * W1_ind + 1;
         ++w_idx;
@@ -134,16 +116,6 @@ void ForwardTransformToBitReverseRadix4(
         const uint64_t W1 = root_of_unity_powers[W1_ind];
         const uint64_t W2 = root_of_unity_powers[W2_ind];
         const uint64_t W3 = root_of_unity_powers[W3_ind];
-
-        // HEXL_VLOG(3, "Ws " << (std::vector<uint64_t>{W1, W2, W3}));
-
-        // HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind,
-        // X2_ind,
-        //                                                 X3_ind}));
-
-        // HEXL_VLOG(3, "Xs " << (std::vector<uint64_t>{
-        //                  operand[X0_ind], operand[X1_ind], operand[X2_ind],
-        //                  operand[X3_ind]}));
 
         uint64_t X0 = operand[X0_ind] % modulus;
         uint64_t X1 = operand[X1_ind] % modulus;
@@ -159,8 +131,6 @@ void ForwardTransformToBitReverseRadix4(
         operand[X3_ind] = X3;
       }
       w_idx = w_idx * 2;
-      j1 += (t << 2);
-
       // HEXL_VLOG(3, "inner Intermediate values "
       //                  << std::vector<uint64_t>(operand, operand + n));
     }
