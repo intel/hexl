@@ -18,7 +18,7 @@
 /// @param[in] expr The expression to be logged
 #define HEXL_CHECK(cond, expr)                              \
   if (!(cond)) {                                            \
-    LOG(ERROR) << expr << " in fuction: " << __FUNCTION__   \
+    LOG(ERROR) << expr << " in function: " << __FUNCTION__  \
                << " in file: " __FILE__ << ":" << __LINE__; \
     throw std::runtime_error("Error. Check log output");    \
   }

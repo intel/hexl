@@ -66,7 +66,7 @@ TEST(NTT, bad_input) {
   EXPECT_ANY_THROW(ntt.ComputeForward(input.data(), input.data(), 2, 123));
   init_inputs();
 
-  // Inverse tranform
+  // Inverse transform
 
   // Bad input
   EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), nullptr, 1, 1));

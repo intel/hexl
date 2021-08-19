@@ -12,6 +12,10 @@ repos:
       - id: mixed-line-ending
       - id: check-byte-order-marker
       - id: check-yaml
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.1.6
+    hooks:
+      - id: typos
   - repo: local
     hooks:
       - id: clang-format-10
