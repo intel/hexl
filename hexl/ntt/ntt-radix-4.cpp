@@ -88,32 +88,87 @@ void ForwardTransformToBitReverseRadix4(
     // std::cout << "t " << t << "\n";
 
     switch (t) {
+      case 1: {
+        for (size_t i = 0; i < m; i++) {
+          uint64_t X0_ind = 4 * i * t;
+          uint64_t X1_ind = X0_ind + gap;
+          uint64_t X2_ind = X0_ind + 2 * gap;
+          uint64_t X3_ind = X0_ind + 3 * gap;
+
+          uint64_t W1_ind = m + i;
+          uint64_t W2_ind = 2 * W1_ind;
+          uint64_t W3_ind = 2 * W1_ind + 1;
+
+          const uint64_t W1 = root_of_unity_powers[W1_ind];
+          const uint64_t W2 = root_of_unity_powers[W2_ind];
+          const uint64_t W3 = root_of_unity_powers[W3_ind];
+
+          const uint64_t W1_precon = precon_root_of_unity_powers[W1_ind];
+          const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
+          const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
+
+          uint64_t* X0 = &operand[X0_ind];
+          uint64_t* X1 = &operand[X1_ind];
+          uint64_t* X2 = &operand[X2_ind];
+          uint64_t* X3 = &operand[X3_ind];
+
+          FwdButterflyRadix4(X0, X1, X2, X3, W1, W1_precon, W2, W2_precon, W3,
+                             W3_precon, modulus, twice_modulus,
+                             four_times_modulus);
+        }
+        break;
+      }
+      case 4: {
+        for (size_t i = 0; i < m; i++) {
+          uint64_t X0_ind = 4 * i * t;
+          uint64_t X1_ind = X0_ind + gap;
+          uint64_t X2_ind = X0_ind + 2 * gap;
+          uint64_t X3_ind = X0_ind + 3 * gap;
+
+          uint64_t W1_ind = m + i;
+          uint64_t W2_ind = 2 * W1_ind;
+          uint64_t W3_ind = 2 * W1_ind + 1;
+
+          const uint64_t W1 = root_of_unity_powers[W1_ind];
+          const uint64_t W2 = root_of_unity_powers[W2_ind];
+          const uint64_t W3 = root_of_unity_powers[W3_ind];
+
+          const uint64_t W1_precon = precon_root_of_unity_powers[W1_ind];
+          const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
+          const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
+
+          uint64_t* X0 = &operand[X0_ind];
+          uint64_t* X1 = &operand[X1_ind];
+          uint64_t* X2 = &operand[X2_ind];
+          uint64_t* X3 = &operand[X3_ind];
+
+          FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                             W2_precon, W3, W3_precon, modulus, twice_modulus,
+                             four_times_modulus);
+          FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                             W2_precon, W3, W3_precon, modulus, twice_modulus,
+                             four_times_modulus);
+          FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                             W2_precon, W3, W3_precon, modulus, twice_modulus,
+                             four_times_modulus);
+          FwdButterflyRadix4(X0, X1, X2, X3, W1, W1_precon, W2, W2_precon, W3,
+                             W3_precon, modulus, twice_modulus,
+                             four_times_modulus);
+        }
+        break;
+      }
       default: {
         for (size_t i = 0; i < m; i++) {
-          HEXL_VLOG(3, "i " << i << " up to " << m);
-          HEXL_VLOG(3, "t " << t);
-
           HEXL_LOOP_UNROLL_4
           for (size_t j = 0; j < t; j++) {
-            HEXL_VLOG(3, "j " << j << " up to " << t);
-            HEXL_VLOG(3, "j1 " << j1);
-
-            // 4-point NTT butterfly
             uint64_t X0_ind = j + 4 * i * t;
             uint64_t X1_ind = X0_ind + gap;
             uint64_t X2_ind = X0_ind + 2 * gap;
             uint64_t X3_ind = X0_ind + 3 * gap;
 
-            HEXL_VLOG(3, "Xinds " << (std::vector<uint64_t>{X0_ind, X1_ind,
-                                                            X2_ind, X3_ind}));
-
             uint64_t W1_ind = m + i;
             uint64_t W2_ind = 2 * W1_ind;
             uint64_t W3_ind = 2 * W1_ind + 1;
-            ++w_idx;
-
-            HEXL_VLOG(
-                3, "Winds " << (std::vector<uint64_t>{W1_ind, W2_ind, W3_ind}));
 
             const uint64_t W1 = root_of_unity_powers[W1_ind];
             const uint64_t W2 = root_of_unity_powers[W2_ind];
@@ -122,10 +177,6 @@ void ForwardTransformToBitReverseRadix4(
             const uint64_t W1_precon = precon_root_of_unity_powers[W1_ind];
             const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
             const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
-
-            // MultiplyFactor W1_factor(W1, 64, modulus);
-            // MultiplyFactor W2_factor(W2, 64, modulus);
-            // MultiplyFactor W3_factor(W3, 64, modulus);
 
             uint64_t* X0 = &operand[X0_ind];
             uint64_t* X1 = &operand[X1_ind];
@@ -136,11 +187,9 @@ void ForwardTransformToBitReverseRadix4(
                                W3_precon, modulus, twice_modulus,
                                four_times_modulus);
           }
-          w_idx <<= 1;
         }
       }
     }
-
     t >>= 2;
   }
 
