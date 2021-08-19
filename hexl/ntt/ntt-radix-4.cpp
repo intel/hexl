@@ -44,11 +44,6 @@ void ForwardTransformToBitReverseRadix4(
   HEXL_VLOG(3, "root_of_unity_powers " << std::vector<uint64_t>(
                    root_of_unity_powers, root_of_unity_powers + n));
 
-  uint64_t root_of_unity = root_of_unity_powers[1];
-
-  uint64_t log_n = Log2(n);
-  HEXL_VLOG(3, "log_n " << log_n);
-
   bool is_power_of_4 = IsPowerOfFour(n);
 
   uint64_t twice_modulus = modulus << 1;
@@ -59,7 +54,6 @@ void ForwardTransformToBitReverseRadix4(
     HEXL_VLOG(3, "Radix 2 step");
 
     size_t t = (n >> 1);
-    size_t root_index = 1;
 
     const uint64_t W = root_of_unity_powers[1];
     const uint64_t W_precon = precon_root_of_unity_powers[1];
@@ -78,6 +72,7 @@ void ForwardTransformToBitReverseRadix4(
 
   uint64_t w_idx = is_power_of_4 ? 1 : 2;
   size_t t = (n >> w_idx) >> 1;
+  // uint64_t gap = (n >> w_idx) >> 2;
   for (size_t m = is_power_of_4 ? 1 : 2; m < n; m <<= 2) {
     HEXL_VLOG(3, "m " << m);
 
@@ -85,39 +80,7 @@ void ForwardTransformToBitReverseRadix4(
     gap >>= 2;
     HEXL_VLOG(3, "gap " << gap);
 
-    // std::cout << "t " << t << "\n";
-
     switch (t) {
-      case 1: {
-        for (size_t i = 0; i < m; i++) {
-          uint64_t X0_ind = 4 * i * t;
-          uint64_t X1_ind = X0_ind + gap;
-          uint64_t X2_ind = X0_ind + 2 * gap;
-          uint64_t X3_ind = X0_ind + 3 * gap;
-
-          uint64_t W1_ind = m + i;
-          uint64_t W2_ind = 2 * W1_ind;
-          uint64_t W3_ind = 2 * W1_ind + 1;
-
-          const uint64_t W1 = root_of_unity_powers[W1_ind];
-          const uint64_t W2 = root_of_unity_powers[W2_ind];
-          const uint64_t W3 = root_of_unity_powers[W3_ind];
-
-          const uint64_t W1_precon = precon_root_of_unity_powers[W1_ind];
-          const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
-          const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
-
-          uint64_t* X0 = &operand[X0_ind];
-          uint64_t* X1 = &operand[X1_ind];
-          uint64_t* X2 = &operand[X2_ind];
-          uint64_t* X3 = &operand[X3_ind];
-
-          FwdButterflyRadix4(X0, X1, X2, X3, W1, W1_precon, W2, W2_precon, W3,
-                             W3_precon, modulus, twice_modulus,
-                             four_times_modulus);
-        }
-        break;
-      }
       case 4: {
         for (size_t i = 0; i < m; i++) {
           uint64_t X0_ind = 4 * i * t;
@@ -157,10 +120,41 @@ void ForwardTransformToBitReverseRadix4(
         }
         break;
       }
+      case 1: {
+        for (size_t i = 0; i < m; i++) {
+          uint64_t X0_ind = 4 * i * t;
+          uint64_t X1_ind = X0_ind + gap;
+          uint64_t X2_ind = X0_ind + 2 * gap;
+          uint64_t X3_ind = X0_ind + 3 * gap;
+
+          uint64_t W1_ind = m + i;
+          uint64_t W2_ind = 2 * W1_ind;
+          uint64_t W3_ind = 2 * W1_ind + 1;
+
+          const uint64_t W1 = root_of_unity_powers[W1_ind];
+          const uint64_t W2 = root_of_unity_powers[W2_ind];
+          const uint64_t W3 = root_of_unity_powers[W3_ind];
+
+          const uint64_t W1_precon = precon_root_of_unity_powers[W1_ind];
+          const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
+          const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
+
+          uint64_t* X0 = &operand[X0_ind];
+          uint64_t* X1 = &operand[X1_ind];
+          uint64_t* X2 = &operand[X2_ind];
+          uint64_t* X3 = &operand[X3_ind];
+
+          FwdButterflyRadix4(X0, X1, X2, X3, W1, W1_precon, W2, W2_precon, W3,
+                             W3_precon, modulus, twice_modulus,
+                             four_times_modulus);
+        }
+        break;
+      }
+
       default: {
         for (size_t i = 0; i < m; i++) {
           HEXL_LOOP_UNROLL_4
-          for (size_t j = 0; j < t; j++) {
+          for (size_t j = 0; j < t; j += 16) {
             uint64_t X0_ind = j + 4 * i * t;
             uint64_t X1_ind = X0_ind + gap;
             uint64_t X2_ind = X0_ind + 2 * gap;
@@ -183,14 +177,60 @@ void ForwardTransformToBitReverseRadix4(
             uint64_t* X2 = &operand[X2_ind];
             uint64_t* X3 = &operand[X3_ind];
 
-            FwdButterflyRadix4(X0, X1, X2, X3, W1, W1_precon, W2, W2_precon, W3,
-                               W3_precon, modulus, twice_modulus,
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
+                               four_times_modulus);
+            FwdButterflyRadix4(X0++, X1++, X2++, X3++, W1, W1_precon, W2,
+                               W2_precon, W3, W3_precon, modulus, twice_modulus,
                                four_times_modulus);
           }
         }
       }
     }
     t >>= 2;
+    // gap <<= 2;
   }
 
   if (output_mod_factor == 1) {
