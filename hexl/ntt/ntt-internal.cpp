@@ -205,64 +205,54 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
     std::memcpy(result, operand, m_degree * sizeof(uint64_t));
   }
 
-  // #ifdef HEXL_HAS_AVX512IFMA
-  //   if (has_avx512ifma && (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16)))
-  //   {
-  //     const uint64_t* root_of_unity_powers =
-  //     GetAVX512RootOfUnityPowers().data(); const uint64_t*
-  //     precon_root_of_unity_powers =
-  //         GetAVX512Precon52RootOfUnityPowers().data();
+#ifdef HEXL_HAS_AVX512IFMA
+  if (has_avx512ifma && (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16))) {
+    const uint64_t* root_of_unity_powers = GetAVX512RootOfUnityPowers().data();
+    const uint64_t* precon_root_of_unity_powers =
+        GetAVX512Precon52RootOfUnityPowers().data();
 
-  //     HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA FwdNTT");
-  //     ForwardTransformToBitReverseAVX512<s_ifma_shift_bits>(
-  //         result, m_degree, m_q, root_of_unity_powers,
-  //         precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
-  //     return;
-  //   }
-  // #endif
+    HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA FwdNTT");
+    ForwardTransformToBitReverseAVX512<s_ifma_shift_bits>(
+        result, m_degree, m_q, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    return;
+  }
+#endif
 
-  // #ifdef HEXL_HAS_AVX512DQ
-  //   if (has_avx512dq && m_degree >= 16) {
-  //     if (m_q < s_max_fwd_32_modulus) {
-  //       HEXL_VLOG(3, "Calling 32-bit AVX512-DQ FwdNTT");
-  //       const uint64_t* root_of_unity_powers =
-  //           GetAVX512RootOfUnityPowers().data();
-  //       const uint64_t* precon_root_of_unity_powers =
-  //           GetAVX512Precon32RootOfUnityPowers().data();
-  //       ForwardTransformToBitReverseAVX512<32>(
-  //           result, m_degree, m_q, root_of_unity_powers,
-  //           precon_root_of_unity_powers, input_mod_factor,
-  //           output_mod_factor);
-  //     } else {
-  //       HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdNTT");
-  //       const uint64_t* root_of_unity_powers =
-  //           GetAVX512RootOfUnityPowers().data();
-  //       const uint64_t* precon_root_of_unity_powers =
-  //           GetAVX512Precon64RootOfUnityPowers().data();
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq && m_degree >= 16) {
+    if (m_q < s_max_fwd_32_modulus) {
+      HEXL_VLOG(3, "Calling 32-bit AVX512-DQ FwdNTT");
+      const uint64_t* root_of_unity_powers =
+          GetAVX512RootOfUnityPowers().data();
+      const uint64_t* precon_root_of_unity_powers =
+          GetAVX512Precon32RootOfUnityPowers().data();
+      ForwardTransformToBitReverseAVX512<32>(
+          result, m_degree, m_q, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    } else {
+      HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdNTT");
+      const uint64_t* root_of_unity_powers =
+          GetAVX512RootOfUnityPowers().data();
+      const uint64_t* precon_root_of_unity_powers =
+          GetAVX512Precon64RootOfUnityPowers().data();
 
-  //       ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
-  //           result, m_degree, m_q, root_of_unity_powers,
-  //           precon_root_of_unity_powers, input_mod_factor,
-  //           output_mod_factor);
-  //     }
-  //     return;
-  //   }
-  // #endif
+      ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
+          result, m_degree, m_q, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
+    }
+    return;
+  }
+#endif
 
   HEXL_VLOG(3, "Calling 64-bit default FwdNTT");
   const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
   const uint64_t* precon_root_of_unity_powers =
       GetPrecon64RootOfUnityPowers().data();
 
-  if (std::getenv("RAD4") == nullptr) {
-    ForwardTransformToBitReverse64(result, m_degree, m_q, root_of_unity_powers,
-                                   precon_root_of_unity_powers,
-                                   input_mod_factor, output_mod_factor);
-  } else {
-    ForwardTransformToBitReverseRadix4(
-        result, m_degree, m_q, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
-  }
+  ForwardTransformToBitReverse64(result, m_degree, m_q, root_of_unity_powers,
+                                 precon_root_of_unity_powers, input_mod_factor,
+                                 output_mod_factor);
 }
 
 void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,

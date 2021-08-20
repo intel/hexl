@@ -60,7 +60,6 @@ inline uint64_t MSB(uint64_t input) {
 
 #define HEXL_LOOP_UNROLL_4 _Pragma("clang loop unroll_count(4)")
 #define HEXL_LOOP_UNROLL_8 _Pragma("clang loop unroll_count(8)")
-#define HEXL_LOOP_UNROLL_16 _Pragma("clang loop unroll_count(16)")
 
 #endif
 
