@@ -429,42 +429,42 @@ void EltwiseMultModAVX512IFMAIntLoop(__m512i* vp_result,
                                      __m512i v_neg_mod, __m512i v_twice_mod,
                                      uint64_t n) {
   switch (n) {
-    case 1024:
+    case 1024: {
       EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 1024>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
-
-    case 2048:
+    }
+    case 2048: {
       EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 2048>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
-
-    case 4096:
+    }
+    case 4096: {
       EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 4096>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
-
-    case 8192:
+    }
+    case 8192: {
       EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 8192>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
-
-    case 16384:
+    }
+    case 16384: {
       EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 16384>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
-
-    case 32768:
+    }
+    case 32768: {
       EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 32768>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
-
+    }
     default:
       EltwiseMultModAVX512IFMAIntLoopDefault<BitShift, InputModFactor>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
@@ -533,8 +533,6 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
     switch (N) {
       // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
       // which requires a compile-time constant for the shift.
-      // Hence we shift on
-
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(47, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(48, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(49, InputModFactor)

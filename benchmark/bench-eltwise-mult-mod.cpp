@@ -106,7 +106,7 @@ BENCHMARK(BM_EltwiseMultModAVX512Float)
 static void BM_EltwiseMultModAVX512DQInt(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t input_mod_factor = state.range(1);
-  size_t modulus = 100;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   AlignedVector64<uint64_t> input1(input_size, 1);
   AlignedVector64<uint64_t> input2(input_size, 2);
