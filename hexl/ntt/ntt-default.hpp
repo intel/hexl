@@ -42,8 +42,8 @@ inline void FwdButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
   HEXL_VLOG(3, "Output X " << *X << ", Y " << *Y);
 }
 
-// Assume X, Y in [0, np) and return X', Y' in [0, (n+2)p)
-// such that X' = X + WY mod p and Y' = X - WY mod p
+// Assume X, Y in [0, n*q) and return X', Y' in [0, (n+2)*q)
+// such that X' = X + WY mod q and Y' = X - WY mod q
 inline void FwdButterflyLazy(uint64_t* X, uint64_t* Y, uint64_t W,
                              uint64_t W_precon, uint64_t modulus,
                              uint64_t twice_modulus) {
@@ -69,15 +69,15 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
                                uint64_t four_times_modulus) {
   HEXL_VLOG(3, "FwdButterflyRadix4");
 
-  // Returns Xs in [0, 6p)
+  // Returns Xs in [0, 6q)
   FwdButterflyLazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
   FwdButterflyLazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
 
-  // Returns Xs in [0, 8p)
+  // Returns Xs in [0, 8q)
   FwdButterflyLazy(X0, X1, W2, W2_precon, modulus, twice_modulus);
   FwdButterflyLazy(X2, X3, W3, W3_precon, modulus, twice_modulus);
 
-  // Reduce Xs to [0, 4p)
+  // Reduce Xs to [0, 4q)
   *X0 = ReduceMod<2>(*X0, four_times_modulus);
   *X1 = ReduceMod<2>(*X1, four_times_modulus);
   *X2 = ReduceMod<2>(*X2, four_times_modulus);
