@@ -365,8 +365,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
         _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, c3, v_neg_mod);
 
     // Reduce result to [0, q)
-    v_result =
-        _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus, &v_twice_mod);
+    v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
     _mm512_storeu_si512(vp_result, v_result);
 
     ++vp_operand1;
@@ -413,8 +412,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
         _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, c3, v_neg_mod);
 
     // Reduce result to [0, q)
-    v_result =
-        _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus, &v_twice_mod);
+    v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
     _mm512_storeu_si512(vp_result, v_result);
 
     ++vp_operand1;
