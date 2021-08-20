@@ -462,8 +462,8 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
                                uint64_t modulus) {
   HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 || InputModFactor == 4,
              "Require InputModFactor = 1, 2, or 4")
-  // HEXL_CHECK(InputModFactor * modulus > (1ULL << 50),
-  //  "Require InputModFactor * modulus > (1ULL << 50)")
+  HEXL_CHECK(InputModFactor * modulus > (1ULL << 50),
+             "Require InputModFactor * modulus > (1ULL << 50)")
   HEXL_CHECK(InputModFactor * modulus < (1ULL << 63),
              "Require InputModFactor * modulus < (1ULL << 63)");
   HEXL_CHECK(modulus < (1ULL << 62), "Require  modulus < (1ULL << 62)");

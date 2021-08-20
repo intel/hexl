@@ -13,7 +13,11 @@ namespace hexl {
 TEST(NumberTheory, Log2) {
   ASSERT_EQ(0, Log2(1));
   ASSERT_EQ(1, Log2(2));
+  ASSERT_EQ(1, Log2(3));
   ASSERT_EQ(2, Log2(4));
+  ASSERT_EQ(2, Log2(5));
+  ASSERT_EQ(2, Log2(6));
+  ASSERT_EQ(2, Log2(7));
   ASSERT_EQ(3, Log2(8));
   ASSERT_EQ(4, Log2(16));
   ASSERT_EQ(5, Log2(32));
@@ -21,7 +25,9 @@ TEST(NumberTheory, Log2) {
   ASSERT_EQ(7, Log2(128));
   ASSERT_EQ(8, Log2(256));
   ASSERT_EQ(9, Log2(512));
+  ASSERT_EQ(9, Log2(1023));
   ASSERT_EQ(10, Log2(1024));
+  ASSERT_EQ(10, Log2(1025));
   ASSERT_EQ(11, Log2(2048));
   ASSERT_EQ(12, Log2(4096));
   ASSERT_EQ(13, Log2(8192));
