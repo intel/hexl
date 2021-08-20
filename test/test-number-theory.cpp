@@ -131,6 +131,21 @@ TEST(NumberTheory, IsPowerOfTwo) {
   }
 }
 
+TEST(NumberTheory, IsPowerOfFour) {
+  std::vector<uint64_t> powers_of_four{1,    4,    16,    64,   256,
+                                       1024, 4096, 16384, 65536};
+  std::vector<uint64_t> not_powers_of_four{0, 2,  3,  5,  7,    8,
+                                           9, 31, 32, 33, 1025, 4095};
+
+  for (auto power_of_four : powers_of_four) {
+    EXPECT_TRUE(IsPowerOfFour(power_of_four));
+  }
+
+  for (auto not_power_of_four : not_powers_of_four) {
+    EXPECT_FALSE(IsPowerOfFour(not_power_of_four));
+  }
+}
+
 TEST(NumberTheory, IsPrimitiveRoot) {
   uint64_t modulus = 11;
   ASSERT_TRUE(IsPrimitiveRoot(10, 2, modulus));
