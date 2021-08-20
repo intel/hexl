@@ -80,10 +80,15 @@ void ForwardTransformToBitReverseRadix4(
     gap >>= 2;
     HEXL_VLOG(3, "gap " << gap);
 
+    size_t X0_offset = 0;
+
     switch (t) {
       case 4: {
         for (size_t i = 0; i < m; i++) {
-          uint64_t* X0 = operand + 4 * i * t;
+          if (i != 0) {
+            X0_offset += 4 * t;
+          }
+          uint64_t* X0 = operand + X0_offset;
           uint64_t* X1 = X0 + t;
           uint64_t* X2 = X0 + 2 * t;
           uint64_t* X3 = X0 + 3 * t;
@@ -117,7 +122,10 @@ void ForwardTransformToBitReverseRadix4(
       }
       case 1: {
         for (size_t i = 0; i < m; i++) {
-          uint64_t* X0 = operand + 4 * i * t;
+          if (i != 0) {
+            X0_offset += 4 * t;
+          }
+          uint64_t* X0 = operand + X0_offset;
           uint64_t* X1 = X0 + t;
           uint64_t* X2 = X0 + 2 * t;
           uint64_t* X3 = X0 + 3 * t;
@@ -142,7 +150,10 @@ void ForwardTransformToBitReverseRadix4(
       }
       default: {
         for (size_t i = 0; i < m; i++) {
-          uint64_t* X0 = operand + 4 * i * t;
+          if (i != 0) {
+            X0_offset += 4 * t;
+          }
+          uint64_t* X0 = operand + X0_offset;
           uint64_t* X1 = X0 + t;
           uint64_t* X2 = X0 + 2 * t;
           uint64_t* X3 = X0 + 3 * t;
