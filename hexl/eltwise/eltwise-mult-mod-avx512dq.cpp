@@ -611,7 +611,6 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
         break;
       }
       default: {
-        LOG(INFO) << "Default";
         EltwiseMultModAVX512DQIntLoopDefault<InputModFactor>(
             vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n, N);

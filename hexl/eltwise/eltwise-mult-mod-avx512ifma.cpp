@@ -57,189 +57,189 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = loop_count; i > 0; --i) {
-    __m512i x1 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y1 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x2 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y2 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x3 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y3 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x4 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y4 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x5 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y5 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x6 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y6 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x7 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y7 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x8 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y8 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x9 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y9 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x10 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y10 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x11 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y11 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x12 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y12 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x13 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y13 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x14 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y14 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x15 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y15 = _mm512_loadu_si512(vp_operand2++);
-    __m512i x16 = _mm512_loadu_si512(vp_operand1++);
-    __m512i y16 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_1 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_1 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_2 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_2 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_3 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_3 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_4 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_4 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_5 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_5 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_6 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_6 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_7 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_7 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_8 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_8 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_9 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_9 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_10 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_10 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_11 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_11 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_12 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_12 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_13 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_13 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_14 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_14 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_15 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_15 = _mm512_loadu_si512(vp_operand2++);
+    __m512i v_op1_16 = _mm512_loadu_si512(vp_operand1++);
+    __m512i v_op2_16 = _mm512_loadu_si512(vp_operand2++);
 
-    x1 = _mm512_hexl_small_mod_epu64<InputModFactor>(x1, v_modulus,
-                                                     &v_twice_mod);
-    x2 = _mm512_hexl_small_mod_epu64<InputModFactor>(x2, v_modulus,
-                                                     &v_twice_mod);
-    x3 = _mm512_hexl_small_mod_epu64<InputModFactor>(x3, v_modulus,
-                                                     &v_twice_mod);
-    x4 = _mm512_hexl_small_mod_epu64<InputModFactor>(x4, v_modulus,
-                                                     &v_twice_mod);
-    x5 = _mm512_hexl_small_mod_epu64<InputModFactor>(x5, v_modulus,
-                                                     &v_twice_mod);
-    x6 = _mm512_hexl_small_mod_epu64<InputModFactor>(x6, v_modulus,
-                                                     &v_twice_mod);
-    x7 = _mm512_hexl_small_mod_epu64<InputModFactor>(x7, v_modulus,
-                                                     &v_twice_mod);
-    x8 = _mm512_hexl_small_mod_epu64<InputModFactor>(x8, v_modulus,
-                                                     &v_twice_mod);
-    x9 = _mm512_hexl_small_mod_epu64<InputModFactor>(x9, v_modulus,
-                                                     &v_twice_mod);
-    x10 = _mm512_hexl_small_mod_epu64<InputModFactor>(x10, v_modulus,
-                                                      &v_twice_mod);
-    x11 = _mm512_hexl_small_mod_epu64<InputModFactor>(x11, v_modulus,
-                                                      &v_twice_mod);
-    x12 = _mm512_hexl_small_mod_epu64<InputModFactor>(x12, v_modulus,
-                                                      &v_twice_mod);
-    x13 = _mm512_hexl_small_mod_epu64<InputModFactor>(x13, v_modulus,
-                                                      &v_twice_mod);
-    x14 = _mm512_hexl_small_mod_epu64<InputModFactor>(x14, v_modulus,
-                                                      &v_twice_mod);
-    x15 = _mm512_hexl_small_mod_epu64<InputModFactor>(x15, v_modulus,
-                                                      &v_twice_mod);
-    x16 = _mm512_hexl_small_mod_epu64<InputModFactor>(x16, v_modulus,
-                                                      &v_twice_mod);
+    v_op1_1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_1, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_2, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_3 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_3, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_4 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_4, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_5 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_5, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_6 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_6, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_7 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_7, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_8 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_8, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_9 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_9, v_modulus,
+                                                          &v_twice_mod);
+    v_op1_10 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_10, v_modulus,
+                                                           &v_twice_mod);
+    v_op1_11 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_11, v_modulus,
+                                                           &v_twice_mod);
+    v_op1_12 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_12, v_modulus,
+                                                           &v_twice_mod);
+    v_op1_13 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_13, v_modulus,
+                                                           &v_twice_mod);
+    v_op1_14 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_14, v_modulus,
+                                                           &v_twice_mod);
+    v_op1_15 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_15, v_modulus,
+                                                           &v_twice_mod);
+    v_op1_16 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1_16, v_modulus,
+                                                           &v_twice_mod);
 
-    y1 = _mm512_hexl_small_mod_epu64<InputModFactor>(y1, v_modulus,
-                                                     &v_twice_mod);
-    y2 = _mm512_hexl_small_mod_epu64<InputModFactor>(y2, v_modulus,
-                                                     &v_twice_mod);
-    y3 = _mm512_hexl_small_mod_epu64<InputModFactor>(y3, v_modulus,
-                                                     &v_twice_mod);
-    y4 = _mm512_hexl_small_mod_epu64<InputModFactor>(y4, v_modulus,
-                                                     &v_twice_mod);
-    y5 = _mm512_hexl_small_mod_epu64<InputModFactor>(y5, v_modulus,
-                                                     &v_twice_mod);
-    y6 = _mm512_hexl_small_mod_epu64<InputModFactor>(y6, v_modulus,
-                                                     &v_twice_mod);
-    y7 = _mm512_hexl_small_mod_epu64<InputModFactor>(y7, v_modulus,
-                                                     &v_twice_mod);
-    y8 = _mm512_hexl_small_mod_epu64<InputModFactor>(y8, v_modulus,
-                                                     &v_twice_mod);
-    y9 = _mm512_hexl_small_mod_epu64<InputModFactor>(y9, v_modulus,
-                                                     &v_twice_mod);
-    y10 = _mm512_hexl_small_mod_epu64<InputModFactor>(y10, v_modulus,
-                                                      &v_twice_mod);
-    y11 = _mm512_hexl_small_mod_epu64<InputModFactor>(y11, v_modulus,
-                                                      &v_twice_mod);
-    y12 = _mm512_hexl_small_mod_epu64<InputModFactor>(y12, v_modulus,
-                                                      &v_twice_mod);
-    y13 = _mm512_hexl_small_mod_epu64<InputModFactor>(y13, v_modulus,
-                                                      &v_twice_mod);
-    y14 = _mm512_hexl_small_mod_epu64<InputModFactor>(y14, v_modulus,
-                                                      &v_twice_mod);
-    y15 = _mm512_hexl_small_mod_epu64<InputModFactor>(y15, v_modulus,
-                                                      &v_twice_mod);
-    y16 = _mm512_hexl_small_mod_epu64<InputModFactor>(y16, v_modulus,
-                                                      &v_twice_mod);
+    v_op2_1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_1, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_2, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_3 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_3, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_4 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_4, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_5 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_5, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_6 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_6, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_7 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_7, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_8 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_8, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_9 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_9, v_modulus,
+                                                          &v_twice_mod);
+    v_op2_10 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_10, v_modulus,
+                                                           &v_twice_mod);
+    v_op2_11 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_11, v_modulus,
+                                                           &v_twice_mod);
+    v_op2_12 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_12, v_modulus,
+                                                           &v_twice_mod);
+    v_op2_13 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_13, v_modulus,
+                                                           &v_twice_mod);
+    v_op2_14 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_14, v_modulus,
+                                                           &v_twice_mod);
+    v_op2_15 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_15, v_modulus,
+                                                           &v_twice_mod);
+    v_op2_16 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2_16, v_modulus,
+                                                           &v_twice_mod);
 
-    __m512i v_prod_hi1 = _mm512_hexl_mulhi_epi<52>(x1, y1);
-    __m512i v_prod_hi2 = _mm512_hexl_mulhi_epi<52>(x2, y2);
-    __m512i v_prod_hi3 = _mm512_hexl_mulhi_epi<52>(x3, y3);
-    __m512i v_prod_hi4 = _mm512_hexl_mulhi_epi<52>(x4, y4);
-    __m512i v_prod_hi5 = _mm512_hexl_mulhi_epi<52>(x5, y5);
-    __m512i v_prod_hi6 = _mm512_hexl_mulhi_epi<52>(x6, y6);
-    __m512i v_prod_hi7 = _mm512_hexl_mulhi_epi<52>(x7, y7);
-    __m512i v_prod_hi8 = _mm512_hexl_mulhi_epi<52>(x8, y8);
-    __m512i v_prod_hi9 = _mm512_hexl_mulhi_epi<52>(x9, y9);
-    __m512i v_prod_hi10 = _mm512_hexl_mulhi_epi<52>(x10, y10);
-    __m512i v_prod_hi11 = _mm512_hexl_mulhi_epi<52>(x11, y11);
-    __m512i v_prod_hi12 = _mm512_hexl_mulhi_epi<52>(x12, y12);
-    __m512i v_prod_hi13 = _mm512_hexl_mulhi_epi<52>(x13, y13);
-    __m512i v_prod_hi14 = _mm512_hexl_mulhi_epi<52>(x14, y14);
-    __m512i v_prod_hi15 = _mm512_hexl_mulhi_epi<52>(x15, y15);
-    __m512i v_prod_hi16 = _mm512_hexl_mulhi_epi<52>(x16, y16);
+    __m512i v_prod_hi_1 = _mm512_hexl_mulhi_epi<52>(v_op1_1, v_op2_1);
+    __m512i v_prod_hi_2 = _mm512_hexl_mulhi_epi<52>(v_op1_2, v_op2_2);
+    __m512i v_prod_hi_3 = _mm512_hexl_mulhi_epi<52>(v_op1_3, v_op2_3);
+    __m512i v_prod_hi_4 = _mm512_hexl_mulhi_epi<52>(v_op1_4, v_op2_4);
+    __m512i v_prod_hi_5 = _mm512_hexl_mulhi_epi<52>(v_op1_5, v_op2_5);
+    __m512i v_prod_hi_6 = _mm512_hexl_mulhi_epi<52>(v_op1_6, v_op2_6);
+    __m512i v_prod_hi_7 = _mm512_hexl_mulhi_epi<52>(v_op1_7, v_op2_7);
+    __m512i v_prod_hi_8 = _mm512_hexl_mulhi_epi<52>(v_op1_8, v_op2_8);
+    __m512i v_prod_hi_9 = _mm512_hexl_mulhi_epi<52>(v_op1_9, v_op2_9);
+    __m512i v_prod_hi_10 = _mm512_hexl_mulhi_epi<52>(v_op1_10, v_op2_10);
+    __m512i v_prod_hi_11 = _mm512_hexl_mulhi_epi<52>(v_op1_11, v_op2_11);
+    __m512i v_prod_hi_12 = _mm512_hexl_mulhi_epi<52>(v_op1_12, v_op2_12);
+    __m512i v_prod_hi_13 = _mm512_hexl_mulhi_epi<52>(v_op1_13, v_op2_13);
+    __m512i v_prod_hi_14 = _mm512_hexl_mulhi_epi<52>(v_op1_14, v_op2_14);
+    __m512i v_prod_hi_15 = _mm512_hexl_mulhi_epi<52>(v_op1_15, v_op2_15);
+    __m512i v_prod_hi_16 = _mm512_hexl_mulhi_epi<52>(v_op1_16, v_op2_16);
 
-    __m512i v_prod_lo1 = _mm512_hexl_mullo_epi<52>(x1, y1);
-    __m512i v_prod_lo2 = _mm512_hexl_mullo_epi<52>(x2, y2);
-    __m512i v_prod_lo3 = _mm512_hexl_mullo_epi<52>(x3, y3);
-    __m512i v_prod_lo4 = _mm512_hexl_mullo_epi<52>(x4, y4);
-    __m512i v_prod_lo5 = _mm512_hexl_mullo_epi<52>(x5, y5);
-    __m512i v_prod_lo6 = _mm512_hexl_mullo_epi<52>(x6, y6);
-    __m512i v_prod_lo7 = _mm512_hexl_mullo_epi<52>(x7, y7);
-    __m512i v_prod_lo8 = _mm512_hexl_mullo_epi<52>(x8, y8);
-    __m512i v_prod_lo9 = _mm512_hexl_mullo_epi<52>(x9, y9);
-    __m512i v_prod_lo10 = _mm512_hexl_mullo_epi<52>(x10, y10);
-    __m512i v_prod_lo11 = _mm512_hexl_mullo_epi<52>(x11, y11);
-    __m512i v_prod_lo12 = _mm512_hexl_mullo_epi<52>(x12, y12);
-    __m512i v_prod_lo13 = _mm512_hexl_mullo_epi<52>(x13, y13);
-    __m512i v_prod_lo14 = _mm512_hexl_mullo_epi<52>(x14, y14);
-    __m512i v_prod_lo15 = _mm512_hexl_mullo_epi<52>(x15, y15);
-    __m512i v_prod_lo16 = _mm512_hexl_mullo_epi<52>(x16, y16);
+    __m512i v_prod_lo_1 = _mm512_hexl_mullo_epi<52>(v_op1_1, v_op2_1);
+    __m512i v_prod_lo_2 = _mm512_hexl_mullo_epi<52>(v_op1_2, v_op2_2);
+    __m512i v_prod_lo_3 = _mm512_hexl_mullo_epi<52>(v_op1_3, v_op2_3);
+    __m512i v_prod_lo_4 = _mm512_hexl_mullo_epi<52>(v_op1_4, v_op2_4);
+    __m512i v_prod_lo_5 = _mm512_hexl_mullo_epi<52>(v_op1_5, v_op2_5);
+    __m512i v_prod_lo_6 = _mm512_hexl_mullo_epi<52>(v_op1_6, v_op2_6);
+    __m512i v_prod_lo_7 = _mm512_hexl_mullo_epi<52>(v_op1_7, v_op2_7);
+    __m512i v_prod_lo_8 = _mm512_hexl_mullo_epi<52>(v_op1_8, v_op2_8);
+    __m512i v_prod_lo_9 = _mm512_hexl_mullo_epi<52>(v_op1_9, v_op2_9);
+    __m512i v_prod_lo_10 = _mm512_hexl_mullo_epi<52>(v_op1_10, v_op2_10);
+    __m512i v_prod_lo_11 = _mm512_hexl_mullo_epi<52>(v_op1_11, v_op2_11);
+    __m512i v_prod_lo_12 = _mm512_hexl_mullo_epi<52>(v_op1_12, v_op2_12);
+    __m512i v_prod_lo_13 = _mm512_hexl_mullo_epi<52>(v_op1_13, v_op2_13);
+    __m512i v_prod_lo_14 = _mm512_hexl_mullo_epi<52>(v_op1_14, v_op2_14);
+    __m512i v_prod_lo_15 = _mm512_hexl_mullo_epi<52>(v_op1_15, v_op2_15);
+    __m512i v_prod_lo_16 = _mm512_hexl_mullo_epi<52>(v_op1_16, v_op2_16);
 
-    __m512i c1_lo1 = _mm512_srli_epi64(v_prod_lo1, Nm1);
-    __m512i c1_lo2 = _mm512_srli_epi64(v_prod_lo2, Nm1);
-    __m512i c1_lo3 = _mm512_srli_epi64(v_prod_lo3, Nm1);
-    __m512i c1_lo4 = _mm512_srli_epi64(v_prod_lo4, Nm1);
-    __m512i c1_lo5 = _mm512_srli_epi64(v_prod_lo5, Nm1);
-    __m512i c1_lo6 = _mm512_srli_epi64(v_prod_lo6, Nm1);
-    __m512i c1_lo7 = _mm512_srli_epi64(v_prod_lo7, Nm1);
-    __m512i c1_lo8 = _mm512_srli_epi64(v_prod_lo8, Nm1);
-    __m512i c1_lo9 = _mm512_srli_epi64(v_prod_lo9, Nm1);
-    __m512i c1_lo10 = _mm512_srli_epi64(v_prod_lo10, Nm1);
-    __m512i c1_lo11 = _mm512_srli_epi64(v_prod_lo11, Nm1);
-    __m512i c1_lo12 = _mm512_srli_epi64(v_prod_lo12, Nm1);
-    __m512i c1_lo13 = _mm512_srli_epi64(v_prod_lo13, Nm1);
-    __m512i c1_lo14 = _mm512_srli_epi64(v_prod_lo14, Nm1);
-    __m512i c1_lo15 = _mm512_srli_epi64(v_prod_lo15, Nm1);
-    __m512i c1_lo16 = _mm512_srli_epi64(v_prod_lo16, Nm1);
+    __m512i c1_lo_1 = _mm512_srli_epi64(v_prod_lo_1, Nm1);
+    __m512i c1_lo_2 = _mm512_srli_epi64(v_prod_lo_2, Nm1);
+    __m512i c1_lo_3 = _mm512_srli_epi64(v_prod_lo_3, Nm1);
+    __m512i c1_lo_4 = _mm512_srli_epi64(v_prod_lo_4, Nm1);
+    __m512i c1_lo_5 = _mm512_srli_epi64(v_prod_lo_5, Nm1);
+    __m512i c1_lo_6 = _mm512_srli_epi64(v_prod_lo_6, Nm1);
+    __m512i c1_lo_7 = _mm512_srli_epi64(v_prod_lo_7, Nm1);
+    __m512i c1_lo_8 = _mm512_srli_epi64(v_prod_lo_8, Nm1);
+    __m512i c1_lo_9 = _mm512_srli_epi64(v_prod_lo_9, Nm1);
+    __m512i c1_lo_10 = _mm512_srli_epi64(v_prod_lo_10, Nm1);
+    __m512i c1_lo_11 = _mm512_srli_epi64(v_prod_lo_11, Nm1);
+    __m512i c1_lo_12 = _mm512_srli_epi64(v_prod_lo_12, Nm1);
+    __m512i c1_lo_13 = _mm512_srli_epi64(v_prod_lo_13, Nm1);
+    __m512i c1_lo_14 = _mm512_srli_epi64(v_prod_lo_14, Nm1);
+    __m512i c1_lo_15 = _mm512_srli_epi64(v_prod_lo_15, Nm1);
+    __m512i c1_lo_16 = _mm512_srli_epi64(v_prod_lo_16, Nm1);
 
-    __m512i c1_hi1 = _mm512_srli_epi64(v_prod_hi1, HiShift);
-    __m512i c1_hi2 = _mm512_srli_epi64(v_prod_hi2, HiShift);
-    __m512i c1_hi3 = _mm512_srli_epi64(v_prod_hi3, HiShift);
-    __m512i c1_hi4 = _mm512_srli_epi64(v_prod_hi4, HiShift);
-    __m512i c1_hi5 = _mm512_srli_epi64(v_prod_hi5, HiShift);
-    __m512i c1_hi6 = _mm512_srli_epi64(v_prod_hi6, HiShift);
-    __m512i c1_hi7 = _mm512_srli_epi64(v_prod_hi7, HiShift);
-    __m512i c1_hi8 = _mm512_srli_epi64(v_prod_hi8, HiShift);
-    __m512i c1_hi9 = _mm512_srli_epi64(v_prod_hi9, HiShift);
-    __m512i c1_hi10 = _mm512_srli_epi64(v_prod_hi10, HiShift);
-    __m512i c1_hi11 = _mm512_srli_epi64(v_prod_hi11, HiShift);
-    __m512i c1_hi12 = _mm512_srli_epi64(v_prod_hi12, HiShift);
-    __m512i c1_hi13 = _mm512_srli_epi64(v_prod_hi13, HiShift);
-    __m512i c1_hi14 = _mm512_srli_epi64(v_prod_hi14, HiShift);
-    __m512i c1_hi15 = _mm512_srli_epi64(v_prod_hi15, HiShift);
-    __m512i c1_hi16 = _mm512_srli_epi64(v_prod_hi16, HiShift);
+    __m512i c1_hi_1 = _mm512_slli_epi64(v_prod_hi_1, HiShift);
+    __m512i c1_hi_2 = _mm512_slli_epi64(v_prod_hi_2, HiShift);
+    __m512i c1_hi_3 = _mm512_slli_epi64(v_prod_hi_3, HiShift);
+    __m512i c1_hi_4 = _mm512_slli_epi64(v_prod_hi_4, HiShift);
+    __m512i c1_hi_5 = _mm512_slli_epi64(v_prod_hi_5, HiShift);
+    __m512i c1_hi_6 = _mm512_slli_epi64(v_prod_hi_6, HiShift);
+    __m512i c1_hi_7 = _mm512_slli_epi64(v_prod_hi_7, HiShift);
+    __m512i c1_hi_8 = _mm512_slli_epi64(v_prod_hi_8, HiShift);
+    __m512i c1_hi_9 = _mm512_slli_epi64(v_prod_hi_9, HiShift);
+    __m512i c1_hi_10 = _mm512_slli_epi64(v_prod_hi_10, HiShift);
+    __m512i c1_hi_11 = _mm512_slli_epi64(v_prod_hi_11, HiShift);
+    __m512i c1_hi_12 = _mm512_slli_epi64(v_prod_hi_12, HiShift);
+    __m512i c1_hi_13 = _mm512_slli_epi64(v_prod_hi_13, HiShift);
+    __m512i c1_hi_14 = _mm512_slli_epi64(v_prod_hi_14, HiShift);
+    __m512i c1_hi_15 = _mm512_slli_epi64(v_prod_hi_15, HiShift);
+    __m512i c1_hi_16 = _mm512_slli_epi64(v_prod_hi_16, HiShift);
 
-    __m512i c1_1 = _mm512_or_epi64(c1_lo1, c1_hi1);
-    __m512i c1_2 = _mm512_or_epi64(c1_lo2, c1_hi2);
-    __m512i c1_3 = _mm512_or_epi64(c1_lo3, c1_hi3);
-    __m512i c1_4 = _mm512_or_epi64(c1_lo4, c1_hi4);
-    __m512i c1_5 = _mm512_or_epi64(c1_lo5, c1_hi5);
-    __m512i c1_6 = _mm512_or_epi64(c1_lo6, c1_hi6);
-    __m512i c1_7 = _mm512_or_epi64(c1_lo7, c1_hi7);
-    __m512i c1_8 = _mm512_or_epi64(c1_lo8, c1_hi8);
-    __m512i c1_9 = _mm512_or_epi64(c1_lo9, c1_hi9);
-    __m512i c1_10 = _mm512_or_epi64(c1_lo10, c1_hi10);
-    __m512i c1_11 = _mm512_or_epi64(c1_lo11, c1_hi11);
-    __m512i c1_12 = _mm512_or_epi64(c1_lo12, c1_hi12);
-    __m512i c1_13 = _mm512_or_epi64(c1_lo13, c1_hi13);
-    __m512i c1_14 = _mm512_or_epi64(c1_lo14, c1_hi14);
-    __m512i c1_15 = _mm512_or_epi64(c1_lo15, c1_hi15);
-    __m512i c1_16 = _mm512_or_epi64(c1_lo16, c1_hi16);
+    __m512i c1_1 = _mm512_or_epi64(c1_lo_1, c1_hi_1);
+    __m512i c1_2 = _mm512_or_epi64(c1_lo_2, c1_hi_2);
+    __m512i c1_3 = _mm512_or_epi64(c1_lo_3, c1_hi_3);
+    __m512i c1_4 = _mm512_or_epi64(c1_lo_4, c1_hi_4);
+    __m512i c1_5 = _mm512_or_epi64(c1_lo_5, c1_hi_5);
+    __m512i c1_6 = _mm512_or_epi64(c1_lo_6, c1_hi_6);
+    __m512i c1_7 = _mm512_or_epi64(c1_lo_7, c1_hi_7);
+    __m512i c1_8 = _mm512_or_epi64(c1_lo_8, c1_hi_8);
+    __m512i c1_9 = _mm512_or_epi64(c1_lo_9, c1_hi_9);
+    __m512i c1_10 = _mm512_or_epi64(c1_lo_10, c1_hi_10);
+    __m512i c1_11 = _mm512_or_epi64(c1_lo_11, c1_hi_11);
+    __m512i c1_12 = _mm512_or_epi64(c1_lo_12, c1_hi_12);
+    __m512i c1_13 = _mm512_or_epi64(c1_lo_13, c1_hi_13);
+    __m512i c1_14 = _mm512_or_epi64(c1_lo_14, c1_hi_14);
+    __m512i c1_15 = _mm512_or_epi64(c1_lo_15, c1_hi_15);
+    __m512i c1_16 = _mm512_or_epi64(c1_lo_16, c1_hi_16);
 
     __m512i c3_1 = _mm512_hexl_mulhi_epi<52>(c1_1, v_barr_lo);
     __m512i c3_2 = _mm512_hexl_mulhi_epi<52>(c1_2, v_barr_lo);
@@ -259,78 +259,87 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
     __m512i c3_16 = _mm512_hexl_mulhi_epi<52>(c1_16, v_barr_lo);
 
     __m512i c4_1 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo1, c3_1, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_1, c3_1, v_neg_mod);
     __m512i c4_2 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo2, c3_2, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_2, c3_2, v_neg_mod);
     __m512i c4_3 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo3, c3_3, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_3, c3_3, v_neg_mod);
     __m512i c4_4 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo4, c3_4, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_4, c3_4, v_neg_mod);
     __m512i c4_5 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo5, c3_5, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_5, c3_5, v_neg_mod);
     __m512i c4_6 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo6, c3_6, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_6, c3_6, v_neg_mod);
     __m512i c4_7 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo7, c3_7, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_7, c3_7, v_neg_mod);
     __m512i c4_8 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo8, c3_8, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_8, c3_8, v_neg_mod);
     __m512i c4_9 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo9, c3_9, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_9, c3_9, v_neg_mod);
     __m512i c4_10 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo10, c3_10, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_10, c3_10, v_neg_mod);
     __m512i c4_11 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo11, c3_11, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_11, c3_11, v_neg_mod);
     __m512i c4_12 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo12, c3_12, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_12, c3_12, v_neg_mod);
     __m512i c4_13 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo13, c3_13, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_13, c3_13, v_neg_mod);
     __m512i c4_14 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo14, c3_14, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_14, c3_14, v_neg_mod);
     __m512i c4_15 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo15, c3_15, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_15, c3_15, v_neg_mod);
     __m512i c4_16 =
-        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo16, c3_16, v_neg_mod);
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_16, c3_16, v_neg_mod);
 
-    __m512i vr1 = _mm512_hexl_small_mod_epu64<2>(c4_1, v_modulus, &v_twice_mod);
-    __m512i vr2 = _mm512_hexl_small_mod_epu64<2>(c4_2, v_modulus, &v_twice_mod);
-    __m512i vr3 = _mm512_hexl_small_mod_epu64<2>(c4_3, v_modulus, &v_twice_mod);
-    __m512i vr4 = _mm512_hexl_small_mod_epu64<2>(c4_4, v_modulus, &v_twice_mod);
-    __m512i vr5 = _mm512_hexl_small_mod_epu64<2>(c4_5, v_modulus, &v_twice_mod);
-    __m512i vr6 = _mm512_hexl_small_mod_epu64<2>(c4_6, v_modulus, &v_twice_mod);
-    __m512i vr7 = _mm512_hexl_small_mod_epu64<2>(c4_7, v_modulus, &v_twice_mod);
-    __m512i vr8 = _mm512_hexl_small_mod_epu64<2>(c4_8, v_modulus, &v_twice_mod);
-    __m512i vr9 = _mm512_hexl_small_mod_epu64<2>(c4_9, v_modulus, &v_twice_mod);
-    __m512i vr10 =
+    // TODO(fboemer): remote v_twice-mod agruent?
+
+    __m512i v_result_1 = _mm512_hexl_small_mod_epu64<2>(c4_1, v_modulus);
+    __m512i v_result_2 = _mm512_hexl_small_mod_epu64<2>(c4_2, v_modulus);
+    __m512i v_result_3 =
+        _mm512_hexl_small_mod_epu64<2>(c4_3, v_modulus, &v_twice_mod);
+    __m512i v_result_4 =
+        _mm512_hexl_small_mod_epu64<2>(c4_4, v_modulus, &v_twice_mod);
+    __m512i v_result_5 =
+        _mm512_hexl_small_mod_epu64<2>(c4_5, v_modulus, &v_twice_mod);
+    __m512i v_result_6 =
+        _mm512_hexl_small_mod_epu64<2>(c4_6, v_modulus, &v_twice_mod);
+    __m512i v_result_7 =
+        _mm512_hexl_small_mod_epu64<2>(c4_7, v_modulus, &v_twice_mod);
+    __m512i v_result_8 =
+        _mm512_hexl_small_mod_epu64<2>(c4_8, v_modulus, &v_twice_mod);
+    __m512i v_result_9 =
+        _mm512_hexl_small_mod_epu64<2>(c4_9, v_modulus, &v_twice_mod);
+    __m512i v_result_10 =
         _mm512_hexl_small_mod_epu64<2>(c4_10, v_modulus, &v_twice_mod);
-    __m512i vr11 =
+    __m512i v_result_11 =
         _mm512_hexl_small_mod_epu64<2>(c4_11, v_modulus, &v_twice_mod);
-    __m512i vr12 =
+    __m512i v_result_12 =
         _mm512_hexl_small_mod_epu64<2>(c4_12, v_modulus, &v_twice_mod);
-    __m512i vr13 =
+    __m512i v_result_13 =
         _mm512_hexl_small_mod_epu64<2>(c4_13, v_modulus, &v_twice_mod);
-    __m512i vr14 =
+    __m512i v_result_14 =
         _mm512_hexl_small_mod_epu64<2>(c4_14, v_modulus, &v_twice_mod);
-    __m512i vr15 =
+    __m512i v_result_15 =
         _mm512_hexl_small_mod_epu64<2>(c4_15, v_modulus, &v_twice_mod);
-    __m512i vr16 =
+    __m512i v_result_16 =
         _mm512_hexl_small_mod_epu64<2>(c4_16, v_modulus, &v_twice_mod);
 
-    _mm512_storeu_si512(vp_result++, vr1);
-    _mm512_storeu_si512(vp_result++, vr2);
-    _mm512_storeu_si512(vp_result++, vr3);
-    _mm512_storeu_si512(vp_result++, vr4);
-    _mm512_storeu_si512(vp_result++, vr5);
-    _mm512_storeu_si512(vp_result++, vr6);
-    _mm512_storeu_si512(vp_result++, vr7);
-    _mm512_storeu_si512(vp_result++, vr8);
-    _mm512_storeu_si512(vp_result++, vr9);
-    _mm512_storeu_si512(vp_result++, vr10);
-    _mm512_storeu_si512(vp_result++, vr11);
-    _mm512_storeu_si512(vp_result++, vr12);
-    _mm512_storeu_si512(vp_result++, vr13);
-    _mm512_storeu_si512(vp_result++, vr14);
-    _mm512_storeu_si512(vp_result++, vr15);
-    _mm512_storeu_si512(vp_result++, vr16);
+    _mm512_storeu_si512(vp_result++, v_result_1);
+    _mm512_storeu_si512(vp_result++, v_result_2);
+    _mm512_storeu_si512(vp_result++, v_result_3);
+    _mm512_storeu_si512(vp_result++, v_result_4);
+    _mm512_storeu_si512(vp_result++, v_result_5);
+    _mm512_storeu_si512(vp_result++, v_result_6);
+    _mm512_storeu_si512(vp_result++, v_result_7);
+    _mm512_storeu_si512(vp_result++, v_result_8);
+    _mm512_storeu_si512(vp_result++, v_result_9);
+    _mm512_storeu_si512(vp_result++, v_result_10);
+    _mm512_storeu_si512(vp_result++, v_result_11);
+    _mm512_storeu_si512(vp_result++, v_result_12);
+    _mm512_storeu_si512(vp_result++, v_result_13);
+    _mm512_storeu_si512(vp_result++, v_result_14);
+    _mm512_storeu_si512(vp_result++, v_result_15);
+    _mm512_storeu_si512(vp_result++, v_result_16);
   }
 }
 
@@ -346,17 +355,17 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
-    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
-    v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-        v_operand1, v_modulus, &v_twice_mod);
+    __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
+    v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
+                                                        &v_twice_mod);
 
-    __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
-    v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-        v_operand2, v_modulus, &v_twice_mod);
+    __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
+    v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
+                                                        &v_twice_mod);
 
     // Compute product
-    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_operand1, v_operand2);
-    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_operand1, v_operand2);
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
     __m512i c1_lo =
         _mm512_srli_epi64(v_prod_lo, static_cast<unsigned int>(N - 1ULL));
@@ -390,26 +399,26 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i v_barr_lo, __m512i v_modulus, __m512i v_neg_mod,
     __m512i v_twice_mod, uint64_t n, uint64_t bit_shift) {
   uint64_t N = bit_shift;
+  unsigned int Nm1 = static_cast<unsigned int>(N - 1);
+  unsigned int HiShift = static_cast<unsigned int>(53 - N);
 
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
-    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
-    v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-        v_operand1, v_modulus, &v_twice_mod);
+    __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
+    v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
+                                                        &v_twice_mod);
 
-    __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
-    v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-        v_operand2, v_modulus, &v_twice_mod);
+    __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
+    v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
+                                                        &v_twice_mod);
 
     // Compute product
-    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_operand1, v_operand2);
-    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_operand1, v_operand2);
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
-    __m512i c1_lo =
-        _mm512_srli_epi64(v_prod_lo, static_cast<unsigned int>(N - 1ULL));
-    __m512i c1_hi = _mm512_slli_epi64(
-        v_prod_hi, static_cast<unsigned int>(52ULL - (N - 1ULL)));
+    __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, Nm1);
+    __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, HiShift);
     __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
     // L - N + 1 == 52, so we only need high 52 bits
@@ -437,49 +446,42 @@ void EltwiseMultModAVX512IFMAIntLoop(__m512i* vp_result,
                                      __m512i v_barr_lo, __m512i v_modulus,
                                      __m512i v_neg_mod, __m512i v_twice_mod,
                                      uint64_t n) {
-  LOG(INFO) << "EltwiseMultModAVX512IFMAIntLoop BitShift " << BitShift;
   switch (n) {
-      // case 1024:
-      //   EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor,
-      //   1024>(
-      //       vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-      //       v_neg_mod, v_twice_mod);
-      //   break;
+    case 1024:
+      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 1024>(
+          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
+          v_twice_mod);
+      break;
 
-      // case 2048:
-      //   EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor,
-      //   2048>(
-      //       vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-      //       v_neg_mod, v_twice_mod);
-      //   break;
+    case 2048:
+      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 2048>(
+          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
+          v_twice_mod);
+      break;
 
-      // case 4096:
-      //   EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor,
-      //   4096>(
-      //       vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-      //       v_neg_mod, v_twice_mod);
-      //   break;
+    case 4096:
+      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 4096>(
+          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
+          v_twice_mod);
+      break;
 
-      // case 8192:
-      //   EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor,
-      //   8192>(
-      //       vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-      //       v_neg_mod, v_twice_mod);
-      //   break;
+    case 8192:
+      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 8192>(
+          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
+          v_twice_mod);
+      break;
 
-      // case 16384:
-      //   EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor,
-      //   16384>(
-      //       vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-      //       v_neg_mod, v_twice_mod);
-      //   break;
+    case 16384:
+      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 16384>(
+          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
+          v_twice_mod);
+      break;
 
-      // case 32768:
-      //   EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor,
-      //   32768>(
-      //       vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-      //       v_neg_mod, v_twice_mod);
-      //   break;
+    case 32768:
+      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 32768>(
+          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
+          v_twice_mod);
+      break;
 
     default:
       EltwiseMultModAVX512IFMAIntLoopDefault<BitShift, InputModFactor>(
@@ -518,8 +520,6 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
     result += n_mod_8;
     n -= n_mod_8;
   }
-
-  LOG(INFO) << "mod " << modulus;
 
   const uint64_t logmod = MSB(modulus);
 
