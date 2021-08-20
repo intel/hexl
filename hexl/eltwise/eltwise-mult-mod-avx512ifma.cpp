@@ -291,38 +291,22 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
     __m512i c4_16 =
         _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo_16, c3_16, v_neg_mod);
 
-    // TODO(fboemer): remote v_twice-mod agruent?
-
     __m512i v_result_1 = _mm512_hexl_small_mod_epu64<2>(c4_1, v_modulus);
     __m512i v_result_2 = _mm512_hexl_small_mod_epu64<2>(c4_2, v_modulus);
-    __m512i v_result_3 =
-        _mm512_hexl_small_mod_epu64<2>(c4_3, v_modulus, &v_twice_mod);
-    __m512i v_result_4 =
-        _mm512_hexl_small_mod_epu64<2>(c4_4, v_modulus, &v_twice_mod);
-    __m512i v_result_5 =
-        _mm512_hexl_small_mod_epu64<2>(c4_5, v_modulus, &v_twice_mod);
-    __m512i v_result_6 =
-        _mm512_hexl_small_mod_epu64<2>(c4_6, v_modulus, &v_twice_mod);
-    __m512i v_result_7 =
-        _mm512_hexl_small_mod_epu64<2>(c4_7, v_modulus, &v_twice_mod);
-    __m512i v_result_8 =
-        _mm512_hexl_small_mod_epu64<2>(c4_8, v_modulus, &v_twice_mod);
-    __m512i v_result_9 =
-        _mm512_hexl_small_mod_epu64<2>(c4_9, v_modulus, &v_twice_mod);
-    __m512i v_result_10 =
-        _mm512_hexl_small_mod_epu64<2>(c4_10, v_modulus, &v_twice_mod);
-    __m512i v_result_11 =
-        _mm512_hexl_small_mod_epu64<2>(c4_11, v_modulus, &v_twice_mod);
-    __m512i v_result_12 =
-        _mm512_hexl_small_mod_epu64<2>(c4_12, v_modulus, &v_twice_mod);
-    __m512i v_result_13 =
-        _mm512_hexl_small_mod_epu64<2>(c4_13, v_modulus, &v_twice_mod);
-    __m512i v_result_14 =
-        _mm512_hexl_small_mod_epu64<2>(c4_14, v_modulus, &v_twice_mod);
-    __m512i v_result_15 =
-        _mm512_hexl_small_mod_epu64<2>(c4_15, v_modulus, &v_twice_mod);
-    __m512i v_result_16 =
-        _mm512_hexl_small_mod_epu64<2>(c4_16, v_modulus, &v_twice_mod);
+    __m512i v_result_3 = _mm512_hexl_small_mod_epu64<2>(c4_3, v_modulus);
+    __m512i v_result_4 = _mm512_hexl_small_mod_epu64<2>(c4_4, v_modulus);
+    __m512i v_result_5 = _mm512_hexl_small_mod_epu64<2>(c4_5, v_modulus);
+    __m512i v_result_6 = _mm512_hexl_small_mod_epu64<2>(c4_6, v_modulus);
+    __m512i v_result_7 = _mm512_hexl_small_mod_epu64<2>(c4_7, v_modulus);
+    __m512i v_result_8 = _mm512_hexl_small_mod_epu64<2>(c4_8, v_modulus);
+    __m512i v_result_9 = _mm512_hexl_small_mod_epu64<2>(c4_9, v_modulus);
+    __m512i v_result_10 = _mm512_hexl_small_mod_epu64<2>(c4_10, v_modulus);
+    __m512i v_result_11 = _mm512_hexl_small_mod_epu64<2>(c4_11, v_modulus);
+    __m512i v_result_12 = _mm512_hexl_small_mod_epu64<2>(c4_12, v_modulus);
+    __m512i v_result_13 = _mm512_hexl_small_mod_epu64<2>(c4_13, v_modulus);
+    __m512i v_result_14 = _mm512_hexl_small_mod_epu64<2>(c4_14, v_modulus);
+    __m512i v_result_15 = _mm512_hexl_small_mod_epu64<2>(c4_15, v_modulus);
+    __m512i v_result_16 = _mm512_hexl_small_mod_epu64<2>(c4_16, v_modulus);
 
     _mm512_storeu_si512(vp_result++, v_result_1);
     _mm512_storeu_si512(vp_result++, v_result_2);
@@ -539,7 +523,33 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
 
   // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
   // which requires a compile-time constant for the shift.
+  // Hence we shift on
   switch (N) {
+    // Smaller bit shifts are uncommon.
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(15)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(16)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(17)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(18)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(19)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(20)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(21)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(22)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(23)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(24)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(25)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(26)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(27)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(28)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(29)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(31)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(32)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(33)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(34)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(35)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(36)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(37)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(38)
+    GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(39)
     GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(40)
     GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(41)
     GENERATE_ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(42)
