@@ -72,13 +72,8 @@ void ForwardTransformToBitReverseRadix4(
 
   uint64_t w_idx = is_power_of_4 ? 1 : 2;
   size_t t = (n >> w_idx) >> 1;
-  // uint64_t gap = (n >> w_idx) >> 2;
   for (size_t m = is_power_of_4 ? 1 : 2; m < n; m <<= 2) {
     HEXL_VLOG(3, "m " << m);
-
-    size_t gap = n >> Log2(m);
-    gap >>= 2;
-    HEXL_VLOG(3, "gap " << gap);
 
     size_t X0_offset = 0;
 
@@ -225,7 +220,6 @@ void ForwardTransformToBitReverseRadix4(
       }
     }
     t >>= 2;
-    // gap <<= 2;
   }
 
   if (output_mod_factor == 1) {
