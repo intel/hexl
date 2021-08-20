@@ -310,16 +310,10 @@ TEST(NTT, FwdNTT_AVX512_64) {
         input[i] = distrib(gen);
       }
       std::vector<std::uint64_t> input_avx = input;
-      std::vector<std::uint64_t> input_radix_4 = input;
       std::vector<std::uint64_t> input_avx_lazy = input;
 
       ForwardTransformToBitReverse64(
           input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
-          ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
-
-      // Radix 4
-      ForwardTransformToBitReverseRadix4(
-          input_radix_4.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
           ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
       ForwardTransformToBitReverseAVX512<64>(
@@ -337,7 +331,6 @@ TEST(NTT, FwdNTT_AVX512_64) {
       }
 
       ASSERT_EQ(input, input_avx);
-      ASSERT_EQ(input, input_radix_4);
       ASSERT_EQ(input, input_avx_lazy);
     }
   }
