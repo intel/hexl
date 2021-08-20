@@ -337,7 +337,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
     __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
     // Computes result in [0, 4q)
-    v_result = _mm512_add_epi64(v_prod_lo, v_result);
+    v_result = _mm512_sub_epi64(v_prod_lo, v_result);
 
     // Reduce result to [0, q)
     v_result =
