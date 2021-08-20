@@ -83,10 +83,10 @@ void ForwardTransformToBitReverseRadix4(
     switch (t) {
       case 4: {
         for (size_t i = 0; i < m; i++) {
-          uint64_t* X0 = operand + 16 * i;
-          uint64_t* X1 = X0 + gap;
-          uint64_t* X2 = X0 + 2 * gap;
-          uint64_t* X3 = X0 + 3 * gap;
+          uint64_t* X0 = operand + 4 * i * t;
+          uint64_t* X1 = X0 + t;
+          uint64_t* X2 = X0 + 2 * t;
+          uint64_t* X3 = X0 + 3 * t;
 
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
@@ -117,10 +117,10 @@ void ForwardTransformToBitReverseRadix4(
       }
       case 1: {
         for (size_t i = 0; i < m; i++) {
-          uint64_t* X0 = operand + 4 * i;
-          uint64_t* X1 = X0 + gap;
-          uint64_t* X2 = X0 + 2 * gap;
-          uint64_t* X3 = X0 + 3 * gap;
+          uint64_t* X0 = operand + 4 * i * t;
+          uint64_t* X1 = X0 + t;
+          uint64_t* X2 = X0 + 2 * t;
+          uint64_t* X3 = X0 + 3 * t;
 
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
@@ -142,10 +142,10 @@ void ForwardTransformToBitReverseRadix4(
       }
       default: {
         for (size_t i = 0; i < m; i++) {
-          uint64_t* X0 = &operand[4 * i * t];
-          uint64_t* X1 = &operand[4 * i * t + gap];
-          uint64_t* X2 = &operand[4 * i * t + 2 * gap];
-          uint64_t* X3 = &operand[4 * i * t + 3 * gap];
+          uint64_t* X0 = operand + 4 * i * t;
+          uint64_t* X1 = X0 + t;
+          uint64_t* X2 = X0 + 2 * t;
+          uint64_t* X3 = X0 + 3 * t;
 
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
