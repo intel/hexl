@@ -36,38 +36,19 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
     if (modulus < (1ULL << 50)) {
-      if (has_avx512ifma) {
-        switch (input_mod_factor) {
-          case 1:
-            EltwiseMultModAVX512IFMAInt<1>(result, operand1, operand2, n,
-                                           modulus);
-            break;
-          case 2:
-            EltwiseMultModAVX512IFMAInt<2>(result, operand1, operand2, n,
-                                           modulus);
-            break;
-          case 4:
-            EltwiseMultModAVX512IFMAInt<4>(result, operand1, operand2, n,
-                                           modulus);
-            break;
-        }
-        return;
-      } else {
-        switch (input_mod_factor) {
-          case 1:
-            EltwiseMultModAVX512Float<1>(result, operand1, operand2, n,
-                                         modulus);
-            break;
-          case 2:
-            EltwiseMultModAVX512Float<2>(result, operand1, operand2, n,
-                                         modulus);
-            break;
-          case 4:
-            EltwiseMultModAVX512Float<4>(result, operand1, operand2, n,
-                                         modulus);
-            break;
-        }
-        return;
+      // EltwiseMultModAVX512IFMA has similar performance to
+      // EltwiseMultModAVX512Float, but requires the AVX512IFMA instruction set,
+      // so we prefer to use EltwiseMultModAVX512Float.
+      switch (input_mod_factor) {
+        case 1:
+          EltwiseMultModAVX512Float<1>(result, operand1, operand2, n, modulus);
+          break;
+        case 2:
+          EltwiseMultModAVX512Float<2>(result, operand1, operand2, n, modulus);
+          break;
+        case 4:
+          EltwiseMultModAVX512Float<4>(result, operand1, operand2, n, modulus);
+          break;
       }
     } else {
       switch (input_mod_factor) {
@@ -81,7 +62,6 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
           EltwiseMultModAVX512DQInt<4>(result, operand1, operand2, n, modulus);
           break;
       }
-      return;
     }
     return;
   }

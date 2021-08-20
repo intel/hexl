@@ -306,14 +306,13 @@ void EltwiseMultModAVX512DQIntLoopUnroll(__m512i* vp_result,
   }
 }
 
-// Algorithm 1 from
-// https://hal.archives-ouvertes.fr/hal-01215845/document
+/// @brief Algorithm 1 from
+/// https://hal.archives-ouvertes.fr/hal-01215845/document
 template <int BitShift, int InputModFactor>
 void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           const __m512i* vp_operand1,
                                           const __m512i* vp_operand2,
                                           __m512i vbarr_lo, __m512i v_modulus,
-                                          __m512i v_neg_mod,
                                           __m512i v_twice_mod, uint64_t n) {
   HEXL_UNUSED(v_twice_mod);
 
@@ -328,14 +327,64 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
         v_operand2, v_modulus, &v_twice_mod);
 
-    __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
-    __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
 
-    __m512i c1 = _mm512_hexl_shrdi_epi64<BitShift - 1>(vprod_lo, vprod_hi);
+    __m512i c1 = _mm512_hexl_shrdi_epi64<BitShift - 1>(v_prod_lo, v_prod_hi);
+    // L - N + 1 == 64, so we only need high 64 bits
+    // Perform approximate computation of high bits, as described on page
+    // 7 of https://arxiv.org/pdf/2003.04510.pdf
     __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
-    __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_neg_mod);
+    __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
     // Computes result in [0, 4q)
-    v_result = _mm512_add_epi64(vprod_lo, v_result);
+    v_result = _mm512_add_epi64(v_prod_lo, v_result);
+
+    // Reduce result to [0, q)
+    v_result =
+        _mm512_hexl_small_mod_epu64<4>(v_result, v_modulus, &v_twice_mod);
+    _mm512_storeu_si512(vp_result, v_result);
+
+    ++vp_operand1;
+    ++vp_operand2;
+    ++vp_result;
+  }
+}
+
+/// @brief Algorithm 1 from
+/// https://hal.archives-ouvertes.fr/hal-01215845/document
+template <int InputModFactor>
+void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
+                                          const __m512i* vp_operand1,
+                                          const __m512i* vp_operand2,
+                                          __m512i vbarr_lo, __m512i v_modulus,
+                                          __m512i v_twice_mod, uint64_t n,
+                                          uint64_t bit_shift) {
+  HEXL_UNUSED(v_twice_mod);
+
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = n / 8; i > 0; --i) {
+    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
+    __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
+
+    v_operand1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+        v_operand1, v_modulus, &v_twice_mod);
+
+    v_operand2 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+        v_operand2, v_modulus, &v_twice_mod);
+
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
+
+    __m512i c1 = _mm512_hexl_shrdi_epi64(
+        v_prod_lo, v_prod_hi, static_cast<unsigned int>(bit_shift - 1));
+
+    // L - N + 1 == 64, so we only need high 64 bits
+    // Perform approximate computation of high bits, as described on page
+    // 7 of https://arxiv.org/pdf/2003.04510.pdf
+    __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
+    __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+    // Computes result in [0, 4q)
+    v_result = _mm512_sub_epi64(v_prod_lo, v_result);
 
     // Reduce result to [0, q)
     v_result =
@@ -352,8 +401,8 @@ template <int BitShift, int InputModFactor>
 void EltwiseMultModAVX512DQIntLoop(__m512i* vp_result,
                                    const __m512i* vp_operand1,
                                    const __m512i* vp_operand2, __m512i vbarr_lo,
-                                   __m512i v_modulus, __m512i v_neg_mod,
-                                   __m512i v_twice_mod, uint64_t n) {
+                                   __m512i v_modulus, __m512i v_twice_mod,
+                                   uint64_t n) {
   switch (n) {
     case 1024:
       EltwiseMultModAVX512DQIntLoopUnroll<BitShift, InputModFactor, 1024>(
@@ -393,8 +442,8 @@ void EltwiseMultModAVX512DQIntLoop(__m512i* vp_result,
 
     default:
       EltwiseMultModAVX512DQIntLoopDefault<BitShift, InputModFactor>(
-          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
-          v_twice_mod, n);
+          vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod,
+          n);
   }
 }
 
@@ -444,7 +493,6 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
-  __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
@@ -456,25 +504,25 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     switch (N) {
       case 59: {
         EltwiseMultModAVX512DQIntLoop<59, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 60: {
         EltwiseMultModAVX512DQIntLoop<60, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 61: {
         EltwiseMultModAVX512DQIntLoop<61, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 62: {
         EltwiseMultModAVX512DQIntLoop<62, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
@@ -484,7 +532,7 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     }
   } else {  // Input mod reduction not required; pass InputModFactor == 1.
     // For N < 50, we should prefer EltwiseMultModAVX512Float or
-    // EltwiseMultModAVX512DQInt, so we don't generate a special case for it
+    // EltwiseMultModAVX512DQIFMA, so we don't generate a special case for it
     // here
 
     // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
@@ -492,107 +540,85 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     switch (N) {
       case 50: {
         EltwiseMultModAVX512DQIntLoop<50, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 51: {
         EltwiseMultModAVX512DQIntLoop<51, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 52: {
         EltwiseMultModAVX512DQIntLoop<52, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 53: {
         EltwiseMultModAVX512DQIntLoop<53, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 54: {
         EltwiseMultModAVX512DQIntLoop<54, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 55: {
         EltwiseMultModAVX512DQIntLoop<55, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 56: {
         EltwiseMultModAVX512DQIntLoop<56, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 57: {
         EltwiseMultModAVX512DQIntLoop<57, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 58: {
         EltwiseMultModAVX512DQIntLoop<58, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 59: {
         EltwiseMultModAVX512DQIntLoop<59, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 60: {
         EltwiseMultModAVX512DQIntLoop<60, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       case 61: {
         EltwiseMultModAVX512DQIntLoop<61, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_neg_mod,
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
             v_twice_mod, n);
         break;
       }
       default: {
-        // Algorithm 1 from
-        // https://hal.archives-ouvertes.fr/hal-01215845/document
-        HEXL_LOOP_UNROLL_4
-        for (size_t i = n / 8; i > 0; --i) {
-          __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
-          __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
-
-          __m512i vprod_hi = _mm512_hexl_mulhi_epi<64>(v_operand1, v_operand2);
-          __m512i vprod_lo = _mm512_hexl_mullo_epi<64>(v_operand1, v_operand2);
-
-          __m512i c1 = _mm512_hexl_shrdi_epi64(
-              vprod_lo, vprod_hi, static_cast<unsigned int>(N - 1));
-          __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, vbarr_lo);
-          __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_neg_mod);
-          // Computes result in [0, 4q)
-          v_result = _mm512_add_epi64(vprod_lo, v_result);
-
-          // Reduce result to [0, q)
-          v_result =
-              _mm512_hexl_small_mod_epu64<4>(v_result, v_modulus, &v_twice_mod);
-          _mm512_storeu_si512(vp_result, v_result);
-
-          ++vp_operand1;
-          ++vp_operand2;
-          ++vp_result;
-        }
+        LOG(INFO) << "Default";
+        EltwiseMultModAVX512DQIntLoopDefault<InputModFactor>(
+            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
+            v_twice_mod, n, N);
       }
     }
-    HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
   }
+  HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 
 // From Function 18, page 19 of https://arxiv.org/pdf/1407.3383.pdf
