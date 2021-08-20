@@ -20,7 +20,7 @@ namespace hexl {
 
 //=================================================================
 
-static void BM_FwdNTTNative(benchmark::State& state) {  //  NOLINT
+static void BM_FwdNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
 
@@ -28,13 +28,13 @@ static void BM_FwdNTTNative(benchmark::State& state) {  //  NOLINT
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
-    ForwardTransformToBitReverse64(
+    ForwardTransformToBitReverseRadix2(
         input.data(), ntt_size, modulus, ntt.GetRootOfUnityPowers().data(),
         ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
   }
 }
 
-BENCHMARK(BM_FwdNTTNative)
+BENCHMARK(BM_FwdNTTNativeRadix2)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})

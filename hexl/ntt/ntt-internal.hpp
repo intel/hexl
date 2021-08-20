@@ -17,7 +17,7 @@
 namespace intel {
 namespace hexl {
 
-/// @brief Default C++ NTT implementation of the forward NTT
+/// @brief Radix-4 C++ NTT implementation of the forward NTT
 /// @param[in, out] operand Input data. Overwritten with NTT output
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
@@ -30,12 +30,11 @@ namespace hexl {
 /// input_mod_factor * q)
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
-void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
-                                    uint64_t modulus,
-                                    const uint64_t* root_of_unity_powers,
-                                    const uint64_t* precon_root_of_unity_powers,
-                                    uint64_t input_mod_factor = 1,
-                                    uint64_t output_mod_factor = 1);
+void ForwardTransformToBitReverseRadix2(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
+    uint64_t output_mod_factor = 1);
 
 /// @brief Radix-4 C++ NTT implementation of the forward NTT
 /// @param[in, out] operand Input data. Overwritten with NTT output

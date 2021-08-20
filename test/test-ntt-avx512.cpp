@@ -260,7 +260,7 @@ TEST(NTT, FwdNTT_AVX512_32) {
       std::vector<std::uint64_t> input_avx = input;
       std::vector<std::uint64_t> input_avx_lazy = input;
 
-      ForwardTransformToBitReverse64(
+      ForwardTransformToBitReverseRadix2(
           input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
           ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
@@ -312,7 +312,7 @@ TEST(NTT, FwdNTT_AVX512_64) {
       std::vector<std::uint64_t> input_avx = input;
       std::vector<std::uint64_t> input_avx_lazy = input;
 
-      ForwardTransformToBitReverse64(
+      ForwardTransformToBitReverseRadix2(
           input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
           ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 

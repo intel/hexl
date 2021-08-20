@@ -33,7 +33,7 @@ inline void FwdButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
   HEXL_VLOG(3, "FwdButterfly");
   HEXL_VLOG(3, "Inputs: X " << *X << ", Y " << *Y << ", W " << W << ", modulus "
                             << modulus);
-  uint64_t tx = (*X >= twice_modulus) ? (*X - twice_modulus) : *X;
+  uint64_t tx = ReduceMod<2>(*X, twice_modulus);
   uint64_t T = MultiplyModLazy<64>(*Y, W, W_precon, modulus);
   HEXL_VLOG(3, "T " << T);
   *X = tx + T;
@@ -68,6 +68,7 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
                                uint64_t twice_modulus,
                                uint64_t four_times_modulus) {
   HEXL_VLOG(3, "FwdButterflyRadix4");
+  HEXL_UNUSED(four_times_modulus);
 
   FwdButterfly(X0, X2, W1, W1_precon, modulus, twice_modulus);
   FwdButterfly(X1, X3, W1, W1_precon, modulus, twice_modulus);
@@ -75,7 +76,7 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
   FwdButterfly(X2, X3, W3, W3_precon, modulus, twice_modulus);
 
   // Alternate implementation
-  // Returns Xs in [0, 6q)
+  // // Returns Xs in [0, 6q)
   // FwdButterflyLazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
   // FwdButterflyLazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
 
@@ -108,7 +109,7 @@ inline void InvButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
   uint64_t tx = *X + *Y;
   uint64_t ty = *X + twice_modulus - *Y;
 
-  *X = (tx >= twice_modulus) ? (tx - twice_modulus) : tx;
+  *X = ReduceMod<2>(tx, twice_modulus);
   *Y = MultiplyModLazy<64>(ty, W, W_precon, modulus);
 }
 

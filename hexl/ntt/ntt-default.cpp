@@ -18,12 +18,11 @@
 namespace intel {
 namespace hexl {
 
-void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
-                                    uint64_t modulus,
-                                    const uint64_t* root_of_unity_powers,
-                                    const uint64_t* precon_root_of_unity_powers,
-                                    uint64_t input_mod_factor,
-                                    uint64_t output_mod_factor) {
+void ForwardTransformToBitReverseRadix2(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor) {
   HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
   HEXL_CHECK_BOUNDS(operand, n, modulus * input_mod_factor,
                     "operand exceeds bound " << modulus * input_mod_factor);
@@ -139,12 +138,7 @@ void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
   }
   if (output_mod_factor == 1) {
     for (size_t i = 0; i < n; ++i) {
-      if (operand[i] >= twice_modulus) {
-        operand[i] -= twice_modulus;
-      }
-      if (operand[i] >= modulus) {
-        operand[i] -= modulus;
-      }
+      operand[i] = ReduceMod<4>(operand[i], modulus, &twice_modulus);
       HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in NTT "
                                            << operand[i] << " >= " << modulus);
     }
@@ -318,10 +312,7 @@ void InverseTransformFromBitReverse64(
     // Assume X, Y in [0, 2q) and compute
     // X' = N^{-1} (X + Y) (mod q)
     // Y' = N^{-1} * W * (X - Y) (mod q)
-    uint64_t tx = X[j] + Y[j];
-    if (tx >= twice_modulus) {
-      tx -= twice_modulus;
-    }
+    uint64_t tx = AddUIntMod(X[j], Y[j], twice_modulus);
     uint64_t ty = X[j] + twice_modulus - Y[j];
     X[j] = MultiplyModLazy<64>(tx, inv_n, inv_n_precon, modulus);
     Y[j] = MultiplyModLazy<64>(ty, inv_n_w, inv_n_w_precon, modulus);
@@ -330,9 +321,7 @@ void InverseTransformFromBitReverse64(
   if (output_mod_factor == 1) {
     // Reduce from [0, 2q) to [0,q)
     for (size_t i = 0; i < n; ++i) {
-      if (operand[i] >= modulus) {
-        operand[i] -= modulus;
-      }
+      operand[i] = ReduceMod<2>(operand[i], modulus);
       HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in InvNTT"
                                            << operand[i] << " >= " << modulus);
     }
