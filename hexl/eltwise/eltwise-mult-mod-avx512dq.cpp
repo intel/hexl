@@ -447,6 +447,14 @@ void EltwiseMultModAVX512DQIntLoop(__m512i* vp_result,
   }
 }
 
+#define ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(BitShift, InputModFactor) \
+  case (BitShift): {                                                           \
+    EltwiseMultModAVX512DQIntLoop<(BitShift), (InputModFactor)>(               \
+        vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus, v_twice_mod, \
+        n);                                                                    \
+    break;                                                                     \
+  }
+
 // Algorithm 1 from https://hal.archives-ouvertes.fr/hal-01215845/document
 template <int InputModFactor>
 void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
@@ -482,6 +490,13 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   uint64_t barr_lo =
       MultiplyFactor(uint64_t(1) << (L - 64), 64, modulus).BarrettFactor();
 
+  __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
+  const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
+  const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
+  __m512i* vp_result = reinterpret_cast<__m512i*>(result);
+
   // Let d be the product operand1 * operand2.
   // To ensure d >> (N - 1) < (1ULL << 64), we need
   // (input_mod_factor * modulus)^2 >> (N-1) < (1ULL << 64)
@@ -490,126 +505,37 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   // correctness. This is less efficient, so we avoid it when possible.
   bool reduce_mod = 2 * Log2(InputModFactor) + N >= 63;
 
-  __m512i vbarr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
-  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
-  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
-  const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
-  const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
-  __m512i* vp_result = reinterpret_cast<__m512i*>(result);
-
   if (reduce_mod) {
-    // This case happens only when  N >= 63 - 2 * log2(input_mod_factor) = 59
+    // This case happens only when  N >= 63 - 2 * log2(input_mod_factor) >= 59
     // Additionally, modulus < (1ULL << 62) implies N <= 62.
     // So N == 59, 60, 61, 62 are the only cases here.
     switch (N) {
-      case 59: {
-        EltwiseMultModAVX512DQIntLoop<59, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 60: {
-        EltwiseMultModAVX512DQIntLoop<60, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 61: {
-        EltwiseMultModAVX512DQIntLoop<61, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 62: {
-        EltwiseMultModAVX512DQIntLoop<62, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(59, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(60, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(61, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(62, InputModFactor)
       default: {
         HEXL_CHECK(false, "Bad value for N: " << N);
       }
     }
   } else {  // Input mod reduction not required; pass InputModFactor == 1.
-    // For N < 50, we should prefer EltwiseMultModAVX512Float or
-    // EltwiseMultModAVX512IFMAInt, so we don't generate a special case for it
-    // here
-
     // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
     // which requires a compile-time constant for the shift.
     switch (N) {
-      case 50: {
-        EltwiseMultModAVX512DQIntLoop<50, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 51: {
-        EltwiseMultModAVX512DQIntLoop<51, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 52: {
-        EltwiseMultModAVX512DQIntLoop<52, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 53: {
-        EltwiseMultModAVX512DQIntLoop<53, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 54: {
-        EltwiseMultModAVX512DQIntLoop<54, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 55: {
-        EltwiseMultModAVX512DQIntLoop<55, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 56: {
-        EltwiseMultModAVX512DQIntLoop<56, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 57: {
-        EltwiseMultModAVX512DQIntLoop<57, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 58: {
-        EltwiseMultModAVX512DQIntLoop<58, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 59: {
-        EltwiseMultModAVX512DQIntLoop<59, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 60: {
-        EltwiseMultModAVX512DQIntLoop<60, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
-      case 61: {
-        EltwiseMultModAVX512DQIntLoop<61, InputModFactor>(
-            vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
-            v_twice_mod, n);
-        break;
-      }
+      // For N < 50, we should prefer EltwiseMultModAVX512Float or
+      // EltwiseMultModAVX512IFMAInt, so we don't generate special cases here
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(50, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(51, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(52, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(53, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(54, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(55, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(56, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(57, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(58, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(59, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(60, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_BITSHIFT_CASE(61, 1)
       default: {
         EltwiseMultModAVX512DQIntLoopDefault<InputModFactor>(
             vp_result, vp_operand1, vp_operand2, vbarr_lo, v_modulus,
