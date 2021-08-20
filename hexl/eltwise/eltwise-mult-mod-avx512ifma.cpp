@@ -506,10 +506,8 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  const uint64_t logmod = MSB(modulus);
-
   // modulus < 2**N
-  const uint64_t N = logmod + 1;
+  const uint64_t N = Log2(modulus) + 1;
   uint64_t L = 51 + N;  // Ensures L-N+1 == 52
   uint64_t barr_lo =
       MultiplyFactor(uint64_t(1) << (L - 52), 52, modulus).BarrettFactor();
