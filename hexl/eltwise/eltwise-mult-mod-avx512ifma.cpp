@@ -448,14 +448,6 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   uint64_t barr_lo =
       MultiplyFactor(uint64_t(1) << (L - 52), 52, modulus).BarrettFactor();
 
-  // Let d be the product operand1 * operand2.
-  // To ensure d >> (N - 1) < (1ULL << 52), we need
-  // (input_mod_factor * modulus)^2 >> (N-1) < (1ULL << 52)
-  // This happens when 2 * log_2(input_mod_factor) + N < 51
-  // If not, we need to reduce the inputs to be less than modulus for
-  // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * Log2(InputModFactor) + N >= 51;
-
   __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
@@ -543,7 +535,7 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
       // Algorithm 1 from
       // https://hal.archives-ouvertes.fr/hal-01215845/document
       __m512i zero = _mm512_set1_epi64(0);
-      uint64_t Nm1 = N - 1;
+      auto Nm1 = static_cast<unsigned int>(N - 1);
       for (size_t i = n / 8; i > 0; --i) {
         __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
         __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
