@@ -269,7 +269,7 @@ void InverseTransformFromBitReverseRadix4(
     const uint64_t* W_precon = precon_inv_root_of_unity_powers + 1;
 
     HEXL_LOOP_UNROLL_8
-    for (size_t j = 0; j < (n >> 1); j++) {
+    for (size_t j = 0; j < n / 2; j++) {
       InvButterfly(X++, Y++, *W++, *W_precon++, modulus, twice_modulus);
       X++;
       Y++;
@@ -280,8 +280,8 @@ void InverseTransformFromBitReverseRadix4(
   uint64_t m_start = n >> (is_power_of_4 ? 3 : 2);
   size_t t = is_power_of_4 ? 2 : 1;
 
-  size_t w1_root_index = is_power_of_4 ? (n / 2 + 1) : 1;
-  size_t w3_root_index = is_power_of_4 ? (n / 2 + n / 4 + 1) : (n / 2 + 1);
+  size_t w1_root_index = is_power_of_4 ? (n_div_2 + 1) : 1;
+  size_t w3_root_index = is_power_of_4 ? (n_div_2 + n / 4 + 1) : (n_div_2 + 1);
 
   HEXL_VLOG(4, "m_start " << m_start);
 
@@ -421,8 +421,8 @@ void InverseTransformFromBitReverseRadix4(
       MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
 
   uint64_t* X = operand;
-  uint64_t* Y = X + (n >> 1);
-  for (size_t j = 0; j < (n >> 1); ++j) {
+  uint64_t* Y = X + n_div_2;
+  for (size_t j = 0; j < n_div_2; ++j) {
     // Assume X, Y in [0, 2q) and compute
     // X' = N^{-1} (X + Y) (mod q)
     // Y' = N^{-1} * W * (X - Y) (mod q)

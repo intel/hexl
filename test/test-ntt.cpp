@@ -354,8 +354,8 @@ INSTANTIATE_TEST_SUITE_P(
                                   12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
                                   23, 24, 25, 26, 27, 28, 29, 30, 31, 32})));
 
-// First argument is NTT degree
-// Second argument is number of bits in the NTT modulus
+// First parameter is the NTT degree
+// Second parameter is the number of bits in the NTT modulus
 class DegreeModulusTest
     : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t>> {
  protected:
@@ -426,7 +426,7 @@ TEST_P(DegreeModulusTest, InverseRadix4Random) {
   uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
 
   std::random_device rd;
-  std::mt19937 gen(rd());
+  std::mt19937 gen(42);  // rd());
   std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
 
   std::vector<uint64_t> input(N);
