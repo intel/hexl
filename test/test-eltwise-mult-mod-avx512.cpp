@@ -78,7 +78,7 @@ TEST(EltwiseMultMod, Big) {
   CheckEqual(result, exp_out);
 }
 
-TEST(EltwiseMultMod, AVX512FloatInPlaceSmall) {
+TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
   uint64_t input_mod_factor = 4;
   uint64_t modulus = 281474976546817;
   std::uniform_int_distribution<uint64_t> distrib(
