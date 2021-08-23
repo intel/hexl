@@ -314,7 +314,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
   const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowers().data();
   const uint64_t* precon_inv_root_of_unity_powers =
       GetPrecon64InvRootOfUnityPowers().data();
-  InverseTransformFromBitReverse64(
+  InverseTransformFromBitReverseRadix2(
       result, m_degree, m_q, inv_root_of_unity_powers,
       precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
 }

@@ -300,7 +300,7 @@ TEST_P(DegreeModulusInputOutput, API) {
       input_radix4.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
-  InverseTransformFromBitReverse64(
+  InverseTransformFromBitReverseRadix2(
       input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 }
@@ -437,7 +437,7 @@ TEST_P(DegreeModulusTest, InverseRadix4Random) {
 
   NTT ntt(N, modulus);
 
-  InverseTransformFromBitReverse64(
+  InverseTransformFromBitReverseRadix2(
       input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 

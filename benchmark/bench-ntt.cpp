@@ -268,9 +268,9 @@ static void BM_InvNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
   const AlignedVector64<uint64_t> precon_root_of_unity =
       ntt.GetPrecon64InvRootOfUnityPowers();
   for (auto _ : state) {
-    InverseTransformFromBitReverse64(input.data(), ntt_size, modulus,
-                                     root_of_unity.data(),
-                                     precon_root_of_unity.data(), 1, 1);
+    InverseTransformFromBitReverseRadix2(input.data(), ntt_size, modulus,
+                                         root_of_unity.data(),
+                                         precon_root_of_unity.data(), 1, 1);
   }
 }
 

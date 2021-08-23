@@ -257,29 +257,12 @@ void InverseTransformFromBitReverseRadix4(
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
 
-  HEXL_VLOG(2, "\n\n\n\nInverseTransformFromBitReverseRadix4");
-
-  HEXL_VLOG(2, "modulus " << modulus);
-  HEXL_VLOG(2, "n " << n);
-
-  HEXL_VLOG(2, "operand " << std::vector<uint64_t>(operand, operand + n));
-
-  HEXL_VLOG(2, "inv_root_of_unity_powers " << std::vector<uint64_t>(
-                   inv_root_of_unity_powers, inv_root_of_unity_powers + n));
-  HEXL_VLOG(2, "precon_inv_root_of_unity_powers " << std::vector<uint64_t>(
-                   precon_inv_root_of_unity_powers,
-                   precon_inv_root_of_unity_powers + n));
+  uint64_t twice_modulus = modulus << 1;
+  uint64_t n_div_2 = (n >> 1);
 
   bool is_power_of_4 = IsPowerOfFour(n);
-
-  HEXL_VLOG(3, "is_power_of_4" << is_power_of_4);
-
-  uint64_t twice_modulus = modulus << 1;
-
   // Radix-2 step for powers of 4
   if (is_power_of_4) {
-    HEXL_VLOG(3, "Radix 2 step");
-
     uint64_t* X = operand;
     uint64_t* Y = X + 1;
     const uint64_t* W = inv_root_of_unity_powers + 1;
