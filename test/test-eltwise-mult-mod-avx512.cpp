@@ -78,6 +78,26 @@ TEST(EltwiseMultMod, Big) {
   CheckEqual(result, exp_out);
 }
 
+TEST(EltwiseMultMod, AVX512FloatInPlaceSmall) {
+  uint64_t input_mod_factor = 4;
+  uint64_t modulus = 281474976546817;
+  std::uniform_int_distribution<uint64_t> distrib(
+      0, input_mod_factor * modulus - 1);
+
+  std::vector<uint64_t> data_native(8, 998771110802331);
+  auto data_avx = data_native;
+
+  EltwiseMultModAVX512Float<4>(data_avx.data(), data_avx.data(),
+                               data_avx.data(), data_avx.size(), modulus);
+
+  EltwiseMultModNative<4>(data_native.data(), data_native.data(),
+                          data_native.data(), data_avx.size(), modulus);
+
+  CheckEqual(data_native, std::vector<uint64_t>(8, 273497826869315));
+  CheckEqual(data_avx, std::vector<uint64_t>(8, 273497826869315));
+  CheckEqual(data_avx, data_native);
+}
+
 TEST(EltwiseMultMod, avx512dqint_small) {
   if (!has_avx512dq) {
     GTEST_SKIP();
