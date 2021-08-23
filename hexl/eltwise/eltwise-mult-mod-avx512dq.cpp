@@ -789,8 +789,13 @@ void EltwiseMultModAVX512Float(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
-  bool no_reduce_mod = (InputModFactor * modulus) < MaximumValue(50);
-  if (no_reduce_mod) {  // No input modulus reduction necessary
+  // The implementation without modular reduction of the operands is correct
+  // as long as (InputModFactor * modulus)^2 < 2^50 * modulus, i.e.
+  // InputModFactor^2 * modulus < 2^50.
+  // See function 16 of https://arxiv.org/pdf/1407.3383.pdf.
+  bool no_input_reduce_mod =
+      (InputModFactor * InputModFactor * modulus) < (1ULL << 50);
+  if (no_input_reduce_mod) {
     EltwiseMultModAVX512FloatLoop<1>(vp_result, vp_operand1, vp_operand2, v_u,
                                      v_p, v_modulus, v_twice_mod, n);
   } else {
