@@ -17,7 +17,7 @@
 namespace intel {
 namespace hexl {
 
-/// @brief Radix-4 C++ NTT implementation of the forward NTT
+/// @brief Radix-2 C++ NTT implementation of the forward NTT
 /// @param[in, out] operand Input data. Overwritten with NTT output
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
