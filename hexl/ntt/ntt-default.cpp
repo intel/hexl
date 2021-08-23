@@ -138,7 +138,12 @@ void ForwardTransformToBitReverseRadix2(
   }
   if (output_mod_factor == 1) {
     for (size_t i = 0; i < n; ++i) {
-      operand[i] = ReduceMod<4>(operand[i], modulus, &twice_modulus);
+      if (operand[i] >= twice_modulus) {
+        operand[i] -= twice_modulus;
+      }
+      if (operand[i] >= modulus) {
+        operand[i] -= modulus;
+      }
       HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in NTT "
                                            << operand[i] << " >= " << modulus);
     }
@@ -192,6 +197,9 @@ void InverseTransformFromBitReverse64(
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
 
+  HEXL_VLOG(3, "InverseTransformFromBitReverse64");
+  HEXL_VLOG(3, "operand " << std::vector<uint64_t>(operand, operand + n));
+
   uint64_t twice_modulus = modulus << 1;
   size_t t = 1;
   size_t root_index = 1;
@@ -207,6 +215,7 @@ void InverseTransformFromBitReverse64(
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
+          HEXL_VLOG(3, "W_idx " << root_index);
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -222,6 +231,7 @@ void InverseTransformFromBitReverse64(
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
+          HEXL_VLOG(3, "W_idx " << root_index);
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -238,6 +248,7 @@ void InverseTransformFromBitReverse64(
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
+          HEXL_VLOG(3, "W_idx " << root_index);
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -256,6 +267,7 @@ void InverseTransformFromBitReverse64(
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
+          HEXL_VLOG(3, "W_idx " << root_index);
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
@@ -277,6 +289,7 @@ void InverseTransformFromBitReverse64(
             j1 += (t << 1);
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
+          HEXL_VLOG(3, "W_idx " << root_index);
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
           uint64_t* X = operand + j1;
@@ -298,8 +311,13 @@ void InverseTransformFromBitReverse64(
     t <<= 1;
   }
 
+  HEXL_VLOG(4, "Starting final invNTT stage");
+  HEXL_VLOG(4, "operand " << std::vector<uint64_t>(operand, operand + n));
+
   // Fold multiplication by N^{-1} to final stage butterfly
-  const uint64_t W = inv_root_of_unity_powers[root_index];
+  const uint64_t W = inv_root_of_unity_powers[n - 1];
+  HEXL_VLOG(4, "final W " << W);
+
   const uint64_t inv_n = InverseMod(n, modulus);
   uint64_t inv_n_precon = MultiplyFactor(inv_n, 64, modulus).BarrettFactor();
   const uint64_t inv_n_w = MultiplyMod(inv_n, W, modulus);
@@ -321,7 +339,9 @@ void InverseTransformFromBitReverse64(
   if (output_mod_factor == 1) {
     // Reduce from [0, 2q) to [0,q)
     for (size_t i = 0; i < n; ++i) {
-      operand[i] = ReduceMod<2>(operand[i], modulus);
+      if (operand[i] >= modulus) {
+        operand[i] -= modulus;
+      }
       HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in InvNTT"
                                            << operand[i] << " >= " << modulus);
     }
