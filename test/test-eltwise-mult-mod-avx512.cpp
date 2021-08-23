@@ -46,8 +46,8 @@ TEST(EltwiseMultMod, avx512_int2) {
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<uint64_t> exp_out{12, 1, 1, 1, 1, 1, 1, 1};
 
-  EltwiseMultModAVX512Int<2>(result.data(), op1.data(), op2.data(), op1.size(),
-                             modulus);
+  EltwiseMultModAVX512DQInt<2>(result.data(), op1.data(), op2.data(),
+                               op1.size(), modulus);
   CheckEqual(result, exp_out);
 }
 
@@ -72,13 +72,13 @@ TEST(EltwiseMultMod, Big) {
       409735411065439, 25680427818594,  950138933882289,
       554128714280822, 1465109636753,   1};
 
-  EltwiseMultModAVX512Int<4>(result.data(), op1.data(), op2.data(), op1.size(),
-                             modulus);
+  EltwiseMultModAVX512DQInt<4>(result.data(), op1.data(), op2.data(),
+                               op1.size(), modulus);
 
   CheckEqual(result, exp_out);
 }
 
-TEST(EltwiseMultMod, AVX512Int) {
+TEST(EltwiseMultMod, avx512dqint_small) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -102,8 +102,8 @@ TEST(EltwiseMultMod, AVX512Int) {
       op2[i] = distrib(gen);
     }
 
-    EltwiseMultModAVX512Int<1>(out_avx.data(), op1.data(), op2.data(),
-                               op1.size(), modulus);
+    EltwiseMultModAVX512DQInt<1>(out_avx.data(), op1.data(), op2.data(),
+                                 op1.size(), modulus);
 
     EltwiseMultModNative<1>(out_native.data(), op1.data(), op2.data(),
                             op1.size(), modulus);
@@ -111,12 +111,11 @@ TEST(EltwiseMultMod, AVX512Int) {
     CheckEqual(out_avx, out_native);
   }
 }
-
 #endif
 
-// Checks AVX512 and native eltwise mult Out-of-Place implementations match
+// Checks AVX512 and native eltwise mult out-of-place implementations match
 #ifdef HEXL_HAS_AVX512DQ
-TEST(EltwiseMultMod, AVX512Big) {
+TEST(EltwiseMultMod, avx512dqint_big) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -162,8 +161,8 @@ TEST(EltwiseMultMod, AVX512Big) {
                 EltwiseMultModAVX512Float<1>(rs2.data(), op1.data(), op2.data(),
                                              op1.size(), modulus);
               } else {
-                EltwiseMultModAVX512Int<1>(rs3.data(), op1.data(), op2.data(),
-                                           op1.size(), modulus);
+                EltwiseMultModAVX512DQInt<1>(rs3.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
               }
               break;
             case 2:
@@ -173,8 +172,8 @@ TEST(EltwiseMultMod, AVX512Big) {
                 EltwiseMultModAVX512Float<2>(rs2.data(), op1.data(), op2.data(),
                                              op1.size(), modulus);
               } else {
-                EltwiseMultModAVX512Int<2>(rs3.data(), op1.data(), op2.data(),
-                                           op1.size(), modulus);
+                EltwiseMultModAVX512DQInt<2>(rs3.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
               }
               break;
             case 4:
@@ -184,8 +183,8 @@ TEST(EltwiseMultMod, AVX512Big) {
                 EltwiseMultModAVX512Float<4>(rs2.data(), op1.data(), op2.data(),
                                              op1.size(), modulus);
               } else {
-                EltwiseMultModAVX512Int<4>(rs3.data(), op1.data(), op2.data(),
-                                           op1.size(), modulus);
+                EltwiseMultModAVX512DQInt<4>(rs3.data(), op1.data(), op2.data(),
+                                             op1.size(), modulus);
               }
               break;
           }
@@ -208,5 +207,77 @@ TEST(EltwiseMultMod, AVX512Big) {
   }
 }
 #endif
+
+#ifdef HEXL_HAS_AVX512IFMA
+TEST(EltwiseMultMod, avx512ifma_big) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  for (size_t length = 1024; length <= 32768; length *= 2) {
+    std::vector<uint64_t> op1(length, 0);
+    std::vector<uint64_t> op2(length, 0);
+    std::vector<uint64_t> result_native(length, 0);
+    std::vector<uint64_t> result_ifma(length, 0);
+
+    for (size_t input_mod_factor = 1; input_mod_factor <= 4;
+         input_mod_factor *= 2) {
+      for (size_t bits = 40; bits <= 50; ++bits) {
+        uint64_t modulus = (1ULL << bits) + 7;
+        if (input_mod_factor * modulus > MaximumValue(50)) {
+          continue;
+        }
+
+        std::uniform_int_distribution<uint64_t> distrib(
+            0, input_mod_factor * modulus - 1);
+
+#ifdef HEXL_DEBUG
+        size_t num_trials = 1;
+#else
+        size_t num_trials = 10;
+#endif
+        for (size_t trial = 0; trial < num_trials; ++trial) {
+          for (size_t i = 0; i < length; ++i) {
+            op1[i] = distrib(gen);
+            op2[i] = distrib(gen);
+          }
+          op1[0] = input_mod_factor * modulus - 1;
+          op2[0] = input_mod_factor * modulus - 1;
+
+          switch (input_mod_factor) {
+            case 1: {
+              EltwiseMultModNative<1>(result_native.data(), op1.data(),
+                                      op2.data(), op1.size(), modulus);
+              EltwiseMultModAVX512IFMAInt<1>(result_ifma.data(), op1.data(),
+                                             op2.data(), op1.size(), modulus);
+              break;
+            }
+            case 2: {
+              EltwiseMultModNative<2>(result_native.data(), op1.data(),
+                                      op2.data(), op1.size(), modulus);
+              EltwiseMultModAVX512IFMAInt<2>(result_ifma.data(), op1.data(),
+                                             op2.data(), op1.size(), modulus);
+              break;
+            }
+            case 4: {
+              EltwiseMultModNative<4>(result_native.data(), op1.data(),
+                                      op2.data(), op1.size(), modulus);
+              EltwiseMultModAVX512IFMAInt<4>(result_ifma.data(), op1.data(),
+                                             op2.data(), op1.size(), modulus);
+            }
+          }
+
+          ASSERT_EQ(result_native[0], 1);
+          ASSERT_EQ(result_native, result_ifma);
+        }
+      }
+    }
+  }
+}
+#endif
+
 }  // namespace hexl
 }  // namespace intel

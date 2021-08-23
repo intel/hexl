@@ -95,15 +95,7 @@ static void BM_EltwiseMultModAVX512Float(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512Float)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 2})
-    ->Args({16384, 4});
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
 #endif
 
 //=================================================================
@@ -111,10 +103,10 @@ BENCHMARK(BM_EltwiseMultModAVX512Float)
 #ifdef HEXL_HAS_AVX512DQ
 // state[0] is the degree
 // state[1] is the input_mod_factor
-static void BM_EltwiseMultModAVX512Int(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseMultModAVX512DQInt(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t input_mod_factor = state.range(1);
-  size_t modulus = 1152921504606877697;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   AlignedVector64<uint64_t> input1(input_size, 1);
   AlignedVector64<uint64_t> input2(input_size, 2);
@@ -123,32 +115,60 @@ static void BM_EltwiseMultModAVX512Int(benchmark::State& state) {  //  NOLINT
   for (auto _ : state) {
     switch (input_mod_factor) {
       case 1:
-        EltwiseMultModAVX512Int<1>(output.data(), input1.data(), input2.data(),
-                                   input_size, modulus);
+        EltwiseMultModAVX512DQInt<1>(output.data(), input1.data(),
+                                     input2.data(), input_size, modulus);
         break;
       case 2:
-        EltwiseMultModAVX512Int<2>(output.data(), input1.data(), input2.data(),
-                                   input_size, modulus);
+        EltwiseMultModAVX512DQInt<2>(output.data(), input1.data(),
+                                     input2.data(), input_size, modulus);
         break;
       case 4:
-        EltwiseMultModAVX512Int<4>(output.data(), input1.data(), input2.data(),
-                                   input_size, modulus);
+        EltwiseMultModAVX512DQInt<4>(output.data(), input1.data(),
+                                     input2.data(), input_size, modulus);
         break;
     }
   }
 }
 
-BENCHMARK(BM_EltwiseMultModAVX512Int)
+BENCHMARK(BM_EltwiseMultModAVX512DQInt)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
-    ->Args({1024, 4})
-    ->Args({4096, 1})
-    ->Args({4096, 2})
-    ->Args({4096, 4})
-    ->Args({16384, 1})
-    ->Args({16384, 2})
-    ->Args({16384, 4});
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+#endif
+
+#ifdef HEXL_HAS_AVX512IFMA
+// state[0] is the degree
+// state[1] is the input_mod_factor
+static void BM_EltwiseMultModAVX512IFMAInt(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t input_mod_factor = state.range(1);
+  size_t modulus = 100;
+
+  AlignedVector64<uint64_t> input1(input_size, 1);
+  AlignedVector64<uint64_t> input2(input_size, 2);
+  AlignedVector64<uint64_t> output(input_size, 3);
+
+  for (auto _ : state) {
+    switch (input_mod_factor) {
+      case 1:
+        EltwiseMultModAVX512IFMAInt<1>(output.data(), input1.data(),
+                                       input2.data(), input_size, modulus);
+        break;
+      case 2:
+        EltwiseMultModAVX512IFMAInt<2>(output.data(), input1.data(),
+                                       input2.data(), input_size, modulus);
+        break;
+      case 4:
+        EltwiseMultModAVX512IFMAInt<4>(output.data(), input1.data(),
+                                       input2.data(), input_size, modulus);
+        break;
+    }
+  }
+}
+
+BENCHMARK(BM_EltwiseMultModAVX512IFMAInt)
+    ->Unit(benchmark::kMicrosecond)
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
 #endif
 
 //=================================================================

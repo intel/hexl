@@ -36,6 +36,9 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
     if (modulus < (1ULL << 50)) {
+      // EltwiseMultModAVX512IFMA has similar performance to
+      // EltwiseMultModAVX512Float, but requires the AVX512IFMA instruction set,
+      // so we prefer to use EltwiseMultModAVX512Float.
       switch (input_mod_factor) {
         case 1:
           EltwiseMultModAVX512Float<1>(result, operand1, operand2, n, modulus);
@@ -47,21 +50,20 @@ void EltwiseMultMod(uint64_t* result, const uint64_t* operand1,
           EltwiseMultModAVX512Float<4>(result, operand1, operand2, n, modulus);
           break;
       }
-      return;
     } else {
       switch (input_mod_factor) {
         case 1:
-          EltwiseMultModAVX512Int<1>(result, operand1, operand2, n, modulus);
+          EltwiseMultModAVX512DQInt<1>(result, operand1, operand2, n, modulus);
           break;
         case 2:
-          EltwiseMultModAVX512Int<2>(result, operand1, operand2, n, modulus);
+          EltwiseMultModAVX512DQInt<2>(result, operand1, operand2, n, modulus);
           break;
         case 4:
-          EltwiseMultModAVX512Int<4>(result, operand1, operand2, n, modulus);
+          EltwiseMultModAVX512DQInt<4>(result, operand1, operand2, n, modulus);
           break;
       }
-      return;
     }
+    return;
   }
 #endif
 

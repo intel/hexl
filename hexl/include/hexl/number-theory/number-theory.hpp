@@ -54,11 +54,8 @@ class MultiplyFactor {
 /// @brief Returns whether or not num is a power of two
 inline bool IsPowerOfTwo(uint64_t num) { return num && !(num & (num - 1)); }
 
-/// @brief Returns log2(x) for x a power of 2
-inline uint64_t Log2(uint64_t x) {
-  HEXL_CHECK(IsPowerOfTwo(x), x << " not a power of 2");
-  return MSB(x);
-}
+/// @brief Returns floor(log2(x))
+inline uint64_t Log2(uint64_t x) { return MSB(x); }
 
 inline bool IsPowerOfFour(uint64_t num) {
   return IsPowerOfTwo(num) && (Log2(num) % 2 == 0);
