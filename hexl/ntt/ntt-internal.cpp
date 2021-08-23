@@ -245,14 +245,14 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
   }
 #endif
 
-  HEXL_VLOG(3, "Calling 64-bit default FwdNTT");
+  HEXL_VLOG(3, "Calling ForwardTransformToBitReverseRadix2");
   const uint64_t* root_of_unity_powers = GetRootOfUnityPowers().data();
   const uint64_t* precon_root_of_unity_powers =
       GetPrecon64RootOfUnityPowers().data();
 
-  ForwardTransformToBitReverse64(result, m_degree, m_q, root_of_unity_powers,
-                                 precon_root_of_unity_powers, input_mod_factor,
-                                 output_mod_factor);
+  ForwardTransformToBitReverseRadix2(
+      result, m_degree, m_q, root_of_unity_powers, precon_root_of_unity_powers,
+      input_mod_factor, output_mod_factor);
 }
 
 void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,

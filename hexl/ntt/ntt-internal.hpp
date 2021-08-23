@@ -17,7 +17,7 @@
 namespace intel {
 namespace hexl {
 
-/// @brief Default C++ NTT implementation of the forward NTT
+/// @brief Radix-2 C++ NTT implementation of the forward NTT
 /// @param[in, out] operand Input data. Overwritten with NTT output
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
@@ -30,12 +30,30 @@ namespace hexl {
 /// input_mod_factor * q)
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
-void ForwardTransformToBitReverse64(uint64_t* operand, uint64_t n,
-                                    uint64_t modulus,
-                                    const uint64_t* root_of_unity_powers,
-                                    const uint64_t* precon_root_of_unity_powers,
-                                    uint64_t input_mod_factor = 1,
-                                    uint64_t output_mod_factor = 1);
+void ForwardTransformToBitReverseRadix2(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
+    uint64_t output_mod_factor = 1);
+
+/// @brief Radix-4 C++ NTT implementation of the forward NTT
+/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
+/// power of two.
+/// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
+/// @param[in] root_of_unity_powers Powers of 2n'th root of unity in F_q. In
+/// bit-reversed order
+/// @param[in] precon_root_of_unity_powers Pre-conditioned Powers of 2n'th root
+/// of unity in F_q. In bit-reversed order.
+/// @param[in] input_mod_factor Upper bound for inputs; inputs must be in [0,
+/// input_mod_factor * q)
+/// @param[in] output_mod_factor Upper bound for result; result must be in [0,
+/// output_mod_factor * q)
+void ForwardTransformToBitReverseRadix4(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
+    uint64_t output_mod_factor = 1);
 
 /// @brief Reference NTT which is written for clarity rather than performance
 /// @param[in, out] operand Input data. Overwritten with NTT output
