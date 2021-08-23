@@ -1,8 +1,6 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ntt/ntt-default.hpp"
-
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -13,6 +11,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
+#include "ntt/ntt-default.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
@@ -138,12 +137,7 @@ void ForwardTransformToBitReverseRadix2(
   }
   if (output_mod_factor == 1) {
     for (size_t i = 0; i < n; ++i) {
-      if (operand[i] >= twice_modulus) {
-        operand[i] -= twice_modulus;
-      }
-      if (operand[i] >= modulus) {
-        operand[i] -= modulus;
-      }
+      operand[i] = ReduceMod<4>(operand[i], modulus, &twice_modulus);
       HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in NTT "
                                            << operand[i] << " >= " << modulus);
     }
@@ -339,9 +333,7 @@ void InverseTransformFromBitReverse64(
   if (output_mod_factor == 1) {
     // Reduce from [0, 2q) to [0,q)
     for (size_t i = 0; i < n; ++i) {
-      if (operand[i] >= modulus) {
-        operand[i] -= modulus;
-      }
+      operand[i] = ReduceMod<2>(operand[i], modulus);
       HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in InvNTT"
                                            << operand[i] << " >= " << modulus);
     }
