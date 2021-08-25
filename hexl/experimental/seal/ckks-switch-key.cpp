@@ -52,8 +52,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
   for (size_t i = 0; i < rns_modulus_size; ++i) {
     size_t key_index = (i == decomp_modulus_size ? key_modulus_size - 1 : i);
 
-    // Allocate memory for a lazy accumulator
-    // (128-bit coefficients)
+    // Allocate memory for a lazy accumulator (128-bit coefficients)
     std::vector<uint64_t> t_poly_lazy(key_component_count * coeff_count * 2, 0);
     uint64_t* t_poly_lazy_ptr = &t_poly_lazy[0];
     uint64_t* accumulator_ptr = &t_poly_lazy[0];
@@ -171,8 +170,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
       uint64_t qi_lazy = qi << 1;  // some multiples of qi
 
       NTT(n, moduli[i]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
-      // Since SEAL uses at most 60bit
-      // moduli, 8*qi < 2^63.
+      // Since SEAL uses at most 60bit moduli, 8*qi < 2^63.
       qi_lazy = qi << 2;
 
       // ((ct mod qi) - (ct mod qk)) mod qi
