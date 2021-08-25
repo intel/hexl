@@ -14,6 +14,13 @@ set(NATIVE_TEST_SRC main.cpp
     test-ntt.cpp
 )
 
+if (HEXL_EXPERIMENTAL)
+    list(APPEND NATIVE_TEST_SRC
+        experimental/seal/test-ckks-multiply.cpp
+        experimental/seal/test-ckks-switch-key.cpp
+    )
+endif()
+
 set(AVX512_TEST_SRC
     test-avx512-util.cpp
     test-eltwise-add-mod-avx512.cpp

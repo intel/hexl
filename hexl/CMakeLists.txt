@@ -15,6 +15,13 @@ set(NATIVE_SRC
     number-theory/number-theory.cpp
 )
 
+if (HEXL_EXPERIMENTAL)
+    list(APPEND NATIVE_SRC
+        experimental/seal/ckks-multiply.cpp
+        experimental/seal/ckks-switch-key.cpp
+    )
+endif()
+
 if (HEXL_HAS_AVX512DQ)
     set(AVX512_SRC
         eltwise/eltwise-mult-mod-avx512dq.cpp

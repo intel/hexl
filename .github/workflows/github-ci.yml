@@ -201,3 +201,49 @@ jobs:
           build/${{ matrix.build_type}}/example.exe
 
           # TODO: add pkgconfig and vcpkg examples
+
+  experimental-build:
+    name: 'experimental: ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
+    runs-on: '${{ matrix.os }}'
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        # TODO: add Linux/ice-lake tag to self-hosted runner
+        os: [self-hosted]
+        build_type: [Release]
+        shared_lib: [ON]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Default build
+        run: |
+          set -x
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            export CC=clang-10
+            export CXX=clang++-10
+          fi
+
+          # Print information useful for debugging
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REFH
+          cmake --version
+          pwd
+
+          # Build library
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
+            -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
+            -DCMAKE_INSTALL_PREFIX=./ \
+            -DHEXL_EXPERIMENTAL=ON
+          cmake --build build -j
+          cmake --build build --target install
+          cmake --build build --target unittest
+          # Instead of calling cmake --build build --target bench,
+          # we run the executable directly to pass command-line arguments
+          ./build/benchmark/bench_hexl \
+            --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" \
+            --benchmark_out_format=csv
