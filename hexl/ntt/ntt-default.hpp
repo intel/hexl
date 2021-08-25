@@ -27,10 +27,10 @@ namespace hexl {
 /// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
-inline void FwdButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
-                         uint64_t W_precon, uint64_t modulus,
-                         uint64_t twice_modulus) {
-  HEXL_VLOG(5, "FwdButterfly");
+inline void FwdButterflyRadix2(uint64_t* X, uint64_t* Y, uint64_t W,
+                               uint64_t W_precon, uint64_t modulus,
+                               uint64_t twice_modulus) {
+  HEXL_VLOG(5, "FwdButterflyRadix2");
   HEXL_VLOG(5, "Inputs: X " << *X << ", Y " << *Y << ", W " << W << ", modulus "
                             << modulus);
   uint64_t tx = ReduceMod<2>(*X, twice_modulus);
@@ -44,10 +44,10 @@ inline void FwdButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
 
 // Assume X, Y in [0, n*q) and return X', Y' in [0, (n+2)*q)
 // such that X' = X + WY mod q and Y' = X - WY mod q
-inline void FwdButterflyLazy(uint64_t* X, uint64_t* Y, uint64_t W,
-                             uint64_t W_precon, uint64_t modulus,
-                             uint64_t twice_modulus) {
-  HEXL_VLOG(3, "FwdButterflyLazy");
+inline void FwdButterflyRadix4Lazy(uint64_t* X, uint64_t* Y, uint64_t W,
+                                   uint64_t W_precon, uint64_t modulus,
+                                   uint64_t twice_modulus) {
+  HEXL_VLOG(3, "FwdButterflyRadix4Lazy");
   HEXL_VLOG(3, "Inputs: X " << *X << ", Y " << *Y << ", W " << W << ", modulus "
                             << modulus);
 
@@ -70,19 +70,19 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
   HEXL_VLOG(3, "FwdButterflyRadix4");
   HEXL_UNUSED(four_times_modulus);
 
-  FwdButterfly(X0, X2, W1, W1_precon, modulus, twice_modulus);
-  FwdButterfly(X1, X3, W1, W1_precon, modulus, twice_modulus);
-  FwdButterfly(X0, X1, W2, W2_precon, modulus, twice_modulus);
-  FwdButterfly(X2, X3, W3, W3_precon, modulus, twice_modulus);
+  FwdButterflyRadix2(X0, X2, W1, W1_precon, modulus, twice_modulus);
+  FwdButterflyRadix2(X1, X3, W1, W1_precon, modulus, twice_modulus);
+  FwdButterflyRadix2(X0, X1, W2, W2_precon, modulus, twice_modulus);
+  FwdButterflyRadix2(X2, X3, W3, W3_precon, modulus, twice_modulus);
 
   // Alternate implementation
   // // Returns Xs in [0, 6q)
-  // FwdButterflyLazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
-  // FwdButterflyLazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
+  // FwdButterflyRadix4Lazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
+  // FwdButterflyRadix4Lazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
 
   // // Returns Xs in [0, 8q)
-  // FwdButterflyLazy(X0, X1, W2, W2_precon, modulus, twice_modulus);
-  // FwdButterflyLazy(X2, X3, W3, W3_precon, modulus, twice_modulus);
+  // FwdButterflyRadix4Lazy(X0, X1, W2, W2_precon, modulus, twice_modulus);
+  // FwdButterflyRadix4Lazy(X2, X3, W3, W3_precon, modulus, twice_modulus);
 
   // // Reduce Xs to [0, 4q)
   // *X0 = ReduceMod<2>(*X0, four_times_modulus);
@@ -103,19 +103,19 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
 /// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
 /// @details See Algorithm 3 of https://arxiv.org/pdf/1205.2926.pdf
-inline void InvButterfly(uint64_t* X, uint64_t* Y, uint64_t W,
-                         uint64_t W_precon, uint64_t modulus,
-                         uint64_t twice_modulus) {
-  HEXL_VLOG(4, "InvButterfly X " << *X << ", Y " << *Y << " W " << W
-                                 << " W_precon " << W_precon << " modulus "
-                                 << modulus);
+inline void InvButterflyRadix2(uint64_t* X, uint64_t* Y, uint64_t W,
+                               uint64_t W_precon, uint64_t modulus,
+                               uint64_t twice_modulus) {
+  HEXL_VLOG(4, "InvButterflyRadix2 X " << *X << ", Y " << *Y << " W " << W
+                                       << " W_precon " << W_precon
+                                       << " modulus " << modulus);
   uint64_t tx = *X + *Y;
   uint64_t ty = *X + twice_modulus - *Y;
 
   *X = ReduceMod<2>(tx, twice_modulus);
   *Y = MultiplyModLazy<64>(ty, W, W_precon, modulus);
 
-  HEXL_VLOG(4, "InvButterfly returning X " << *X << ", Y " << *Y);
+  HEXL_VLOG(4, "InvButterflyRadix2 returning X " << *X << ", Y " << *Y);
 }
 
 // Assume X0, X1, X2, X3 in [0, 2q) and return X0, X1, X2, X3 in [0, 2q)
@@ -132,28 +132,13 @@ inline void InvButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
                    << " W3 " << W3 << " W3_precon " << W3_precon  //
                    << " modulus " << modulus);
 
-  uint64_t Y0 = *X0;
-  uint64_t Y1 = *X1;
-  uint64_t Y2 = *X2;
-  uint64_t Y3 = *X3;
-
-  InvButterfly(&Y0, &Y1, W1, W1_precon, modulus, twice_modulus);
-  InvButterfly(&Y2, &Y3, W2, W2_precon, modulus, twice_modulus);
-  InvButterfly(&Y0, &Y2, W3, W3_precon, modulus, twice_modulus);
-  InvButterfly(&Y1, &Y3, W3, W3_precon, modulus, twice_modulus);
+  InvButterflyRadix2(X0, X1, W1, W1_precon, modulus, twice_modulus);
+  InvButterflyRadix2(X2, X3, W2, W2_precon, modulus, twice_modulus);
+  InvButterflyRadix2(X0, X2, W3, W3_precon, modulus, twice_modulus);
+  InvButterflyRadix2(X1, X3, W3, W3_precon, modulus, twice_modulus);
 
   HEXL_VLOG(4, "InvButterflyRadix4 returning X0 "
                    << *X0 << ", X1 " << *X1 << ", X2 " << *X2 << " X3 " << *X3);
-
-  HEXL_CHECK(*X0 <= 2 * modulus, "Bad value X0");
-  HEXL_CHECK(*X1 <= 2 * modulus, "Bad value X1");
-  HEXL_CHECK(*X2 <= 2 * modulus, "Bad value X2");
-  HEXL_CHECK(*X3 <= 2 * modulus, "Bad value X3");
-
-  HEXL_CHECK(Y0 == *X0, "X0 ( " << *X0 << " ) != Y0 ( " << Y0 << ")");
-  HEXL_CHECK(Y1 == *X1, "X1 ( " << *X1 << " ) != Y1 ( " << Y1 << ")");
-  HEXL_CHECK(Y2 == *X2, "X2 ( " << *X2 << " ) != Y2 ( " << Y2 << ")");
-  HEXL_CHECK(Y3 == *X3, "X3 ( " << *X3 << " ) != Y3 ( " << Y3 << ")");
 }
 
 }  // namespace hexl

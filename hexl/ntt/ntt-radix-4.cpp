@@ -62,7 +62,7 @@ void ForwardTransformToBitReverseRadix4(
     uint64_t* Y = X + t;
     HEXL_LOOP_UNROLL_8
     for (size_t j = 0; j < t; j++) {
-      FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+      FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
     }
     // Data in [0, 4q)
   }
@@ -270,7 +270,7 @@ void InverseTransformFromBitReverseRadix4(
 
     HEXL_LOOP_UNROLL_8
     for (size_t j = 0; j < n / 2; j++) {
-      InvButterfly(X++, Y++, *W++, *W_precon++, modulus, twice_modulus);
+      InvButterflyRadix2(X++, Y++, *W++, *W_precon++, modulus, twice_modulus);
       X++;
       Y++;
     }
