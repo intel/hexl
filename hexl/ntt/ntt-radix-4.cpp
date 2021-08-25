@@ -280,8 +280,8 @@ void InverseTransformFromBitReverseRadix4(
   uint64_t m_start = n >> (is_power_of_4 ? 3 : 2);
   size_t t = is_power_of_4 ? 2 : 1;
 
-  size_t w1_root_index = is_power_of_4 ? (n_div_2 + 1) : 1;
-  size_t w3_root_index = is_power_of_4 ? (n_div_2 + n / 4 + 1) : (n_div_2 + 1);
+  size_t w1_root_index = 1 + (is_power_of_4 ? n_div_2 : 0);
+  size_t w3_root_index = n_div_2 + 1 + (is_power_of_4 ? (n / 4) : 0);
 
   HEXL_VLOG(4, "m_start " << m_start);
 
@@ -307,10 +307,6 @@ void InverseTransformFromBitReverseRadix4(
           uint64_t W1_ind = w1_root_index++;
           uint64_t W2_ind = w1_root_index++;
           uint64_t W3_ind = w3_root_index++;
-
-          HEXL_VLOG(4, "W1_ind " << W1_ind);
-          HEXL_VLOG(4, "W2_ind " << W2_ind);
-          HEXL_VLOG(4, "W3_ind " << W3_ind);
 
           const uint64_t W1 = inv_root_of_unity_powers[W1_ind];
           const uint64_t W2 = inv_root_of_unity_powers[W2_ind];
@@ -340,10 +336,6 @@ void InverseTransformFromBitReverseRadix4(
           uint64_t W1_ind = w1_root_index++;
           uint64_t W2_ind = w1_root_index++;
           uint64_t W3_ind = w3_root_index++;
-
-          HEXL_VLOG(4, "W1_ind " << W1_ind);
-          HEXL_VLOG(4, "W2_ind " << W2_ind);
-          HEXL_VLOG(4, "W3_ind " << W3_ind);
 
           const uint64_t W1 = inv_root_of_unity_powers[W1_ind];
           const uint64_t W2 = inv_root_of_unity_powers[W2_ind];
@@ -380,10 +372,6 @@ void InverseTransformFromBitReverseRadix4(
           uint64_t W1_ind = w1_root_index++;
           uint64_t W2_ind = w1_root_index++;
           uint64_t W3_ind = w3_root_index++;
-
-          HEXL_VLOG(4, "W1_ind " << W1_ind);
-          HEXL_VLOG(4, "W2_ind " << W2_ind);
-          HEXL_VLOG(4, "W3_ind " << W3_ind);
 
           const uint64_t W1 = inv_root_of_unity_powers[W1_ind];
           const uint64_t W2 = inv_root_of_unity_powers[W2_ind];
@@ -426,6 +414,7 @@ void InverseTransformFromBitReverseRadix4(
     // Assume X, Y in [0, 2q) and compute
     // X' = N^{-1} (X + Y) (mod q)
     // Y' = N^{-1} * W * (X - Y) (mod q)
+    // with X', Y' in [0, 2q)
     uint64_t tx = AddUIntMod(X[j], Y[j], twice_modulus);
     uint64_t ty = X[j] + twice_modulus - Y[j];
     X[j] = MultiplyModLazy<64>(tx, inv_n, inv_n_precon, modulus);
