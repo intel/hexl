@@ -160,7 +160,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
         }
       }
 
-      // Lazy substraction, results in [0, 2*qi), since fix is in [0, qi].
+      // Lazy subtraction, results in [0, 2*qi), since fix is in [0, qi].
       uint64_t barrett_factor =
           MultiplyFactor(1, 64, moduli[i]).BarrettFactor();
       uint64_t fix = qi - BarrettReduce64(qk_half, moduli[i], barrett_factor);
