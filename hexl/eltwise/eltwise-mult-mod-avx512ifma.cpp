@@ -385,6 +385,8 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   unsigned int Nm1 = static_cast<unsigned int>(N - 1);
   unsigned int HiShift = static_cast<unsigned int>(53 - N);
 
+  std::cout << "EltwiseMultModAVX512IFMAIntLoopDefault\n";
+
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
