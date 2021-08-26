@@ -496,6 +496,9 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
                     "operand2 exceeds bound " << (InputModFactor * modulus));
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
+
+  std::cout << "EltwiseMultModAVX512IFMAInt\n";
+
   uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
     EltwiseMultModNative<InputModFactor>(result, operand1, operand2, n_mod_8,
@@ -527,6 +530,8 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
   bool reduce_mod = 2 * Log2(InputModFactor) + N >= 51;
+
+  std::cout << "reduce_mod " << reduce_mod << "\n";
 
   if (reduce_mod) {
     // This case happens only when  N >= 51 - 2 * log2(input_mod_factor) >= 47
