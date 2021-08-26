@@ -245,7 +245,7 @@ TEST(EltwiseMultMod, avx512ifma_big) {
 
     for (size_t input_mod_factor = 1; input_mod_factor <= 4;
          input_mod_factor *= 2) {
-      for (size_t bits = 40; bits <= 50; ++bits) {
+      for (size_t bits = 40; bits <= 40; ++bits) {
         uint64_t modulus = (1ULL << bits) + 7;
         if (input_mod_factor * modulus > MaximumValue(50)) {
           continue;
@@ -259,7 +259,7 @@ TEST(EltwiseMultMod, avx512ifma_big) {
 #ifdef HEXL_DEBUG
         size_t num_trials = 1;
 #else
-        size_t num_trials = 10;
+        size_t num_trials = 1;
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
           for (size_t i = 0; i < length; ++i) {

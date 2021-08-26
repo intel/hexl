@@ -327,6 +327,15 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
   }
 }
 
+template <typename T>
+void print_vector(const std::vector<T>& vec, const std::string& name = "") {
+  std::cout << name << ": ";
+  for (size_t i = 0; i < vec.size(); ++i) {
+    std::cout << vec[i] << " ";
+  }
+  std::cout << "\n";
+}
+
 // Algorithm 1 from
 // https://hal.archives-ouvertes.fr/hal-01215845/document
 template <int BitShift, int InputModFactor>
@@ -337,6 +346,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   uint64_t N = BitShift;
 
   std::cout << "EltwiseMultModAVX512IFMAIntLoopDefault\n";
+  std::cout << "BitShift " << BitShift << "\n";
 
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
@@ -352,6 +362,8 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
     // Compute product
     __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
+
+    print_vector(ExtractValues(v_prod_lo), "v_prod_lo");
 
     __m512i c1_lo =
         _mm512_srli_epi64(v_prod_lo, static_cast<unsigned int>(N - 1ULL));
@@ -386,8 +398,6 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   uint64_t N = bit_shift;
   unsigned int Nm1 = static_cast<unsigned int>(N - 1);
   unsigned int HiShift = static_cast<unsigned int>(53 - N);
-
-  std::cout << "EltwiseMultModAVX512IFMAIntLoopDefault\n";
 
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
