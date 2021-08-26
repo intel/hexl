@@ -336,6 +336,8 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i v_twice_mod, uint64_t n) {
   uint64_t N = BitShift;
 
+  std::cout << "EltwiseMultModAVX512IFMAIntLoopDefault\n";
+
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
