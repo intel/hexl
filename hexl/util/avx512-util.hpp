@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "hexl/number-theory/number-theory.hpp"
+#include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/defines.hpp"
 #include "hexl/util/util.hpp"
@@ -18,20 +19,38 @@ namespace hexl {
 #ifdef HEXL_HAS_AVX512DQ
 
 /// @brief Returns the unsigned 64-bit integer values in x as a vector
-inline std::vector<uint64_t> ExtractValues(__m512i x) {
-  __m256i x0 = _mm512_extracti64x4_epi64(x, 0);
-  __m256i x1 = _mm512_extracti64x4_epi64(x, 1);
+inline std::vector<uint64_t> ExtractValues(__m512i v_x) {
+  AlignedVector64<uint64_t> xs(8, 0);
+  _mm512_storeu_si512(reinterpret_cast<__m512i*>(xs.data()), v_x);
 
-  std::vector<uint64_t> xs{static_cast<uint64_t>(_mm256_extract_epi64(x0, 0)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x0, 1)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x0, 2)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x0, 3)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x1, 0)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x1, 1)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x1, 2)),
-                           static_cast<uint64_t>(_mm256_extract_epi64(x1, 3))};
+  std::vector<uint64_t> ret(8, 0);
+  for (size_t i = 0; i < 8; ++i) {
+    ret[i] = xs[i];
+  }
 
-  return xs;
+  return ret;
+
+  // __m256i x0 = _mm512_extracti64x4_epi64(x, 0);
+  // __m256i x1 = _mm512_extracti64x4_epi64(x, 1);
+
+  // std::vector<uint64_t> xs{static_cast<uint64_t>(_mm256_extract_epi64(x0,
+  // 0)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x0,
+  //                          1)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x0,
+  //                          2)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x0,
+  //                          3)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x1,
+  //                          0)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x1,
+  //                          1)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x1,
+  //                          2)),
+  //                          static_cast<uint64_t>(_mm256_extract_epi64(x1,
+  //                          3))};
+
+  // return xs;
 }
 
 /// @brief Returns the signed 64-bit integer values in x as a vector
