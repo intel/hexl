@@ -46,7 +46,7 @@ NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
              m_w << " is not a primitive 2*" << degree << "'th root of unity");
 
   m_degree_bits = Log2(m_degree);
-  m_winv = InverseMod(m_w, m_q);
+  m_w_inv = InverseMod(m_w, m_q);
   ComputeRootOfUnityPowers();
 }
 
@@ -314,7 +314,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
   const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowers().data();
   const uint64_t* precon_inv_root_of_unity_powers =
       GetPrecon64InvRootOfUnityPowers().data();
-  InverseTransformFromBitReverse64(
+  InverseTransformFromBitReverseRadix2(
       result, m_degree, m_q, inv_root_of_unity_powers,
       precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
 }

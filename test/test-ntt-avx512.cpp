@@ -22,7 +22,7 @@ namespace intel {
 namespace hexl {
 
 #ifdef HEXL_HAS_AVX512IFMA
-class NTTModulusTest
+class ModulusTest
     : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t>> {
  protected:
   void SetUp() {}
@@ -34,7 +34,7 @@ class NTTModulusTest
 
 // Test modulus around 50 bits to check IFMA behavior
 // Parameters = (degree, modulus_bits)
-TEST_P(NTTModulusTest, IFMAModuli) {
+TEST_P(ModulusTest, IFMAModuli) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
@@ -77,7 +77,7 @@ TEST_P(NTTModulusTest, IFMAModuli) {
   AssertEqual(input64, input_ifma_lazy);
 }
 
-INSTANTIATE_TEST_SUITE_P(NTTModulusTest, NTTModulusTest,
+INSTANTIATE_TEST_SUITE_P(NTT, ModulusTest,
                          ::testing::Values(std::make_tuple(1 << 4, 48),
                                            std::make_tuple(1 << 5, 49),
                                            std::make_tuple(1 << 6, 49),
@@ -364,7 +364,7 @@ TEST(NTT, InvNTT_AVX512_32) {
       std::vector<std::uint64_t> input_avx = input;
       std::vector<std::uint64_t> input_avx_lazy = input;
 
-      InverseTransformFromBitReverse64(
+      InverseTransformFromBitReverseRadix2(
           input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
           ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
@@ -416,7 +416,7 @@ TEST(NTT, InvNTT_AVX512_64) {
       std::vector<std::uint64_t> input_avx = input;
       std::vector<std::uint64_t> input_avx_lazy = input;
 
-      InverseTransformFromBitReverse64(
+      InverseTransformFromBitReverseRadix2(
           input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
           ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 

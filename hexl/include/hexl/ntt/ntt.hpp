@@ -230,8 +230,8 @@ class NTT {
 
   uint64_t m_degree_bits;  // log_2(m_degree)
 
-  uint64_t m_winv;  // Inverse of minimal root of unity
-  uint64_t m_w;     // A 2N'th root of unity
+  uint64_t m_w_inv;  // Inverse of minimal root of unity
+  uint64_t m_w;      // A 2N'th root of unity
 
   std::shared_ptr<AllocatorBase> m_alloc;
 

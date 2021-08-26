@@ -1,8 +1,6 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ntt/ntt-default.hpp"
-
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -13,6 +11,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
+#include "ntt/ntt-default.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
@@ -53,14 +52,14 @@ void ForwardTransformToBitReverseRadix2(
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -74,10 +73,10 @@ void ForwardTransformToBitReverseRadix2(
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -91,8 +90,8 @@ void ForwardTransformToBitReverseRadix2(
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -106,7 +105,7 @@ void ForwardTransformToBitReverseRadix2(
 
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
-          FwdButterfly(X, Y, W, W_precon, modulus, twice_modulus);
+          FwdButterflyRadix2(X, Y, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -122,14 +121,14 @@ void ForwardTransformToBitReverseRadix2(
           uint64_t* Y = X + t;
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < t; j += 8) {
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            FwdButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            FwdButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
           }
         }
       }
@@ -175,7 +174,7 @@ void ReferenceForwardTransformToBitReverse(
   }
 }
 
-void InverseTransformFromBitReverse64(
+void InverseTransformFromBitReverseRadix2(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
@@ -193,10 +192,11 @@ void InverseTransformFromBitReverse64(
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
 
   uint64_t twice_modulus = modulus << 1;
+  uint64_t n_div_2 = (n >> 1);
   size_t t = 1;
   size_t root_index = 1;
 
-  for (size_t m = (n >> 1); m > 1; m >>= 1) {
+  for (size_t m = n_div_2; m > 1; m >>= 1) {
     size_t j1 = 0;
 
     switch (t) {
@@ -211,7 +211,7 @@ void InverseTransformFromBitReverse64(
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
 
-          InvButterfly(X, Y, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X, Y, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -226,8 +226,8 @@ void InverseTransformFromBitReverse64(
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
 
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -242,10 +242,10 @@ void InverseTransformFromBitReverse64(
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
 
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -260,14 +260,14 @@ void InverseTransformFromBitReverse64(
           uint64_t* X = operand + j1;
           uint64_t* Y = X + t;
 
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-          InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+          InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
         }
         break;
       }
@@ -283,14 +283,14 @@ void InverseTransformFromBitReverse64(
           uint64_t* Y = X + t;
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < t; j += 8) {
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
-            InvButterfly(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
+            InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
           }
         }
       }
@@ -299,7 +299,8 @@ void InverseTransformFromBitReverse64(
   }
 
   // Fold multiplication by N^{-1} to final stage butterfly
-  const uint64_t W = inv_root_of_unity_powers[root_index];
+  const uint64_t W = inv_root_of_unity_powers[n - 1];
+
   const uint64_t inv_n = InverseMod(n, modulus);
   uint64_t inv_n_precon = MultiplyFactor(inv_n, 64, modulus).BarrettFactor();
   const uint64_t inv_n_w = MultiplyMod(inv_n, W, modulus);
@@ -307,8 +308,8 @@ void InverseTransformFromBitReverse64(
       MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
 
   uint64_t* X = operand;
-  uint64_t* Y = X + (n >> 1);
-  for (size_t j = 0; j < (n >> 1); ++j) {
+  uint64_t* Y = X + n_div_2;
+  for (size_t j = 0; j < n_div_2; ++j) {
     // Assume X, Y in [0, 2q) and compute
     // X' = N^{-1} (X + Y) (mod q)
     // Y' = N^{-1} * W * (X - Y) (mod q)
