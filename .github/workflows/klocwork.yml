@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 env:
-  KLOCWORK_DIR: ~/kwbuildtools/bin/
   PROJECT_NAME: hexl_github-ci
 
 jobs:
@@ -21,7 +20,6 @@ jobs:
         run: |
           mkdir build
           cmake -S . -B build
-          echo "${{ env.KLOCWORK_DIR }}" >> $GITHUB_PATH
 
       - name: Build Klocwork Project
         run: |
@@ -36,6 +34,6 @@ jobs:
       - name: Upload Klocwork Results
         run: |
           # Add checkerset
-          kwadmin --url ${{ secrets.KLOCWORK_SERVER }} import-config ${{ env.PROJECT_NAME }} ~/KW20-1_Rec_Checker_Set.pconf;
+          kwadmin --url ${{ secrets.KLOCWORK_SERVER }} import-config ${{ env.PROJECT_NAME }} ~/KW21-1_Checker_Set.pconf
           kwadmin --url ${{ secrets.KLOCWORK_SERVER }} load ${{ env.PROJECT_NAME }} tables
         working-directory: ./build
