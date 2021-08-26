@@ -25,6 +25,7 @@ inline std::vector<uint64_t> ExtractValues(__m512i v_x) {
 
   std::vector<uint64_t> ret(8, 0);
   for (size_t i = 0; i < 8; ++i) {
+    std::cout << "copyring " << xs[i] << "\n";
     ret[i] = xs[i];
   }
 
