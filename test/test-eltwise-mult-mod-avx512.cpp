@@ -235,9 +235,9 @@ TEST(EltwiseMultMod, avx512ifma_big) {
   }
 
   std::random_device rd;
-  std::mt19937 gen(rd());
+  std::mt19937 gen(42);  // rd());
 
-  for (size_t length = 1024; length <= 32768; length *= 2) {
+  for (size_t length = 8; length <= 8; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> result_native(length, 0);
@@ -250,6 +250,8 @@ TEST(EltwiseMultMod, avx512ifma_big) {
         if (input_mod_factor * modulus > MaximumValue(50)) {
           continue;
         }
+
+        std::cout << "bits " << bits << "\n";
 
         std::uniform_int_distribution<uint64_t> distrib(
             0, input_mod_factor * modulus - 1);
@@ -266,6 +268,8 @@ TEST(EltwiseMultMod, avx512ifma_big) {
           }
           op1[0] = input_mod_factor * modulus - 1;
           op2[0] = input_mod_factor * modulus - 1;
+          std::cout << "trial " << trial << "\n";
+          std::cout << "input_mod_factor " << input_mod_factor << "\n";
 
           switch (input_mod_factor) {
             case 1: {
