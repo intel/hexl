@@ -352,12 +352,18 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
     __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
+    print_vector(ExtractValues(v_op1), "v_op1 before ");
     v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
                                                         &v_twice_mod);
 
+    print_vector(ExtractValues(v_op1), "v_op1");
+
     __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
+    print_vector(ExtractValues(v_op2), "v_op2 before ");
+
     v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
                                                         &v_twice_mod);
+    print_vector(ExtractValues(v_op2), "v_op2");
 
     // Compute product
     __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
