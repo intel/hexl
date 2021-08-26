@@ -152,8 +152,8 @@ jobs:
 
           # Build example using vcpkg
           # TODO: fix vcpkg example CI
-          export VCPKG_DOWNLOADS=$GITHUB_WORKSPACE/vcpkg-install/
-          vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
+          # export VCPKG_DOWNLOADS=$GITHUB_WORKSPACE/vcpkg-install/
+          vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head --downloads-root=$GITHUB_WORKSPACE/vcpkg-install/
           cd $GITHUB_WORKSPACE/example/vcpkg
           vcpkg_toolchain=$(locate vcpkg.cmake)
           echo $vcpkg_toolchain
