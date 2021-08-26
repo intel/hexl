@@ -265,6 +265,9 @@ TEST(EltwiseMultMod, avx512ifma_big) {
           for (size_t i = 0; i < length; ++i) {
             op1[i] = distrib(gen);
             op2[i] = distrib(gen);
+
+            std::cout << "op1[" << i << "] " << op1[i] << "\n";
+            std::cout << "op2[" << i << "] " << op2[i] << "\n";
           }
           op1[0] = input_mod_factor * modulus - 1;
           op2[0] = input_mod_factor * modulus - 1;
