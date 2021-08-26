@@ -18,6 +18,8 @@ on:
 env:
   HEXL_VER: 1.2.0
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
+  # Override default vcpkg installation, which may require sudo privilege
+  VCPKG_DOWNLOADS:  ${GITHUB_WORKSPACE}/vcpkg-install
   HEXL_HINT_DIR: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   COVERAGE_COMPILER_FLAGS: >
