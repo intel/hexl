@@ -150,14 +150,14 @@ jobs:
 
           # Build example using vcpkg
           # TODO: fix vcpkg example CI
-          # vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
-          # cd $GITHUB_WORKSPACE/example/vcpkg
-          # vcpkg_toolchain=$(locate vcpkg.cmake)
-          # echo $vcpkg_toolchain
-          # cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain
-          # cmake --build build
-          # build/example
-          # set +x
+          vcpkg install hexl --overlay-ports=$GITHUB_WORKSPACE/port/hexl/ --head
+          cd $GITHUB_WORKSPACE/example/vcpkg
+          vcpkg_toolchain=$(locate vcpkg.cmake)
+          echo $vcpkg_toolchain
+          cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain
+          cmake --build build
+          build/example
+          set +x
 
       - name: Archive benchmark results
         uses: actions/upload-artifact@v2
