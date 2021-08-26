@@ -27,7 +27,7 @@ inline void CheckClose(const std::vector<uint64_t>& x,
 
 inline void CheckEqual(const std::vector<uint64_t>& x,
                        const std::vector<uint64_t>& y) {
-  return CheckClose(x, y, 0);
+  CheckClose(x, y, 0);
 }
 
 // Asserts x and y are within tolerance
@@ -44,7 +44,7 @@ inline void AssertClose(const std::vector<T>& x, const std::vector<T>& y,
 
 template <typename T>
 inline void AssertEqual(const std::vector<T>& x, const std::vector<T>& y) {
-  return AssertClose(x, y, 0);
+  AssertClose(x, y, 0);
 }
 
 }  // namespace hexl

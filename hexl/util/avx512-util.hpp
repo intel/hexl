@@ -281,6 +281,8 @@ inline __m512i _mm512_hexl_small_mod_epu64(__m512i x, __m512i q,
     x = _mm512_min_epu64(x, _mm512_sub_epi64(x, *q_times_2));
     return _mm512_min_epu64(x, _mm512_sub_epi64(x, q));
   }
+  HEXL_CHECK(false, "Invalid InputModFactor");
+  return x;  // Return dummy value
 }
 
 // Returns (x + y) mod q; assumes 0 < x, y < q
