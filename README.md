@@ -49,7 +49,7 @@ Intel HEXL also supports a build using the CMake build system. See below for the
 
 ### Dependencies
 We have tested Intel HEXL on the following operating systems:
-- Ubuntu 18.04
+- Ubuntu 20.04
 - macOS 10.15
 - Microsoft Windows 10
 
