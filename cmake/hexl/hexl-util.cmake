@@ -89,6 +89,9 @@ endfunction()
 
 # Add dependency to the target archive
 function(hexl_create_archive target dependency)
+  # For proper export of HEXLConfig.cmake / HEXLTargets.cmake,
+  # we avoid explicitly linking dependencies via target_link_libraries, since
+  # this would add dependencies to the exported hexl target.
   add_dependencies(${target} ${dependency})
 
   if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

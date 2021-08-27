@@ -109,11 +109,8 @@ if (HEXL_SHARED_LIB)
         )
     endif()
 else ()
-    # For static library, we include all the dependencies for Intel HEXL in
-    # the libhexl.a.
-    # For proper export of HEXLConfig.cmake / HEXLTargets.cmake,
-    # we avoid explicitly linking dependencies via target_link_libraries, since
-    # this would add dependencies to the exported hexl target.
+    # For static library, if the dependencies are not found on the system,
+    # we manually add the dependencies for Intel HEXL in the exported library.
 
     # Export logging only if in debug mode
     if (HEXL_DEBUG)
