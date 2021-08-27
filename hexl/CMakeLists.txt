@@ -109,112 +109,27 @@ if (HEXL_SHARED_LIB)
         )
     endif()
 else ()
-    # For static library, we include all the dependencies for Intel HEXL in
-    # the libhexl.a.
-    # For proper export of HEXLConfig.cmake / HEXLTargets.cmake,
-    # we avoid explicitly linking dependencies via target_link_libraries, since
-    # this would add dependencies to the exported hexl target.
+    # For static library, if the dependencies are not found on the system,
+    # we manually add the dependencies for Intel HEXL in the exported library.
 
-    if (CpuFeatures_FOUND)
-      target_link_libraries(hexl PRIVATE cpu_features)
-    else()
-      add_dependencies(hexl cpu_features)
-    endif()
-
+    # Export logging only if in debug mode
     if (HEXL_DEBUG)
-        add_dependencies(hexl easyloggingpp)
         # Manually add logging include directory
         target_include_directories(hexl
             PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
         )
+        hexl_create_archive(hexl easyloggingpp)
+    endif()
+
+    if (CpuFeatures_FOUND)
+      target_link_libraries(hexl PRIVATE cpu_features)
+    else()
+      hexl_create_archive(hexl cpu_features)
     endif()
 
     # Manually add cpu_features include directory
     target_include_directories(hexl
       PRIVATE $<TARGET_PROPERTY:cpu_features,INTERFACE_INCLUDE_DIRECTORIES>)
-
-    # Export logging only if we are debugging
-    if (HEXL_DEBUG)
-        if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-            if(CpuFeatures_FOUND)
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND ar -x $<TARGET_FILE:hexl>
-                    COMMAND ar -x $<TARGET_FILE:easyloggingpp>
-                    COMMAND ar -qcs $<TARGET_FILE:hexl> *.o
-                    COMMAND rm -f *.o
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl easyloggingpp
-                )
-            else()
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND ar -x $<TARGET_FILE:hexl>
-                    COMMAND ar -x $<TARGET_FILE:cpu_features>
-                    COMMAND ar -x $<TARGET_FILE:easyloggingpp>
-                    COMMAND ar -qcs $<TARGET_FILE:hexl> *.o
-                    COMMAND rm -f *.o
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl cpu_features easyloggingpp
-            )
-            endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-            if(CpuFeatures_FOUND)
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
-                        $<TARGET_FILE:hexl>
-                        $<TARGET_FILE:easyloggingpp>
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl easyloggingpp
-                )
-            else()
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
-                        $<TARGET_FILE:hexl>
-                        $<TARGET_FILE:cpu_features>
-                        $<TARGET_FILE:easyloggingpp>
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl cpu_features easyloggingpp
-                )
-            endif()
-        endif()
-    else()
-        if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-            if(CpuFeatures_FOUND)
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND ar -x $<TARGET_FILE:hexl>
-                    COMMAND ar -qcs $<TARGET_FILE:hexl> *.o
-                    COMMAND rm -f *.o
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl
-            )
-            else()
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND ar -x $<TARGET_FILE:hexl>
-                    COMMAND ar -x $<TARGET_FILE:cpu_features>
-                    COMMAND ar -qcs $<TARGET_FILE:hexl> *.o
-                    COMMAND rm -f *.o
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl cpu_features
-                )
-            endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-            if(CpuFeatures_FOUND)
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
-                        $<TARGET_FILE:hexl>
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl
-                )
-            else()
-                add_custom_command(TARGET hexl POST_BUILD
-                    COMMAND lib.exe /OUT:$<TARGET_FILE:hexl>
-                        $<TARGET_FILE:hexl>
-                        $<TARGET_FILE:cpu_features>
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    DEPENDS hexl cpu_features
-                )
-            endif()
-      endif()
-    endif()
 endif()
 
 install(TARGETS hexl DESTINATION ${CMAKE_INSTALL_LIBDIR})

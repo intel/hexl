@@ -26,6 +26,7 @@ function(hexl_check_compile_flag SOURCE_FILE OUTPUT_FLAG)
     endif()
 endfunction()
 
+# Checks the supported compiler versions
 function(hexl_check_compiler_version)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
       if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
@@ -62,6 +63,7 @@ function(hexl_uncache_variable variable)
   endif()
 endfunction()
 
+# Defines compiler-specific CMake variables
 function(hexl_add_compiler_definition)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(HEXL_USE_MSVC ON PARENT_SCOPE)
@@ -74,8 +76,8 @@ function(hexl_add_compiler_definition)
   endif()
 endfunction()
 
+# Link HEXL with AddressSanitizer in Debug mode on Mac/Linux
 function(hexl_add_asan_flag target)
-  # Enable AddressSanitizer in Debug mode on Mac/Linux
   if(HEXL_DEBUG AND UNIX)
     target_compile_options(${target} PUBLIC -fsanitize=address)
     target_link_options(${target} PUBLIC -fsanitize=address)
@@ -83,5 +85,33 @@ function(hexl_add_asan_flag target)
   else()
     set(HEXL_ASAN_LINK "" PARENT_SCOPE)
   endif()
+endfunction()
 
+# Add dependency to the target archive
+function(hexl_create_archive target dependency)
+  # For proper export of HEXLConfig.cmake / HEXLTargets.cmake,
+  # we avoid explicitly linking dependencies via target_link_libraries, since
+  # this would add dependencies to the exported hexl target.
+  add_dependencies(${target} ${dependency})
+
+  if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_custom_command(TARGET ${target} POST_BUILD
+                      COMMAND ar -x $<TARGET_FILE:${target}>
+                      COMMAND ar -x $<TARGET_FILE:${dependency}>
+                      COMMAND ar -qcs $<TARGET_FILE:${target}> *.o
+                      COMMAND rm -f *.o
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                      DEPENDS ${target} ${dependency}
+      )
+  elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_custom_command(TARGET ${target} POST_BUILD
+                       COMMAND lib.exe /OUT:$<TARGET_FILE:${target}>
+                        $<TARGET_FILE:${target}>
+                        $<TARGET_FILE:${dependency}>
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                        DEPENDS ${target} ${dependency}
+  )
+  else()
+    message(WARNING "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
+  endif()
 endfunction()
