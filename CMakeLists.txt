@@ -139,7 +139,7 @@ message(STATUS "CMAKE_INSTALL_PREFIX:     ${CMAKE_INSTALL_PREFIX}")
 #------------------------------------------------------------------------------
 find_package(CpuFeatures CONFIG)
 if (NOT CpuFeatures_FOUND)
-  message(STATUS "CpuFeatures: not found")
+  message(STATUS "CpuFeatures: pre-installed CpuFeatures not found")
   add_subdirectory(cmake/third-party/cpu-features)
 else()
   message(STATUS "CpuFeatures: found")
