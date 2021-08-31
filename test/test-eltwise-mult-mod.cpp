@@ -77,7 +77,7 @@ TEST(EltwiseMultModInPlace, 8_bounds) {
 #endif
 
 TEST(EltwiseMultModInPlace, 9) {
-  uint64_t modulus = GeneratePrimes(1, 51, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 51, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 3, 1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint64_t> op2{modulus - 4, 8, 7, 6, 5, 4, 3, 2, 1};
@@ -105,7 +105,7 @@ TEST(EltwiseMultMod, native_mult2) {
 }
 
 TEST(EltwiseMultMod, native2_big) {
-  uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 3, 1, 1, 1, 1, 1, 1, 1};
   std::vector<uint64_t> op2{modulus - 4, 1, 1, 1, 1, 1, 1, 1};
@@ -119,7 +119,7 @@ TEST(EltwiseMultMod, native2_big) {
 }
 
 TEST(EltwiseMultMod, 8big) {
-  uint64_t modulus = GeneratePrimes(1, 48, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 48, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 1, 1, 1, 1, 1, 1, 1, 1};
   std::vector<uint64_t> op2{modulus - 1, 1, 1, 1, 1, 1, 1, 1};
@@ -198,7 +198,7 @@ TEST(EltwiseMultMod, 8_bounds) {
 #endif
 
 TEST(EltwiseMultMod, 9) {
-  uint64_t modulus = GeneratePrimes(1, 51, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 51, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 3, 1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint64_t> op2{modulus - 4, 8, 7, 6, 5, 4, 3, 2, 1};

@@ -52,7 +52,7 @@ TEST(EltwiseSubMod, vector_vector_avx512_big) {
     GTEST_SKIP();
   }
 
-  uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
   std::vector<uint64_t> op1{0,           1,           2,           3,
                             modulus - 1, modulus - 2, modulus - 3, modulus - 4};
@@ -71,7 +71,7 @@ TEST(EltwiseSubMod, vector_scalar_avx512_big) {
     GTEST_SKIP();
   }
 
-  uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
   std::vector<uint64_t> op1{0,           1,           2,           3,
                             modulus - 1, modulus - 2, modulus - 3, modulus - 4};

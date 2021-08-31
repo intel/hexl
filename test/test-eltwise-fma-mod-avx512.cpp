@@ -229,7 +229,7 @@ TEST(EltwiseFMAMod, AVX512IFMA) {
   constexpr uint64_t input_mod_factor = 8;
 
   for (size_t bits = 48; bits <= 51; ++bits) {
-    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     std::uniform_int_distribution<uint64_t> distrib(
         0, input_mod_factor * modulus - 1);
 

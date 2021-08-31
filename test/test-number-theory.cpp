@@ -336,7 +336,17 @@ TEST(NumberTheory, IsPrime) {
 
 TEST(NumberTheory, GeneratePrimes) {
   for (int bit_size = 40; bit_size < 62; ++bit_size) {
-    std::vector<uint64_t> primes = GeneratePrimes(10, bit_size, 4096);
+    std::vector<uint64_t> primes = GeneratePrimes(10, bit_size, true, 4096);
+    ASSERT_EQ(primes.size(), 10);
+    for (const auto& prime : primes) {
+      ASSERT_EQ(prime % 8192, 1);
+      ASSERT_TRUE(IsPrime(prime));
+      ASSERT_TRUE(prime <= (1ULL << (bit_size + 1)));
+      ASSERT_TRUE(prime >= (1ULL << bit_size));
+    }
+  }
+  for (int bit_size = 40; bit_size < 62; ++bit_size) {
+    std::vector<uint64_t> primes = GeneratePrimes(10, bit_size, false, 4096);
     ASSERT_EQ(primes.size(), 10);
     for (const auto& prime : primes) {
       ASSERT_EQ(prime % 8192, 1);

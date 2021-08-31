@@ -61,9 +61,29 @@ template void ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
 template <int BitShift, bool InputLessThanMod>
 void FwdButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
                   __m512i neg_modulus, __m512i twice_modulus) {
+  HEXL_VLOG(5, " ");
+  HEXL_VLOG(5, "FwdButterfly AVX512 inputs");
+  HEXL_VLOG(5, "X " << ExtractValues(*X));
+  HEXL_VLOG(5, "Y " << ExtractValues(*Y));
+  HEXL_VLOG(5, "W " << ExtractValues(W));
+  HEXL_VLOG(5, "modulus " << ExtractValues(twice_modulus)[0] / 2);
+  HEXL_VLOG(5, "W_precon " << ExtractValues(W_precon));
+
+  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
+                    2 * ExtractValues(twice_modulus).data()[0],
+                    "FwdButterfly input Y exceeds 4 * modulus "
+                        << 2 * ExtractValues(twice_modulus).data()[0]);
+  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
+                    2 * ExtractValues(twice_modulus).data()[0],
+                    "FwdButterfly input Y exceeds 4 * modulus "
+                        << 2 * ExtractValues(twice_modulus).data()[0]);
+
   if (!InputLessThanMod) {
+    HEXL_VLOG(5, "HEXL small modding");
     *X = _mm512_hexl_small_mod_epu64(*X, twice_modulus);
   }
+
+  HEXL_VLOG(5, "X in [0,2q] " << ExtractValues(*X));
 
   __m512i T;
   if (BitShift == 32) {
@@ -88,9 +108,24 @@ void FwdButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
     HEXL_CHECK(false, "Invalid BitShift " << BitShift);
   }
 
+  HEXL_VLOG(5, "T " << ExtractValues(T));
+
   __m512i twice_mod_minus_T = _mm512_sub_epi64(twice_modulus, T);
   *Y = _mm512_add_epi64(*X, twice_mod_minus_T);
   *X = _mm512_add_epi64(*X, T);
+
+  HEXL_VLOG(5, "FwdButterfly AVX512 outputs");
+  HEXL_VLOG(5, "X " << ExtractValues(*X));
+  HEXL_VLOG(5, "Y " << ExtractValues(*Y));
+
+  HEXL_CHECK_BOUNDS(ExtractValues(*X).data(), 8,
+                    2 * ExtractValues(twice_modulus).data()[0],
+                    "FwdButterfly output X exceeds 4 * modulus "
+                        << 2 * ExtractValues(twice_modulus).data()[0]);
+  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
+                    2 * ExtractValues(twice_modulus).data()[0],
+                    "FwdButterfly output Y exceeds 4 * modulus "
+                        << 2 * ExtractValues(twice_modulus).data()[0]);
 }
 
 template <int BitShift>
@@ -266,7 +301,7 @@ void ForwardTransformToBitReverseAVX512(
       const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-      if (input_mod_factor <= 2) {
+      if ((input_mod_factor <= 2) && (recursion_depth == 0)) {
         FwdT8<BitShift, true>(operand, v_neg_modulus, v_twice_mod, t, m, W,
                               W_precon);
       } else {

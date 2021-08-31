@@ -176,14 +176,17 @@ inline unsigned char AddUInt64(uint64_t operand1, uint64_t operand2,
 /// @brief Returns whether or not the input is prime
 bool IsPrime(uint64_t n);
 
-/// @brief Generates a list of num_primes primes in the range [2^(bit_size,
+/// @brief Generates a list of num_primes primes in the range [2^(bit_size),
 // 2^(bit_size+1)]. Ensures each prime q satisfies
 // q % (2*ntt_size+1)) == 1
 /// @param[in] num_primes Number of primes to generate
 /// @param[in] bit_size Bit size of each prime
+/// @param[in] prefer_small_primes When true, returns primes starting from
+/// 2^(bit_size); when false, returns primes starting from 2^(bit_size+1)
 /// @param[in] ntt_size N such that each prime q satisfies q % (2N) == 1. N must
-/// be a power of two
+/// be a power of two less than 2^bit_size.
 std::vector<uint64_t> GeneratePrimes(size_t num_primes, size_t bit_size,
+                                     bool prefer_small_primes,
                                      size_t ntt_size = 1);
 
 /// @brief Returns input mod modulus, computed via 64-bit Barrett reduction

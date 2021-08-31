@@ -100,7 +100,7 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
 #ifdef HEXL_DEBUG
@@ -139,7 +139,7 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, (4 * modulus) - 1);
 
 #ifdef HEXL_DEBUG
@@ -178,7 +178,7 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, (4 * modulus) - 1);
 
 #ifdef HEXL_DEBUG
@@ -217,7 +217,7 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
-    uint64_t modulus = GeneratePrimes(1, bits, length)[0];
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     std::uniform_int_distribution<uint64_t> distrib(0, (2 * modulus) - 1);
 
 #ifdef HEXL_DEBUG
