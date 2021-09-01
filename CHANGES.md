@@ -1,5 +1,14 @@
 # Changes
 
+## Version 1.2.1
+- Fixes a bug in AVX512 floating-point implementation of element-wise vector-vector modular multiplication (https://github.com/microsoft/SEAL/issues/385)
+- Fixes a bug in the NTT default constructor (https://gitlab.com/palisade/palisade-development/-/issues/329)
+- Fixes a bug in the AVX512 NTT (https://github.com/intel/hexl/pull/58)
+- Improves performance of EltwiseFMAModAVX512 on ICX (https://github.com/intel/hexl/pull/42)
+- Improves performance of the native NTT
+- Adds reference implementations for the radix-4 NTT
+- Enables support for pre-built easylogging (https://github.com/intel/hexl/pull/57)
+
 ## Version 1.2.0
 - Large performance improvement in large (N >= 16384) AVX512 NTTs via recursive implementations
 - Slight performance improvements in AVX512IFMA NTT
