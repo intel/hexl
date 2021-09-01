@@ -118,7 +118,11 @@ else ()
         target_include_directories(hexl
             PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
         )
-        hexl_create_archive(hexl easyloggingpp)
+        if (EASYLOGGINGPP_FOUND)
+            target_link_libraries(hexl PRIVATE easyloggingpp)
+        else()
+            hexl_create_archive(hexl easyloggingpp)
+        endif()
     endif()
 
     if (CpuFeatures_FOUND)
