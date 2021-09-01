@@ -4,6 +4,9 @@
 #pragma once
 
 #include <cstddef>
+#include <random>
+
+#include "hexl/util/aligned-allocator.hpp"
 
 namespace intel {
 namespace hexl {

@@ -14,6 +14,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
