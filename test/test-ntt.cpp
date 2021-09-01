@@ -426,7 +426,7 @@ TEST_P(DegreeModulusTest, InverseRadix4Random) {
   uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
   std::random_device rd;
-  std::mt19937 gen(42);  // rd());
+  std::mt19937 gen(rd());
   std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
 
   std::vector<uint64_t> input(N);

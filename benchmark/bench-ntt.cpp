@@ -284,7 +284,7 @@ BENCHMARK(BM_InvNTTNativeRadix2)
 
 static void BM_InvNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
-  size_t modulus = GeneratePrimes(1, 45, ntt_size)[0];
+  size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
   AlignedVector64<uint64_t> input(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
