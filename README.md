@@ -49,7 +49,7 @@ Intel HEXL also supports a build using the CMake build system. See below for the
 
 ### Dependencies
 We have tested Intel HEXL on the following operating systems:
-- Ubuntu 18.04
+- Ubuntu 20.04
 - macOS 10.15
 - Microsoft Windows 10
 
@@ -134,14 +134,19 @@ Then, run
 ```bash
 cmake --build build --target unittest
 ```
-The unit-test executable itself is located at `build/test/unit-test`
+The unit-test executable itself is located at `build/test/unit-test` on Linux and Mac, and at `build\test\Release\unit-test.exe` or `build\test\Debug\unit-test.exe` on Windows.
 ## Benchmarking Intel HEXL
 To run a set of benchmarks via Google benchmark, configure and build Intel HEXL with `-DHEXL_BENCHMARK=ON` (see [Compile-time options](#compile-time-options)).
 Then, run
 ```bash
 cmake --build build --target bench
 ```
-The benchmark executable itself is located at `build/benchmark/bench_hexl`
+On Windows, run
+```bash
+cmake --build build --target bench --config Release
+```
+
+The benchmark executable itself is located at `build/benchmark/bench_hexl` on Linux and Mac, and at `build\benchmark\Debug\bench_hexl.exe` or `build\benchmark\Release\bench_hexl.exe` on Windows.
 
 ## Using Intel HEXL
 The `example` folder has an example of using Intel HEXL in a third-party project.
@@ -150,6 +155,9 @@ The `example` folder has an example of using Intel HEXL in a third-party project
 For optimal performance, Intel HEXL does not perform input validation. In many cases the time required for the validation would be longer than the execution of the function itself. To debug Intel HEXL, configure and build Intel HEXL with `-DCMAKE_BUILD_TYPE=Debug` (see [Compile-time options](#compile-time-options)). This will generate a debug version of the library, e.g. `libhexl_debug.a`, that can be used to debug the execution. In Debug mode, Intel HEXL will also link against [Address Sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer).
 
 **Note**, enabling `CMAKE_BUILD_TYPE=Debug` will result in a significant runtime overhead.
+
+To enable verbose logging for the benchmarks or unit-tests in a Debug build, add the log level as a command-line argument, e.g. `build/benchmark/bench_hexl --v=9`. See [easyloggingpp's documentation](https://github.com/amrayn/easyloggingpp#application-arguments) for more details.
+
 ## Threading
 Intel HEXL is single-threaded and thread-safe.
 
@@ -175,7 +183,7 @@ Then, configure Intel HEXL with `-DHEXL_DOCS=ON` (see [Compile-time options](#co
 ```
 cmake --build build --target docs
 ```
-To view the generated Doxygen documentation, open the generated `build/docs/doxygen/html/index.html` file in a web browser.
+To view the generated Doxygen documentation, open the generated `docs/doxygen/html/index.html` file in a web browser.
 
 # Contributing
 This project welcomes external contributions. To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -195,7 +203,7 @@ To cite Intel HEXL, please use the following BibTeX entry.
         author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.2)},
         howpublished = {\url{https://github.com/intel/hexl}},
-        month = july,
+        month = september,
         year = 2021,
         key = {Intel HEXL}
     }
@@ -240,3 +248,6 @@ The Intel contributors to this project, sorted by last name, are
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
+
+In addition to the Intel contributors listed, we are also grateful to contributions to this project that are not reflected in the Git history:
+  - [Antonis Papadimitriou](https://www.linkedin.com/in/apapadimitriou/)

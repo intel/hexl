@@ -1,0 +1,52 @@
+\hypertarget{aligned-allocator_8hpp}{}\section{aligned-\/allocator.hpp File Reference}
+\label{aligned-allocator_8hpp}\index{aligned-\/allocator.\+hpp@{aligned-\/allocator.\+hpp}}
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include \char`\"{}hexl/number-\/theory/number-\/theory.\+hpp\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hexl/util/allocator.\+hpp\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hexl/util/defines.\+hpp\char`\"{}}\newline
+Include dependency graph for aligned-\/allocator.hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aligned-allocator_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{aligned-allocator_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structintel_1_1hexl_1_1MallocStrategy}{intel\+::hexl\+::\+Malloc\+Strategy}
+\begin{DoxyCompactList}\small\item\em Allocater implementation using malloc and free. \end{DoxyCompactList}\item 
+class \hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator$<$ T, Alignment $>$}
+\begin{DoxyCompactList}\small\item\em Allocates memory aligned to Alignment-\/byte sized boundaries. \end{DoxyCompactList}\item 
+struct \hyperlink{structintel_1_1hexl_1_1AlignedAllocator_1_1rebind}{intel\+::hexl\+::\+Aligned\+Allocator$<$ T, Alignment $>$\+::rebind$<$ U $>$}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceintel}{intel}
+\item 
+ \hyperlink{namespaceintel_1_1hexl}{intel\+::hexl}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \hyperlink{namespaceintel_1_1hexl_aced64250965d3b78827d8009634eef0c}{intel\+::hexl\+::\+Allocator\+Strategy\+Ptr} = std\+::shared\+\_\+ptr$<$ Allocator\+Base $>$
+\item 
+{\footnotesize template$<$typename T $>$ }\\using \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{intel\+::hexl\+::\+Aligned\+Vector64} = std\+::vector$<$ T, Aligned\+Allocator$<$ T, 64 $>$ $>$
+\begin{DoxyCompactList}\small\item\em 64-\/byte aligned memory allocator \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+Allocator\+Strategy\+Ptr \hyperlink{namespaceintel_1_1hexl_aedc86b34ea92ac34d036acff6d84479a}{intel\+::hexl\+::malloc\+Strategy}
+\end{DoxyCompactItemize}

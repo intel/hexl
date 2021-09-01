@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="util_8hpp" kind="file" language="C++">
+    <compoundname>util.hpp</compoundname>
+    <includes local="no">cstddef</includes>
+    <includedby refid="eltwise-cmp-add_8hpp" local="yes">eltwise-cmp-add.hpp</includedby>
+    <includedby refid="eltwise-cmp-sub-mod_8hpp" local="yes">eltwise-cmp-sub-mod.hpp</includedby>
+    <includedby refid="hexl_8hpp" local="yes">hexl.hpp</includedby>
+    <incdepgraph>
+      <node id="191">
+        <label>util.hpp</label>
+        <link refid="util_8hpp"/>
+        <childnode refid="192" relation="include">
+        </childnode>
+      </node>
+      <node id="192">
+        <label>cstddef</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="196">
+        <label>eltwise-cmp-sub-mod.hpp</label>
+        <link refid="eltwise-cmp-sub-mod_8hpp"/>
+        <childnode refid="195" relation="include">
+        </childnode>
+      </node>
+      <node id="194">
+        <label>eltwise-cmp-add.hpp</label>
+        <link refid="eltwise-cmp-add_8hpp"/>
+        <childnode refid="195" relation="include">
+        </childnode>
+      </node>
+      <node id="195">
+        <label>hexl.hpp</label>
+        <link refid="hexl_8hpp"/>
+      </node>
+      <node id="193">
+        <label>util.hpp</label>
+        <link refid="util_8hpp"/>
+        <childnode refid="194" relation="include">
+        </childnode>
+        <childnode refid="196" relation="include">
+        </childnode>
+        <childnode refid="195" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespaceintel">intel</innernamespace>
+    <innernamespace refid="namespaceintel_1_1hexl">intel::hexl</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>(C)<sp/>2020-2021<sp/>Intel<sp/>Corporation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstddef&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceintel" kindref="compound">intel</ref><sp/>{</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">hexl<sp/>{</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#undef<sp/>TRUE<sp/><sp/><sp/>//<sp/>MSVC<sp/>defines<sp/>TRUE</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#undef<sp/>FALSE<sp/><sp/>//<sp/>MSVC<sp/>defines<sp/>FALSE</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16" refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" refkind="member"><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref><sp/>{</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47" kindref="member">EQ</ref><sp/>=<sp/>0,<sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b" kindref="member">LT</ref><sp/>=<sp/>1,<sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6" kindref="member">LE</ref><sp/>=<sp/>2,<sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" kindref="member">FALSE</ref><sp/>=<sp/>3,<sp/><sp/></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0" kindref="member">NE</ref><sp/>=<sp/>4,<sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8" kindref="member">NLT</ref><sp/>=<sp/>5,<sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57" kindref="member">NLE</ref><sp/>=<sp/>6,<sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61" kindref="member">TRUE</ref><sp/>=<sp/>7<sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="25"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29" refid="namespaceintel_1_1hexl_1a8c654502a5e7fe2cfdd198f0fd920f2a" refkind="member"><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref><sp/><ref refid="namespaceintel_1_1hexl_1a8c654502a5e7fe2cfdd198f0fd920f2a" kindref="member">Not</ref>(<ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kindref="member">CMPINT</ref><sp/>cmp)<sp/>{</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordflow">switch</highlight><highlight class="normal"><sp/>(cmp)<sp/>{</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47" kindref="member">CMPINT::EQ</ref>:</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0" kindref="member">CMPINT::NE</ref>;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b" kindref="member">CMPINT::LT</ref>:</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8" kindref="member">CMPINT::NLT</ref>;</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6" kindref="member">CMPINT::LE</ref>:</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57" kindref="member">CMPINT::NLE</ref>;</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" kindref="member">CMPINT::FALSE</ref>:</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61" kindref="member">CMPINT::TRUE</ref>;</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0" kindref="member">CMPINT::NE</ref>:</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47" kindref="member">CMPINT::EQ</ref>;</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8" kindref="member">CMPINT::NLT</ref>:</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b" kindref="member">CMPINT::LT</ref>;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57" kindref="member">CMPINT::NLE</ref>:</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6" kindref="member">CMPINT::LE</ref>;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61" kindref="member">CMPINT::TRUE</ref>:</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" kindref="member">CMPINT::FALSE</ref>;</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" kindref="member">CMPINT::FALSE</ref>;</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="50"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>hexl</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>intel</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/util/util.hpp"/>
+  </compounddef>
+</doxygen>

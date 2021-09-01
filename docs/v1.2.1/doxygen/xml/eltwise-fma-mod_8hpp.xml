@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="eltwise-fma-mod_8hpp" kind="file" language="C++">
+    <compoundname>eltwise-fma-mod.hpp</compoundname>
+    <includes local="no">stdint.h</includes>
+    <includedby refid="hexl_8hpp" local="yes">hexl.hpp</includedby>
+    <incdepgraph>
+      <node id="86">
+        <label>eltwise-fma-mod.hpp</label>
+        <link refid="eltwise-fma-mod_8hpp"/>
+        <childnode refid="87" relation="include">
+        </childnode>
+      </node>
+      <node id="87">
+        <label>stdint.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="88">
+        <label>eltwise-fma-mod.hpp</label>
+        <link refid="eltwise-fma-mod_8hpp"/>
+        <childnode refid="89" relation="include">
+        </childnode>
+      </node>
+      <node id="89">
+        <label>hexl.hpp</label>
+        <link refid="hexl_8hpp"/>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespaceintel">intel</innernamespace>
+    <innernamespace refid="namespaceintel_1_1hexl">intel::hexl</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>(C)<sp/>2020-2021<sp/>Intel<sp/>Corporation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdint.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceintel" kindref="compound">intel</ref><sp/>{</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">hexl<sp/>{</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1a5b65d563391b4a1a5041633aeb118aa5" kindref="member">EltwiseFMAMod</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>arg1,<sp/>uint64_t<sp/>arg2,</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>arg3,<sp/>uint64_t<sp/>n,<sp/>uint64_t<sp/>modulus,</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>hexl</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>intel</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/eltwise/eltwise-fma-mod.hpp"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,1017 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classintel_1_1hexl_1_1NTT" kind="class" language="C++" prot="public">
+    <compoundname>intel::hexl::NTT</compoundname>
+    <includes refid="ntt_8hpp" local="no">ntt.hpp</includes>
+    <innerclass refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" prot="public">intel::hexl::NTT::AllocatorAdapter</innerclass>
+      <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ab0db0e033026cff37b7acba889500b6d" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t intel::hexl::NTT::s_default_shift_bits</definition>
+        <argsstring></argsstring>
+        <name>s_default_shift_bits</name>
+        <initializer>{64}</initializer>
+        <briefdescription>
+<para>Default bit shift used in Barrett precomputation. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="203" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="203" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t intel::hexl::NTT::s_ifma_shift_bits</definition>
+        <argsstring></argsstring>
+        <name>s_ifma_shift_bits</name>
+        <initializer>{52}</initializer>
+        <briefdescription>
+<para>Bit shift used in Barrett precomputation when AVX512-IFMA acceleration is enabled. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="207" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="207" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a4c42c952781ae97d1abf02ab5334143f" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t intel::hexl::NTT::s_max_fwd_32_modulus</definition>
+        <argsstring></argsstring>
+        <name>s_max_fwd_32_modulus</name>
+        <initializer>{1ULL &lt;&lt; (32 - 2)}</initializer>
+        <briefdescription>
+<para>Maximum modulus to use 32-bit AVX512-DQ acceleration for the forward transform. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="211" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="211" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a33af06994139ae14c69d8958611487bd" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t intel::hexl::NTT::s_max_inv_32_modulus</definition>
+        <argsstring></argsstring>
+        <name>s_max_inv_32_modulus</name>
+        <initializer>{1ULL &lt;&lt; (32 - 1)}</initializer>
+        <briefdescription>
+<para>Maximum modulus to use 32-bit AVX512-DQ acceleration for the inverse transform. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="215" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="215" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a248f7a613b187a7f71a67b93e4ca13ad" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t intel::hexl::NTT::s_max_fwd_ifma_modulus</definition>
+        <argsstring></argsstring>
+        <name>s_max_fwd_ifma_modulus</name>
+        <initializer>{1ULL &lt;&lt; (s_ifma_shift_bits - 2)}</initializer>
+        <briefdescription>
+<para>Maximum modulus to use AVX512-IFMA acceleration for the forward transform. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="219" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="219" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a741db1877b630638173b6ed5f9a6e6c7" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t intel::hexl::NTT::s_max_inv_ifma_modulus</definition>
+        <argsstring></argsstring>
+        <name>s_max_inv_ifma_modulus</name>
+        <initializer>{1ULL &lt;&lt; (s_ifma_shift_bits - 1)}</initializer>
+        <briefdescription>
+<para>Maximum modulus to use AVX512-IFMA acceleration for the inverse transform. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="223" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="223" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ac41484faffcc5c2b28e67e2e9434a050" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::m_degree</definition>
+        <argsstring></argsstring>
+        <name>m_degree</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="228" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="228" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ab7ca32c10ef1e39fc80818d981a4459d" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::m_q</definition>
+        <argsstring></argsstring>
+        <name>m_q</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="229" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="229" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a2b6b5ebbca9b783e50d83c409d4fd307" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::m_degree_bits</definition>
+        <argsstring></argsstring>
+        <name>m_degree_bits</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="231" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="231" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ab317600c0da04b8f07f11beed2f6ccf0" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::m_w_inv</definition>
+        <argsstring></argsstring>
+        <name>m_w_inv</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="233" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="233" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ab8b29317bf63f5e42552673506a0fa14" prot="private" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::m_w</definition>
+        <argsstring></argsstring>
+        <name>m_w</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="234" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="234" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1aa0c4c11c8fe8cf7e321cdc9affd5bdf2" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; <ref refid="structintel_1_1hexl_1_1AllocatorBase" kindref="compound">AllocatorBase</ref> &gt;</type>
+        <definition>std::shared_ptr&lt;AllocatorBase&gt; intel::hexl::NTT::m_alloc</definition>
+        <argsstring></argsstring>
+        <name>m_alloc</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="236" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="236" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a5e114b624bb80345b5ede2f81461482c" prot="private" static="no" mutable="no">
+        <type><ref refid="classintel_1_1hexl_1_1AlignedAllocator" kindref="compound">AlignedAllocator</ref>&lt; uint64_t, 64 &gt;</type>
+        <definition>AlignedAllocator&lt;uint64_t, 64&gt; intel::hexl::NTT::m_aligned_alloc</definition>
+        <argsstring></argsstring>
+        <name>m_aligned_alloc</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="238" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="238" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a04bb6f1f6b82d10990253ecd16484756" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="241" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="241" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ac836d4affd8489cc730557ea98f171ef" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_precon32_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_precon32_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="243" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="243" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a4aa83d8ce07822401cc4c9f30d3bd52e" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_precon64_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_precon64_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="245" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="245" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a32c0c87274355be249bd7b6402441e97" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_avx512_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_avx512_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="249" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="249" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a70fcbf1ff8f2591d5f925f13247805ed" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_avx512_precon32_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_avx512_precon32_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="251" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="251" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1ac5697dcce55597a302e4c064e3d3cb91" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_avx512_precon52_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_avx512_precon52_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="253" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="253" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1aec04ba2216d0c396c704bb04c120a8e2" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_avx512_precon64_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_avx512_precon64_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="255" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="255" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a91abec33f5fa0ec5f6bc2c0ea335c575" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_precon32_inv_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_precon32_inv_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="258" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="258" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a2c90a66e40d2dfa6babe3ec369fb8325" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_precon52_inv_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_precon52_inv_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="260" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="260" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1a9fc75f9773575158dbf57727cfd27a6d" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_precon64_inv_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_precon64_inv_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="262" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="262" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classintel_1_1hexl_1_1NTT_1afef36650ec9e3c35aa04021024117ae2" prot="private" static="no" mutable="no">
+        <type><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt;</type>
+        <definition>AlignedVector64&lt;uint64_t&gt; intel::hexl::NTT::m_inv_root_of_unity_powers</definition>
+        <argsstring></argsstring>
+        <name>m_inv_root_of_unity_powers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="264" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="264" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1ad31a184065b07b50c3ff01260f6dad28" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>()=default</argsstring>
+        <name>NTT</name>
+        <briefdescription>
+<para>Initializes an empty <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="40" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a4fbb886db7389f6a5bac264a3e0cf66f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::~NTT</definition>
+        <argsstring>()=default</argsstring>
+        <name>~NTT</name>
+        <briefdescription>
+<para>Destructs the <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="43" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a7a86355beefbe191d0e77618eeaaf6b7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>(uint64_t degree, uint64_t q, std::shared_ptr&lt; AllocatorBase &gt; alloc_ptr={})</argsstring>
+        <name>NTT</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>q</declname>
+        </param>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="structintel_1_1hexl_1_1AllocatorBase" kindref="compound">AllocatorBase</ref> &gt;</type>
+          <declname>alloc_ptr</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+<para>Initializes an <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> object with degree <computeroutput>degree</computeroutput> and modulus <computeroutput>q</computeroutput>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">degree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>also known as N. Size of the <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> transform. Must be a power of 2 </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">q</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Prime modulus. Must satisfy <formula id="9">$ q == 1 \mod 2N $</formula> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">alloc_ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Custom memory allocator used for intermediate calculations Performs pre-computation necessary for forward and inverse transforms </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="54" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a716fd07255e9b68fec80e2a9b98841f4" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Allocator</type>
+          </param>
+          <param>
+            <type>class...</type>
+            <declname>AllocatorArgs</declname>
+            <defname>AllocatorArgs</defname>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>(uint64_t degree, uint64_t q, Allocator &amp;&amp;a, AllocatorArgs &amp;&amp;... args)</argsstring>
+        <name>NTT</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>q</declname>
+        </param>
+        <param>
+          <type>Allocator &amp;&amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>AllocatorArgs &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="58" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="58" bodyend="62"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1ac5ef577bf39789c1e200b7d5a7b65989" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>(uint64_t degree, uint64_t q, uint64_t root_of_unity, std::shared_ptr&lt; AllocatorBase &gt; alloc_ptr={})</argsstring>
+        <name>NTT</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>q</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>root_of_unity</declname>
+        </param>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="structintel_1_1hexl_1_1AllocatorBase" kindref="compound">AllocatorBase</ref> &gt;</type>
+          <declname>alloc_ptr</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+<para>Initializes an <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> object with degree <computeroutput>degree</computeroutput> and modulus <computeroutput>q</computeroutput>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">degree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>also known as N. Size of the <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> transform. Must be a power of 2 </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">q</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Prime modulus. Must satisfy <formula id="9">$ q == 1 \mod 2N $</formula> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">root_of_unity</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>2N&apos;th root of unity in <formula id="10">$ \mathbb{Z_q} $</formula>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">alloc_ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Custom memory allocator used for intermediate calculations</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+Performs pre-computation necessary for forward and inverse transforms </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="75" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a831df901cf9ea5a83e5d628cdbd36671" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Allocator</type>
+          </param>
+          <param>
+            <type>class...</type>
+            <declname>AllocatorArgs</declname>
+            <defname>AllocatorArgs</defname>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>intel::hexl::NTT::NTT</definition>
+        <argsstring>(uint64_t degree, uint64_t q, uint64_t root_of_unity, Allocator &amp;&amp;a, AllocatorArgs &amp;&amp;... args)</argsstring>
+        <name>NTT</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>q</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>root_of_unity</declname>
+        </param>
+        <param>
+          <type>Allocator &amp;&amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>AllocatorArgs &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="79" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="79" bodyend="84"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a7f8dac5ff3fc117d3e7259762a716140" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::NTT::ComputeForward</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand, uint64_t input_mod_factor, uint64_t output_mod_factor)</argsstring>
+        <name>ComputeForward</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>input_mod_factor</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>output_mod_factor</declname>
+        </param>
+        <briefdescription>
+<para>Compute forward <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>. Results are bit-reversed. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the result </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data on which to compute the <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Assume input <computeroutput>operand</computeroutput> are in [0, input_mod_factor * q). Must be 1, 2 or 4. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">output_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Returns output <computeroutput>result</computeroutput> in [0, output_mod_factor * q). Must be 1 or 4. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="99" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a31e78375dcafd5df85cb1259a9156a9a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::NTT::ComputeInverse</definition>
+        <argsstring>(uint64_t *result, const uint64_t *operand, uint64_t input_mod_factor, uint64_t output_mod_factor)</argsstring>
+        <name>ComputeInverse</name>
+        <param>
+          <type>uint64_t *</type>
+          <declname>result</declname>
+        </param>
+        <param>
+          <type>const uint64_t *</type>
+          <declname>operand</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>input_mod_factor</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>output_mod_factor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Compute inverse <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>. Results are bit-reversed. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Stores the result </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">operand</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data on which to compute the <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Assume input <computeroutput>operand</computeroutput> are in [0, input_mod_factor * q). Must be 1 or 2. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">output_mod_factor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Returns output <computeroutput>result</computeroutput> in [0, output_mod_factor * q). Must be 1 or 2. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="109" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1af10476eb10c3b5723052bdf59d7f3d22" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::GetMinimalRootOfUnity</definition>
+        <argsstring>() const</argsstring>
+        <name>GetMinimalRootOfUnity</name>
+        <briefdescription>
+<para>Returns the minimal 2N&apos;th root of unity. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="113" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="113" bodyend="113"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a25172ec87ce3cbfe9bbc20cd9c52f2ab" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::GetDegree</definition>
+        <argsstring>() const</argsstring>
+        <name>GetDegree</name>
+        <briefdescription>
+<para>Returns the degree N. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="116" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="116" bodyend="116"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1aef2a5afbd559f7e27d5fa7d4e28bd252" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::GetModulus</definition>
+        <argsstring>() const</argsstring>
+        <name>GetModulus</name>
+        <briefdescription>
+<para>Returns the word-sized prime modulus. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="119" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="119" bodyend="119"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a71749beadc3fde1d2b80f2d99b739099" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetRootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetRootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns the root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="122" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="122" bodyend="124"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1af0ab14a87e3f9e8cf46502c4c766fec5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::GetRootOfUnityPower</definition>
+        <argsstring>(size_t i)</argsstring>
+        <name>GetRootOfUnityPower</name>
+        <param>
+          <type>size_t</type>
+          <declname>i</declname>
+        </param>
+        <briefdescription>
+<para>Returns the root of unity power at bit-reversed index i. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="127" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="127" bodyend="127"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a1cbd65fb426faafbd22fcb8b7ee98807" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetPrecon32RootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetPrecon32RootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns 32-bit pre-conditioned root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="131" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="131" bodyend="133"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a3bddde00a1832f4ac175e71469939e51" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetPrecon64RootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetPrecon64RootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns 64-bit pre-conditioned root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="137" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="137" bodyend="139"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1ac93455767a667ef07aa41f747c77b4ae" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetAVX512RootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetAVX512RootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns the root of unity powers in bit-reversed order with modifications for use by AVX512 implementation. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="143" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="143" bodyend="145"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1acf8896d7c5ab8c47fe860f3d5a1be215" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetAVX512Precon32RootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetAVX512Precon32RootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns 32-bit pre-conditioned AVX512 root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="149" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="149" bodyend="151"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1aca9903ac08ed7e06d343f85a0ced8b04" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetAVX512Precon52RootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetAVX512Precon52RootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns 52-bit pre-conditioned AVX512 root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="155" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="155" bodyend="157"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1afb5b2c6cd1135f708c5e8a4e97d6f7da" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetAVX512Precon64RootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetAVX512Precon64RootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns 64-bit pre-conditioned AVX512 root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="161" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="161" bodyend="163"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a509f384895cf97ef9cd2edd2902eb82a" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetInvRootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetInvRootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns the inverse root of unity powers in bit-reversed order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="166" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="166" bodyend="168"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a7dd5b59ed992c5466099999ce1eb15d6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t intel::hexl::NTT::GetInvRootOfUnityPower</definition>
+        <argsstring>(size_t i)</argsstring>
+        <name>GetInvRootOfUnityPower</name>
+        <param>
+          <type>size_t</type>
+          <declname>i</declname>
+        </param>
+        <briefdescription>
+<para>Returns the inverse root of unity power at bit-reversed index i. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="171" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="171" bodyend="173"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a70d5480692fcd13418ae7f4c38345770" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetPrecon32InvRootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetPrecon32InvRootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns the vector of 32-bit pre-conditioned pre-computed root of unity. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="178" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="178" bodyend="180"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a9314e0edf36095233efaf72dc6cb9d5e" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetPrecon52InvRootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetPrecon52InvRootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns the vector of 52-bit pre-conditioned pre-computed root of unity. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="185" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="185" bodyend="187"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a0f7f195efe5166b0f3a8c9e71f3a405a" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const <ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref>&lt; uint64_t &gt; &amp;</type>
+        <definition>const AlignedVector64&lt;uint64_t&gt;&amp; intel::hexl::NTT::GetPrecon64InvRootOfUnityPowers</definition>
+        <argsstring>() const</argsstring>
+        <name>GetPrecon64InvRootOfUnityPowers</name>
+        <briefdescription>
+<para>Returns the vector of 64-bit pre-conditioned pre-computed root of unity. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="192" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="192" bodyend="194"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a81e461e466f57c1c454564879121d8d3" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool intel::hexl::NTT::CheckArguments</definition>
+        <argsstring>(uint64_t degree, uint64_t modulus)</argsstring>
+        <name>CheckArguments</name>
+        <param>
+          <type>uint64_t</type>
+          <declname>degree</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>modulus</declname>
+        </param>
+        <briefdescription>
+<para>Returns true if arguments satisfy constraints for negacyclic <ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">degree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>N. Size of the transform, i.e. the polynomial degree. Must be a power of two. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">modulus</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Prime modulus q. Must satisfy q mod 2N = 1 </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="90" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1a76d33e88bd12c2c91b7f8285f8525d72" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>static size_t intel::hexl::NTT::MaxDegreeBits</definition>
+        <argsstring>()</argsstring>
+        <name>MaxDegreeBits</name>
+        <briefdescription>
+<para>Maximum power of 2 in degree. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="197" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="197" bodyend="197"/>
+      </memberdef>
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1afa71c9bf13109e0d07cacce9e752357c" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>static size_t intel::hexl::NTT::MaxModulusBits</definition>
+        <argsstring>()</argsstring>
+        <name>MaxModulusBits</name>
+        <briefdescription>
+<para>Maximum number of bits in modulus;. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="200" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="200" bodyend="200"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classintel_1_1hexl_1_1NTT_1aae8497bb26c5421107c9b051eec724cb" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::NTT::ComputeRootOfUnityPowers</definition>
+        <argsstring>()</argsstring>
+        <name>ComputeRootOfUnityPowers</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="226" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Performs negacyclic forward and inverse number-theoretic transform (<ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>), commonly used in RLWE cryptography. </para>    </briefdescription>
+    <detaileddescription>
+<para>The number-theoretic transform (<ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>) specializes the discrete Fourier transform (DFT) to the finite field <formula id="8">$ \mathbb{Z}_q[X] / (X^N + 1) $</formula>. </para>    </detaileddescription>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" line="22" column="1" bodyfile="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp" bodystart="22" bodyend="265"/>
+    <listofallmembers>
+      <member refid="classintel_1_1hexl_1_1NTT_1a81e461e466f57c1c454564879121d8d3" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>CheckArguments</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a7f8dac5ff3fc117d3e7259762a716140" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>ComputeForward</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a31e78375dcafd5df85cb1259a9156a9a" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>ComputeInverse</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1aae8497bb26c5421107c9b051eec724cb" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>ComputeRootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1acf8896d7c5ab8c47fe860f3d5a1be215" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetAVX512Precon32RootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1aca9903ac08ed7e06d343f85a0ced8b04" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetAVX512Precon52RootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1afb5b2c6cd1135f708c5e8a4e97d6f7da" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetAVX512Precon64RootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ac93455767a667ef07aa41f747c77b4ae" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetAVX512RootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a25172ec87ce3cbfe9bbc20cd9c52f2ab" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetDegree</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a7dd5b59ed992c5466099999ce1eb15d6" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetInvRootOfUnityPower</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a509f384895cf97ef9cd2edd2902eb82a" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetInvRootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1af10476eb10c3b5723052bdf59d7f3d22" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetMinimalRootOfUnity</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1aef2a5afbd559f7e27d5fa7d4e28bd252" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetModulus</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a70d5480692fcd13418ae7f4c38345770" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetPrecon32InvRootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a1cbd65fb426faafbd22fcb8b7ee98807" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetPrecon32RootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a9314e0edf36095233efaf72dc6cb9d5e" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetPrecon52InvRootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a0f7f195efe5166b0f3a8c9e71f3a405a" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetPrecon64InvRootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a3bddde00a1832f4ac175e71469939e51" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetPrecon64RootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1af0ab14a87e3f9e8cf46502c4c766fec5" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetRootOfUnityPower</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a71749beadc3fde1d2b80f2d99b739099" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>GetRootOfUnityPowers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a5e114b624bb80345b5ede2f81461482c" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_aligned_alloc</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1aa0c4c11c8fe8cf7e321cdc9affd5bdf2" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_alloc</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a70fcbf1ff8f2591d5f925f13247805ed" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_avx512_precon32_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ac5697dcce55597a302e4c064e3d3cb91" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_avx512_precon52_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1aec04ba2216d0c396c704bb04c120a8e2" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_avx512_precon64_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a32c0c87274355be249bd7b6402441e97" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_avx512_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ac41484faffcc5c2b28e67e2e9434a050" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_degree</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a2b6b5ebbca9b783e50d83c409d4fd307" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_degree_bits</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1afef36650ec9e3c35aa04021024117ae2" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_inv_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a91abec33f5fa0ec5f6bc2c0ea335c575" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_precon32_inv_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ac836d4affd8489cc730557ea98f171ef" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_precon32_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a2c90a66e40d2dfa6babe3ec369fb8325" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_precon52_inv_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a9fc75f9773575158dbf57727cfd27a6d" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_precon64_inv_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a4aa83d8ce07822401cc4c9f30d3bd52e" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_precon64_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ab7ca32c10ef1e39fc80818d981a4459d" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_q</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a04bb6f1f6b82d10990253ecd16484756" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_root_of_unity_powers</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ab8b29317bf63f5e42552673506a0fa14" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_w</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ab317600c0da04b8f07f11beed2f6ccf0" prot="private" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>m_w_inv</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a76d33e88bd12c2c91b7f8285f8525d72" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>MaxDegreeBits</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1afa71c9bf13109e0d07cacce9e752357c" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>MaxModulusBits</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ad31a184065b07b50c3ff01260f6dad28" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a7a86355beefbe191d0e77618eeaaf6b7" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a716fd07255e9b68fec80e2a9b98841f4" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ac5ef577bf39789c1e200b7d5a7b65989" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a831df901cf9ea5a83e5d628cdbd36671" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>NTT</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1ab0db0e033026cff37b7acba889500b6d" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>s_default_shift_bits</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>s_ifma_shift_bits</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a4c42c952781ae97d1abf02ab5334143f" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>s_max_fwd_32_modulus</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a248f7a613b187a7f71a67b93e4ca13ad" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>s_max_fwd_ifma_modulus</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a33af06994139ae14c69d8958611487bd" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>s_max_inv_32_modulus</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a741db1877b630638173b6ed5f9a6e6c7" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>s_max_inv_ifma_modulus</name></member>
+      <member refid="classintel_1_1hexl_1_1NTT_1a4fbb886db7389f6a5bac264a3e0cf66f" prot="public" virt="non-virtual"><scope>intel::hexl::NTT</scope><name>~NTT</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

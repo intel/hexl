@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="CONTRIBUTING_8md" kind="file" language="Markdown">
+    <compoundname>CONTRIBUTING.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/>Pull<sp/>Requests</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>welcomes<sp/>pull<sp/>requests<sp/>from<sp/>external<sp/>contributors.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Before<sp/>contributing,<sp/>please<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>check<sp/>unittest</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">to<sp/>make<sp/>sure<sp/>the<sp/>formatting<sp/>checks<sp/>and<sp/>all<sp/>unit<sp/>tests<sp/>pass.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Please<sp/>sign<sp/>your<sp/>commits<sp/>before<sp/>making<sp/>a<sp/>pull<sp/>request.<sp/>See<sp/>instructions<sp/>[here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)<sp/>for<sp/>how<sp/>to<sp/>sign<sp/>commits.</highlight></codeline>
+    </programlisting>
+    <location file="/home/gelila/Desktop/workspace/hexl/CONTRIBUTING.md"/>
+  </compounddef>
+</doxygen>

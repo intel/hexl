@@ -1,0 +1,320 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="ntt_8hpp" kind="file" language="C++">
+    <compoundname>ntt.hpp</compoundname>
+    <includes local="no">stdint.h</includes>
+    <includes local="no">memory</includes>
+    <includes local="no">vector</includes>
+    <includes refid="aligned-allocator_8hpp" local="yes">hexl/util/aligned-allocator.hpp</includes>
+    <includes refid="allocator_8hpp" local="yes">hexl/util/allocator.hpp</includes>
+    <includedby refid="hexl_8hpp" local="yes">hexl.hpp</includedby>
+    <incdepgraph>
+      <node id="156">
+        <label>limits</label>
+      </node>
+      <node id="149">
+        <label>stdint.h</label>
+      </node>
+      <node id="154">
+        <label>hexl/number-theory/number-theory.hpp</label>
+        <link refid="number-theory_8hpp"/>
+        <childnode refid="149" relation="include">
+        </childnode>
+        <childnode refid="155" relation="include">
+        </childnode>
+        <childnode refid="156" relation="include">
+        </childnode>
+        <childnode refid="151" relation="include">
+        </childnode>
+        <childnode refid="157" relation="include">
+        </childnode>
+        <childnode refid="160" relation="include">
+        </childnode>
+      </node>
+      <node id="157">
+        <label>hexl/util/check.hpp</label>
+        <link refid="check_8hpp"/>
+        <childnode refid="149" relation="include">
+        </childnode>
+        <childnode refid="158" relation="include">
+        </childnode>
+      </node>
+      <node id="148">
+        <label>ntt.hpp</label>
+        <link refid="ntt_8hpp"/>
+        <childnode refid="149" relation="include">
+        </childnode>
+        <childnode refid="150" relation="include">
+        </childnode>
+        <childnode refid="151" relation="include">
+        </childnode>
+        <childnode refid="152" relation="include">
+        </childnode>
+        <childnode refid="161" relation="include">
+        </childnode>
+      </node>
+      <node id="158">
+        <label>hexl/util/types.hpp</label>
+        <link refid="types_8hpp"/>
+        <childnode refid="149" relation="include">
+        </childnode>
+        <childnode refid="159" relation="include">
+        </childnode>
+      </node>
+      <node id="159">
+        <label>hexl/util/defines.hpp</label>
+        <link refid="defines_8hpp"/>
+      </node>
+      <node id="151">
+        <label>vector</label>
+      </node>
+      <node id="161">
+        <label>hexl/util/allocator.hpp</label>
+        <link refid="allocator_8hpp"/>
+        <childnode refid="162" relation="include">
+        </childnode>
+      </node>
+      <node id="152">
+        <label>hexl/util/aligned-allocator.hpp</label>
+        <link refid="aligned-allocator_8hpp"/>
+        <childnode refid="153" relation="include">
+        </childnode>
+        <childnode refid="150" relation="include">
+        </childnode>
+        <childnode refid="151" relation="include">
+        </childnode>
+        <childnode refid="154" relation="include">
+        </childnode>
+        <childnode refid="161" relation="include">
+        </childnode>
+        <childnode refid="159" relation="include">
+        </childnode>
+      </node>
+      <node id="153">
+        <label>cstdlib</label>
+      </node>
+      <node id="155">
+        <label>iostream</label>
+      </node>
+      <node id="162">
+        <label>cstddef</label>
+      </node>
+      <node id="160">
+        <label>hexl/util/compiler.hpp</label>
+        <link refid="compiler_8hpp"/>
+        <childnode refid="159" relation="include">
+        </childnode>
+      </node>
+      <node id="150">
+        <label>memory</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="164">
+        <label>hexl.hpp</label>
+        <link refid="hexl_8hpp"/>
+      </node>
+      <node id="163">
+        <label>ntt.hpp</label>
+        <link refid="ntt_8hpp"/>
+        <childnode refid="164" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classintel_1_1hexl_1_1NTT" prot="public">intel::hexl::NTT</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" prot="public">intel::hexl::NTT::AllocatorAdapter</innerclass>
+    <innernamespace refid="namespaceintel">intel</innernamespace>
+    <innernamespace refid="namespaceintel_1_1hexl">intel::hexl</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>(C)<sp/>2020-2021<sp/>Intel<sp/>Corporation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdint.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="aligned-allocator_8hpp" kindref="compound">hexl/util/aligned-allocator.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="allocator_8hpp" kindref="compound">hexl/util/allocator.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceintel" kindref="compound">intel</ref><sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">hexl<sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22" refid="classintel_1_1hexl_1_1NTT" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref><sp/>{</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Adaptee,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>Args&gt;</highlight></codeline>
+<codeline lineno="26" refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" refkind="compound"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" kindref="compound">AllocatorAdapter</ref></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1AllocatorInterface" kindref="compound">AllocatorInterface</ref>&lt;AllocatorAdapter&lt;Adaptee,<sp/>Args...&gt;&gt;<sp/>{</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a4403f32f5ed5527a13c2bf12c20a68af" kindref="member">AllocatorAdapter</ref>(Adaptee&amp;&amp;<sp/>_a,<sp/>Args&amp;&amp;...<sp/>args);</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a4403f32f5ed5527a13c2bf12c20a68af" kindref="member">AllocatorAdapter</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Adaptee&amp;<sp/>_a,<sp/>Args&amp;...<sp/>args);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>interface<sp/>implementation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/><ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a408a6a4b42aef1db5ab7e9b5c8ec2670" kindref="member">allocate_impl</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>bytes_count);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a123aa02665ce9f2b219ca9b88164e114" kindref="member">deallocate_impl</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>p,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>n);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/>Adaptee<sp/>alloc;</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/>};</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1NTT_1ad31a184065b07b50c3ff01260f6dad28" kindref="member">NTT</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a4fbb886db7389f6a5bac264a3e0cf66f" kindref="member">~NTT</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1NTT_1ad31a184065b07b50c3ff01260f6dad28" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>q,</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::shared_ptr&lt;AllocatorBase&gt;<sp/>alloc_ptr<sp/>=<sp/>{});</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Allocator,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>AllocatorArgs&gt;</highlight></codeline>
+<codeline lineno="58" refid="classintel_1_1hexl_1_1NTT_1a716fd07255e9b68fec80e2a9b98841f4" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a716fd07255e9b68fec80e2a9b98841f4" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>q,<sp/>Allocator&amp;&amp;<sp/>a,<sp/>AllocatorArgs&amp;&amp;...<sp/>args)</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>(degree,<sp/>q,</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::static_pointer_cast&lt;<ref refid="structintel_1_1hexl_1_1AllocatorBase" kindref="compound">AllocatorBase</ref>&gt;(</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::make_shared&lt;<ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" kindref="compound">AllocatorAdapter</ref>&lt;Allocator,<sp/>AllocatorArgs...&gt;&gt;(</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::move(a),<sp/>std::forward&lt;AllocatorArgs&gt;(args)...)))<sp/>{}</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1NTT_1ad31a184065b07b50c3ff01260f6dad28" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>q,<sp/>uint64_t<sp/>root_of_unity,</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::shared_ptr&lt;AllocatorBase&gt;<sp/>alloc_ptr<sp/>=<sp/>{});</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Allocator,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>AllocatorArgs&gt;</highlight></codeline>
+<codeline lineno="79" refid="classintel_1_1hexl_1_1NTT_1a831df901cf9ea5a83e5d628cdbd36671" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a831df901cf9ea5a83e5d628cdbd36671" kindref="member">NTT</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>q,<sp/>uint64_t<sp/>root_of_unity,<sp/>Allocator&amp;&amp;<sp/>a,</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>AllocatorArgs&amp;&amp;...<sp/>args)</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="classintel_1_1hexl_1_1NTT" kindref="compound">NTT</ref>(degree,<sp/>q,<sp/>root_of_unity,</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::static_pointer_cast&lt;<ref refid="structintel_1_1hexl_1_1AllocatorBase" kindref="compound">AllocatorBase</ref>&gt;(</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::make_shared&lt;<ref refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" kindref="compound">AllocatorAdapter</ref>&lt;Allocator,<sp/>AllocatorArgs...&gt;&gt;(</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::move(a),<sp/>std::forward&lt;AllocatorArgs&gt;(args)...)))<sp/>{}</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a81e461e466f57c1c454564879121d8d3" kindref="member">CheckArguments</ref>(uint64_t<sp/>degree,<sp/>uint64_t<sp/>modulus);</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a7f8dac5ff3fc117d3e7259762a716140" kindref="member">ComputeForward</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>operand,</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor,<sp/>uint64_t<sp/>output_mod_factor);</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"></highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a31e78375dcafd5df85cb1259a9156a9a" kindref="member">ComputeInverse</ref>(uint64_t*<sp/>result,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint64_t*<sp/>operand,</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint64_t<sp/>input_mod_factor,<sp/>uint64_t<sp/>output_mod_factor);</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"></highlight></codeline>
+<codeline lineno="113" refid="classintel_1_1hexl_1_1NTT_1af10476eb10c3b5723052bdf59d7f3d22" refkind="member"><highlight class="normal"><sp/><sp/>uint64_t<sp/><ref refid="classintel_1_1hexl_1_1NTT_1af10476eb10c3b5723052bdf59d7f3d22" kindref="member">GetMinimalRootOfUnity</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_w;<sp/>}</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"></highlight></codeline>
+<codeline lineno="116" refid="classintel_1_1hexl_1_1NTT_1a25172ec87ce3cbfe9bbc20cd9c52f2ab" refkind="member"><highlight class="normal"><sp/><sp/>uint64_t<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a25172ec87ce3cbfe9bbc20cd9c52f2ab" kindref="member">GetDegree</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_degree;<sp/>}</highlight></codeline>
+<codeline lineno="117"><highlight class="normal"></highlight></codeline>
+<codeline lineno="119" refid="classintel_1_1hexl_1_1NTT_1aef2a5afbd559f7e27d5fa7d4e28bd252" refkind="member"><highlight class="normal"><sp/><sp/>uint64_t<sp/><ref refid="classintel_1_1hexl_1_1NTT_1aef2a5afbd559f7e27d5fa7d4e28bd252" kindref="member">GetModulus</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_q;<sp/>}</highlight></codeline>
+<codeline lineno="120"><highlight class="normal"></highlight></codeline>
+<codeline lineno="122" refid="classintel_1_1hexl_1_1NTT_1a71749beadc3fde1d2b80f2d99b739099" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a71749beadc3fde1d2b80f2d99b739099" kindref="member">GetRootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"></highlight></codeline>
+<codeline lineno="127" refid="classintel_1_1hexl_1_1NTT_1af0ab14a87e3f9e8cf46502c4c766fec5" refkind="member"><highlight class="normal"><sp/><sp/>uint64_t<sp/><ref refid="classintel_1_1hexl_1_1NTT_1af0ab14a87e3f9e8cf46502c4c766fec5" kindref="member">GetRootOfUnityPower</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>i)<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a71749beadc3fde1d2b80f2d99b739099" kindref="member">GetRootOfUnityPowers</ref>()[i];<sp/>}</highlight></codeline>
+<codeline lineno="128"><highlight class="normal"></highlight></codeline>
+<codeline lineno="131" refid="classintel_1_1hexl_1_1NTT_1a1cbd65fb426faafbd22fcb8b7ee98807" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a1cbd65fb426faafbd22fcb8b7ee98807" kindref="member">GetPrecon32RootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="132"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_precon32_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"></highlight></codeline>
+<codeline lineno="137" refid="classintel_1_1hexl_1_1NTT_1a3bddde00a1832f4ac175e71469939e51" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a3bddde00a1832f4ac175e71469939e51" kindref="member">GetPrecon64RootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="138"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_precon64_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="139"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="140"><highlight class="normal"></highlight></codeline>
+<codeline lineno="143" refid="classintel_1_1hexl_1_1NTT_1ac93455767a667ef07aa41f747c77b4ae" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1ac93455767a667ef07aa41f747c77b4ae" kindref="member">GetAVX512RootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_avx512_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"></highlight></codeline>
+<codeline lineno="149" refid="classintel_1_1hexl_1_1NTT_1acf8896d7c5ab8c47fe860f3d5a1be215" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1acf8896d7c5ab8c47fe860f3d5a1be215" kindref="member">GetAVX512Precon32RootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_avx512_precon32_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="152"><highlight class="normal"></highlight></codeline>
+<codeline lineno="155" refid="classintel_1_1hexl_1_1NTT_1aca9903ac08ed7e06d343f85a0ced8b04" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1aca9903ac08ed7e06d343f85a0ced8b04" kindref="member">GetAVX512Precon52RootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="156"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_avx512_precon52_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"></highlight></codeline>
+<codeline lineno="161" refid="classintel_1_1hexl_1_1NTT_1afb5b2c6cd1135f708c5e8a4e97d6f7da" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1afb5b2c6cd1135f708c5e8a4e97d6f7da" kindref="member">GetAVX512Precon64RootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_avx512_precon64_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="164"><highlight class="normal"></highlight></codeline>
+<codeline lineno="166" refid="classintel_1_1hexl_1_1NTT_1a509f384895cf97ef9cd2edd2902eb82a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a509f384895cf97ef9cd2edd2902eb82a" kindref="member">GetInvRootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="167"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"></highlight></codeline>
+<codeline lineno="171" refid="classintel_1_1hexl_1_1NTT_1a7dd5b59ed992c5466099999ce1eb15d6" refkind="member"><highlight class="normal"><sp/><sp/>uint64_t<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a7dd5b59ed992c5466099999ce1eb15d6" kindref="member">GetInvRootOfUnityPower</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>i)<sp/>{</highlight></codeline>
+<codeline lineno="172"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a509f384895cf97ef9cd2edd2902eb82a" kindref="member">GetInvRootOfUnityPowers</ref>()[i];</highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="174"><highlight class="normal"></highlight></codeline>
+<codeline lineno="177"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>powers<sp/>for<sp/>the<sp/>modulus<sp/>and<sp/>root<sp/>of<sp/>unity.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="178" refid="classintel_1_1hexl_1_1NTT_1a70d5480692fcd13418ae7f4c38345770" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a70d5480692fcd13418ae7f4c38345770" kindref="member">GetPrecon32InvRootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_precon32_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="180"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"></highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>powers<sp/>for<sp/>the<sp/>modulus<sp/>and<sp/>root<sp/>of<sp/>unity.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="185" refid="classintel_1_1hexl_1_1NTT_1a9314e0edf36095233efaf72dc6cb9d5e" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a9314e0edf36095233efaf72dc6cb9d5e" kindref="member">GetPrecon52InvRootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="186"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_precon52_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="188"><highlight class="normal"></highlight></codeline>
+<codeline lineno="191"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>powers<sp/>for<sp/>the<sp/>modulus<sp/>and<sp/>root<sp/>of<sp/>unity.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="192" refid="classintel_1_1hexl_1_1NTT_1a0f7f195efe5166b0f3a8c9e71f3a405a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1NTT_1a0f7f195efe5166b0f3a8c9e71f3a405a" kindref="member">GetPrecon64InvRootOfUnityPowers</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="193"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m_precon64_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="194"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="195"><highlight class="normal"></highlight></codeline>
+<codeline lineno="197" refid="classintel_1_1hexl_1_1NTT_1a76d33e88bd12c2c91b7f8285f8525d72" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a76d33e88bd12c2c91b7f8285f8525d72" kindref="member">MaxDegreeBits</ref>()<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>20;<sp/>}</highlight></codeline>
+<codeline lineno="198"><highlight class="normal"></highlight></codeline>
+<codeline lineno="200" refid="classintel_1_1hexl_1_1NTT_1afa71c9bf13109e0d07cacce9e752357c" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1afa71c9bf13109e0d07cacce9e752357c" kindref="member">MaxModulusBits</ref>()<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>62;<sp/>}</highlight></codeline>
+<codeline lineno="201"><highlight class="normal"></highlight></codeline>
+<codeline lineno="203" refid="classintel_1_1hexl_1_1NTT_1ab0db0e033026cff37b7acba889500b6d" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1ab0db0e033026cff37b7acba889500b6d" kindref="member">s_default_shift_bits</ref>{64};</highlight></codeline>
+<codeline lineno="204"><highlight class="normal"></highlight></codeline>
+<codeline lineno="207" refid="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" kindref="member">s_ifma_shift_bits</ref>{52};</highlight></codeline>
+<codeline lineno="208"><highlight class="normal"></highlight></codeline>
+<codeline lineno="211" refid="classintel_1_1hexl_1_1NTT_1a4c42c952781ae97d1abf02ab5334143f" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a4c42c952781ae97d1abf02ab5334143f" kindref="member">s_max_fwd_32_modulus</ref>{1ULL<sp/>&lt;&lt;<sp/>(32<sp/>-<sp/>2)};</highlight></codeline>
+<codeline lineno="212"><highlight class="normal"></highlight></codeline>
+<codeline lineno="215" refid="classintel_1_1hexl_1_1NTT_1a33af06994139ae14c69d8958611487bd" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a33af06994139ae14c69d8958611487bd" kindref="member">s_max_inv_32_modulus</ref>{1ULL<sp/>&lt;&lt;<sp/>(32<sp/>-<sp/>1)};</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"></highlight></codeline>
+<codeline lineno="219" refid="classintel_1_1hexl_1_1NTT_1a248f7a613b187a7f71a67b93e4ca13ad" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a248f7a613b187a7f71a67b93e4ca13ad" kindref="member">s_max_fwd_ifma_modulus</ref>{1ULL<sp/>&lt;&lt;<sp/>(<ref refid="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" kindref="member">s_ifma_shift_bits</ref><sp/>-<sp/>2)};</highlight></codeline>
+<codeline lineno="220"><highlight class="normal"></highlight></codeline>
+<codeline lineno="223" refid="classintel_1_1hexl_1_1NTT_1a741db1877b630638173b6ed5f9a6e6c7" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1NTT_1a741db1877b630638173b6ed5f9a6e6c7" kindref="member">s_max_inv_ifma_modulus</ref>{1ULL<sp/>&lt;&lt;<sp/>(<ref refid="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" kindref="member">s_ifma_shift_bits</ref><sp/>-<sp/>1)};</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"></highlight></codeline>
+<codeline lineno="225"><highlight class="normal"><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>ComputeRootOfUnityPowers();</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"></highlight></codeline>
+<codeline lineno="228"><highlight class="normal"><sp/><sp/>uint64_t<sp/>m_degree;<sp/><sp/></highlight><highlight class="comment">//<sp/>N:<sp/>size<sp/>of<sp/>NTT<sp/>transform,<sp/>should<sp/>be<sp/>power<sp/>of<sp/>2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="229"><highlight class="normal"><sp/><sp/>uint64_t<sp/>m_q;<sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>prime<sp/>modulus.<sp/>Must<sp/>satisfy<sp/>q<sp/>==<sp/>1<sp/>mod<sp/>2n</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="230"><highlight class="normal"></highlight></codeline>
+<codeline lineno="231"><highlight class="normal"><sp/><sp/>uint64_t<sp/>m_degree_bits;<sp/><sp/></highlight><highlight class="comment">//<sp/>log_2(m_degree)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="232"><highlight class="normal"></highlight></codeline>
+<codeline lineno="233"><highlight class="normal"><sp/><sp/>uint64_t<sp/>m_w_inv;<sp/><sp/></highlight><highlight class="comment">//<sp/>Inverse<sp/>of<sp/>minimal<sp/>root<sp/>of<sp/>unity</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="234"><highlight class="normal"><sp/><sp/>uint64_t<sp/>m_w;<sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>A<sp/>2N&apos;th<sp/>root<sp/>of<sp/>unity</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="235"><highlight class="normal"></highlight></codeline>
+<codeline lineno="236"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;AllocatorBase&gt;<sp/>m_alloc;</highlight></codeline>
+<codeline lineno="237"><highlight class="normal"></highlight></codeline>
+<codeline lineno="238"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1AlignedAllocator" kindref="compound">AlignedAllocator&lt;uint64_t, 64&gt;</ref><sp/>m_aligned_alloc;</highlight></codeline>
+<codeline lineno="239"><highlight class="normal"></highlight></codeline>
+<codeline lineno="240"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>powers<sp/>of<sp/>the<sp/>minimal<sp/>root<sp/>of<sp/>unity</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="241"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="242"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**32<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="243"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_precon32_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="244"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**64<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="245"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_precon64_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="246"><highlight class="normal"></highlight></codeline>
+<codeline lineno="247"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>powers<sp/>of<sp/>the<sp/>minimal<sp/>root<sp/>of<sp/>unity<sp/>adjusted<sp/>for<sp/>use<sp/>in<sp/>AVX512</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="248"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>implementations</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="249"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_avx512_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="250"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**32<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>AVX512<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_avx512_precon32_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**52<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>AVX512<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="253"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_avx512_precon52_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="254"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**64<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>AVX512<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="255"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_avx512_precon64_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="256"><highlight class="normal"></highlight></codeline>
+<codeline lineno="257"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**32<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>inverse<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="258"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_precon32_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="259"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**52<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>inverse<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="260"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_precon52_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="261"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>vector<sp/>of<sp/>floor(W<sp/>*<sp/>2**64<sp/>/<sp/>m_q),<sp/>with<sp/>W<sp/>the<sp/>inverse<sp/>root<sp/>of<sp/>unity<sp/>powers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="262"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_precon64_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="263"><highlight class="normal"></highlight></codeline>
+<codeline lineno="264"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64&lt;uint64_t&gt;</ref><sp/>m_inv_root_of_unity_powers;</highlight></codeline>
+<codeline lineno="265"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="266"><highlight class="normal"></highlight></codeline>
+<codeline lineno="267"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>hexl</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="268"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>intel</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/ntt/ntt.hpp"/>
+  </compounddef>
+</doxygen>

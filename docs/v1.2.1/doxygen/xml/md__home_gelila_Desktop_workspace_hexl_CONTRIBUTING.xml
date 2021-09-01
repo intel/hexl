@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING" kind="page">
+    <compoundname>md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING</compoundname>
+    <title>Pull Requests</title>
+    <detaileddescription>
+<para>Intel HEXL welcomes pull requests from external contributors.</para><para>Before contributing, please run <programlisting><codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>check<sp/>unittest</highlight></codeline>
+</programlisting> to make sure the formatting checks and all unit tests pass.</para><para>Please sign your commits before making a pull request. See instructions <ulink url="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits">here</ulink> for how to sign commits. </para>    </detaileddescription>
+  </compounddef>
+</doxygen>
