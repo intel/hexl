@@ -183,7 +183,7 @@ Then, configure Intel HEXL with `-DHEXL_DOCS=ON` (see [Compile-time options](#co
 ```
 cmake --build build --target docs
 ```
-To view the generated Doxygen documentation, open the generated `build/docs/doxygen/html/index.html` file in a web browser.
+To view the generated Doxygen documentation, open the generated `docs/doxygen/html/index.html` file in a web browser.
 
 # Contributing
 This project welcomes external contributions. To contribute to Intel HEXL, see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -203,7 +203,7 @@ To cite Intel HEXL, please use the following BibTeX entry.
         author={Boemer, Fabian and Kim, Sejun and Seifu, Gelila and de Souza, Fillipe DM and Gopal, Vinodh and others},
         title = {{I}ntel {HEXL} (release 1.2)},
         howpublished = {\url{https://github.com/intel/hexl}},
-        month = july,
+        month = september,
         year = 2021,
         key = {Intel HEXL}
     }
