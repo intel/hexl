@@ -27,28 +27,23 @@ TEST(EltwiseCmpSubMod, AVX512) {
   }
 
   uint64_t length = 172;
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
   for (size_t cmp = 0; cmp < 8; ++cmp) {
     for (size_t bits = 48; bits <= 51; ++bits) {
       uint64_t modulus = GeneratePrimes(1, bits, true, 1024)[0];
-      std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
       for (size_t trial = 0; trial < 200; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        uint64_t bound = distrib(gen);
-        uint64_t diff = distrib(gen);
-        std::vector<uint64_t> op3(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-          op3[i] = distrib(gen);
-        }
-        std::vector<uint64_t> op1a = op1;
-        std::vector<uint64_t> op1b = op1;
-        std::vector<uint64_t> op1_out(op1.size(), 0);
-        std::vector<uint64_t> op1a_out(op1.size(), 0);
-        std::vector<uint64_t> op1b_out(op1.size(), 0);
+        auto op1 = GenerateUniformRandomValues(length, modulus);
+        auto op3 = GenerateUniformRandomValues(length, modulus);
+
+        uint64_t bound = GenerateUniformRandomValues(modulus);
+        uint64_t diff = GenerateUniformRandomValues(modulus);
+
+        auto op1a = op1;
+        auto op1b = op1;
+        auto op1_out(op1.size(), 0);
+        auto op1a_out(op1.size(), 0);
+        auto op1b_out(op1.size(), 0);
 
         EltwiseCmpSubMod(op1_out.data(), op1.data(), op1.size(), modulus,
                          static_cast<CMPINT>(cmp), bound, diff);

@@ -95,9 +95,6 @@ TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   size_t length = 173;
 
   for (size_t bits = 1; bits <= 62; ++bits) {
@@ -112,12 +109,8 @@ TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<uint64_t> op1(length, 0);
-      std::vector<uint64_t> op2(length, 0);
-      for (size_t i = 0; i < length; ++i) {
-        op1[i] = distrib(gen);
-        op2[i] = distrib(gen);
-      }
+      auto op1 = GenerateUniformRandomValues(length, modulus);
+      auto op2 = GenerateUniformRandomValues(length, modulus);
       op1[0] = modulus - 1;
       op2[0] = modulus - 1;
 
@@ -139,16 +132,10 @@ TEST(EltwiseAddMod, vector_scalar_avx512_native_match) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   size_t length = 173;
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;
-
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -157,11 +144,8 @@ TEST(EltwiseAddMod, vector_scalar_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<uint64_t> op1(length, 0);
-      for (size_t i = 0; i < length; ++i) {
-        op1[i] = distrib(gen);
-      }
-      uint64_t op2 = distrib(gen);
+      auto op1 = GenerateUniformRandomValues(length, modulus);
+      uint64_t op2 = GenerateUniformRandomValue(modulus);
 
       auto op1a = op1;
 
