@@ -169,8 +169,11 @@ TEST(NTT, WriteInvInterleavedT4) {
 }
 
 #ifdef HEXL_HAS_AVX512IFMA
-class ModulusTest
-    : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t>> {
+// First parameter is the NTT degree
+// Second parameter is the number of bits in the NTT modulus
+// Third parameter is whether or not to prefer small primes
+class DegreeModulusBoolTest
+    : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t, bool>> {
  protected:
   void SetUp() {}
 
@@ -179,104 +182,121 @@ class ModulusTest
  public:
 };
 
-TEST_P(ModulusTest, FwdNTTAVX512IFMA) {
+TEST_P(DegreeModulusBoolTest, FwdNTTAVX512IFMA) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, false, N)[0];
+  bool prefer_small_primes = std::get<2>(GetParam());
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, prefer_small_primes, N)[0];
+
+#ifdef HEXL_DEBUG
+  size_t num_trials = 1;
+#else
+  size_t num_trials = 20;
+#endif
 
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
 
-  std::vector<uint64_t> input64(N, 0);
-  for (size_t i = 0; i < N; ++i) {
-    input64[i] = distrib(gen);
+  for (size_t trial = 0; trial < num_trials; ++trial) {
+    std::vector<uint64_t> input64(N, 0);
+    for (size_t i = 0; i < N; ++i) {
+      input64[i] = distrib(gen);
+    }
+
+    std::vector<uint64_t> input_ifma = input64;
+    std::vector<uint64_t> input_ifma_lazy = input64;
+    std::vector<uint64_t> exp_output(N, 0);
+
+    // Compute reference
+    NTT ntt64(N, modulus);
+    ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
+                                          ntt64.GetRootOfUnityPowers().data());
+
+    ForwardTransformToBitReverseAVX512<52>(
+        input_ifma.data(), N, ntt64.GetModulus(),
+        ntt64.GetAVX512RootOfUnityPowers().data(),
+        ntt64.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
+
+    // Compute lazy
+    ForwardTransformToBitReverseAVX512<52>(
+        input_ifma_lazy.data(), N, ntt64.GetModulus(),
+        ntt64.GetAVX512RootOfUnityPowers().data(),
+        ntt64.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
+    for (auto& elem : input_ifma_lazy) {
+      elem = elem % modulus;
+    }
+
+    AssertEqual(input64, input_ifma);
+    AssertEqual(input64, input_ifma_lazy);
   }
-
-  std::vector<uint64_t> input_ifma = input64;
-  std::vector<uint64_t> input_ifma_lazy = input64;
-
-  std::vector<uint64_t> exp_output(N, 0);
-
-  // Compute reference
-  NTT ntt64(N, modulus);
-  ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
-                                        ntt64.GetRootOfUnityPowers().data());
-
-  ForwardTransformToBitReverseAVX512<52>(
-      input_ifma.data(), N, ntt64.GetModulus(),
-      ntt64.GetAVX512RootOfUnityPowers().data(),
-      ntt64.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
-
-  // Compute lazy
-  ForwardTransformToBitReverseAVX512<52>(
-      input_ifma_lazy.data(), N, ntt64.GetModulus(),
-      ntt64.GetAVX512RootOfUnityPowers().data(),
-      ntt64.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
-  for (auto& elem : input_ifma_lazy) {
-    elem = elem % modulus;
-  }
-
-  AssertEqual(input64, input_ifma);
-  AssertEqual(input64, input_ifma_lazy);
 }
 
-TEST_P(ModulusTest, InvNTTAVX512IFMA) {
+TEST_P(DegreeModulusBoolTest, InvNTTAVX512IFMA) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, false, N)[0];
+  bool prefer_small_primes = std::get<2>(GetParam());
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, prefer_small_primes, N)[0];
+
+#ifdef HEXL_DEBUG
+  size_t num_trials = 1;
+#else
+  size_t num_trials = 20;
+#endif
 
   std::random_device rd;
-  std::mt19937 gen(42);  // rd());
+  std::mt19937 gen(rd());
   std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
 
-  std::vector<uint64_t> input64(N, 0);
-  for (size_t i = 0; i < N; ++i) {
-    input64[i] = distrib(gen);
+  for (size_t trial = 0; trial < num_trials; ++trial) {
+    std::vector<uint64_t> input64(N, 0);
+    for (size_t i = 0; i < N; ++i) {
+      input64[i] = distrib(gen);
+    }
+
+    std::vector<uint64_t> input_ifma = input64;
+    std::vector<uint64_t> input_ifma_lazy = input64;
+
+    std::vector<uint64_t> exp_output(N, 0);
+
+    // Compute reference
+    NTT ntt(N, modulus);
+    InverseTransformFromBitReverseRadix2(
+        input64.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+        ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+
+    InverseTransformFromBitReverseAVX512<52>(
+        input_ifma.data(), N, ntt.GetModulus(),
+        ntt.GetInvRootOfUnityPowers().data(),
+        ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 1);
+
+    // Compute lazy
+    InverseTransformFromBitReverseAVX512<52>(
+        input_ifma_lazy.data(), N, ntt.GetModulus(),
+        ntt.GetInvRootOfUnityPowers().data(),
+        ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 2);
+    for (auto& elem : input_ifma_lazy) {
+      elem = elem % modulus;
+    }
+
+    AssertEqual(input64, input_ifma);
+    AssertEqual(input64, input_ifma_lazy);
   }
-
-  std::vector<uint64_t> input_ifma = input64;
-  std::vector<uint64_t> input_ifma_lazy = input64;
-
-  std::vector<uint64_t> exp_output(N, 0);
-
-  // Compute reference
-  NTT ntt(N, modulus);
-  InverseTransformFromBitReverseRadix2(
-      input64.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
-      ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
-
-  InverseTransformFromBitReverseAVX512<52>(
-      input_ifma.data(), N, ntt.GetModulus(),
-      ntt.GetAVX512RootOfUnityPowers().data(),
-      ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
-
-  // Compute lazy
-  // InverseTransformFromBitReverseAVX512<52>(
-  //     input_ifma_lazy.data(), N, ntt.GetModulus(),
-  //     ntt.GetAVX512RootOfUnityPowers().data(),
-  //     ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 2);
-  // for (auto& elem : input_ifma_lazy) {
-  //   elem = elem % modulus;
-  // }
-
-  AssertEqual(input64, input_ifma);
-  // AssertEqual(input64, input_ifma_lazy);
 }
 
 // Test modulus around 50 bits to check IFMA behavior
-// Parameters = (degree, modulus_bits)
-INSTANTIATE_TEST_SUITE_P(NTT, ModulusTest,
-                         ::testing::Values(std::make_tuple(1 << 6, 48)));
-//  std::make_tuple(1 << 11, 48),
-//  std::make_tuple(1 << 12, 49),
-//  std::make_tuple(1 << 13, 49)));
+INSTANTIATE_TEST_SUITE_P(
+    NTT, DegreeModulusBoolTest,
+    ::testing::Combine(::testing::ValuesIn(std::vector<uint64_t>{
+                           1 << 11, 1 << 12, 1 << 13}),
+                       ::testing::ValuesIn(std::vector<uint64_t>{48, 49}),
+                       ::testing::ValuesIn(std::vector<bool>{false, true})));
 
 #endif
 
