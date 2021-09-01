@@ -368,7 +368,7 @@ class DegreeModulusTest
 TEST_P(DegreeModulusTest, ForwardZeros) {
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
   std::vector<uint64_t> input(N, 0);
   std::vector<uint64_t> exp_output(N, 0);
@@ -382,7 +382,7 @@ TEST_P(DegreeModulusTest, ForwardZeros) {
 TEST_P(DegreeModulusTest, InverseZeros) {
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
   std::vector<uint64_t> input(N, 0);
   std::vector<uint64_t> exp_output(N, 0);
@@ -396,7 +396,7 @@ TEST_P(DegreeModulusTest, InverseZeros) {
 TEST_P(DegreeModulusTest, ForwardRadix4Random) {
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -423,10 +423,10 @@ TEST_P(DegreeModulusTest, ForwardRadix4Random) {
 TEST_P(DegreeModulusTest, InverseRadix4Random) {
   uint64_t N = std::get<0>(GetParam());
   uint64_t modulus_bits = std::get<1>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, N)[0];
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
   std::random_device rd;
-  std::mt19937 gen(42);  // rd());
+  std::mt19937 gen(rd());
   std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
 
   std::vector<uint64_t> input(N);

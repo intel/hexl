@@ -223,6 +223,7 @@ bool IsPrime(uint64_t n) {
 }
 
 std::vector<uint64_t> GeneratePrimes(size_t num_primes, size_t bit_size,
+                                     bool prefer_small_primes,
                                      size_t ntt_size) {
   HEXL_CHECK(num_primes > 0, "num_primes == 0");
   HEXL_CHECK(IsPowerOfTwo(ntt_size),
@@ -231,18 +232,39 @@ std::vector<uint64_t> GeneratePrimes(size_t num_primes, size_t bit_size,
              "log2(ntt_size) " << Log2(ntt_size)
                                << " should be less than bit_size " << bit_size);
 
-  uint64_t value = (1ULL << bit_size) + 1;
+  int64_t prime_lower_bound = (1LL << bit_size) + 1LL;
+  int64_t prime_upper_bound = (1LL << (bit_size + 1LL)) - 1LL;
+
+  // Keep signed to enable negative step
+  int64_t prime_candidate =
+      prefer_small_primes
+          ? prime_lower_bound
+          : prime_upper_bound - (prime_upper_bound % (2 * ntt_size)) + 1;
+  HEXL_CHECK(prime_candidate % (2 * ntt_size) == 1, "bad prime candidate");
+
+  // Ensure prime % 2 * ntt_size == 1
+  int64_t prime_candidate_step =
+      (prefer_small_primes ? 1 : -1) * 2 * static_cast<int64_t>(ntt_size);
+
+  auto continue_condition = [&](int64_t local_candidate_prime) {
+    if (prefer_small_primes) {
+      return local_candidate_prime < prime_upper_bound;
+    } else {
+      return local_candidate_prime > prime_lower_bound;
+    }
+  };
 
   std::vector<uint64_t> ret;
 
-  while (value < (1ULL << (bit_size + 1))) {
-    if (IsPrime(value)) {
-      ret.emplace_back(value);
+  while (continue_condition(prime_candidate)) {
+    if (IsPrime(prime_candidate)) {
+      HEXL_CHECK(prime_candidate % (2 * ntt_size) == 1, "bad prime candidate");
+      ret.emplace_back(static_cast<uint64_t>(prime_candidate));
       if (ret.size() == num_primes) {
         return ret;
       }
     }
-    value += 2 * ntt_size;
+    prime_candidate += prime_candidate_step;
   }
 
   HEXL_CHECK(false, "Failed to find enough primes");

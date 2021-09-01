@@ -81,7 +81,7 @@ TEST(EltwiseAddMod, vector_scalar_native_small) {
 }
 
 TEST(EltwiseAddMod, vector_vector_native_big) {
-  uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 1, modulus - 1, modulus - 2, modulus - 2,
                             modulus - 3, modulus - 3, modulus - 4, modulus - 4};
@@ -97,7 +97,7 @@ TEST(EltwiseAddMod, vector_vector_native_big) {
 }
 
 TEST(EltwiseAddMod, vector_scalar_native_big) {
-  uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 1, modulus - 1, modulus - 2, modulus - 2,
                             modulus - 3, modulus - 3, modulus - 4, modulus - 4};
