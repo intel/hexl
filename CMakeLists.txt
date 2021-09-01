@@ -170,10 +170,9 @@ if (HEXL_DEBUG)
   find_package(EASYLOGGINGPP MODULE)
   if (EASYLOGGINGPP_FOUND)
     message(STATUS "easyloggingpp: pre-installed easyloggingpp found")
-    add_library(easyloggingpp ALIAS easyloggingpp::easyloggingpp)
     get_target_property(
       EASYLOGGINGPP_INCLUDE_DIR
-      easyloggingpp::easyloggingpp
+      easyloggingpp
       INTERFACE_INCLUDE_DIRECTORIES)
   else()
     message(STATUS "easyloggingpp: pre-installed easyloggingpp NOT found, building from source")
