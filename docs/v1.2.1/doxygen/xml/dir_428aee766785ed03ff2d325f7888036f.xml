@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_428aee766785ed03ff2d325f7888036f" kind="dir">
+    <compoundname>logging</compoundname>
+    <innerfile refid="logging_8hpp">logging.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/logging/"/>
+  </compounddef>
+</doxygen>

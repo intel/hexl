@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_73c34c91767e4126fcbbc3b749cad3d8" kind="dir">
+    <compoundname>util</compoundname>
+    <innerfile refid="aligned-allocator_8hpp">aligned-allocator.hpp</innerfile>
+    <innerfile refid="allocator_8hpp">allocator.hpp</innerfile>
+    <innerfile refid="check_8hpp">check.hpp</innerfile>
+    <innerfile refid="clang_8hpp">clang.hpp</innerfile>
+    <innerfile refid="compiler_8hpp">compiler.hpp</innerfile>
+    <innerfile refid="defines_8hpp">defines.hpp</innerfile>
+    <innerfile refid="gcc_8hpp">gcc.hpp</innerfile>
+    <innerfile refid="msvc_8hpp">msvc.hpp</innerfile>
+    <innerfile refid="types_8hpp">types.hpp</innerfile>
+    <innerfile refid="util_8hpp">util.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/util/"/>
+  </compounddef>
+</doxygen>

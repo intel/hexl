@@ -1,0 +1,17 @@
+var searchData=
+[
+  ['adduint64',['AddUInt64',['../namespaceintel_1_1hexl.html#a3ecce7e5a5591605703890fb3b2b6d80',1,'intel::hexl']]],
+  ['adduintmod',['AddUIntMod',['../namespaceintel_1_1hexl.html#ad16852e2b8114cd9c22dd25593c76f99',1,'intel::hexl']]],
+  ['aligned_2dallocator_2ehpp',['aligned-allocator.hpp',['../aligned-allocator_8hpp.html',1,'']]],
+  ['alignedallocator',['AlignedAllocator',['../classintel_1_1hexl_1_1AlignedAllocator.html',1,'intel::hexl::AlignedAllocator&lt; T, Alignment &gt;'],['../classintel_1_1hexl_1_1AlignedAllocator.html#aaded07599020ca35e89e078674263c63',1,'intel::hexl::AlignedAllocator::AlignedAllocator()'],['../classintel_1_1hexl_1_1AlignedAllocator.html#afb7109e1c05fc55412ecfdc36894f7e5',1,'intel::hexl::AlignedAllocator::AlignedAllocator(AllocatorStrategyPtr strategy=nullptr) noexcept'],['../classintel_1_1hexl_1_1AlignedAllocator.html#a93a20265cc1f7b25ccd5e7b2cc759b67',1,'intel::hexl::AlignedAllocator::AlignedAllocator(const AlignedAllocator &amp;src)'],['../classintel_1_1hexl_1_1AlignedAllocator.html#a7ef7928d5be819410959faf80f6746cc',1,'intel::hexl::AlignedAllocator::AlignedAllocator(const AlignedAllocator&lt; U, Alignment &gt; &amp;src)']]],
+  ['alignedallocator_3c_20uint64_5ft_2c_2064_20_3e',['AlignedAllocator&lt; uint64_t, 64 &gt;',['../classintel_1_1hexl_1_1AlignedAllocator.html',1,'intel::hexl']]],
+  ['alignedvector64',['AlignedVector64',['../namespaceintel_1_1hexl.html#afbdf0d2cc4209ee547a88ff22a02801b',1,'intel::hexl']]],
+  ['allocate',['allocate',['../structintel_1_1hexl_1_1MallocStrategy.html#a010052a3f5e39991d57a38742d853738',1,'intel::hexl::MallocStrategy::allocate()'],['../classintel_1_1hexl_1_1AlignedAllocator.html#ac007b85746672b4e777aa9561b54f8a9',1,'intel::hexl::AlignedAllocator::allocate()'],['../structintel_1_1hexl_1_1AllocatorBase.html#aadf587e7617fbace2e9d3b4f9d9e8af0',1,'intel::hexl::AllocatorBase::allocate()'],['../structintel_1_1hexl_1_1AllocatorInterface.html#a02d2d7918ea916fce443ba2f5dbaa8d1',1,'intel::hexl::AllocatorInterface::allocate()']]],
+  ['allocate_5fimpl',['allocate_impl',['../structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter.html#a408a6a4b42aef1db5ab7e9b5c8ec2670',1,'intel::hexl::NTT::AllocatorAdapter']]],
+  ['allocator_2ehpp',['allocator.hpp',['../allocator_8hpp.html',1,'']]],
+  ['allocatoradapter',['AllocatorAdapter',['../structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter.html',1,'intel::hexl::NTT::AllocatorAdapter&lt; Adaptee, Args &gt;'],['../structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter.html#a4403f32f5ed5527a13c2bf12c20a68af',1,'intel::hexl::NTT::AllocatorAdapter::AllocatorAdapter(Adaptee &amp;&amp;_a, Args &amp;&amp;... args)'],['../structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter.html#aee97fbd36cf2299db87f6dbe75f12396',1,'intel::hexl::NTT::AllocatorAdapter::AllocatorAdapter(const Adaptee &amp;_a, Args &amp;... args)']]],
+  ['allocatorbase',['AllocatorBase',['../structintel_1_1hexl_1_1AllocatorBase.html',1,'intel::hexl']]],
+  ['allocatorinterface',['AllocatorInterface',['../structintel_1_1hexl_1_1AllocatorInterface.html',1,'intel::hexl']]],
+  ['allocatorinterface_3c_20allocatoradapter_3c_20adaptee_2c_20args_2e_2e_2e_20_3e_20_3e',['AllocatorInterface&lt; AllocatorAdapter&lt; Adaptee, Args... &gt; &gt;',['../structintel_1_1hexl_1_1AllocatorInterface.html',1,'intel::hexl']]],
+  ['allocatorstrategyptr',['AllocatorStrategyPtr',['../namespaceintel_1_1hexl.html#aced64250965d3b78827d8009634eef0c',1,'intel::hexl']]]
+];

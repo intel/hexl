@@ -1,0 +1,92 @@
+\hypertarget{structintel_1_1hexl_1_1MallocStrategy}{}\section{intel\+:\+:hexl\+:\+:Malloc\+Strategy Struct Reference}
+\label{structintel_1_1hexl_1_1MallocStrategy}\index{intel\+::hexl\+::\+Malloc\+Strategy@{intel\+::hexl\+::\+Malloc\+Strategy}}
+
+
+Allocater implementation using malloc and free.  
+
+
+
+
+{\ttfamily \#include $<$aligned-\/allocator.\+hpp$>$}
+
+
+
+Inheritance diagram for intel\+:\+:hexl\+:\+:Malloc\+Strategy\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{structintel_1_1hexl_1_1MallocStrategy__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for intel\+:\+:hexl\+:\+:Malloc\+Strategy\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{structintel_1_1hexl_1_1MallocStrategy__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \hyperlink{structintel_1_1hexl_1_1MallocStrategy_a010052a3f5e39991d57a38742d853738}{allocate} (size\+\_\+t bytes\+\_\+count) final
+\begin{DoxyCompactList}\small\item\em Allocates byte\+\_\+count bytes of memory. \end{DoxyCompactList}\item 
+void \hyperlink{structintel_1_1hexl_1_1MallocStrategy_af45ff5d0c9b1e867fac481f447a4569c}{deallocate} (void $\ast$p, size\+\_\+t n) final
+\begin{DoxyCompactList}\small\item\em Deallocate memory. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Allocater implementation using malloc and free. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{structintel_1_1hexl_1_1MallocStrategy_a010052a3f5e39991d57a38742d853738}\label{structintel_1_1hexl_1_1MallocStrategy_a010052a3f5e39991d57a38742d853738}} 
+\index{intel\+::hexl\+::\+Malloc\+Strategy@{intel\+::hexl\+::\+Malloc\+Strategy}!allocate@{allocate}}
+\index{allocate@{allocate}!intel\+::hexl\+::\+Malloc\+Strategy@{intel\+::hexl\+::\+Malloc\+Strategy}}
+\subsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily void$\ast$ intel\+::hexl\+::\+Malloc\+Strategy\+::allocate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{bytes\+\_\+count }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [virtual]}}
+
+
+
+Allocates byte\+\_\+count bytes of memory. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em bytes\+\_\+count} & Number of bytes to allocate \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to the allocated memory 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{structintel_1_1hexl_1_1AllocatorBase_aadf587e7617fbace2e9d3b4f9d9e8af0}{intel\+::hexl\+::\+Allocator\+Base}.
+
+\mbox{\Hypertarget{structintel_1_1hexl_1_1MallocStrategy_af45ff5d0c9b1e867fac481f447a4569c}\label{structintel_1_1hexl_1_1MallocStrategy_af45ff5d0c9b1e867fac481f447a4569c}} 
+\index{intel\+::hexl\+::\+Malloc\+Strategy@{intel\+::hexl\+::\+Malloc\+Strategy}!deallocate@{deallocate}}
+\index{deallocate@{deallocate}!intel\+::hexl\+::\+Malloc\+Strategy@{intel\+::hexl\+::\+Malloc\+Strategy}}
+\subsubsection{\texorpdfstring{deallocate()}{deallocate()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+Malloc\+Strategy\+::deallocate (\begin{DoxyParamCaption}\item[{void $\ast$}]{p,  }\item[{size\+\_\+t}]{n }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [virtual]}}
+
+
+
+Deallocate memory. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em p} & Pointer to memory to deallocate \\
+\hline
+\mbox{\tt in}  & {\em n} & Number of bytes to deallocate \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{structintel_1_1hexl_1_1AllocatorBase_a0f03686f9b78728d4d228ceaf4c2948e}{intel\+::hexl\+::\+Allocator\+Base}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{aligned-allocator_8hpp}{aligned-\/allocator.\+hpp}\end{DoxyCompactItemize}

@@ -1,0 +1,479 @@
+\hypertarget{classintel_1_1hexl_1_1NTT}{}\section{intel\+:\+:hexl\+:\+:N\+TT Class Reference}
+\label{classintel_1_1hexl_1_1NTT}\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+
+
+Performs negacyclic forward and inverse number-\/theoretic transform (\hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}), commonly used in R\+L\+WE cryptography.  
+
+
+
+
+{\ttfamily \#include $<$ntt.\+hpp$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter}{Allocator\+Adapter}
+\begin{DoxyCompactList}\small\item\em Helper class for custom memory allocation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_ad31a184065b07b50c3ff01260f6dad28}{N\+TT} ()=default
+\begin{DoxyCompactList}\small\item\em Initializes an empty \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. \end{DoxyCompactList}\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_a4fbb886db7389f6a5bac264a3e0cf66f}{$\sim$\+N\+TT} ()=default
+\begin{DoxyCompactList}\small\item\em Destructs the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. \end{DoxyCompactList}\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_a7a86355beefbe191d0e77618eeaaf6b7}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$ alloc\+\_\+ptr=\{\})
+\begin{DoxyCompactList}\small\item\em Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Allocator , class... Allocator\+Args$>$ }\\\hyperlink{classintel_1_1hexl_1_1NTT_a716fd07255e9b68fec80e2a9b98841f4}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, Allocator \&\&a, Allocator\+Args \&\&... args)
+\item 
+\hyperlink{classintel_1_1hexl_1_1NTT_ac5ef577bf39789c1e200b7d5a7b65989}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, uint64\+\_\+t root\+\_\+of\+\_\+unity, std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$ alloc\+\_\+ptr=\{\})
+\begin{DoxyCompactList}\small\item\em Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Allocator , class... Allocator\+Args$>$ }\\\hyperlink{classintel_1_1hexl_1_1NTT_a831df901cf9ea5a83e5d628cdbd36671}{N\+TT} (uint64\+\_\+t degree, uint64\+\_\+t q, uint64\+\_\+t root\+\_\+of\+\_\+unity, Allocator \&\&a, Allocator\+Args \&\&... args)
+\item 
+void \hyperlink{classintel_1_1hexl_1_1NTT_a7f8dac5ff3fc117d3e7259762a716140}{Compute\+Forward} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand, uint64\+\_\+t input\+\_\+mod\+\_\+factor, uint64\+\_\+t output\+\_\+mod\+\_\+factor)
+\begin{DoxyCompactList}\small\item\em Compute forward \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. Results are bit-\/reversed. \end{DoxyCompactList}\item 
+void \hyperlink{classintel_1_1hexl_1_1NTT_a31e78375dcafd5df85cb1259a9156a9a}{Compute\+Inverse} (uint64\+\_\+t $\ast$result, const uint64\+\_\+t $\ast$operand, uint64\+\_\+t input\+\_\+mod\+\_\+factor, uint64\+\_\+t output\+\_\+mod\+\_\+factor)
+\item 
+uint64\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_af10476eb10c3b5723052bdf59d7f3d22}{Get\+Minimal\+Root\+Of\+Unity} () const
+\begin{DoxyCompactList}\small\item\em Returns the minimal 2N\textquotesingle{}th root of unity. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a25172ec87ce3cbfe9bbc20cd9c52f2ab}{Get\+Degree} () const
+\begin{DoxyCompactList}\small\item\em Returns the degree N. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_aef2a5afbd559f7e27d5fa7d4e28bd252}{Get\+Modulus} () const
+\begin{DoxyCompactList}\small\item\em Returns the word-\/sized prime modulus. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a71749beadc3fde1d2b80f2d99b739099}{Get\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns the root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_af0ab14a87e3f9e8cf46502c4c766fec5}{Get\+Root\+Of\+Unity\+Power} (size\+\_\+t i)
+\begin{DoxyCompactList}\small\item\em Returns the root of unity power at bit-\/reversed index i. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a1cbd65fb426faafbd22fcb8b7ee98807}{Get\+Precon32\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns 32-\/bit pre-\/conditioned root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a3bddde00a1832f4ac175e71469939e51}{Get\+Precon64\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns 64-\/bit pre-\/conditioned root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_ac93455767a667ef07aa41f747c77b4ae}{Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns the root of unity powers in bit-\/reversed order with modifications for use by A\+V\+X512 implementation. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_acf8896d7c5ab8c47fe860f3d5a1be215}{Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns 32-\/bit pre-\/conditioned A\+V\+X512 root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_aca9903ac08ed7e06d343f85a0ced8b04}{Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns 52-\/bit pre-\/conditioned A\+V\+X512 root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_afb5b2c6cd1135f708c5e8a4e97d6f7da}{Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns 64-\/bit pre-\/conditioned A\+V\+X512 root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a509f384895cf97ef9cd2edd2902eb82a}{Get\+Inv\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns the inverse root of unity powers in bit-\/reversed order. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a7dd5b59ed992c5466099999ce1eb15d6}{Get\+Inv\+Root\+Of\+Unity\+Power} (size\+\_\+t i)
+\begin{DoxyCompactList}\small\item\em Returns the inverse root of unity power at bit-\/reversed index i. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a70d5480692fcd13418ae7f4c38345770}{Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns the vector of 32-\/bit pre-\/conditioned pre-\/computed root of unity. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a9314e0edf36095233efaf72dc6cb9d5e}{Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns the vector of 52-\/bit pre-\/conditioned pre-\/computed root of unity. \end{DoxyCompactList}\item 
+const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$ uint64\+\_\+t $>$ \& \hyperlink{classintel_1_1hexl_1_1NTT_a0f7f195efe5166b0f3a8c9e71f3a405a}{Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers} () const
+\begin{DoxyCompactList}\small\item\em Returns the vector of 64-\/bit pre-\/conditioned pre-\/computed root of unity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \hyperlink{classintel_1_1hexl_1_1NTT_a81e461e466f57c1c454564879121d8d3}{Check\+Arguments} (uint64\+\_\+t degree, uint64\+\_\+t modulus)
+\begin{DoxyCompactList}\small\item\em Returns true if arguments satisfy constraints for negacyclic \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. \end{DoxyCompactList}\item 
+static size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a76d33e88bd12c2c91b7f8285f8525d72}{Max\+Degree\+Bits} ()
+\begin{DoxyCompactList}\small\item\em Maximum power of 2 in degree. \end{DoxyCompactList}\item 
+static size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_afa71c9bf13109e0d07cacce9e752357c}{Max\+Modulus\+Bits} ()
+\begin{DoxyCompactList}\small\item\em Maximum number of bits in modulus;. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_ab0db0e033026cff37b7acba889500b6d}{s\+\_\+default\+\_\+shift\+\_\+bits} \{64\}
+\begin{DoxyCompactList}\small\item\em Default bit shift used in Barrett precomputation. \end{DoxyCompactList}\item 
+static const size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a5642931d7118e5a6304890f18a92c6dc}{s\+\_\+ifma\+\_\+shift\+\_\+bits} \{52\}
+\begin{DoxyCompactList}\small\item\em Bit shift used in Barrett precomputation when A\+V\+X512-\/\+I\+F\+MA acceleration is enabled. \end{DoxyCompactList}\item 
+static const size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a4c42c952781ae97d1abf02ab5334143f}{s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus} \{1\+U\+L\+L $<$$<$ (32 -\/ 2)\}
+\begin{DoxyCompactList}\small\item\em Maximum modulus to use 32-\/bit A\+V\+X512-\/\+DQ acceleration for the forward transform. \end{DoxyCompactList}\item 
+static const size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a33af06994139ae14c69d8958611487bd}{s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus} \{1\+U\+L\+L $<$$<$ (32 -\/ 1)\}
+\begin{DoxyCompactList}\small\item\em Maximum modulus to use 32-\/bit A\+V\+X512-\/\+DQ acceleration for the inverse transform. \end{DoxyCompactList}\item 
+static const size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a248f7a613b187a7f71a67b93e4ca13ad}{s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus} \{1\+U\+L\+L $<$$<$ (s\+\_\+ifma\+\_\+shift\+\_\+bits -\/ 2)\}
+\begin{DoxyCompactList}\small\item\em Maximum modulus to use A\+V\+X512-\/\+I\+F\+MA acceleration for the forward transform. \end{DoxyCompactList}\item 
+static const size\+\_\+t \hyperlink{classintel_1_1hexl_1_1NTT_a741db1877b630638173b6ed5f9a6e6c7}{s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus} \{1\+U\+L\+L $<$$<$ (s\+\_\+ifma\+\_\+shift\+\_\+bits -\/ 1)\}
+\begin{DoxyCompactList}\small\item\em Maximum modulus to use A\+V\+X512-\/\+I\+F\+MA acceleration for the inverse transform. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Performs negacyclic forward and inverse number-\/theoretic transform (\hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}), commonly used in R\+L\+WE cryptography. 
+
+The number-\/theoretic transform (\hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}) specializes the discrete Fourier transform (D\+FT) to the finite field $ \mathbb{Z}_q[X] / (X^N + 1) $. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ad31a184065b07b50c3ff01260f6dad28}\label{classintel_1_1hexl_1_1NTT_ad31a184065b07b50c3ff01260f6dad28}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+Initializes an empty \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a4fbb886db7389f6a5bac264a3e0cf66f}\label{classintel_1_1hexl_1_1NTT_a4fbb886db7389f6a5bac264a3e0cf66f}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!````~N\+TT@{$\sim$\+N\+TT}}
+\index{````~N\+TT@{$\sim$\+N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{$\sim$\+N\+T\+T()}{~NTT()}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::$\sim$\+N\+TT (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+Destructs the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a7a86355beefbe191d0e77618eeaaf6b7}\label{classintel_1_1hexl_1_1NTT_a7a86355beefbe191d0e77618eeaaf6b7}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$}]{alloc\+\_\+ptr = {\ttfamily \{\}} }\end{DoxyParamCaption})}
+
+
+
+Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em degree} & also known as N. Size of the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} transform. Must be a power of 2 \\
+\hline
+\mbox{\tt in}  & {\em q} & Prime modulus. Must satisfy $ q == 1 \mod 2N $ \\
+\hline
+\mbox{\tt in}  & {\em alloc\+\_\+ptr} & Custom memory allocator used for intermediate calculations Performs pre-\/computation necessary for forward and inverse transforms \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a716fd07255e9b68fec80e2a9b98841f4}\label{classintel_1_1hexl_1_1NTT_a716fd07255e9b68fec80e2a9b98841f4}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template$<$class Allocator , class... Allocator\+Args$>$ \\
+intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{Allocator \&\&}]{a,  }\item[{Allocator\+Args \&\&...}]{args }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ac5ef577bf39789c1e200b7d5a7b65989}\label{classintel_1_1hexl_1_1NTT_ac5ef577bf39789c1e200b7d5a7b65989}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{uint64\+\_\+t}]{root\+\_\+of\+\_\+unity,  }\item[{std\+::shared\+\_\+ptr$<$ \hyperlink{structintel_1_1hexl_1_1AllocatorBase}{Allocator\+Base} $>$}]{alloc\+\_\+ptr = {\ttfamily \{\}} }\end{DoxyParamCaption})}
+
+
+
+Initializes an \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} object with degree {\ttfamily degree} and modulus {\ttfamily q}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em degree} & also known as N. Size of the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} transform. Must be a power of 2 \\
+\hline
+\mbox{\tt in}  & {\em q} & Prime modulus. Must satisfy $ q == 1 \mod 2N $ \\
+\hline
+\mbox{\tt in}  & {\em root\+\_\+of\+\_\+unity} & 2N\textquotesingle{}th root of unity in $ \mathbb{Z_q} $. \\
+\hline
+\mbox{\tt in}  & {\em alloc\+\_\+ptr} & Custom memory allocator used for intermediate calculations\\
+\hline
+\end{DoxyParams}
+Performs pre-\/computation necessary for forward and inverse transforms \mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a831df901cf9ea5a83e5d628cdbd36671}\label{classintel_1_1hexl_1_1NTT_a831df901cf9ea5a83e5d628cdbd36671}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!N\+TT@{N\+TT}}
+\index{N\+TT@{N\+TT}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{N\+T\+T()}{NTT()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template$<$class Allocator , class... Allocator\+Args$>$ \\
+intel\+::hexl\+::\+N\+T\+T\+::\+N\+TT (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{q,  }\item[{uint64\+\_\+t}]{root\+\_\+of\+\_\+unity,  }\item[{Allocator \&\&}]{a,  }\item[{Allocator\+Args \&\&...}]{args }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a81e461e466f57c1c454564879121d8d3}\label{classintel_1_1hexl_1_1NTT_a81e461e466f57c1c454564879121d8d3}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Check\+Arguments@{Check\+Arguments}}
+\index{Check\+Arguments@{Check\+Arguments}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Check\+Arguments()}{CheckArguments()}}
+{\footnotesize\ttfamily static bool intel\+::hexl\+::\+N\+T\+T\+::\+Check\+Arguments (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{degree,  }\item[{uint64\+\_\+t}]{modulus }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Returns true if arguments satisfy constraints for negacyclic \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em degree} & N. Size of the transform, i.\+e. the polynomial degree. Must be a power of two. \\
+\hline
+\mbox{\tt in}  & {\em modulus} & Prime modulus q. Must satisfy q mod 2N = 1 \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a7f8dac5ff3fc117d3e7259762a716140}\label{classintel_1_1hexl_1_1NTT_a7f8dac5ff3fc117d3e7259762a716140}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Compute\+Forward@{Compute\+Forward}}
+\index{Compute\+Forward@{Compute\+Forward}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Compute\+Forward()}{ComputeForward()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+N\+T\+T\+::\+Compute\+Forward (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor,  }\item[{uint64\+\_\+t}]{output\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+
+
+Compute forward \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. Results are bit-\/reversed. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em result} & Stores the result \\
+\hline
+\mbox{\tt in}  & {\em operand} & Data on which to compute the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} \\
+\hline
+\mbox{\tt in}  & {\em input\+\_\+mod\+\_\+factor} & Assume input {\ttfamily operand} are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ q). Must be 1, 2 or 4. \\
+\hline
+\mbox{\tt in}  & {\em output\+\_\+mod\+\_\+factor} & Returns output {\ttfamily result} in \mbox{[}0, output\+\_\+mod\+\_\+factor $\ast$ q). Must be 1 or 4. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a31e78375dcafd5df85cb1259a9156a9a}\label{classintel_1_1hexl_1_1NTT_a31e78375dcafd5df85cb1259a9156a9a}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Compute\+Inverse@{Compute\+Inverse}}
+\index{Compute\+Inverse@{Compute\+Inverse}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Compute\+Inverse()}{ComputeInverse()}}
+{\footnotesize\ttfamily void intel\+::hexl\+::\+N\+T\+T\+::\+Compute\+Inverse (\begin{DoxyParamCaption}\item[{uint64\+\_\+t $\ast$}]{result,  }\item[{const uint64\+\_\+t $\ast$}]{operand,  }\item[{uint64\+\_\+t}]{input\+\_\+mod\+\_\+factor,  }\item[{uint64\+\_\+t}]{output\+\_\+mod\+\_\+factor }\end{DoxyParamCaption})}
+
+Compute inverse \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT}. Results are bit-\/reversed. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em result} & Stores the result \\
+\hline
+\mbox{\tt in}  & {\em operand} & Data on which to compute the \hyperlink{classintel_1_1hexl_1_1NTT}{N\+TT} \\
+\hline
+\mbox{\tt in}  & {\em input\+\_\+mod\+\_\+factor} & Assume input {\ttfamily operand} are in \mbox{[}0, input\+\_\+mod\+\_\+factor $\ast$ q). Must be 1 or 2. \\
+\hline
+\mbox{\tt in}  & {\em output\+\_\+mod\+\_\+factor} & Returns output {\ttfamily result} in \mbox{[}0, output\+\_\+mod\+\_\+factor $\ast$ q). Must be 1 or 2. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_acf8896d7c5ab8c47fe860f3d5a1be215}\label{classintel_1_1hexl_1_1NTT_acf8896d7c5ab8c47fe860f3d5a1be215}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers}}
+\index{Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers()}{GetAVX512Precon32RootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+A\+V\+X512\+Precon32\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns 32-\/bit pre-\/conditioned A\+V\+X512 root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_aca9903ac08ed7e06d343f85a0ced8b04}\label{classintel_1_1hexl_1_1NTT_aca9903ac08ed7e06d343f85a0ced8b04}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers}}
+\index{Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers()}{GetAVX512Precon52RootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+A\+V\+X512\+Precon52\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns 52-\/bit pre-\/conditioned A\+V\+X512 root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_afb5b2c6cd1135f708c5e8a4e97d6f7da}\label{classintel_1_1hexl_1_1NTT_afb5b2c6cd1135f708c5e8a4e97d6f7da}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers}}
+\index{Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers()}{GetAVX512Precon64RootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+A\+V\+X512\+Precon64\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns 64-\/bit pre-\/conditioned A\+V\+X512 root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ac93455767a667ef07aa41f747c77b4ae}\label{classintel_1_1hexl_1_1NTT_ac93455767a667ef07aa41f747c77b4ae}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers}}
+\index{Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers@{Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers()}{GetAVX512RootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+A\+V\+X512\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the root of unity powers in bit-\/reversed order with modifications for use by A\+V\+X512 implementation. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a25172ec87ce3cbfe9bbc20cd9c52f2ab}\label{classintel_1_1hexl_1_1NTT_a25172ec87ce3cbfe9bbc20cd9c52f2ab}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Degree@{Get\+Degree}}
+\index{Get\+Degree@{Get\+Degree}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Degree()}{GetDegree()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Degree (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the degree N. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a7dd5b59ed992c5466099999ce1eb15d6}\label{classintel_1_1hexl_1_1NTT_a7dd5b59ed992c5466099999ce1eb15d6}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Inv\+Root\+Of\+Unity\+Power@{Get\+Inv\+Root\+Of\+Unity\+Power}}
+\index{Get\+Inv\+Root\+Of\+Unity\+Power@{Get\+Inv\+Root\+Of\+Unity\+Power}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Inv\+Root\+Of\+Unity\+Power()}{GetInvRootOfUnityPower()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Inv\+Root\+Of\+Unity\+Power (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the inverse root of unity power at bit-\/reversed index i. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a509f384895cf97ef9cd2edd2902eb82a}\label{classintel_1_1hexl_1_1NTT_a509f384895cf97ef9cd2edd2902eb82a}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Inv\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Inv\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Inv\+Root\+Of\+Unity\+Powers()}{GetInvRootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Inv\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the inverse root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_af10476eb10c3b5723052bdf59d7f3d22}\label{classintel_1_1hexl_1_1NTT_af10476eb10c3b5723052bdf59d7f3d22}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Minimal\+Root\+Of\+Unity@{Get\+Minimal\+Root\+Of\+Unity}}
+\index{Get\+Minimal\+Root\+Of\+Unity@{Get\+Minimal\+Root\+Of\+Unity}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Minimal\+Root\+Of\+Unity()}{GetMinimalRootOfUnity()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Minimal\+Root\+Of\+Unity (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the minimal 2N\textquotesingle{}th root of unity. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_aef2a5afbd559f7e27d5fa7d4e28bd252}\label{classintel_1_1hexl_1_1NTT_aef2a5afbd559f7e27d5fa7d4e28bd252}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Modulus@{Get\+Modulus}}
+\index{Get\+Modulus@{Get\+Modulus}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Modulus()}{GetModulus()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Modulus (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the word-\/sized prime modulus. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a70d5480692fcd13418ae7f4c38345770}\label{classintel_1_1hexl_1_1NTT_a70d5480692fcd13418ae7f4c38345770}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers()}{GetPrecon32InvRootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Precon32\+Inv\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the vector of 32-\/bit pre-\/conditioned pre-\/computed root of unity. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a1cbd65fb426faafbd22fcb8b7ee98807}\label{classintel_1_1hexl_1_1NTT_a1cbd65fb426faafbd22fcb8b7ee98807}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Precon32\+Root\+Of\+Unity\+Powers@{Get\+Precon32\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Precon32\+Root\+Of\+Unity\+Powers@{Get\+Precon32\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Precon32\+Root\+Of\+Unity\+Powers()}{GetPrecon32RootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Precon32\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns 32-\/bit pre-\/conditioned root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a9314e0edf36095233efaf72dc6cb9d5e}\label{classintel_1_1hexl_1_1NTT_a9314e0edf36095233efaf72dc6cb9d5e}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers()}{GetPrecon52InvRootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Precon52\+Inv\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the vector of 52-\/bit pre-\/conditioned pre-\/computed root of unity. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a0f7f195efe5166b0f3a8c9e71f3a405a}\label{classintel_1_1hexl_1_1NTT_a0f7f195efe5166b0f3a8c9e71f3a405a}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers@{Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers()}{GetPrecon64InvRootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Precon64\+Inv\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the vector of 64-\/bit pre-\/conditioned pre-\/computed root of unity. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a3bddde00a1832f4ac175e71469939e51}\label{classintel_1_1hexl_1_1NTT_a3bddde00a1832f4ac175e71469939e51}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Precon64\+Root\+Of\+Unity\+Powers@{Get\+Precon64\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Precon64\+Root\+Of\+Unity\+Powers@{Get\+Precon64\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Precon64\+Root\+Of\+Unity\+Powers()}{GetPrecon64RootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Precon64\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns 64-\/bit pre-\/conditioned root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_af0ab14a87e3f9e8cf46502c4c766fec5}\label{classintel_1_1hexl_1_1NTT_af0ab14a87e3f9e8cf46502c4c766fec5}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Root\+Of\+Unity\+Power@{Get\+Root\+Of\+Unity\+Power}}
+\index{Get\+Root\+Of\+Unity\+Power@{Get\+Root\+Of\+Unity\+Power}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Root\+Of\+Unity\+Power()}{GetRootOfUnityPower()}}
+{\footnotesize\ttfamily uint64\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Root\+Of\+Unity\+Power (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the root of unity power at bit-\/reversed index i. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a71749beadc3fde1d2b80f2d99b739099}\label{classintel_1_1hexl_1_1NTT_a71749beadc3fde1d2b80f2d99b739099}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Get\+Root\+Of\+Unity\+Powers@{Get\+Root\+Of\+Unity\+Powers}}
+\index{Get\+Root\+Of\+Unity\+Powers@{Get\+Root\+Of\+Unity\+Powers}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Get\+Root\+Of\+Unity\+Powers()}{GetRootOfUnityPowers()}}
+{\footnotesize\ttfamily const \hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{Aligned\+Vector64}$<$uint64\+\_\+t$>$\& intel\+::hexl\+::\+N\+T\+T\+::\+Get\+Root\+Of\+Unity\+Powers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the root of unity powers in bit-\/reversed order. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a76d33e88bd12c2c91b7f8285f8525d72}\label{classintel_1_1hexl_1_1NTT_a76d33e88bd12c2c91b7f8285f8525d72}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Max\+Degree\+Bits@{Max\+Degree\+Bits}}
+\index{Max\+Degree\+Bits@{Max\+Degree\+Bits}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Max\+Degree\+Bits()}{MaxDegreeBits()}}
+{\footnotesize\ttfamily static size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Max\+Degree\+Bits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Maximum power of 2 in degree. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_afa71c9bf13109e0d07cacce9e752357c}\label{classintel_1_1hexl_1_1NTT_afa71c9bf13109e0d07cacce9e752357c}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!Max\+Modulus\+Bits@{Max\+Modulus\+Bits}}
+\index{Max\+Modulus\+Bits@{Max\+Modulus\+Bits}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{Max\+Modulus\+Bits()}{MaxModulusBits()}}
+{\footnotesize\ttfamily static size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::\+Max\+Modulus\+Bits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Maximum number of bits in modulus;. 
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_ab0db0e033026cff37b7acba889500b6d}\label{classintel_1_1hexl_1_1NTT_ab0db0e033026cff37b7acba889500b6d}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!s\+\_\+default\+\_\+shift\+\_\+bits@{s\+\_\+default\+\_\+shift\+\_\+bits}}
+\index{s\+\_\+default\+\_\+shift\+\_\+bits@{s\+\_\+default\+\_\+shift\+\_\+bits}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{s\+\_\+default\+\_\+shift\+\_\+bits}{s\_default\_shift\_bits}}
+{\footnotesize\ttfamily const size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::s\+\_\+default\+\_\+shift\+\_\+bits \{64\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Default bit shift used in Barrett precomputation. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a5642931d7118e5a6304890f18a92c6dc}\label{classintel_1_1hexl_1_1NTT_a5642931d7118e5a6304890f18a92c6dc}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!s\+\_\+ifma\+\_\+shift\+\_\+bits@{s\+\_\+ifma\+\_\+shift\+\_\+bits}}
+\index{s\+\_\+ifma\+\_\+shift\+\_\+bits@{s\+\_\+ifma\+\_\+shift\+\_\+bits}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{s\+\_\+ifma\+\_\+shift\+\_\+bits}{s\_ifma\_shift\_bits}}
+{\footnotesize\ttfamily const size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::s\+\_\+ifma\+\_\+shift\+\_\+bits \{52\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Bit shift used in Barrett precomputation when A\+V\+X512-\/\+I\+F\+MA acceleration is enabled. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a4c42c952781ae97d1abf02ab5334143f}\label{classintel_1_1hexl_1_1NTT_a4c42c952781ae97d1abf02ab5334143f}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus@{s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus}}
+\index{s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus@{s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus}{s\_max\_fwd\_32\_modulus}}
+{\footnotesize\ttfamily const size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::s\+\_\+max\+\_\+fwd\+\_\+32\+\_\+modulus \{1\+U\+L\+L $<$$<$ (32 -\/ 2)\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Maximum modulus to use 32-\/bit A\+V\+X512-\/\+DQ acceleration for the forward transform. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a248f7a613b187a7f71a67b93e4ca13ad}\label{classintel_1_1hexl_1_1NTT_a248f7a613b187a7f71a67b93e4ca13ad}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus@{s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus}}
+\index{s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus@{s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus}{s\_max\_fwd\_ifma\_modulus}}
+{\footnotesize\ttfamily const size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::s\+\_\+max\+\_\+fwd\+\_\+ifma\+\_\+modulus \{1\+U\+L\+L $<$$<$ (s\+\_\+ifma\+\_\+shift\+\_\+bits -\/ 2)\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Maximum modulus to use A\+V\+X512-\/\+I\+F\+MA acceleration for the forward transform. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a33af06994139ae14c69d8958611487bd}\label{classintel_1_1hexl_1_1NTT_a33af06994139ae14c69d8958611487bd}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus@{s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus}}
+\index{s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus@{s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus}{s\_max\_inv\_32\_modulus}}
+{\footnotesize\ttfamily const size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::s\+\_\+max\+\_\+inv\+\_\+32\+\_\+modulus \{1\+U\+L\+L $<$$<$ (32 -\/ 1)\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Maximum modulus to use 32-\/bit A\+V\+X512-\/\+DQ acceleration for the inverse transform. 
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1NTT_a741db1877b630638173b6ed5f9a6e6c7}\label{classintel_1_1hexl_1_1NTT_a741db1877b630638173b6ed5f9a6e6c7}} 
+\index{intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}!s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus@{s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus}}
+\index{s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus@{s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus}!intel\+::hexl\+::\+N\+TT@{intel\+::hexl\+::\+N\+TT}}
+\subsubsection{\texorpdfstring{s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus}{s\_max\_inv\_ifma\_modulus}}
+{\footnotesize\ttfamily const size\+\_\+t intel\+::hexl\+::\+N\+T\+T\+::s\+\_\+max\+\_\+inv\+\_\+ifma\+\_\+modulus \{1\+U\+L\+L $<$$<$ (s\+\_\+ifma\+\_\+shift\+\_\+bits -\/ 1)\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Maximum modulus to use A\+V\+X512-\/\+I\+F\+MA acceleration for the inverse transform. 
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{ntt_8hpp}{ntt.\+hpp}\end{DoxyCompactItemize}
