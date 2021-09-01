@@ -260,7 +260,7 @@ void InverseTransformFromBitReverseAVX512(
       // t = 1
       const uint64_t* W = &inv_root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_inv_root_of_unity_powers[W_idx];
-      if (input_mod_factor == 1) {
+      if ((input_mod_factor == 1) && (recursion_depth == 0)) {
         InvT1<BitShift, true>(operand, v_neg_modulus, v_twice_mod, m, W,
                               W_precon);
       } else {

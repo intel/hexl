@@ -36,7 +36,7 @@ static void BM_EltwiseMultMod(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultMod)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 8192, 16384}, {48, 60}, {1, 2, 4}});
+    ->ArgsProduct({{1024, 4096, 16384}, {48, 60}, {1, 2, 4}});
 
 //=================================================================
 

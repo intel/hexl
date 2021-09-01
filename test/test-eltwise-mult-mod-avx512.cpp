@@ -39,7 +39,7 @@ TEST(EltwiseMultMod, avx512_int2) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  uint64_t modulus = GeneratePrimes(1, 60, 1024)[0];
+  uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
   std::vector<uint64_t> op1{modulus - 3, 1, 1, 1, 1, 1, 1, 1};
   std::vector<uint64_t> op2{modulus - 4, 1, 1, 1, 1, 1, 1, 1};

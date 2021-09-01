@@ -266,7 +266,7 @@ void ForwardTransformToBitReverseAVX512(
       const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-      if (input_mod_factor <= 2) {
+      if ((input_mod_factor <= 2) && (recursion_depth == 0)) {
         FwdT8<BitShift, true>(operand, v_neg_modulus, v_twice_mod, t, m, W,
                               W_precon);
       } else {
