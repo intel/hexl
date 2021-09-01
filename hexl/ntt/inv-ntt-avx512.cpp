@@ -63,23 +63,6 @@ template void InverseTransformFromBitReverseAVX512<NTT::s_default_shift_bits>(
 template <int BitShift, bool InputLessThanMod>
 inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
                          __m512i neg_modulus, __m512i twice_modulus) {
-  HEXL_VLOG(5, " ");
-  HEXL_VLOG(5, "InvButterfly AVX512 inputs");
-  HEXL_VLOG(5, "modulus " << ExtractValues(twice_modulus)[0] / 2);
-  HEXL_VLOG(5, "X " << ExtractValues(*X));
-  HEXL_VLOG(5, "Y " << ExtractValues(*Y));
-  HEXL_VLOG(5, "W " << ExtractValues(W));
-  HEXL_VLOG(5, "W_precon " << ExtractValues(W_precon));
-
-  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
-                    ExtractValues(twice_modulus).data()[0],
-                    "FwdButterfly input Y exceeds 2 * modulus "
-                        << ExtractValues(twice_modulus).data()[0]);
-  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
-                    ExtractValues(twice_modulus).data()[0],
-                    "FwdButterfly input Y exceeds 2 * modulus "
-                        << ExtractValues(twice_modulus).data()[0]);
-
   __m512i Y_minus_2q = _mm512_sub_epi64(*Y, twice_modulus);
   __m512i T = _mm512_sub_epi64(*X, Y_minus_2q);
 
@@ -113,15 +96,6 @@ inline void InvButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
   } else {
     HEXL_CHECK(false, "Invalid BitShift " << BitShift);
   }
-
-  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
-                    ExtractValues(twice_modulus).data()[0],
-                    "FwdButterfly output Y exceeds 2 * modulus "
-                        << ExtractValues(twice_modulus).data()[0]);
-  HEXL_CHECK_BOUNDS(ExtractValues(*Y).data(), 8,
-                    ExtractValues(twice_modulus).data()[0],
-                    "FwdButterfly output Y exceeds 2 * modulus "
-                        << ExtractValues(twice_modulus).data()[0]);
 }
 
 template <int BitShift, bool InputLessThanMod>
@@ -130,7 +104,6 @@ void InvT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   const __m512i* v_W_pt = reinterpret_cast<const __m512i*>(W);
   const __m512i* v_W_precon_pt = reinterpret_cast<const __m512i*>(W_precon);
   size_t j1 = 0;
-  HEXL_VLOG(3, "InvT1 with InputLessThanMod " << InputLessThanMod);
 
   // 8 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_8
@@ -269,8 +242,6 @@ void InverseTransformFromBitReverseAVX512(
              "input_mod_factor must be 1 or 2; got " << input_mod_factor);
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 2,
              "output_mod_factor must be 1 or 2; got " << output_mod_factor);
-
-  HEXL_VLOG(3, "modulus " << modulus)
 
   uint64_t twice_mod = modulus << 1;
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
