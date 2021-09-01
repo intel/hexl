@@ -166,7 +166,18 @@ if (HEXL_BENCHMARK)
 endif()
 
 if (HEXL_DEBUG)
-  add_subdirectory(cmake/third-party/easylogging)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/third-party/easylogging")
+  find_package(EASYLOGGINGPP MODULE)
+  if (EASYLOGGINGPP_FOUND)
+    message(STATUS "easyloggingpp: pre-installed easyloggingpp found")
+    get_target_property(
+      EASYLOGGINGPP_INCLUDE_DIR
+      easyloggingpp
+      INTERFACE_INCLUDE_DIRECTORIES)
+  else()
+    message(STATUS "easyloggingpp: pre-installed easyloggingpp NOT found, building from source")
+    add_subdirectory(cmake/third-party/easylogging)
+  endif()
 endif()
 
 #------------------------------------------------------------------------------
