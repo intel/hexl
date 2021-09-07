@@ -80,7 +80,6 @@ TEST(EltwiseMultMod, Big) {
 }
 
 TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
-  uint64_t input_mod_factor = 4;
   uint64_t modulus = 281474976546817;
 
   std::vector<uint64_t> data_native(8, 998771110802331);
@@ -111,8 +110,10 @@ TEST(EltwiseMultMod, avx512dqint_small) {
       0, input_mod_factor * modulus - 1);
 
   for (size_t length = 1024; length <= 32768; length *= 2) {
-    auto op1 = GenerateUniformRandomValues(length, input_mod_factor * modulus);
-    auto op2 = GenerateUniformRandomValues(length, input_mod_factor * modulus);
+    auto op1 =
+        GenerateInsecureUniformRandomValues(length, input_mod_factor * modulus);
+    auto op2 =
+        GenerateInsecureUniformRandomValues(length, input_mod_factor * modulus);
 
     std::vector<uint64_t> out_avx(length, 0);
     std::vector<uint64_t> out_native(length, 0);

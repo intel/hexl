@@ -398,7 +398,7 @@ TEST_P(DegreeModulusTest, ForwardRadix4Random) {
   uint64_t modulus_bits = std::get<1>(GetParam());
   uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
-  auto input = GenerateUniformRandomValues(N, modulus);
+  auto input = GenerateInsecureUniformRandomValues(N, modulus);
 
   NTT ntt(N, modulus);
 
@@ -418,7 +418,7 @@ TEST_P(DegreeModulusTest, InverseRadix4Random) {
   uint64_t modulus_bits = std::get<1>(GetParam());
   uint64_t modulus = GeneratePrimes(1, modulus_bits, true, N)[0];
 
-  auto input = GenerateUniformRandomValues(N, modulus);
+  auto input = GenerateInsecureUniformRandomValues(N, modulus);
   auto input_radix4 = input;
 
   NTT ntt(N, modulus);

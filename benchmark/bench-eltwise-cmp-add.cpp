@@ -22,9 +22,9 @@ namespace hexl {
 static void BM_EltwiseCmpAddNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
-  uint64_t bound = GenerateUniformRandomValue(100);
-  uint64_t diff = GenerateUniformRandomValue(100);
-  auto input1 = GenerateUniformRandomValues(input_size, 100);
+  uint64_t bound = GenerateInsecureUniformRandomValue(100);
+  uint64_t diff = GenerateInsecureUniformRandomValue(100);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 100);
 
   for (auto _ : state) {
     EltwiseCmpAddNative(input1.data(), input1.data(), input_size, CMPINT::NLT,
@@ -46,8 +46,8 @@ static void BM_EltwiseCmpAddAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
   uint64_t bound = 50;
-  uint64_t diff = GenerateUniformRandomValue(bound);
-  auto input1 = GenerateUniformRandomValues(input_size, bound);
+  uint64_t diff = GenerateInsecureUniformRandomValue(bound);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, bound);
 
   for (auto _ : state) {
     EltwiseCmpAddAVX512(input1.data(), input1.data(), input_size, CMPINT::NLT,
