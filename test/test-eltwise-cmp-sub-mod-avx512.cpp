@@ -36,14 +36,14 @@ TEST(EltwiseCmpSubMod, AVX512) {
         auto op1 = GenerateUniformRandomValues(length, modulus);
         auto op3 = GenerateUniformRandomValues(length, modulus);
 
-        uint64_t bound = GenerateUniformRandomValues(modulus);
-        uint64_t diff = GenerateUniformRandomValues(modulus);
+        uint64_t bound = GenerateUniformRandomValue(modulus);
+        uint64_t diff = GenerateUniformRandomValue(modulus);
 
         auto op1a = op1;
         auto op1b = op1;
-        auto op1_out(op1.size(), 0);
-        auto op1a_out(op1.size(), 0);
-        auto op1b_out(op1.size(), 0);
+        std::vector<uint64_t> op1_out(op1.size(), 0);
+        std::vector<uint64_t> op1a_out(op1.size(), 0);
+        std::vector<uint64_t> op1b_out(op1.size(), 0);
 
         EltwiseCmpSubMod(op1_out.data(), op1.data(), op1.size(), modulus,
                          static_cast<CMPINT>(cmp), bound, diff);
