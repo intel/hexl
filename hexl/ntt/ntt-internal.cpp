@@ -3,6 +3,7 @@
 
 #include "ntt/ntt-internal.hpp"
 
+#include <cstring>
 #include <utility>
 
 #include "hexl/logging/logging.hpp"
