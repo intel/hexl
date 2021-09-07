@@ -45,7 +45,8 @@ static void BM_EltwiseCmpAddAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
   uint64_t bound = 50;
-  uint64_t diff = GenerateInsecureUniformRandomValue(bound);
+  // must be non-zero
+  uint64_t diff = GenerateInsecureUniformRandomValue(bound - 1) + 1;
   auto input1 = GenerateInsecureUniformRandomValues(input_size, bound);
 
   for (auto _ : state) {
