@@ -46,8 +46,10 @@ inline bool Compare(CMPINT cmp, uint64_t lhs, uint64_t rhs) {
 /// NOTE: this function is not a cryptographically secure random number
 /// generator and should be used for testing/benchmarking only
 inline uint64_t GenerateInsecureUniformRandomValue(uint64_t modulus) {
+  HEXL_CHECK(modulus != 0, "Modulus cannot be zero");
+
   static std::random_device rd;
-  static std::mt19937 mersenne_engine(rd());
+  static std::mt19937 mersenne_engine(42);  // rd());
   static std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
   return distrib(mersenne_engine);

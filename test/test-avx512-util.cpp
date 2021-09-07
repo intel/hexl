@@ -3,8 +3,6 @@
 
 #include <immintrin.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "gtest/gtest.h"

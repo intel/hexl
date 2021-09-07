@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "hexl/experimental/seal/ckks-multiply.hpp"

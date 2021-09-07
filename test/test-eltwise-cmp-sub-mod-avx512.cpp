@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"

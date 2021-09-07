@@ -3,7 +3,6 @@
 
 #include <benchmark/benchmark.h>
 
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"

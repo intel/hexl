@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-mult-mod-internal.hpp"

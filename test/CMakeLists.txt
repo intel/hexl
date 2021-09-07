@@ -12,6 +12,7 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-reduce-mod.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
+    test-util-internal.cpp
 )
 
 if (HEXL_EXPERIMENTAL)

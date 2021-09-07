@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-add-mod-avx512.hpp"
@@ -138,7 +136,7 @@ TEST(EltwiseAddMod, vector_scalar_avx512_native_match) {
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
 #else
-    size_t num_trials = 100;
+    size_t num_trials = 10000;
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {

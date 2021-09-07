@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-fma-mod-avx512.hpp"
@@ -163,7 +161,8 @@ TEST(EltwiseFMAMod, AVX512DQ) {
       for (size_t trial = 0; trial < num_trials; ++trial) {
         auto arg1 = GenerateInsecureUniformRandomValues(
             length, input_mod_factor * modulus);
-        uint64_t arg2 = GenerateInsecureUniformRandomValue(modulus);
+        uint64_t arg2 =
+            GenerateInsecureUniformRandomValue(input_mod_factor * modulus);
         auto arg3 = GenerateInsecureUniformRandomValues(
             length, input_mod_factor * modulus);
 

@@ -3,8 +3,6 @@
 
 #include "hexl/number-theory/number-theory.hpp"
 
-#include <random>
-
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/check.hpp"
 #include "util/util-internal.hpp"
