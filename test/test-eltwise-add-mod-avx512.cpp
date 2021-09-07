@@ -100,8 +100,6 @@ TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;
 
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
-
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
 #else
