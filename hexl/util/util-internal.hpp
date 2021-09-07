@@ -49,8 +49,8 @@ inline uint64_t GenerateInsecureUniformRandomValue(uint64_t modulus) {
   HEXL_CHECK(modulus != 0, "Modulus cannot be zero");
 
   static std::random_device rd;
-  static std::mt19937 mersenne_engine(42);  // rd());
-  static std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
+  static std::mt19937 mersenne_engine(rd());
+  std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
   return distrib(mersenne_engine);
 }
