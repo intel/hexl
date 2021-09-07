@@ -37,7 +37,8 @@ TEST(EltwiseCmpSubMod, AVX512) {
         auto op3 = GenerateUniformRandomValues(length, modulus);
 
         uint64_t bound = GenerateUniformRandomValue(modulus);
-        uint64_t diff = GenerateUniformRandomValue(modulus);
+        // Ensure diff != 0
+        uint64_t diff = GenerateUniformRandomValue(modulus - 1) + 1;
 
         auto op1a = op1;
         auto op1b = op1;
