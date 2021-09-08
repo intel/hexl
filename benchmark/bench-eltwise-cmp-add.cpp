@@ -21,9 +21,11 @@ namespace hexl {
 static void BM_EltwiseCmpAddNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
-  uint64_t bound = GenerateInsecureUniformRandomValue(100);
-  uint64_t diff = GenerateInsecureUniformRandomValue(100);
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 100);
+  uint64_t modulus = 100;
+
+  uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
 
   for (auto _ : state) {
     EltwiseCmpAddNative(input1.data(), input1.data(), input_size, CMPINT::NLT,
