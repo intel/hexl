@@ -166,6 +166,7 @@ Intel HEXL is single-threaded and thread-safe.
 Intel HEXL has been integrated to the following homomorphic encryption libraries:
 - [Microsoft SEAL](https://github.com/microsoft/SEAL)
 - [PALISADE](https://gitlab.com/palisade/palisade-release)
+- [HElib](https://github.com/homenc/HElib)
 
 See also the [Intel Homomorphic Encryption Toolkit](https://github.com/intel/he-toolkit) for example uses cases using HEXL.
 
@@ -192,7 +193,6 @@ We encourage feedback and suggestions via [Github Issues](https://github.com/int
 ## Repository layout
 Public headers reside in the `hexl/include` folder.
 Private headers, e.g. those containing Intel(R) AVX-512 code should not be put in this folder.
-
 
 # Citing Intel HEXL
 To cite Intel HEXL, please use the following BibTeX entry.
