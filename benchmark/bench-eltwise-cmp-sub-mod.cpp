@@ -22,8 +22,8 @@ static void BM_EltwiseCmpSubModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
   uint64_t modulus = 100;
-  uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
-  uint64_t diff = GenerateInsecureUniformRandomValue(modulus);
+  uint64_t bound = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
+  uint64_t diff = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
   auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
 
   for (auto _ : state) {
