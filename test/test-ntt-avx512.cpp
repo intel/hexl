@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <tuple>
 #include <vector>
 
@@ -27,8 +25,8 @@ TEST(NTT, LoadFwdInterleavedT1) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
   __m512i out2;
 
@@ -45,8 +43,8 @@ TEST(NTT, LoadInvInterleavedT1) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
   __m512i out2;
 
@@ -63,8 +61,8 @@ TEST(NTT, LoadFwdInterleavedT2) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
   __m512i out2;
 
@@ -81,8 +79,8 @@ TEST(NTT, LoadInvInterleavedT2) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
   __m512i out2;
 
@@ -99,8 +97,8 @@ TEST(NTT, LoadFwdInterleavedT4) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
   __m512i out2;
 
@@ -117,8 +115,8 @@ TEST(NTT, LoadInvInterleavedT4) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i out1;
   __m512i out2;
 
@@ -135,14 +133,14 @@ TEST(NTT, WriteFwdInterleavedT1) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i arg1 = _mm512_set_epi64(15, 14, 13, 12, 11, 10, 9, 8);
   __m512i arg2 = _mm512_set_epi64(7, 6, 5, 4, 3, 2, 1, 0);
 
-  std::vector<uint64_t> out(16, 0);
-  std::vector<uint64_t> exp{8,  0, 9,  1, 10, 2, 11, 3,
-                            12, 4, 13, 5, 14, 6, 15, 7};
+  AlignedVector64<uint64_t> out(16, 0);
+  AlignedVector64<uint64_t> exp{8,  0, 9,  1, 10, 2, 11, 3,
+                                12, 4, 13, 5, 14, 6, 15, 7};
 
   WriteFwdInterleavedT1(arg1, arg2, reinterpret_cast<__m512i*>(&out[0]));
 
@@ -154,14 +152,14 @@ TEST(NTT, WriteInvInterleavedT4) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
-                            8, 9, 10, 11, 12, 13, 14, 15};
+  AlignedVector64<uint64_t> arg{0, 1, 2,  3,  4,  5,  6,  7,
+                                8, 9, 10, 11, 12, 13, 14, 15};
   __m512i arg1 = _mm512_set_epi64(15, 14, 13, 12, 11, 10, 9, 8);
   __m512i arg2 = _mm512_set_epi64(7, 6, 5, 4, 3, 2, 1, 0);
 
-  std::vector<uint64_t> out(16, 0);
-  std::vector<uint64_t> exp{8,  9,  10, 11, 0, 1, 2, 3,
-                            12, 13, 14, 15, 4, 5, 6, 7};
+  AlignedVector64<uint64_t> out(16, 0);
+  AlignedVector64<uint64_t> exp{8,  9,  10, 11, 0, 1, 2, 3,
+                                12, 13, 14, 15, 4, 5, 6, 7};
 
   WriteInvInterleavedT4(arg1, arg2, reinterpret_cast<__m512i*>(&out[0]));
 
@@ -197,19 +195,12 @@ TEST_P(DegreeModulusBoolTest, FwdNTTAVX512IFMA) {
   size_t num_trials = 20;
 #endif
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
-
   for (size_t trial = 0; trial < num_trials; ++trial) {
-    std::vector<uint64_t> input64(N, 0);
-    for (size_t i = 0; i < N; ++i) {
-      input64[i] = distrib(gen);
-    }
-
-    std::vector<uint64_t> input_ifma = input64;
-    std::vector<uint64_t> input_ifma_lazy = input64;
-    std::vector<uint64_t> exp_output(N, 0);
+    AlignedVector64<uint64_t> input64 =
+        GenerateInsecureUniformRandomValues(N, modulus);
+    AlignedVector64<uint64_t> input_ifma = input64;
+    AlignedVector64<uint64_t> input_ifma_lazy = input64;
+    AlignedVector64<uint64_t> exp_output(N, 0);
 
     // Compute reference
     NTT ntt64(N, modulus);
@@ -250,20 +241,13 @@ TEST_P(DegreeModulusBoolTest, InvNTTAVX512IFMA) {
   size_t num_trials = 20;
 #endif
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
-
   for (size_t trial = 0; trial < num_trials; ++trial) {
-    std::vector<uint64_t> input64(N, 0);
-    for (size_t i = 0; i < N; ++i) {
-      input64[i] = distrib(gen);
-    }
+    AlignedVector64<uint64_t> input64 =
+        GenerateInsecureUniformRandomValues(N, modulus);
+    AlignedVector64<uint64_t> input_ifma = input64;
+    AlignedVector64<uint64_t> input_ifma_lazy = input64;
 
-    std::vector<uint64_t> input_ifma = input64;
-    std::vector<uint64_t> input_ifma_lazy = input64;
-
-    std::vector<uint64_t> exp_output(N, 0);
+    AlignedVector64<uint64_t> exp_output(N, 0);
 
     // Compute reference
     NTT ntt(N, modulus);
@@ -293,9 +277,9 @@ TEST_P(DegreeModulusBoolTest, InvNTTAVX512IFMA) {
 // Test modulus around 50 bits to check IFMA behavior
 INSTANTIATE_TEST_SUITE_P(
     NTT, DegreeModulusBoolTest,
-    ::testing::Combine(::testing::ValuesIn(std::vector<uint64_t>{
+    ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
                            1 << 11, 1 << 12, 1 << 13}),
-                       ::testing::ValuesIn(std::vector<uint64_t>{48, 49}),
+                       ::testing::ValuesIn(AlignedVector64<uint64_t>{48, 49}),
                        ::testing::ValuesIn(std::vector<bool>{false, true})));
 
 #endif
@@ -305,8 +289,6 @@ TEST(NTT, FwdNTT_AVX512_32) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
 #ifdef HEXL_DEBUG
   size_t num_trials = 1;
@@ -316,17 +298,14 @@ TEST(NTT, FwdNTT_AVX512_32) {
 
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 27, true, N)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<std::uint64_t> input(N, 0);
-      for (size_t i = 0; i < N; ++i) {
-        input[i] = distrib(gen);
-      }
-      std::vector<std::uint64_t> input_avx = input;
-      std::vector<std::uint64_t> input_avx_lazy = input;
+      AlignedVector64<uint64_t> input =
+          GenerateInsecureUniformRandomValues(N, modulus);
+      AlignedVector64<uint64_t> input_avx = input;
+      AlignedVector64<uint64_t> input_avx_lazy = input;
 
       ForwardTransformToBitReverseRadix2(
           input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
@@ -357,8 +336,6 @@ TEST(NTT, FwdNTT_AVX512_64) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
 #ifdef HEXL_DEBUG
   size_t num_trials = 1;
@@ -368,17 +345,14 @@ TEST(NTT, FwdNTT_AVX512_64) {
 
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 55, true, N)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<std::uint64_t> input(N, 0);
-      for (size_t i = 0; i < N; ++i) {
-        input[i] = distrib(gen);
-      }
-      std::vector<std::uint64_t> input_avx = input;
-      std::vector<std::uint64_t> input_avx_lazy = input;
+      AlignedVector64<uint64_t> input =
+          GenerateInsecureUniformRandomValues(N, modulus);
+      AlignedVector64<uint64_t> input_avx = input;
+      AlignedVector64<uint64_t> input_avx_lazy = input;
 
       ForwardTransformToBitReverseRadix2(
           input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
@@ -409,8 +383,6 @@ TEST(NTT, InvNTT_AVX512_32) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
 #ifdef HEXL_DEBUG
   size_t num_trials = 1;
@@ -420,17 +392,15 @@ TEST(NTT, InvNTT_AVX512_32) {
 
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 27, true, N)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<std::uint64_t> input(N, 0);
-      for (size_t i = 0; i < N; ++i) {
-        input[i] = distrib(gen);
-      }
-      std::vector<std::uint64_t> input_avx = input;
-      std::vector<std::uint64_t> input_avx_lazy = input;
+      AlignedVector64<uint64_t> input =
+          GenerateInsecureUniformRandomValues(N, modulus);
+
+      AlignedVector64<uint64_t> input_avx = input;
+      AlignedVector64<uint64_t> input_avx_lazy = input;
 
       InverseTransformFromBitReverseRadix2(
           input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
@@ -461,8 +431,6 @@ TEST(NTT, InvNTT_AVX512_64) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
 #ifdef HEXL_DEBUG
   size_t num_trials = 1;
@@ -472,17 +440,14 @@ TEST(NTT, InvNTT_AVX512_64) {
 
   for (size_t N = 512; N <= 65536; N *= 2) {
     uint64_t modulus = GeneratePrimes(1, 55, true, N)[0];
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
     NTT ntt(N, modulus);
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<std::uint64_t> input(N, 0);
-      for (size_t i = 0; i < N; ++i) {
-        input[i] = distrib(gen);
-      }
-      std::vector<std::uint64_t> input_avx = input;
-      std::vector<std::uint64_t> input_avx_lazy = input;
+      AlignedVector64<uint64_t> input =
+          GenerateInsecureUniformRandomValues(N, modulus);
+      AlignedVector64<uint64_t> input_avx = input;
+      AlignedVector64<uint64_t> input_avx_lazy = input;
 
       InverseTransformFromBitReverseRadix2(
           input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),

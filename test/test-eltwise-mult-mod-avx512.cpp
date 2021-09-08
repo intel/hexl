@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-mult-mod-avx512.hpp"
@@ -14,6 +12,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -79,10 +78,7 @@ TEST(EltwiseMultMod, Big) {
 }
 
 TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
-  uint64_t input_mod_factor = 4;
   uint64_t modulus = 281474976546817;
-  std::uniform_int_distribution<uint64_t> distrib(
-      0, input_mod_factor * modulus - 1);
 
   std::vector<uint64_t> data_native(8, 998771110802331);
   auto data_avx = data_native;
@@ -103,24 +99,17 @@ TEST(EltwiseMultMod, avx512dqint_small) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   uint64_t input_mod_factor = 1;
   uint64_t modulus = (1ULL << 53) + 7;
-  std::uniform_int_distribution<uint64_t> distrib(
-      0, input_mod_factor * modulus - 1);
 
   for (size_t length = 1024; length <= 32768; length *= 2) {
-    std::vector<uint64_t> op1(length, 0);
-    std::vector<uint64_t> op2(length, 0);
+    auto op1 =
+        GenerateInsecureUniformRandomValues(length, input_mod_factor * modulus);
+    auto op2 =
+        GenerateInsecureUniformRandomValues(length, input_mod_factor * modulus);
+
     std::vector<uint64_t> out_avx(length, 0);
     std::vector<uint64_t> out_native(length, 0);
-
-    for (size_t i = 0; i < length; ++i) {
-      op1[i] = distrib(gen);
-      op2[i] = distrib(gen);
-    }
 
     EltwiseMultModAVX512DQInt<1>(out_avx.data(), op1.data(), op2.data(),
                                  op1.size(), modulus);
@@ -140,9 +129,6 @@ TEST(EltwiseMultMod, avx512dqint_big) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   for (size_t length = 1024; length <= 32768; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
@@ -155,9 +141,6 @@ TEST(EltwiseMultMod, avx512dqint_big) {
          input_mod_factor *= 2) {
       for (size_t bits = 40; bits <= 60; ++bits) {
         uint64_t modulus = (1ULL << bits) + 7;
-        std::uniform_int_distribution<uint64_t> distrib(
-            0, input_mod_factor * modulus - 1);
-
         bool use_avx512_float = (input_mod_factor * modulus < MaximumValue(50));
 
 #ifdef HEXL_DEBUG
@@ -166,10 +149,11 @@ TEST(EltwiseMultMod, avx512dqint_big) {
         size_t num_trials = 10;
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
-          for (size_t i = 0; i < length; ++i) {
-            op1[i] = distrib(gen);
-            op2[i] = distrib(gen);
-          }
+          auto op1 = GenerateInsecureUniformRandomValues(
+              length, input_mod_factor * modulus);
+          auto op2 = GenerateInsecureUniformRandomValues(
+              length, input_mod_factor * modulus);
+
           op1[0] = input_mod_factor * modulus - 1;
           op2[0] = input_mod_factor * modulus - 1;
 
@@ -234,9 +218,6 @@ TEST(EltwiseMultMod, avx512ifma_big) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   for (size_t length = 1024; length <= 32768; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
@@ -251,19 +232,17 @@ TEST(EltwiseMultMod, avx512ifma_big) {
           continue;
         }
 
-        std::uniform_int_distribution<uint64_t> distrib(
-            0, input_mod_factor * modulus - 1);
-
 #ifdef HEXL_DEBUG
         size_t num_trials = 1;
 #else
         size_t num_trials = 10;
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
-          for (size_t i = 0; i < length; ++i) {
-            op1[i] = distrib(gen);
-            op2[i] = distrib(gen);
-          }
+          auto op1 = GenerateInsecureUniformRandomValues(
+              length, input_mod_factor * modulus);
+          auto op2 = GenerateInsecureUniformRandomValues(
+              length, input_mod_factor * modulus);
+
           op1[0] = input_mod_factor * modulus - 1;
           op2[0] = input_mod_factor * modulus - 1;
 

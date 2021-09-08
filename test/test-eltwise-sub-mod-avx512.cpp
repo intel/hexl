@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-sub-mod-avx512.hpp"
@@ -14,6 +12,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -92,15 +91,10 @@ TEST(EltwiseSubMod, vector_vector_avx512_native_match) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   size_t length = 173;
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;
-
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -109,12 +103,9 @@ TEST(EltwiseSubMod, vector_vector_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<uint64_t> op1(length, 0);
-      std::vector<uint64_t> op2(length, 0);
-      for (size_t i = 0; i < length; ++i) {
-        op1[i] = distrib(gen);
-        op2[i] = distrib(gen);
-      }
+      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
+      auto op2 = GenerateInsecureUniformRandomValues(length, modulus);
+
       op1[0] = modulus - 1;
       op2[0] = modulus - 1;
 
@@ -137,15 +128,10 @@ TEST(EltwiseSubMod, vector_scalar_avx512_native_match) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   size_t length = 173;
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;
-
-    std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -154,11 +140,8 @@ TEST(EltwiseSubMod, vector_scalar_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      std::vector<uint64_t> op1(length, 0);
-      uint64_t op2 = distrib(gen);
-      for (size_t i = 0; i < length; ++i) {
-        op1[i] = distrib(gen);
-      }
+      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
+      uint64_t op2 = GenerateInsecureUniformRandomValues(1, modulus)[0];
       auto op1a = op1;
 
       EltwiseSubModNative(op1.data(), op1.data(), op2, op1.size(), modulus);

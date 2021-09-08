@@ -3,10 +3,9 @@
 
 #include "hexl/number-theory/number-theory.hpp"
 
-#include <random>
-
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/check.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -112,9 +111,6 @@ bool IsPrimitiveRoot(uint64_t root, uint64_t degree, uint64_t modulus) {
 // Tries to return a primitive degree-th root of unity
 // throw error if no root is found
 uint64_t GeneratePrimitiveRoot(uint64_t degree, uint64_t modulus) {
-  std::default_random_engine generator;
-  std::uniform_int_distribution<uint64_t> distribution(0, modulus - 1);
-
   // We need to divide modulus-1 by degree to get the size of the quotient group
   uint64_t size_entire_group = modulus - 1;
 
@@ -122,7 +118,7 @@ uint64_t GeneratePrimitiveRoot(uint64_t degree, uint64_t modulus) {
   uint64_t size_quotient_group = size_entire_group / degree;
 
   for (int trial = 0; trial < 200; ++trial) {
-    uint64_t root = distribution(generator);
+    uint64_t root = GenerateInsecureUniformRandomValue(modulus);
     root = PowMod(root, size_quotient_group, modulus);
 
     if (IsPrimitiveRoot(root, degree, modulus)) {

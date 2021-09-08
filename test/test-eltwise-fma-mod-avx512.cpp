@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-fma-mod-avx512.hpp"
@@ -14,6 +12,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -147,15 +146,11 @@ TEST(EltwiseFMAMod, AVX512DQ) {
   }
 
   uint64_t length = 1031;
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
   for (size_t input_mod_factor = 1; input_mod_factor <= 8;
        input_mod_factor *= 2) {
     for (size_t bits = 1; bits <= 60; ++bits) {
       uint64_t modulus = (1ULL << bits) + 7;
-      std::uniform_int_distribution<uint64_t> distrib(
-          0, input_mod_factor * modulus - 1);
 
 #ifdef HEXL_DEBUG
       size_t num_trials = 10;
@@ -164,13 +159,13 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 #endif
 
       for (size_t trial = 0; trial < num_trials; ++trial) {
-        std::vector<uint64_t> arg1(length, 0);
-        uint64_t arg2 = distrib(gen);
-        std::vector<uint64_t> arg3(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          arg1[i] = distrib(gen);
-          arg3[i] = distrib(gen);
-        }
+        auto arg1 = GenerateInsecureUniformRandomValues(
+            length, input_mod_factor * modulus);
+        uint64_t arg2 =
+            GenerateInsecureUniformRandomValue(input_mod_factor * modulus);
+        auto arg3 = GenerateInsecureUniformRandomValues(
+            length, input_mod_factor * modulus);
+
         std::vector<uint64_t> out_default(length, 0);
         std::vector<uint64_t> out_native(length, 0);
         std::vector<uint64_t> out_avx(length, 0);
@@ -223,26 +218,20 @@ TEST(EltwiseFMAMod, AVX512IFMA) {
   }
 
   uint64_t length = 1024;
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
   constexpr uint64_t input_mod_factor = 8;
 
   for (size_t bits = 48; bits <= 51; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
-    std::uniform_int_distribution<uint64_t> distrib(
-        0, input_mod_factor * modulus - 1);
-
     for (size_t trial = 0; trial < 1000; ++trial) {
-      std::vector<uint64_t> arg1(length, 0);
-      uint64_t arg2 = distrib(gen) % modulus;
-      std::vector<uint64_t> arg3(length, 0);
-      for (size_t i = 0; i < length; ++i) {
-        arg1[i] = distrib(gen);
-        arg3[i] = distrib(gen);
-      }
-      std::vector<uint64_t> arg1a = arg1;
-      std::vector<uint64_t> arg1b = arg1;
+      auto arg1 = GenerateInsecureUniformRandomValues(
+          length, input_mod_factor * modulus);
+      uint64_t arg2 = GenerateInsecureUniformRandomValue(modulus);
+      auto arg3 = GenerateInsecureUniformRandomValues(
+          length, input_mod_factor * modulus);
+
+      auto arg1a = arg1;
+      auto arg1b = arg1;
 
       uint64_t* arg3_data = (trial % 2 == 0) ? arg3.data() : nullptr;
 

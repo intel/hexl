@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"
@@ -14,6 +12,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -26,25 +25,21 @@ TEST(EltwiseCmpSubMod, AVX512) {
   }
 
   uint64_t length = 172;
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
   for (size_t cmp = 0; cmp < 8; ++cmp) {
     for (size_t bits = 48; bits <= 51; ++bits) {
       uint64_t modulus = GeneratePrimes(1, bits, true, 1024)[0];
-      std::uniform_int_distribution<uint64_t> distrib(0, modulus - 1);
 
       for (size_t trial = 0; trial < 200; ++trial) {
-        std::vector<uint64_t> op1(length, 0);
-        uint64_t bound = distrib(gen);
-        uint64_t diff = distrib(gen);
-        std::vector<uint64_t> op3(length, 0);
-        for (size_t i = 0; i < length; ++i) {
-          op1[i] = distrib(gen);
-          op3[i] = distrib(gen);
-        }
-        std::vector<uint64_t> op1a = op1;
-        std::vector<uint64_t> op1b = op1;
+        auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
+        auto op3 = GenerateInsecureUniformRandomValues(length, modulus);
+
+        uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
+        // Ensure diff != 0
+        uint64_t diff = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
+
+        auto op1a = op1;
+        auto op1b = op1;
         std::vector<uint64_t> op1_out(op1.size(), 0);
         std::vector<uint64_t> op1a_out(op1.size(), 0);
         std::vector<uint64_t> op1b_out(op1.size(), 0);

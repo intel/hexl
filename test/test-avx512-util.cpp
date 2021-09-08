@@ -3,14 +3,13 @@
 
 #include <immintrin.h>
 
-#include <memory>
-#include <random>
 #include <vector>
 
 #include "gtest/gtest.h"
 #include "test-util-avx512.hpp"
 #include "util/avx512-util.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -318,29 +317,25 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
 
   // Random
   {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
     uint64_t modulus = 75;
-    std::uniform_int_distribution<uint64_t> distrib(50, modulus * modulus - 1);
     __m512i vmodulus = _mm512_set1_epi64(modulus);
     __m512i vbarr =
         _mm512_set1_epi64(MultiplyFactor(1, 64, modulus).BarrettFactor());
 
     for (size_t trial = 0; trial < 200; ++trial) {
-      std::vector<uint64_t> arg1(8, 0);
-      std::vector<uint64_t> exp(8, 0);
-      for (size_t i = 0; i < 8; ++i) {
-        arg1[i] = distrib(gen);
-        exp[i] = arg1[i] % modulus;
+      auto arg1 = GenerateInsecureUniformRandomValues(8, modulus * modulus);
+      auto exp = arg1;
+      for (auto& elem : exp) {
+        elem %= modulus;
       }
+
       __m512i varg1 = _mm512_set_epi64(arg1[7], arg1[6], arg1[5], arg1[4],
                                        arg1[3], arg1[2], arg1[1], arg1[0]);
 
       __m512i c = _mm512_hexl_barrett_reduce64(varg1, vmodulus, vbarr);
       std::vector<uint64_t> result = ExtractValues(c);
 
-      ASSERT_EQ(result, exp);
+      AssertEqual(result, exp);
     }
   }
 }

@@ -3,7 +3,6 @@
 
 #pragma once
 #include <cmath>
-#include <iostream>
 
 #include "hexl/util/check.hpp"
 #include "hexl/util/types.hpp"

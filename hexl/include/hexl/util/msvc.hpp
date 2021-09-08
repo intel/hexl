@@ -14,7 +14,6 @@
 #include <stdint.h>
 
 #include <cmath>
-#include <iostream>
 
 #include "hexl/util/check.hpp"
 

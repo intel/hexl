@@ -3,7 +3,6 @@
 
 #include <benchmark/benchmark.h>
 
-#include <random>
 #include <vector>
 
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"
@@ -11,6 +10,7 @@
 #include "hexl/eltwise/eltwise-cmp-sub-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -21,18 +21,10 @@ namespace hexl {
 static void BM_EltwiseCmpSubModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   uint64_t modulus = 100;
-  std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
-
-  uint64_t bound = distrib(gen);
-  uint64_t diff = distrib(gen);
-  AlignedVector64<uint64_t> input1(input_size);
-  for (size_t i = 0; i < input_size; ++i) {
-    input1[i] = distrib(gen);
-  }
+  uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
 
   for (auto _ : state) {
     EltwiseCmpSubModNative(input1.data(), input1.data(), input_size, modulus,
@@ -52,19 +44,10 @@ BENCHMARK(BM_EltwiseCmpSubModNative)
 // state[0] is the degree
 static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  size_t modulus = 100;
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
-  std::uniform_int_distribution<uint64_t> distrib(1, modulus - 1);
-
-  uint64_t bound = distrib(gen);
-  uint64_t diff = distrib(gen);
-  AlignedVector64<uint64_t> input1(input_size);
-  for (size_t i = 0; i < input_size; ++i) {
-    input1[i] = distrib(gen);
-  }
+  uint64_t modulus = 100;
+  uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
 
   for (auto _ : state) {
     EltwiseCmpSubModAVX512(input1.data(), input1.data(), input_size, modulus,
