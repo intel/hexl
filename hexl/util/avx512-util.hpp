@@ -371,18 +371,36 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
 
 // Returns x mod q, computed via Barrett reduction
 // @param q_barr floor(2^BitShift / q)
-template <int BitShift = 64>
+template <int BitShift = 64, int OutputModFactor = 1>
 inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
                                             __m512i q_barr) {
-  __m512i rnd1_hi = _mm512_hexl_mulhi_epi<BitShift>(x, q_barr);
+  HEXL_CHECK(BitShift == 52 || BitShift == 64,
+             "Invalid bitshift " << BitShift << "; need 52 or 64");
 
-  // Barrett subtraction
-  // tmp[0] = input - tmp[1] * q;
-  __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
-  x = _mm512_sub_epi64(x, tmp1_times_mod);
+#ifdef HEXL_HAS_AVX512IFMA
+  if (BitShift == 52) {
+    __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr);
+    // Barrett subtraction
+    // tmp[0] = input - tmp[1] * q;
+    __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
+    x = _mm512_sub_epi64(x, tmp1_times_mod);
+  }
+#endif
+  if (BitShift == 64) {
+    __m512i rnd1_hi = _mm512_hexl_mulhi_epi<64>(x, q_barr);
+    // Barrett subtraction
+    // tmp[0] = input - tmp[1] * q;
+    __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
+    x = _mm512_sub_epi64(x, tmp1_times_mod);
+  }
+
   // Correction
-  x = _mm512_hexl_small_mod_epu64(x, q);
-  return x;
+  if (OutputModFactor == 2) {
+    return x;
+  } else {
+    x = _mm512_hexl_small_mod_epu64(x, q);
+    return x;
+  }
 }
 
 // Concatenate packed 64-bit integers in x and y, producing an intermediate
