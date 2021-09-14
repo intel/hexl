@@ -28,7 +28,7 @@ TEST(EltwiseReduceMod, avx512_0_1) {
   std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 769;
-  const uint64_t input_mod_factor = 0;
+  const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
   EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
                          input_mod_factor, output_mod_factor);
@@ -113,10 +113,10 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
       std::vector<uint64_t> result1(length, 0);
       std::vector<uint64_t> result2(length, 0);
 
-      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 0,
-                             1);
-      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 0,
-                             1);
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus,
+                             modulus, 1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus,
+                             modulus, 1);
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);

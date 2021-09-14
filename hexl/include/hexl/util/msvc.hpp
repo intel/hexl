@@ -273,9 +273,13 @@ inline uint64_t DivideUInt128UInt64Lo(const uint64_t numerator_hi,
 
 // Returns most-significant bit of the input
 inline uint64_t MSB(uint64_t input) {
+  HEXL_CHECK(input == 0, "input cannot be 0: Got " << input);
   unsigned long index{0};  // NOLINT(runtime/int)
   _BitScanReverse64(&index, input);
-  return index;
+  if (index >= 0 && input > 0) {
+    return static_cast<uint64_t>(index);
+  }
+  return 0;
 }
 
 #define HEXL_LOOP_UNROLL_4 \
