@@ -136,7 +136,6 @@ static void BM_EltwiseReduceModAVX512BitShift64(
 
 BENCHMARK(BM_EltwiseReduceModAVX512BitShift64)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
@@ -164,7 +163,6 @@ static void BM_EltwiseReduceModAVX512BitShift52(
 
 BENCHMARK(BM_EltwiseReduceModAVX512BitShift52)
     ->Unit(benchmark::kMicrosecond)
-    ->MinTime(1.0)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
