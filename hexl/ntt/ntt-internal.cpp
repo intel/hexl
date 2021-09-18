@@ -51,7 +51,7 @@ NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
 NTT::NTT(uint64_t degree, uint64_t q, std::shared_ptr<AllocatorBase> alloc_ptr)
     : NTT(degree, q, MinimalPrimitiveRoot(2 * degree, q), alloc_ptr) {}
 
-NTT::~NTT(){};  // = default;
+NTT::~NTT() = default;
 
 void NTT::ComputeRootOfUnityPowers() {
   AlignedVector64<uint64_t> root_of_unity_powers(m_degree, 0, m_aligned_alloc);
