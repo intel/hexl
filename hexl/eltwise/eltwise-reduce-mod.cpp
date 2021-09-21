@@ -35,11 +35,7 @@ void EltwiseReduceModNative(uint64_t* result, const uint64_t* operand,
   switch (input_mod_factor) {
     case 0:
       for (size_t i = 0; i < n; ++i) {
-        if (operand[i] >= modulus) {
-          result[i] = BarrettReduce64(operand[i], modulus, barrett_factor);
-        } else {
-          result[i] = operand[i];
-        }
+        result[i] = BarrettReduce64(operand[i], modulus, barrett_factor);
       }
       HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
       break;

@@ -69,8 +69,8 @@ static void BM_EltwiseReduceModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus * 2);
+  AlignedVector64<uint64_t> input1 = GenerateInsecureUniformRandomValues(
+      input_size, modulus, modulus * modulus);
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
