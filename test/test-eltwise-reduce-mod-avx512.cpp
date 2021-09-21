@@ -107,7 +107,7 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
     size_t num_trials = 100;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
       auto op2 = op1;
 
       std::vector<uint64_t> result1(length, 0);
@@ -143,7 +143,7 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
     size_t num_trials = 100;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, 4 * modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, 4 * modulus);
       auto op2 = op1;
       std::vector<uint64_t> result1(length, 0);
       std::vector<uint64_t> result2(length, 0);
@@ -175,7 +175,7 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
     size_t num_trials = 100;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, 4 * modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, 4 * modulus);
       auto op2 = op1;
       std::vector<uint64_t> result1(length, 0);
       std::vector<uint64_t> result2(length, 0);
@@ -207,7 +207,7 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
     size_t num_trials = 100;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, 2 * modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, 2 * modulus);
       auto op2 = op1;
       std::vector<uint64_t> result1(length, 0);
       std::vector<uint64_t> result2(length, 0);

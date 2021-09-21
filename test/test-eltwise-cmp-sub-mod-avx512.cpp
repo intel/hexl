@@ -31,12 +31,12 @@ TEST(EltwiseCmpSubMod, AVX512) {
       uint64_t modulus = GeneratePrimes(1, bits, true, 1024)[0];
 
       for (size_t trial = 0; trial < 200; ++trial) {
-        auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
-        auto op3 = GenerateInsecureUniformRandomValues(length, modulus);
+        auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+        auto op3 = GenerateInsecureUniformRandomValues(length, 0, modulus);
 
-        uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
+        uint64_t bound = GenerateInsecureUniformRandomValue(0, modulus);
         // Ensure diff != 0
-        uint64_t diff = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
+        uint64_t diff = GenerateInsecureUniformRandomValue(1, modulus - 1);
 
         auto op1a = op1;
         auto op1b = op1;

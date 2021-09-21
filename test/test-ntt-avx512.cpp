@@ -197,7 +197,7 @@ TEST_P(DegreeModulusBoolTest, FwdNTTAVX512IFMA) {
 
   for (size_t trial = 0; trial < num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
-        GenerateInsecureUniformRandomValues(N, modulus);
+        GenerateInsecureUniformRandomValues(N, 0, modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
     AlignedVector64<uint64_t> exp_output(N, 0);
@@ -243,7 +243,7 @@ TEST_P(DegreeModulusBoolTest, InvNTTAVX512IFMA) {
 
   for (size_t trial = 0; trial < num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
-        GenerateInsecureUniformRandomValues(N, modulus);
+        GenerateInsecureUniformRandomValues(N, 0, modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
 
@@ -303,7 +303,7 @@ TEST(NTT, FwdNTT_AVX512_32) {
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
       AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, modulus);
+          GenerateInsecureUniformRandomValues(N, 0, modulus);
       AlignedVector64<uint64_t> input_avx = input;
       AlignedVector64<uint64_t> input_avx_lazy = input;
 
@@ -350,7 +350,7 @@ TEST(NTT, FwdNTT_AVX512_64) {
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
       AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, modulus);
+          GenerateInsecureUniformRandomValues(N, 0, modulus);
       AlignedVector64<uint64_t> input_avx = input;
       AlignedVector64<uint64_t> input_avx_lazy = input;
 
@@ -397,7 +397,7 @@ TEST(NTT, InvNTT_AVX512_32) {
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
       AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, modulus);
+          GenerateInsecureUniformRandomValues(N, 0, modulus);
 
       AlignedVector64<uint64_t> input_avx = input;
       AlignedVector64<uint64_t> input_avx_lazy = input;
@@ -445,7 +445,7 @@ TEST(NTT, InvNTT_AVX512_64) {
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
       AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, modulus);
+          GenerateInsecureUniformRandomValues(N, 0, modulus);
       AlignedVector64<uint64_t> input_avx = input;
       AlignedVector64<uint64_t> input_avx_lazy = input;
 

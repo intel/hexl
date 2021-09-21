@@ -17,7 +17,7 @@ TEST(GenerateInsecureUniformRandomValue, 10) {
 
   bool reached_max = false;
   for (size_t i = 0; i < 1000; ++i) {
-    uint64_t x = GenerateInsecureUniformRandomValue(modulus);
+    uint64_t x = GenerateInsecureUniformRandomValue(0, modulus);
     EXPECT_LT(x, modulus);
     if (x == modulus - 1) {
       reached_max = true;
@@ -31,7 +31,7 @@ TEST(GenerateInsecureUniformRandomValues, 100) {
   uint64_t length = 1024;
 
   AlignedVector64<uint64_t> values =
-      GenerateInsecureUniformRandomValues(length, modulus);
+      GenerateInsecureUniformRandomValues(length, 0, modulus);
   EXPECT_EQ(values.size(), length);
   EXPECT_TRUE(std::all_of(values.begin(), values.end(),
                           [&](uint64_t x) { return x < modulus; }));

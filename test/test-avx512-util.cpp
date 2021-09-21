@@ -323,7 +323,7 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
         _mm512_set1_epi64(MultiplyFactor(1, 64, modulus).BarrettFactor());
 
     for (size_t trial = 0; trial < 200; ++trial) {
-      auto arg1 = GenerateInsecureUniformRandomValues(8, modulus * modulus);
+      auto arg1 = GenerateInsecureUniformRandomValues(8, 0, modulus * modulus);
       auto exp = arg1;
       for (auto& elem : exp) {
         elem %= modulus;

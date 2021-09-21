@@ -103,10 +103,10 @@ TEST(EltwiseMultMod, avx512dqint_small) {
   uint64_t modulus = (1ULL << 53) + 7;
 
   for (size_t length = 1024; length <= 32768; length *= 2) {
-    auto op1 =
-        GenerateInsecureUniformRandomValues(length, input_mod_factor * modulus);
-    auto op2 =
-        GenerateInsecureUniformRandomValues(length, input_mod_factor * modulus);
+    auto op1 = GenerateInsecureUniformRandomValues(length, 0,
+                                                   input_mod_factor * modulus);
+    auto op2 = GenerateInsecureUniformRandomValues(length, 0,
+                                                   input_mod_factor * modulus);
 
     std::vector<uint64_t> out_avx(length, 0);
     std::vector<uint64_t> out_native(length, 0);
@@ -150,9 +150,9 @@ TEST(EltwiseMultMod, avx512dqint_big) {
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
           auto op1 = GenerateInsecureUniformRandomValues(
-              length, input_mod_factor * modulus);
+              length, 0, input_mod_factor * modulus);
           auto op2 = GenerateInsecureUniformRandomValues(
-              length, input_mod_factor * modulus);
+              length, 0, input_mod_factor * modulus);
 
           op1[0] = input_mod_factor * modulus - 1;
           op2[0] = input_mod_factor * modulus - 1;
@@ -239,9 +239,9 @@ TEST(EltwiseMultMod, avx512ifma_big) {
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
           auto op1 = GenerateInsecureUniformRandomValues(
-              length, input_mod_factor * modulus);
+              length, 0, input_mod_factor * modulus);
           auto op2 = GenerateInsecureUniformRandomValues(
-              length, input_mod_factor * modulus);
+              length, 0, input_mod_factor * modulus);
 
           op1[0] = input_mod_factor * modulus - 1;
           op2[0] = input_mod_factor * modulus - 1;
