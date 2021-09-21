@@ -18,9 +18,9 @@ repos:
       - id: typos
   - repo: local
     hooks:
-      - id: clang-format-10
-        name: clang-format-10
-        entry: clang-format-10
+      - id: clang-format
+        name: clang-format
+        entry: clang-format
         language: system
         files: \.(c|cc|cxx|cpp|h|hpp|hxx|js|proto)$
         args: ["-i"]

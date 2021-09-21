@@ -10,6 +10,7 @@
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
 #include "hexl/eltwise/eltwise-sub-mod.hpp"
+#include "hexl/experimental/misc/lr-mat-vec-mult.hpp"
 #include "hexl/experimental/seal/ckks-multiply.hpp"
 #include "hexl/experimental/seal/ckks-switch-key.hpp"
 #include "hexl/logging/logging.hpp"
