@@ -46,7 +46,7 @@ static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 100;
   uint64_t bound = GenerateInsecureUniformRandomValue(0, modulus);
-  uint64_t diff = GenerateInsecureUniformRandomValue(0, modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(1, modulus);
   auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   for (auto _ : state) {
