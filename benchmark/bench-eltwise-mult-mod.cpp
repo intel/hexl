@@ -25,10 +25,8 @@ static void BM_EltwiseMultMod(benchmark::State& state) {  //  NOLINT
   size_t input_mod_factor = state.range(2);
   uint64_t modulus = (1ULL << bit_width) + 7;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 2);
 
   for (auto _ : state) {
@@ -48,10 +46,8 @@ static void BM_EltwiseMultModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 2);
 
   for (auto _ : state) {
@@ -76,10 +72,8 @@ static void BM_EltwiseMultModAVX512Float(benchmark::State& state) {  //  NOLINT
   size_t input_mod_factor = state.range(1);
   size_t modulus = 100;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 2);
 
   for (auto _ : state) {
@@ -115,10 +109,8 @@ static void BM_EltwiseMultModAVX512DQInt(benchmark::State& state) {  //  NOLINT
   size_t input_mod_factor = state.range(1);
   size_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 3);
 
   for (auto _ : state) {
@@ -153,10 +145,8 @@ static void BM_EltwiseMultModAVX512IFMAInt(
   size_t input_mod_factor = state.range(1);
   size_t modulus = 100;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 3);
 
   for (auto _ : state) {

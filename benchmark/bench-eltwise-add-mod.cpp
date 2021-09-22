@@ -22,10 +22,8 @@ static void BM_EltwiseVectorVectorAddModNative(
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -49,10 +47,8 @@ static void BM_EltwiseVectorVectorAddModAVX512(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input2 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -75,8 +71,7 @@ static void BM_EltwiseVectorScalarAddModNative(
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
 
@@ -101,8 +96,7 @@ static void BM_EltwiseVectorScalarAddModAVX512(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
 
