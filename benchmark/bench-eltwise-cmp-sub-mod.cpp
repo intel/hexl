@@ -22,9 +22,9 @@ static void BM_EltwiseCmpSubModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
 
   uint64_t modulus = 100;
-  uint64_t bound = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
-  uint64_t diff = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
+  uint64_t bound = GenerateInsecureUniformRandomValue(1, modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(1, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   for (auto _ : state) {
     EltwiseCmpSubModNative(input1.data(), input1.data(), input_size, modulus,
@@ -45,9 +45,9 @@ BENCHMARK(BM_EltwiseCmpSubModNative)
 static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 100;
-  uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
-  uint64_t diff = GenerateInsecureUniformRandomValue(modulus);
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
+  uint64_t bound = GenerateInsecureUniformRandomValue(0, modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(1, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   for (auto _ : state) {
     EltwiseCmpSubModAVX512(input1.data(), input1.data(), input_size, modulus,

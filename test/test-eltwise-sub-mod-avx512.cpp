@@ -103,8 +103,8 @@ TEST(EltwiseSubMod, vector_vector_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
-      auto op2 = GenerateInsecureUniformRandomValues(length, modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+      auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
 
       op1[0] = modulus - 1;
       op2[0] = modulus - 1;
@@ -140,8 +140,8 @@ TEST(EltwiseSubMod, vector_scalar_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
-      uint64_t op2 = GenerateInsecureUniformRandomValues(1, modulus)[0];
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+      uint64_t op2 = GenerateInsecureUniformRandomValues(1, 0, modulus)[0];
       auto op1a = op1;
 
       EltwiseSubModNative(op1.data(), op1.data(), op2, op1.size(), modulus);

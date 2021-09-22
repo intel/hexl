@@ -23,9 +23,9 @@ static void BM_EltwiseCmpAddNative(benchmark::State& state) {  //  NOLINT
 
   uint64_t modulus = 100;
 
-  uint64_t bound = GenerateInsecureUniformRandomValue(modulus);
-  uint64_t diff = GenerateInsecureUniformRandomValue(modulus - 1) + 1;
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, modulus);
+  uint64_t bound = GenerateInsecureUniformRandomValue(0, modulus);
+  uint64_t diff = GenerateInsecureUniformRandomValue(1, modulus - 1);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   for (auto _ : state) {
     EltwiseCmpAddNative(input1.data(), input1.data(), input_size, CMPINT::NLT,
@@ -48,8 +48,8 @@ static void BM_EltwiseCmpAddAVX512(benchmark::State& state) {  //  NOLINT
 
   uint64_t bound = 50;
   // must be non-zero
-  uint64_t diff = GenerateInsecureUniformRandomValue(bound - 1) + 1;
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, bound);
+  uint64_t diff = GenerateInsecureUniformRandomValue(1, bound - 1);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, bound);
 
   for (auto _ : state) {
     EltwiseCmpAddAVX512(input1.data(), input1.data(), input_size, CMPINT::NLT,

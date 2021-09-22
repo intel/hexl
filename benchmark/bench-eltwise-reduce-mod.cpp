@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -20,7 +21,8 @@ static void BM_EltwiseReduceModInPlace(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
   for (auto _ : state) {
@@ -42,7 +44,8 @@ static void BM_EltwiseReduceModCopy(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -66,7 +69,8 @@ static void BM_EltwiseReduceModNative(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 0xffffffffffc0001ULL;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -91,7 +95,8 @@ static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = 0;
   const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);

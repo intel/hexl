@@ -105,8 +105,8 @@ TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
-      auto op2 = GenerateInsecureUniformRandomValues(length, modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+      auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
       op1[0] = modulus - 1;
       op2[0] = modulus - 1;
 
@@ -140,8 +140,8 @@ TEST(EltwiseAddMod, vector_scalar_avx512_native_match) {
 #endif
 
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, modulus);
-      uint64_t op2 = GenerateInsecureUniformRandomValue(modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+      uint64_t op2 = GenerateInsecureUniformRandomValue(0, modulus);
 
       auto op1a = op1;
 
