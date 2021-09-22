@@ -56,11 +56,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Coverage build
         run: |
-          # Install doxygen and dependencies
-          sudo apt-get install -y doxygen graphviz lcov
-          sudo apt-get install -y lcov
-
           set -x
+
+          # Install dependencies
+          sudo apt-get install -y doxygen graphviz lcov
+
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j --target all docs
@@ -98,6 +98,12 @@ jobs:
         os: [self-hosted, macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
         shared_lib: [ON, OFF]
+        include:
+          # Run benchmarks quickly in Debug mode
+          - build_type: Debug
+            benchmark_min_time: "--benchmark_min_time=0.001"
+          - build_type: Release
+            benchmark_min_time: ""
         exclude: # Skip debug on Mac. TODO: add Debug mode
           - os: macos-latest
             build_type: Debug
@@ -135,7 +141,7 @@ jobs:
           # we run the executable directly to pass command-line arguments
           ./build/benchmark/bench_hexl \
             --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" \
-            --benchmark_out_format=csv
+            --benchmark_out_format=csv ${{ matrix.benchmark_min_time }}
 
           # Build and run examples
           cd $GITHUB_WORKSPACE/example/cmake
