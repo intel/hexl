@@ -103,6 +103,10 @@ jobs:
             build_type: Debug
     steps:
       - uses: actions/checkout@v2
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.10
+        with:
+          cmake-version: '3.13.x'
       - name: Default build
         run: |
           set -x
