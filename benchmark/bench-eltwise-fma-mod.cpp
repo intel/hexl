@@ -11,6 +11,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -22,9 +23,11 @@ static void BM_EltwiseFMAModAddNative(benchmark::State& state) {  //  NOLINT
   uint64_t modulus = 0xffffffffffc0001ULL;
   bool add = state.range(1);
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  uint64_t input2 = 1;
-  AlignedVector64<uint64_t> input3(input_size, 2);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
+  AlignedVector64<uint64_t> input3 =
+      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   uint64_t* arg3 = add ? input3.data() : nullptr;
 
   for (auto _ : state) {
@@ -45,9 +48,11 @@ static void BM_EltwiseFMAModAVX512DQ(benchmark::State& state) {  //  NOLINT
   size_t modulus = 100;
   bool add = state.range(1);
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  uint64_t input2 = 3;
-  AlignedVector64<uint64_t> input3(input_size, 2);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
+  AlignedVector64<uint64_t> input3 =
+      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   uint64_t* arg3 = add ? input3.data() : nullptr;
 
@@ -70,9 +75,11 @@ static void BM_EltwiseFMAModAVX512IFMA(benchmark::State& state) {  //  NOLINT
   size_t modulus = 100;
   bool add = state.range(1);
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
-  uint64_t input2 = 3;
-  AlignedVector64<uint64_t> input3(input_size, 2);
+  AlignedVector64<uint64_t> input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
+  AlignedVector64<uint64_t> input3 =
+      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   uint64_t* arg3 = add ? input3.data() : nullptr;
 
