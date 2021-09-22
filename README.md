@@ -1,3 +1,6 @@
+[![Build](https://github.com/intel/hexl/workflows/hexl/badge.svg)](https://github.com/intel/hexl/actions)
+
+
 # Intel Homomorphic Encryption Acceleration Library (HEXL)
 Intel:registered: HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HEXL targets integer arithmetic with word-sized primes, typically 40-60 bits. Intel HEXL provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HEXL, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf)
 
