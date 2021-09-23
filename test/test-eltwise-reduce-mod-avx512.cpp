@@ -86,6 +86,28 @@ TEST(EltwiseReduceMod, avx512_4_2) {
   CheckEqual(result, exp_out);
 }
 
+TEST(EltwiseReduceMod, avx512_mod_1) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  std::vector<uint64_t> op{914704788761805005, 224925333812073588,
+                           592788284123677125, 142439467624940029,
+                           146023272535470246, 979015887843024185,
+                           496780369302017539, 1073741441};
+  std::vector<uint64_t> exp_out{572243325, 955099389, 432045053, 160411261,
+                                815223709, 349526397, 10878205,  0};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
+
+  uint64_t modulus = 1073741441;
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+
+  EltwiseReduceModAVX512<52>(result.data(), op.data(), op.size(), modulus,
+                             input_mod_factor, output_mod_factor);
+  CheckEqual(result, exp_out);
+}
+
 // Checks AVX512 and native EltwiseReduceMod implementations match with randomly
 // generated inputs
 TEST(EltwiseReduceMod, AVX512Big_0_1) {
