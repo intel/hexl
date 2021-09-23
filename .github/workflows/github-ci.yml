@@ -1,7 +1,7 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: hexl
+name: Build and Test
 on:
   # By default this will run when the activity type is "opened", "synchronize",
   # or "reopened".
@@ -9,6 +9,12 @@ on:
     branches:
       - main
       - "[0-9]+.[0-9]+.[0-9]+" # Run on release branch, e.g. 1.2.0
+  # Run when protected branches are pushed to, e.g. via merge
+  push:
+    branches:
+      - main
+      - "[0-9]+.[0-9]+.[0-9]+" # Run on release branch, e.g. 1.2.0
+
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
@@ -56,11 +62,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Coverage build
         run: |
-          # Install doxygen and dependencies
-          sudo apt-get install -y doxygen graphviz lcov
-          sudo apt-get install -y lcov
-
           set -x
+
+          # Install dependencies
+          sudo apt-get install -y doxygen graphviz lcov
+
           # Build library
           cmake -S . -B build ${{ env.COVERAGE_COMPILER_FLAGS }}
           cmake --build build -j --target all docs
@@ -98,11 +104,21 @@ jobs:
         os: [self-hosted, macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
         shared_lib: [ON, OFF]
+        include:
+          # Run benchmarks quickly in Debug mode
+          - build_type: Debug
+            benchmark_min_time: "--benchmark_min_time=0.001"
+          - build_type: Release
+            benchmark_min_time: ""
         exclude: # Skip debug on Mac. TODO: add Debug mode
           - os: macos-latest
             build_type: Debug
     steps:
       - uses: actions/checkout@v2
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.10
+        with:
+          cmake-version: '3.13.x'
       - name: Default build
         run: |
           set -x
@@ -131,7 +147,7 @@ jobs:
           # we run the executable directly to pass command-line arguments
           ./build/benchmark/bench_hexl \
             --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" \
-            --benchmark_out_format=csv
+            --benchmark_out_format=csv ${{ matrix.benchmark_min_time }}
 
           # Build and run examples
           cd $GITHUB_WORKSPACE/example/cmake
