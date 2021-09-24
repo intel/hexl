@@ -5,7 +5,6 @@
 
 #include <vector>
 
-// #include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
