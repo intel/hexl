@@ -333,7 +333,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<64>(v_op1, v_op2);
 
     __m512i c1 = _mm512_hexl_shrdi_epi64<BitShift>(v_prod_lo, v_prod_hi);
-    // L - N + 1 == 64, so we only need high 64 bits
+    // alpha - beta == 64, so we only need high 64 bits
     // Perform approximate computation of high bits, as described on page
     // 7 of https://arxiv.org/pdf/2003.04510.pdf
     __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, v_barr_lo);
@@ -352,8 +352,8 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
   }
 }
 
-/// @brief Algorithm 1 from
-/// https://hal.archives-ouvertes.fr/hal-01215845/document
+/// @brief Algorithm 2 from
+/// https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
 template <int InputModFactor>
 void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           const __m512i* vp_operand1,
@@ -382,7 +382,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     __m512i c1 = _mm512_hexl_shrdi_epi64(
         v_prod_lo, v_prod_hi, static_cast<unsigned int>(prod_right_shift));
 
-    // L - N + 1 == 64, so we only need high 64 bits
+    // alpha - beta == 64, so we only need high 64 bits
     // Perform approximate computation of high bits, as described on page
     // 7 of https://arxiv.org/pdf/2003.04510.pdf
     __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, v_barr_lo);
@@ -499,12 +499,12 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   uint64_t gamma = Log2(InputModFactor);
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
 
-  const uint64_t ceil_logmod = Log2(modulus) + 1;  // "n" from Algorithm 2
-  uint64_t prod_right_shift = ceil_logmod + beta;
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  uint64_t prod_right_shift = ceil_log_mod + beta;
 
   // Barrett factor "mu"
   uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (ceil_logmod + alpha), 64, modulus)
+      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha), 64, modulus)
           .BarrettFactor();
 
   __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
@@ -517,24 +517,27 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   HEXL_VLOG(2, "barr_lo " << barr_lo);
 
   // Let d be the product operand1 * operand2.
-  // To ensure d >> (N - 1) < (1ULL << 64), we need
-  // (input_mod_factor * modulus)^2 >> (N-1) < (1ULL << 64)
-  // This happens when 2 * log_2(input_mod_factor) + N < 63
+  // To ensure d >> prod_right_shift < (1ULL << 64), we need
+  // (input_mod_factor * modulus)^2 >> (prod_right_shift) < (1ULL << 64)
+  // This happens when 2 * log_2(input_mod_factor) + ceil_log_mod < 63
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-
-  // TODO(fboemer): fix
-  bool reduce_mod = false;  // 2 * Log2(InputModFactor) + N >= 63;
+  bool reduce_mod = 2 * Log2(InputModFactor) + prod_right_shift - beta >= 63;
 
   if (reduce_mod) {
-    // This case happens only when  N >= 63 - 2 * log2(input_mod_factor) >= 59
-    // Additionally, modulus < (1ULL << 62) implies N <= 62.
-    // So N == 59, 60, 61, 62 are the only cases here.
+    // Here, we assume beta = -2
+    // This reduce_mod case happens only when
+    // prod_right_shift >= 63 - 2 * log2(input_mod_factor) >= 57.
+    // Additionally, modulus < (1ULL << 62) implies
+    // prod_right_shift <= 61. So N == 57, 58, 59, 60, 61 are the
+    // only cases here.
+    HEXL_CHECK(beta == -2, "beta != -2 may skip some cases");
     switch (prod_right_shift) {
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(57, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(58, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(59, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(60, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(61, InputModFactor)
-      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(62, InputModFactor)
       default: {
         HEXL_CHECK(false,
                    "Bad value for prod_right_shift: " << prod_right_shift);
@@ -546,18 +549,18 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     switch (prod_right_shift) {
       // For N < 50, we should prefer EltwiseMultModAVX512Float or
       // EltwiseMultModAVX512IFMAInt, so we don't generate special cases here
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(50, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(51, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(52, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(53, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(54, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(55, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(56, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(57, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(58, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(59, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(60, 1)
-      // ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(61, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(50, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(51, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(52, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(53, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(54, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(55, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(56, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(57, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(58, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(59, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(60, 1)
+      ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(61, 1)
       default: {
         HEXL_VLOG(2, "calling EltwiseMultModAVX512DQIntLoopDefault");
         EltwiseMultModAVX512DQIntLoopDefault<InputModFactor>(

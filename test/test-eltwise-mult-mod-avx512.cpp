@@ -120,16 +120,102 @@ TEST(EltwiseMultMod, avx512dqint_small) {
     CheckEqual(out_avx, out_native);
   }
 }
-#endif
+
+struct ModulusInputModData {
+  explicit ModulusInputModData(std::tuple<uint64_t, bool, uint64_t> param) {
+    modulus_bits = std::get<0>(param);
+    prefer_small_modulus = std::get<1>(param);
+    input_mod_factor = std::get<2>(param);
+  }
+
+  uint64_t modulus_bits;
+  bool prefer_small_modulus;
+  uint64_t input_mod_factor;
+};
+
+class ModulusInputModFactor
+    : public ::testing::TestWithParam<std::tuple<uint64_t, bool, uint64_t>> {
+ public:
+  struct PrintToStringParamName {
+    template <class ParamType>
+    std::string operator()(
+        const testing::TestParamInfo<ParamType>& info) const {
+      ModulusInputModData modulus_data(
+          static_cast<std::tuple<uint64_t, bool, uint64_t>>(info.param));
+
+      std::stringstream ss;
+      ss << "q" << std::to_string(modulus_data.modulus_bits)
+         << "bits_SmallPrimes"
+         << std::to_string(modulus_data.prefer_small_modulus)
+         << "_InputModFactor" << std::to_string(modulus_data.input_mod_factor);
+
+      return ss.str();
+    }
+  };
+
+ protected:
+  void SetUp() {}
+  void TearDown() {}
+};
+
+TEST_P(ModulusInputModFactor, AVX512DQRandom) {
+  ModulusInputModData modulus_data(GetParam());
+
+  uint64_t modulus = GeneratePrimes(1, modulus_data.modulus_bits,
+                                    modulus_data.prefer_small_modulus)[0];
+  if (modulus_data.input_mod_factor * modulus <= (1ULL << 50)) {
+    GTEST_SKIP();
+  }
+
+  uint64_t length = 1024;
+
+  uint64_t data_bound = modulus_data.input_mod_factor;
+  auto input_1 = GenerateInsecureUniformRandomValues(length, 0, data_bound);
+  auto input_2 = GenerateInsecureUniformRandomValues(length, 0, data_bound);
+  std::vector<uint64_t> output_avx(length, 0);
+  std::vector<uint64_t> output_native(length, 0);
+
+  switch (modulus_data.input_mod_factor) {
+    case 1: {
+      EltwiseMultModNative<1>(output_native.data(), input_1.data(),
+                              input_2.data(), input_1.size(), modulus);
+      EltwiseMultModAVX512DQInt<1>(output_avx.data(), input_1.data(),
+                                   input_2.data(), length, modulus);
+      break;
+    }
+    case 2: {
+      EltwiseMultModNative<1>(output_native.data(), input_1.data(),
+                              input_2.data(), input_1.size(), modulus);
+      EltwiseMultModAVX512DQInt<2>(output_avx.data(), input_1.data(),
+                                   input_2.data(), length, modulus);
+      break;
+    }
+    case 4: {
+      EltwiseMultModNative<1>(output_native.data(), input_1.data(),
+                              input_2.data(), input_1.size(), modulus);
+      EltwiseMultModAVX512DQInt<4>(output_avx.data(), input_1.data(),
+                                   input_2.data(), length, modulus);
+      break;
+    }
+  }
+  ASSERT_EQ(output_avx, output_native);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    EltwiseMultMod, ModulusInputModFactor,
+    ::testing::Combine(::testing::Range(uint64_t{30}, uint64_t{61}),
+                       ::testing::ValuesIn(std::vector<bool>{false, true}),
+                       ::testing::ValuesIn(std::vector<uint64_t>{1, 2, 4})),
+    ModulusInputModFactor::PrintToStringParamName());
 
 // Checks AVX512 and native eltwise mult out-of-place implementations match
-#ifdef HEXL_HAS_AVX512DQ
+
 TEST(EltwiseMultMod, avx512dqint_big) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
 
-  for (size_t length = 1024; length <= 32768; length *= 2) {
+  for (size_t length = 1024; length <= 1024; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> rs1(length, 0);
@@ -143,11 +229,11 @@ TEST(EltwiseMultMod, avx512dqint_big) {
         uint64_t modulus = (1ULL << bits) + 7;
         bool use_avx512_float = (input_mod_factor * modulus < MaximumValue(50));
 
-#ifdef HEXL_DEBUG
         size_t num_trials = 1;
-#else
-        size_t num_trials = 10;
-#endif
+
+        HEXL_VLOG(2, "input_mod_factor " << input_mod_factor);
+        HEXL_VLOG(2, "bits " << bits);
+
         for (size_t trial = 0; trial < num_trials; ++trial) {
           auto op1 = GenerateInsecureUniformRandomValues(
               length, 0, input_mod_factor * modulus);
