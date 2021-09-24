@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
@@ -221,7 +222,7 @@ struct ModulusInputModData {
   uint64_t input_mod_factor;
 };
 
-class ModulusInputModFactorTest
+class ModulusInputModFactor
     : public ::testing::TestWithParam<std::tuple<uint64_t, bool, uint64_t>> {
  public:
   struct PrintToStringParamName {
@@ -246,7 +247,7 @@ class ModulusInputModFactorTest
   void TearDown() {}
 };
 
-TEST_P(ModulusInputModFactorTest, EltwiseMultModRandom) {
+TEST_P(ModulusInputModFactor, NativeRandom) {
   ModulusInputModData modulus_data(GetParam());
 
   uint64_t modulus = GeneratePrimes(1, modulus_data.modulus_bits,
@@ -279,16 +280,56 @@ TEST_P(ModulusInputModFactorTest, EltwiseMultModRandom) {
       break;
     }
   }
+  ASSERT_EQ(output, expected);
+}
+
+TEST_P(ModulusInputModFactor, AVX512DQRandom) {
+  ModulusInputModData modulus_data(GetParam());
+
+  uint64_t modulus = GeneratePrimes(1, modulus_data.modulus_bits,
+                                    modulus_data.prefer_small_modulus)[0];
+  if (modulus_data.input_mod_factor * modulus <= (1ULL << 50)) {
+    GTEST_SKIP();
+  }
+
+  uint64_t length = 1024;
+
+  auto input_1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto input_2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  std::vector<uint64_t> output(length, 0);
+
+  std::vector<uint64_t> expected(length, 0);
+  for (size_t i = 0; i < length; ++i) {
+    expected[i] = MultiplyMod(input_1[i], input_2[i], modulus);
+  }
+
+  switch (modulus_data.input_mod_factor) {
+    case 1: {
+      EltwiseMultModAVX512DQInt<1>(output.data(), input_1.data(),
+                                   input_2.data(), length, modulus);
+      break;
+    }
+    case 2: {
+      EltwiseMultModAVX512DQInt<2>(output.data(), input_1.data(),
+                                   input_2.data(), length, modulus);
+      break;
+    }
+    case 4: {
+      EltwiseMultModAVX512DQInt<4>(output.data(), input_1.data(),
+                                   input_2.data(), length, modulus);
+      break;
+    }
+  }
 
   ASSERT_EQ(output, expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    EltwiseMultMod, ModulusInputModFactorTest,
+    EltwiseMultMod, ModulusInputModFactor,
     ::testing::Combine(::testing::Range(uint64_t{30}, uint64_t{61}),
                        ::testing::ValuesIn(std::vector<bool>{false, true}),
                        ::testing::ValuesIn(std::vector<uint64_t>{1, 2, 4})),
-    ModulusInputModFactorTest::PrintToStringParamName());
+    ModulusInputModFactor::PrintToStringParamName());
 
 }  // namespace hexl
 }  // namespace intel

@@ -4,7 +4,6 @@
 #pragma once
 
 #include <cmath>
-#include <iostream>
 
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
@@ -52,10 +51,6 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
   const int64_t alpha = 62;  // ensures alpha - beta = 64
 
   uint64_t gamma = Log2(InputModFactor);
-  if (!(alpha >= gamma + 1)) {
-    std::cout << "bad alpha/gamma\n";
-  }
-
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
 
   const uint64_t ceil_logmod = Log2(modulus) + 1;  // "n" from Algorithm 2
