@@ -31,17 +31,12 @@ class MultiplyFactor {
     HEXL_CHECK(operand <= modulus, "operand " << operand
                                               << " must be less than modulus "
                                               << modulus);
-    HEXL_CHECK(bit_shift < 128, "Unsupported bit_shift " << bit_shift);
+    HEXL_CHECK(bit_shift == 32 || bit_shift == 52 || bit_shift == 64,
+               "Unsupported BitShift " << bit_shift);
+    uint64_t op_hi = operand >> (64 - bit_shift);
+    uint64_t op_lo = (bit_shift == 64) ? 0 : (operand << bit_shift);
 
-    if (bit_shift > 64) {
-      uint64_t op_lo = 0;
-      uint64_t op_hi = operand << (64 - bit_shift);
-      m_barrett_factor = DivideUInt128UInt64Lo(op_hi, op_lo, modulus);
-    } else {
-      uint64_t op_hi = operand >> (64 - bit_shift);
-      uint64_t op_lo = (bit_shift == 64) ? 0 : (operand << bit_shift);
-      m_barrett_factor = DivideUInt128UInt64Lo(op_hi, op_lo, modulus);
-    }
+    m_barrett_factor = DivideUInt128UInt64Lo(op_hi, op_lo, modulus);
   }
 
   /// @brief Returns the pre-computed Barrett factor

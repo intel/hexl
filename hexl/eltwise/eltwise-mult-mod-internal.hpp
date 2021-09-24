@@ -53,12 +53,14 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
   uint64_t gamma = Log2(InputModFactor);
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
 
-  const uint64_t ceil_logmod = Log2(modulus) + 1;  // "n" from Algorithm 2
-  uint64_t prod_right_shift = ceil_logmod + beta;
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  uint64_t prod_right_shift = ceil_log_mod + beta;
 
   // Barrett factor "mu"
+  // TODO(fboemer): Allow MultiplyFactor to take bit shifts != 64
+  HEXL_CHECK(ceil_log_mod + alpha >= 64, "ceil_log_mod + alpha < 64");
   uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (ceil_logmod + alpha), 64, modulus)
+      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
           .BarrettFactor();
 
   const uint64_t twice_modulus = 2 * modulus;

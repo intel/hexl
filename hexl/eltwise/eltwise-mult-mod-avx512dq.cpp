@@ -501,8 +501,10 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   uint64_t prod_right_shift = ceil_log_mod + beta;
 
   // Barrett factor "mu"
+  // TODO(fboemer): Allow MultiplyFactor to take bit shifts != 64
+  HEXL_CHECK(ceil_log_mod + alpha >= 64, "ceil_log_mod + alpha < 64");
   uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha), 64, modulus)
+      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
           .BarrettFactor();
 
   __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
