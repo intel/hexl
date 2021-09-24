@@ -492,6 +492,7 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
   constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
   uint64_t gamma = Log2(InputModFactor);
+  HEXL_UNUSED(gamma);
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
 
   const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
