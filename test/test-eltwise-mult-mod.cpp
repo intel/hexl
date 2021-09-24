@@ -209,40 +209,86 @@ TEST(EltwiseMultMod, 9) {
   CheckEqual(result, exp_out);
 }
 
-// Parameter is number of bits in the modulus
-class ModulusTest : public ::testing::TestWithParam<uint64_t> {
+struct ModulusInputModData {
+  explicit ModulusInputModData(std::tuple<uint64_t, bool, uint64_t> param) {
+    modulus_bits = std::get<0>(param);
+    prefer_small_modulus = std::get<1>(param);
+    input_mod_factor = std::get<2>(param);
+  }
+
+  uint64_t modulus_bits;
+  bool prefer_small_modulus;
+  uint64_t input_mod_factor;
+};
+
+class ModulusInputModFactorTest
+    : public ::testing::TestWithParam<std::tuple<uint64_t, bool, uint64_t>> {
+ public:
+  struct PrintToStringParamName {
+    template <class ParamType>
+    std::string operator()(
+        const testing::TestParamInfo<ParamType>& info) const {
+      ModulusInputModData modulus_data(
+          static_cast<std::tuple<uint64_t, bool, uint64_t>>(info.param));
+
+      std::stringstream ss;
+      ss << "q" << std::to_string(modulus_data.modulus_bits)
+         << "bits_SmallPrimes"
+         << std::to_string(modulus_data.prefer_small_modulus)
+         << "_InputModFactor" << std::to_string(modulus_data.input_mod_factor);
+
+      return ss.str();
+    }
+  };
+
  protected:
   void SetUp() {}
   void TearDown() {}
-
- public:
 };
 
-TEST_P(ModulusTest, EltwiseMultModRandom) {
-  uint64_t modulus_bits = GetParam();
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, false)[0];
+TEST_P(ModulusInputModFactorTest, EltwiseMultModRandom) {
+  ModulusInputModData modulus_data(GetParam());
 
+  uint64_t modulus = GeneratePrimes(1, modulus_data.modulus_bits,
+                                    modulus_data.prefer_small_modulus)[0];
   uint64_t length = 1024;
 
   auto input_1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
   auto input_2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
   std::vector<uint64_t> output(length, 0);
 
-  EltwiseMultModNative<1>(output.data(), input_1.data(), input_2.data(), length,
-                          modulus);
-
+  std::vector<uint64_t> expected(length, 0);
   for (size_t i = 0; i < length; ++i) {
-    uint64_t expected = static_cast<uint64_t>(
-        (uint128_t(input_1[i]) * uint128_t(input_2[i])) % modulus);
-    ASSERT_EQ(output[i], expected);
+    expected[i] = MultiplyMod(input_1[i], input_2[i], modulus);
   }
+
+  switch (modulus_data.input_mod_factor) {
+    case 1: {
+      EltwiseMultModNative<1>(output.data(), input_1.data(), input_2.data(),
+                              length, modulus);
+      break;
+    }
+    case 2: {
+      EltwiseMultModNative<2>(output.data(), input_1.data(), input_2.data(),
+                              length, modulus);
+      break;
+    }
+    case 4: {
+      EltwiseMultModNative<4>(output.data(), input_1.data(), input_2.data(),
+                              length, modulus);
+      break;
+    }
+  }
+
+  ASSERT_EQ(output, expected);
 }
 
-INSTANTIATE_TEST_SUITE_P(EltwiseMultMod, ModulusTest,
-                         ::testing::Values(30, 31, 32, 33, 34, 35, 36, 37, 38,
-                                           39, 40, 41, 42, 43, 44, 45, 46, 47,
-                                           48, 49, 50, 51, 52, 53, 54, 55, 56,
-                                           57, 58, 59, 60, 61));
+INSTANTIATE_TEST_SUITE_P(
+    EltwiseMultMod, ModulusInputModFactorTest,
+    ::testing::Combine(::testing::Range(uint64_t{30}, uint64_t{61}),
+                       ::testing::ValuesIn(std::vector<bool>{false, true}),
+                       ::testing::ValuesIn(std::vector<uint64_t>{1, 2, 4})),
+    ModulusInputModFactorTest::PrintToStringParamName());
 
 }  // namespace hexl
 }  // namespace intel

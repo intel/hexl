@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
 
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
@@ -32,6 +33,8 @@ template <int InputModFactor>
 void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
                           const uint64_t* operand2, uint64_t n,
                           uint64_t modulus) {
+  HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 || InputModFactor == 4,
+             "Require InputModFactor = 1, 2, or 4")
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(operand2 != nullptr, "Require operand2 != nullptr");
@@ -44,7 +47,17 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
                     "operand2 exceeds bound " << (InputModFactor * modulus));
 
   const int64_t beta = -2;
-  const int64_t alpha = 62;                        // ensures alpha - beta = 64
+  HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
+
+  const int64_t alpha = 62;  // ensures alpha - beta = 64
+
+  uint64_t gamma = Log2(InputModFactor);
+  if (!(alpha >= gamma + 1)) {
+    std::cout << "bad alpha/gamma\n";
+  }
+
+  HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
+
   const uint64_t ceil_logmod = Log2(modulus) + 1;  // "n" from Algorithm 2
   uint64_t prod_right_shift = ceil_logmod + beta;
 
