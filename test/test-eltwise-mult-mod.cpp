@@ -284,48 +284,6 @@ TEST_P(ModulusInputModFactor, NativeRandom) {
   ASSERT_EQ(output, expected);
 }
 
-// TEST_P(ModulusInputModFactor, AVX512DQRandom) {
-//   ModulusInputModData modulus_data(GetParam());
-
-//   uint64_t modulus = GeneratePrimes(1, modulus_data.modulus_bits,
-//                                     modulus_data.prefer_small_modulus)[0];
-//   if (modulus_data.input_mod_factor * modulus <= (1ULL << 50)) {
-//     GTEST_SKIP();
-//   }
-
-//   uint64_t length = 1024;
-
-//   uint64_t data_bound = modulus_data.input_mod_factor;
-//   auto input_1 = GenerateInsecureUniformRandomValues(length, 0, data_bound);
-//   auto input_2 = GenerateInsecureUniformRandomValues(length, 0, data_bound);
-//   std::vector<uint64_t> output(length, 0);
-
-//   std::vector<uint64_t> expected(length, 0);
-//   for (size_t i = 0; i < length; ++i) {
-//     expected[i] = MultiplyMod(input_1[i], input_2[i], modulus);
-//   }
-
-//   switch (modulus_data.input_mod_factor) {
-//     case 1: {
-//       EltwiseMultModAVX512DQInt<1>(output.data(), input_1.data(),
-//                                    input_2.data(), length, modulus);
-//       break;
-//     }
-//     case 2: {
-//       EltwiseMultModAVX512DQInt<2>(output.data(), input_1.data(),
-//                                    input_2.data(), length, modulus);
-//       break;
-//     }
-//     case 4: {
-//       EltwiseMultModAVX512DQInt<4>(output.data(), input_1.data(),
-//                                    input_2.data(), length, modulus);
-//       break;
-//     }
-//   }
-
-//   ASSERT_EQ(output, expected);
-// }
-
 INSTANTIATE_TEST_SUITE_P(
     EltwiseMultMod, ModulusInputModFactor,
     ::testing::Combine(::testing::Range(uint64_t{30}, uint64_t{61}),

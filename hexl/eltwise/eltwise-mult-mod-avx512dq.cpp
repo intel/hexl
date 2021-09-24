@@ -493,9 +493,7 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
 
   const int64_t beta = -2;
   HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
-
   const int64_t alpha = 62;  // ensures alpha - beta = 64
-
   uint64_t gamma = Log2(InputModFactor);
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
 
@@ -526,12 +524,12 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
 
   if (reduce_mod) {
     // Here, we assume beta = -2
+    HEXL_CHECK(beta == -2, "beta != -2 may skip some cases");
     // This reduce_mod case happens only when
     // prod_right_shift >= 63 - 2 * log2(input_mod_factor) >= 57.
     // Additionally, modulus < (1ULL << 62) implies
     // prod_right_shift <= 61. So N == 57, 58, 59, 60, 61 are the
     // only cases here.
-    HEXL_CHECK(beta == -2, "beta != -2 may skip some cases");
     switch (prod_right_shift) {
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(57, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(58, InputModFactor)
@@ -563,7 +561,7 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(61, 1)
       default: {
         HEXL_VLOG(2, "calling EltwiseMultModAVX512DQIntLoopDefault");
-        EltwiseMultModAVX512DQIntLoopDefault<InputModFactor>(
+        EltwiseMultModAVX512DQIntLoopDefault<1>(
             vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
             v_twice_mod, n, prod_right_shift);
       }

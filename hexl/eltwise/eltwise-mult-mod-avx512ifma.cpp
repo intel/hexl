@@ -33,7 +33,7 @@ template void EltwiseMultModAVX512IFMAInt<4>(uint64_t* result,
                                              const uint64_t* operand2,
                                              uint64_t n, uint64_t modulus);
 
-template <int BitShift, int InputModFactor, int CoeffCount>
+template <int ProdRightShift, int InputModFactor, int CoeffCount>
 void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
                                            const __m512i* vp_operand1,
                                            const __m512i* vp_operand2,
@@ -50,9 +50,8 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
                 "CoeffCount must be a factor of manual_unroll_factor * "
                 "avx512_64bit_count");
 
-  constexpr uint64_t N = BitShift;
-  constexpr unsigned int Nm1 = static_cast<unsigned int>(N - 1);
-  constexpr unsigned int HiShift = static_cast<unsigned int>(53 - N);
+  constexpr unsigned int HiShift =
+      static_cast<unsigned int>(52 - ProdRightShift);
 
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
@@ -190,22 +189,22 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
     __m512i v_prod_lo_15 = _mm512_hexl_mullo_epi<52>(v_op1_15, v_op2_15);
     __m512i v_prod_lo_16 = _mm512_hexl_mullo_epi<52>(v_op1_16, v_op2_16);
 
-    __m512i c1_lo_1 = _mm512_srli_epi64(v_prod_lo_1, Nm1);
-    __m512i c1_lo_2 = _mm512_srli_epi64(v_prod_lo_2, Nm1);
-    __m512i c1_lo_3 = _mm512_srli_epi64(v_prod_lo_3, Nm1);
-    __m512i c1_lo_4 = _mm512_srli_epi64(v_prod_lo_4, Nm1);
-    __m512i c1_lo_5 = _mm512_srli_epi64(v_prod_lo_5, Nm1);
-    __m512i c1_lo_6 = _mm512_srli_epi64(v_prod_lo_6, Nm1);
-    __m512i c1_lo_7 = _mm512_srli_epi64(v_prod_lo_7, Nm1);
-    __m512i c1_lo_8 = _mm512_srli_epi64(v_prod_lo_8, Nm1);
-    __m512i c1_lo_9 = _mm512_srli_epi64(v_prod_lo_9, Nm1);
-    __m512i c1_lo_10 = _mm512_srli_epi64(v_prod_lo_10, Nm1);
-    __m512i c1_lo_11 = _mm512_srli_epi64(v_prod_lo_11, Nm1);
-    __m512i c1_lo_12 = _mm512_srli_epi64(v_prod_lo_12, Nm1);
-    __m512i c1_lo_13 = _mm512_srli_epi64(v_prod_lo_13, Nm1);
-    __m512i c1_lo_14 = _mm512_srli_epi64(v_prod_lo_14, Nm1);
-    __m512i c1_lo_15 = _mm512_srli_epi64(v_prod_lo_15, Nm1);
-    __m512i c1_lo_16 = _mm512_srli_epi64(v_prod_lo_16, Nm1);
+    __m512i c1_lo_1 = _mm512_srli_epi64(v_prod_lo_1, ProdRightShift);
+    __m512i c1_lo_2 = _mm512_srli_epi64(v_prod_lo_2, ProdRightShift);
+    __m512i c1_lo_3 = _mm512_srli_epi64(v_prod_lo_3, ProdRightShift);
+    __m512i c1_lo_4 = _mm512_srli_epi64(v_prod_lo_4, ProdRightShift);
+    __m512i c1_lo_5 = _mm512_srli_epi64(v_prod_lo_5, ProdRightShift);
+    __m512i c1_lo_6 = _mm512_srli_epi64(v_prod_lo_6, ProdRightShift);
+    __m512i c1_lo_7 = _mm512_srli_epi64(v_prod_lo_7, ProdRightShift);
+    __m512i c1_lo_8 = _mm512_srli_epi64(v_prod_lo_8, ProdRightShift);
+    __m512i c1_lo_9 = _mm512_srli_epi64(v_prod_lo_9, ProdRightShift);
+    __m512i c1_lo_10 = _mm512_srli_epi64(v_prod_lo_10, ProdRightShift);
+    __m512i c1_lo_11 = _mm512_srli_epi64(v_prod_lo_11, ProdRightShift);
+    __m512i c1_lo_12 = _mm512_srli_epi64(v_prod_lo_12, ProdRightShift);
+    __m512i c1_lo_13 = _mm512_srli_epi64(v_prod_lo_13, ProdRightShift);
+    __m512i c1_lo_14 = _mm512_srli_epi64(v_prod_lo_14, ProdRightShift);
+    __m512i c1_lo_15 = _mm512_srli_epi64(v_prod_lo_15, ProdRightShift);
+    __m512i c1_lo_16 = _mm512_srli_epi64(v_prod_lo_16, ProdRightShift);
 
     __m512i c1_hi_1 = _mm512_slli_epi64(v_prod_hi_1, HiShift);
     __m512i c1_hi_2 = _mm512_slli_epi64(v_prod_hi_2, HiShift);
@@ -327,15 +326,12 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
   }
 }
 
-// Algorithm 1 from
-// https://hal.archives-ouvertes.fr/hal-01215845/document
-template <int BitShift, int InputModFactor>
+// Algorithm 2 from https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
+template <int ProdRightShift, int InputModFactor>
 void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
     __m512i v_barr_lo, __m512i v_modulus, __m512i v_neg_mod,
     __m512i v_twice_mod, uint64_t n) {
-  uint64_t N = BitShift;
-
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
@@ -352,12 +348,12 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
     __m512i c1_lo =
-        _mm512_srli_epi64(v_prod_lo, static_cast<unsigned int>(N - 1ULL));
+        _mm512_srli_epi64(v_prod_lo, static_cast<unsigned int>(ProdRightShift));
     __m512i c1_hi = _mm512_slli_epi64(
-        v_prod_hi, static_cast<unsigned int>(52ULL - (N - 1ULL)));
+        v_prod_hi, static_cast<unsigned int>(52ULL - (ProdRightShift)));
     __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
-    // L - N + 1 == 52, so we only need high 52 bits
+    // alpha - beta == 52, so we only need high 52 bits
     __m512i c3 = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
 
     // C4 = prod_lo - (p * c3)_lo
@@ -374,16 +370,20 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   }
 }
 
-// Algorithm 1 from
-// https://hal.archives-ouvertes.fr/hal-01215845/document
+// Algorithm 2 from https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
 template <int InputModFactor>
 void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
     __m512i v_barr_lo, __m512i v_modulus, __m512i v_neg_mod,
-    __m512i v_twice_mod, uint64_t n, uint64_t bit_shift) {
-  uint64_t N = bit_shift;
-  unsigned int Nm1 = static_cast<unsigned int>(N - 1);
-  unsigned int HiShift = static_cast<unsigned int>(53 - N);
+    __m512i v_twice_mod, uint64_t n, uint64_t prod_right_shift) {
+  unsigned int low_shift = static_cast<unsigned int>(prod_right_shift);
+  unsigned int high_shift = static_cast<unsigned int>(52 - prod_right_shift);
+
+  HEXL_VLOG(2, "EltwiseMultModAVX512IFMAIntLoopDefault");
+  HEXL_VLOG(2, "prod_right_shift " << prod_right_shift);
+  HEXL_VLOG(2, "InputModFactor " << InputModFactor);
+  HEXL_VLOG(2, "v_twice_mod " << ExtractValues(v_twice_mod)[0]);
+  HEXL_VLOG(2, "v_barr_lo " << ExtractValues(v_barr_lo)[0]);
 
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
@@ -396,15 +396,23 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
     v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
                                                         &v_twice_mod);
 
+    HEXL_VLOG(2, "v_op1 " << ExtractValues(v_op1));
+    HEXL_VLOG(2, "v_op2 " << ExtractValues(v_op2));
+
     // Compute product
     __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
-    __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, Nm1);
-    __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, HiShift);
+    HEXL_VLOG(2, "v_prod_hi " << ExtractValues(v_prod_hi));
+    HEXL_VLOG(2, "v_prod_lo " << ExtractValues(v_prod_lo));
+
+    __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, low_shift);
+    __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, high_shift);
     __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
-    // L - N + 1 == 52, so we only need high 52 bits
+    HEXL_VLOG(2, "c1 " << ExtractValues(c1));
+
+    // alpha - beta == 52, so we only need high 52 bits
     __m512i c3 = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
 
     // C4 = prod_lo - (p * c3)_lo
@@ -413,6 +421,9 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
 
     // Reduce result to [0, q)
     v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
+
+    HEXL_VLOG(2, "v_result " << ExtractValues(v_result));
+
     _mm512_storeu_si512(vp_result, v_result);
 
     ++vp_operand1;
@@ -421,7 +432,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   }
 }
 
-template <int BitShift, int InputModFactor>
+template <int ProdRightShift, int InputModFactor>
 void EltwiseMultModAVX512IFMAIntLoop(__m512i* vp_result,
                                      const __m512i* vp_operand1,
                                      const __m512i* vp_operand2,
@@ -430,58 +441,64 @@ void EltwiseMultModAVX512IFMAIntLoop(__m512i* vp_result,
                                      uint64_t n) {
   switch (n) {
     case 1024: {
-      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 1024>(
+      EltwiseMultModAVX512IFMAIntLoopUnroll<ProdRightShift, InputModFactor,
+                                            1024>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
     }
     case 2048: {
-      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 2048>(
+      EltwiseMultModAVX512IFMAIntLoopUnroll<ProdRightShift, InputModFactor,
+                                            2048>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
     }
     case 4096: {
-      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 4096>(
+      EltwiseMultModAVX512IFMAIntLoopUnroll<ProdRightShift, InputModFactor,
+                                            4096>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
     }
     case 8192: {
-      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 8192>(
+      EltwiseMultModAVX512IFMAIntLoopUnroll<ProdRightShift, InputModFactor,
+                                            8192>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
     }
     case 16384: {
-      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 16384>(
+      EltwiseMultModAVX512IFMAIntLoopUnroll<ProdRightShift, InputModFactor,
+                                            16384>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
     }
     case 32768: {
-      EltwiseMultModAVX512IFMAIntLoopUnroll<BitShift, InputModFactor, 32768>(
+      EltwiseMultModAVX512IFMAIntLoopUnroll<ProdRightShift, InputModFactor,
+                                            32768>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod);
       break;
     }
     default:
-      EltwiseMultModAVX512IFMAIntLoopDefault<BitShift, InputModFactor>(
+      EltwiseMultModAVX512IFMAIntLoopDefault<ProdRightShift, InputModFactor>(
           vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
           v_twice_mod, n);
   }
 }
 
-#define ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(BitShift,              \
-                                                       InputModFactor)        \
-  case (BitShift): {                                                          \
-    EltwiseMultModAVX512IFMAIntLoop<(BitShift), (InputModFactor)>(            \
-        vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod, \
-        v_twice_mod, n);                                                      \
-    break;                                                                    \
+#define ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(ProdRightShift, \
+                                                               InputModFactor) \
+  case (ProdRightShift): {                                                     \
+    EltwiseMultModAVX512IFMAIntLoop<(ProdRightShift), (InputModFactor)>(       \
+        vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,  \
+        v_twice_mod, n);                                                       \
+    break;                                                                     \
   }
 
-// Algorithm 1 from https://hal.archives-ouvertes.fr/hal-01215845/document
+// Algorithm 2 from https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
 template <int InputModFactor>
 void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
                                  const uint64_t* operand2, uint64_t n,
@@ -504,11 +521,24 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  // modulus < 2**N
-  const uint64_t N = Log2(modulus) + 1;
-  uint64_t L = 51 + N;  // Ensures L-N+1 == 52
+  const int64_t beta = -2;
+  HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
+  const int64_t alpha = 50;  // ensures alpha - beta = 52
+  uint64_t gamma = Log2(InputModFactor);
+  HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
+
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  HEXL_VLOG(2, "little_n " << ceil_log_mod);
+
+  uint64_t prod_right_shift = ceil_log_mod + beta;
+
+  // Barrett factor "mu"
+  // uint64_t barr_lo = static_cast<uint64_t>(
+  // (uint128_t(1ULL) << (ceil_log_mod + alpha)) / uint128_t(modulus));
+
   uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (L - 52), 52, modulus).BarrettFactor();
+      MultiplyFactor((1ULL << (ceil_log_mod + alpha - 52)), 52, modulus)
+          .BarrettFactor();
 
   __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
@@ -519,71 +549,81 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
   // Let d be the product operand1 * operand2.
-  // To ensure d >> (N - 1) < (1ULL << 52), we need
-  // (input_mod_factor * modulus)^2 >> (N-1) < (1ULL << 52)
-  // This happens when 2 * log_2(input_mod_factor) + N < 51
+  // To ensure d >> prod_right_shift < (1ULL << 52), we need
+  // (input_mod_factor * modulus)^2 >> (prod_right_shift) < (1ULL << 52)
+  // This happens when 2 * log_2(input_mod_factor) + ceil_log_mod < 51
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * Log2(InputModFactor) + N >= 51;
+  bool reduce_mod = 2 * Log2(InputModFactor) + prod_right_shift - beta >= 51;
+
+  HEXL_VLOG(2, "reduce_mod " << reduce_mod);
+  HEXL_VLOG(2, "prod_right_shift " << prod_right_shift);
 
   if (reduce_mod) {
-    // This case happens only when  N >= 51 - 2 * log2(input_mod_factor) >= 47
-    // Additionally, modulus < (1ULL << 50) implies N <= 50.
-    // So N == 47, 48, 49, 50 are the only cases here.
-    switch (N) {
+    // Here, we assume beta = -2
+    HEXL_CHECK(beta == -2, "beta != -2 may skip some cases");
+    // This reduce_mod case happens only when
+    // prod_right_shift >= 51 - 2 * log2(input_mod_factor) >= 45.
+    // Additionally, modulus < (1ULL << 50) implies
+    // prod_right_shift <= 49. So N == 45, 46, 47, 48, 49 are the
+    // only cases here.
+    switch (prod_right_shift) {
       // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
       // which requires a compile-time constant for the shift.
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(47, InputModFactor)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(48, InputModFactor)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(49, InputModFactor)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(50, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(45, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(46, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(47, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(48, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(49, InputModFactor)
+      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(50, InputModFactor)
       default: {
-        HEXL_CHECK(false, "Bad value for N: " << N);
+        HEXL_CHECK(false,
+                   "Bad value for prod_right_shift: " << prod_right_shift);
       }
     }
   } else {
-    switch (N) {
-      // Smaller bit shifts are uncommon.
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(15, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(16, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(17, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(18, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(19, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(20, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(21, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(22, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(23, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(24, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(25, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(26, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(27, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(28, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(29, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(31, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(32, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(33, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(34, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(35, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(36, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(37, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(38, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(39, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(40, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(41, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(42, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(43, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(44, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(45, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(46, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(47, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(48, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(49, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(50, 1)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_BITSHIFT_CASE(51, 1)
+    switch (prod_right_shift) {
+      // Smaller shifts are uncommon.
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(15, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(16, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(17, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(18, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(19, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(20, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(21, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(22, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(23, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(24, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(25, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(26, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(27, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(28, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(29, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(31, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(32, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(33, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(34, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(35, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(36, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(37, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(38, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(39, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(40, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(41, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(42, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(43, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(44, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(45, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(46, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(47, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(48, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(49, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(50, 1)
+      // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(51, 1)
       default: {
         EltwiseMultModAVX512IFMAIntLoopDefault<1>(
             vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-            v_neg_mod, v_twice_mod, n, N);
+            v_neg_mod, v_twice_mod, n, prod_right_shift);
       }
     }
   }
