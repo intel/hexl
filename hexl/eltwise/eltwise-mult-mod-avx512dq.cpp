@@ -315,7 +315,6 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           const __m512i* vp_operand2,
                                           __m512i v_barr_lo, __m512i v_modulus,
                                           __m512i v_twice_mod, uint64_t n) {
-  HEXL_VLOG(2, "EltwiseMultModAVX512DQIntLoopDefault");
   HEXL_UNUSED(v_twice_mod);
 
   HEXL_LOOP_UNROLL_4
@@ -361,8 +360,6 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           __m512i v_barr_lo, __m512i v_modulus,
                                           __m512i v_twice_mod, uint64_t n,
                                           uint64_t prod_right_shift) {
-  HEXL_VLOG(2, "EltwiseMultModAVX512DQIntLoopDefault with right shift "
-                   << prod_right_shift);
   HEXL_UNUSED(v_twice_mod);
 
   HEXL_LOOP_UNROLL_4
@@ -467,8 +464,6 @@ template <int InputModFactor>
 void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
                                const uint64_t* operand2, uint64_t n,
                                uint64_t modulus) {
-  HEXL_VLOG(2, "EltwiseMultModAVX512DQInt");
-
   HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 || InputModFactor == 4,
              "Require InputModFactor = 1, 2, or 4")
   HEXL_CHECK(InputModFactor * modulus > (1ULL << 50),
@@ -514,12 +509,10 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
-  HEXL_VLOG(2, "barr_lo " << barr_lo);
-
   // Let d be the product operand1 * operand2.
   // To ensure d >> prod_right_shift < (1ULL << 64), we need
   // (input_mod_factor * modulus)^2 >> (prod_right_shift) < (1ULL << 64)
-  // This happens when 2 * log_2(input_mod_factor) + ceil_log_mod < 63
+  // This happens when 2*log_2(input_mod_factor) + prod_right_shift - beta < 63
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
   bool reduce_mod = 2 * Log2(InputModFactor) + prod_right_shift - beta >= 63;
@@ -547,8 +540,9 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
     // which requires a compile-time constant for the shift.
     switch (prod_right_shift) {
-      // For N < 50, we should prefer EltwiseMultModAVX512Float or
-      // EltwiseMultModAVX512IFMAInt, so we don't generate special cases here
+      // For prod_right_shift < 50, we should prefer EltwiseMultModAVX512Float
+      // or EltwiseMultModAVX512IFMAInt, so we don't generate those special
+      // cases here
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(50, 1)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(51, 1)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(52, 1)

@@ -379,12 +379,6 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   unsigned int low_shift = static_cast<unsigned int>(prod_right_shift);
   unsigned int high_shift = static_cast<unsigned int>(52 - prod_right_shift);
 
-  HEXL_VLOG(2, "EltwiseMultModAVX512IFMAIntLoopDefault");
-  HEXL_VLOG(2, "prod_right_shift " << prod_right_shift);
-  HEXL_VLOG(2, "InputModFactor " << InputModFactor);
-  HEXL_VLOG(2, "v_twice_mod " << ExtractValues(v_twice_mod)[0]);
-  HEXL_VLOG(2, "v_barr_lo " << ExtractValues(v_barr_lo)[0]);
-
   HEXL_UNUSED(v_twice_mod);
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
@@ -396,21 +390,13 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
     v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
                                                         &v_twice_mod);
 
-    HEXL_VLOG(2, "v_op1 " << ExtractValues(v_op1));
-    HEXL_VLOG(2, "v_op2 " << ExtractValues(v_op2));
-
     // Compute product
     __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
-    HEXL_VLOG(2, "v_prod_hi " << ExtractValues(v_prod_hi));
-    HEXL_VLOG(2, "v_prod_lo " << ExtractValues(v_prod_lo));
-
     __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, low_shift);
     __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, high_shift);
     __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
-
-    HEXL_VLOG(2, "c1 " << ExtractValues(c1));
 
     // alpha - beta == 52, so we only need high 52 bits
     __m512i c3 = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
@@ -421,8 +407,6 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
 
     // Reduce result to [0, q)
     v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
-
-    HEXL_VLOG(2, "v_result " << ExtractValues(v_result));
 
     _mm512_storeu_si512(vp_result, v_result);
 
@@ -550,13 +534,10 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   // Let d be the product operand1 * operand2.
   // To ensure d >> prod_right_shift < (1ULL << 52), we need
   // (input_mod_factor * modulus)^2 >> (prod_right_shift) < (1ULL << 52)
-  // This happens when 2 * log_2(input_mod_factor) + ceil_log_mod < 51
+  // This happens when 2*log_2(input_mod_factor) + ceil_log_mod - beta < 51
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
   bool reduce_mod = 2 * Log2(InputModFactor) + prod_right_shift - beta >= 51;
-
-  HEXL_VLOG(2, "reduce_mod " << reduce_mod);
-  HEXL_VLOG(2, "prod_right_shift " << prod_right_shift);
 
   if (reduce_mod) {
     // Here, we assume beta = -2
@@ -574,7 +555,6 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(47, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(48, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(49, InputModFactor)
-      ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(50, InputModFactor)
       default: {
         HEXL_CHECK(false,
                    "Bad value for prod_right_shift: " << prod_right_shift);
