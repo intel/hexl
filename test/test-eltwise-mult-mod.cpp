@@ -220,7 +220,7 @@ class ModulusTest : public ::testing::TestWithParam<uint64_t> {
 
 TEST_P(ModulusTest, EltwiseMultModRandom) {
   uint64_t modulus_bits = GetParam();
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, true)[0];
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, false)[0];
 
   uint64_t length = 1024;
 
@@ -228,8 +228,8 @@ TEST_P(ModulusTest, EltwiseMultModRandom) {
   auto input_2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
   std::vector<uint64_t> output(length, 0);
 
-  EltwiseMultMod(output.data(), input_1.data(), input_2.data(), length, modulus,
-                 1);
+  EltwiseMultModNative<1>(output.data(), input_1.data(), input_2.data(), length,
+                          modulus);
 
   for (size_t i = 0; i < length; ++i) {
     uint64_t expected = static_cast<uint64_t>(

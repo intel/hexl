@@ -483,10 +483,15 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
   }
 
   // modulus < 2**N
+  const int64_t beta = -2;
+  const int64_t alpha = 66;
+  const uint64_t little_n = Log2(modulus) + 1;
+
   const uint64_t N = Log2(modulus) + 1;
   uint64_t L = 63 + N;  // Ensures L-N+1 == 64
   uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (L - 64), 64, modulus).BarrettFactor();
+      MultiplyFactor(uint64_t(1) << (little_n + alpha), 64, modulus)
+          .BarrettFactor();
 
   __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
