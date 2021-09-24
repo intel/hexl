@@ -13,7 +13,6 @@ jobs:
   klocwork:
     name: klocwork scan
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       - name: Setup
