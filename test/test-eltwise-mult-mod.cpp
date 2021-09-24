@@ -9,6 +9,7 @@
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
+#include "ntt/ntt-internal.hpp"
 #include "test-util.hpp"
 
 namespace intel {
@@ -207,6 +208,41 @@ TEST(EltwiseMultMod, 9) {
 
   CheckEqual(result, exp_out);
 }
+
+// Parameter is number of bits in the modulus
+class ModulusTest : public ::testing::TestWithParam<uint64_t> {
+ protected:
+  void SetUp() {}
+  void TearDown() {}
+
+ public:
+};
+
+TEST_P(ModulusTest, EltwiseMultModRandom) {
+  uint64_t modulus_bits = GetParam();
+  uint64_t modulus = GeneratePrimes(1, modulus_bits, true)[0];
+
+  uint64_t length = 1024;
+
+  auto input_1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto input_2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  std::vector<uint64_t> output(length, 0);
+
+  EltwiseMultMod(output.data(), input_1.data(), input_2.data(), length, modulus,
+                 1);
+
+  for (size_t i = 0; i < length; ++i) {
+    uint64_t expected = static_cast<uint64_t>(
+        (uint128_t(input_1[i]) * uint128_t(input_2[i])) % modulus);
+    ASSERT_EQ(output[i], expected);
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(EltwiseMultMod, ModulusTest,
+                         ::testing::Values(30, 31, 32, 33, 34, 35, 36, 37, 38,
+                                           39, 40, 41, 42, 43, 44, 45, 46, 47,
+                                           48, 49, 50, 51, 52, 53, 54, 55, 56,
+                                           57, 58, 59, 60, 61));
 
 }  // namespace hexl
 }  // namespace intel
