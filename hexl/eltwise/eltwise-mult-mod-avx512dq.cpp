@@ -328,6 +328,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
                                                         &v_twice_mod);
 
+    // Compute product U
     __m512i v_prod_hi = _mm512_hexl_mulhi_epi<64>(v_op1, v_op2);
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<64>(v_op1, v_op2);
 
@@ -335,8 +336,8 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     // alpha - beta == 64, so we only need high 64 bits
     // Perform approximate computation of high bits, as described on page
     // 7 of https://arxiv.org/pdf/2003.04510.pdf
-    __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, v_barr_lo);
-    __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+    __m512i q_hat = _mm512_hexl_mulhi_approx_epi<64>(c1, v_barr_lo);
+    __m512i v_result = _mm512_hexl_mullo_epi<64>(q_hat, v_modulus);
     // Computes result in [0, 4q)
     v_result = _mm512_sub_epi64(v_prod_lo, v_result);
 
@@ -376,14 +377,15 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
     __m512i v_prod_hi = _mm512_hexl_mulhi_epi<64>(v_op1, v_op2);
     __m512i v_prod_lo = _mm512_hexl_mullo_epi<64>(v_op1, v_op2);
 
+    // c1 = floor(U / 2^{n + beta})
     __m512i c1 = _mm512_hexl_shrdi_epi64(
         v_prod_lo, v_prod_hi, static_cast<unsigned int>(prod_right_shift));
 
     // alpha - beta == 64, so we only need high 64 bits
     // Perform approximate computation of high bits, as described on page
     // 7 of https://arxiv.org/pdf/2003.04510.pdf
-    __m512i c3 = _mm512_hexl_mulhi_approx_epi<64>(c1, v_barr_lo);
-    __m512i v_result = _mm512_hexl_mullo_epi<64>(c3, v_modulus);
+    __m512i q_hat = _mm512_hexl_mulhi_approx_epi<64>(c1, v_barr_lo);
+    __m512i v_result = _mm512_hexl_mullo_epi<64>(q_hat, v_modulus);
     // Computes result in [0, 4q)
     v_result = _mm512_sub_epi64(v_prod_lo, v_result);
 
@@ -486,9 +488,9 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  const int64_t beta = -2;
+  constexpr int64_t beta = -2;
   HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
-  const int64_t alpha = 62;  // ensures alpha - beta = 64
+  constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
   uint64_t gamma = Log2(InputModFactor);
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
 

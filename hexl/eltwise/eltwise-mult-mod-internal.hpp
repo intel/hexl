@@ -45,10 +45,10 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
                     "operand2 exceeds bound " << (InputModFactor * modulus));
 
-  const int64_t beta = -2;
+  constexpr int64_t beta = -2;
   HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
 
-  const int64_t alpha = 62;  // ensures alpha - beta = 64
+  constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
 
   uint64_t gamma = Log2(InputModFactor);
   HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
