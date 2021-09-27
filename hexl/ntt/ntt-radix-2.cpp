@@ -268,6 +268,8 @@ void ReferenceForwardTransformToBitReverse(
              "root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
 
+  Modulus mod_precon(modulus);
+
   size_t t = (n >> 1);
   for (size_t m = 1; m < n; m <<= 1) {
     size_t j1 = 0;
@@ -280,7 +282,7 @@ void ReferenceForwardTransformToBitReverse(
       for (size_t j = j1; j < j2; j++) {
         // X', Y' = X + WY, X - WY (mod q).
         uint64_t tx = *X;
-        uint64_t W_x_Y = MultiplyMod(*Y, W, modulus);
+        uint64_t W_x_Y = MultiplyMod(*Y, W, mod_precon);
         *X++ = AddUIntMod(tx, W_x_Y, modulus);
         *Y++ = SubUIntMod(tx, W_x_Y, modulus);
       }
@@ -453,9 +455,11 @@ void InverseTransformFromBitReverseRadix2(
   // Fold multiplication by N^{-1} to final stage butterfly
   const uint64_t W = inv_root_of_unity_powers[n - 1];
 
+  Modulus mod_precon(modulus);
+
   const uint64_t inv_n = InverseMod(n, modulus);
   uint64_t inv_n_precon = MultiplyFactor(inv_n, 64, modulus).BarrettFactor();
-  const uint64_t inv_n_w = MultiplyMod(inv_n, W, modulus);
+  const uint64_t inv_n_w = MultiplyMod(inv_n, W, mod_precon);
   uint64_t inv_n_w_precon =
       MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
 

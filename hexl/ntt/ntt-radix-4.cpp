@@ -591,7 +591,8 @@ void InverseTransformFromBitReverseRadix4(
 
   const uint64_t inv_n = InverseMod(n, modulus);
   uint64_t inv_n_precon = MultiplyFactor(inv_n, 64, modulus).BarrettFactor();
-  const uint64_t inv_n_w = MultiplyMod(inv_n, W, modulus);
+  Modulus mod_precon(modulus);
+  const uint64_t inv_n_w = MultiplyMod(inv_n, W, mod_precon);
   uint64_t inv_n_w_precon =
       MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
 

@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/allocator.hpp"
 
@@ -116,7 +117,7 @@ class NTT {
   uint64_t GetDegree() const { return m_degree; }
 
   /// @brief Returns the word-sized prime modulus
-  uint64_t GetModulus() const { return m_q; }
+  uint64_t GetModulus() const { return m_q.Value(); }
 
   /// @brief Returns the root of unity powers in bit-reversed order
   const AlignedVector64<uint64_t>& GetRootOfUnityPowers() const {
@@ -254,7 +255,7 @@ class NTT {
   void ComputeRootOfUnityPowers();
 
   uint64_t m_degree;  // N: size of NTT transform, should be power of 2
-  uint64_t m_q;       // prime modulus. Must satisfy q == 1 mod 2n
+  Modulus m_q;        // prime modulus. Must satisfy q == 1 mod 2n
 
   uint64_t m_degree_bits;  // log_2(m_degree)
 

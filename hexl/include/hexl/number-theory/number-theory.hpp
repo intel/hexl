@@ -81,7 +81,7 @@ uint64_t InverseMod(uint64_t x, uint64_t modulus);
 
 /// @brief Returns (x * y) mod modulus
 /// @details Assumes x, y < modulus
-uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus);
+// uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus);
 
 /// @brief Returns (x * y) mod modulus
 /// @param[in] x
@@ -259,26 +259,37 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
 
 class Modulus {
  public:
-  explicit Modulus(uint64_t modulus) : m_modulus(modulus) {
-    constexpr int64_t beta = -2;
-    HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
+  Modulus() = default;
 
-    constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
-
-    const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
-    m_prod_right_shift = ceil_log_mod + beta;
-
-    uint64_t barr_lo =
-        MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
-            .BarrettFactor();
-    m_barr_lo = barr_lo;
+  Modulus& operator=(const uint64_t value) {
+    Initialize(value);
+    return *this;
   }
+
+  explicit Modulus(uint64_t value) { Initialize(value); }
 
   uint64_t Value() const { return m_modulus; }
   uint64_t BarrettFactor() const { return m_barr_lo; }
   uint64_t RightShift() const { return m_prod_right_shift; }
 
  private:
+  void Initialize(uint64_t value) {
+    m_modulus = value;
+    static constexpr int64_t beta = -2;
+    HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
+
+    static constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
+
+    const uint64_t ceil_log_mod = Log2(m_modulus) + 1;  // "n" from Algorithm 2
+    m_prod_right_shift = ceil_log_mod + beta;
+
+    uint64_t barr_lo =
+        MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64,
+                       m_modulus)
+            .BarrettFactor();
+    m_barr_lo = barr_lo;
+  }
+
   uint64_t m_modulus;
   uint64_t m_barr_lo;
   uint64_t m_prod_right_shift;

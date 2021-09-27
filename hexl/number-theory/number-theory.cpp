@@ -41,13 +41,13 @@ uint64_t InverseMod(uint64_t input, uint64_t modulus) {
   return uint64_t(x);
 }
 
-uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus) {
-  HEXL_CHECK(modulus != 0, "modulus == 0");
-  HEXL_CHECK(x < modulus, "x " << x << " >= modulus " << modulus);
-  HEXL_CHECK(y < modulus, "y " << y << " >= modulus " << modulus);
+// uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus) {
+//   HEXL_CHECK(modulus != 0, "modulus == 0");
+//   HEXL_CHECK(x < modulus, "x " << x << " >= modulus " << modulus);
+//   HEXL_CHECK(y < modulus, "y " << y << " >= modulus " << modulus);
 
-  return MultiplyMod(x, y, Modulus(modulus));
-}
+//   return MultiplyMod(x, y, Modulus(modulus));
+// }
 
 uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t y_precon,
                      uint64_t modulus) {
@@ -72,13 +72,14 @@ uint64_t SubUIntMod(uint64_t x, uint64_t y, uint64_t modulus) {
 
 // Returns base^exp mod modulus
 uint64_t PowMod(uint64_t base, uint64_t exp, uint64_t modulus) {
+  Modulus mod_precon(modulus);
   base %= modulus;
   uint64_t result = 1;
   while (exp > 0) {
     if (exp & 1) {
-      result = MultiplyMod(result, base, modulus);
+      result = MultiplyMod(result, base, mod_precon);
     }
-    base = MultiplyMod(base, base, modulus);
+    base = MultiplyMod(base, base, mod_precon);
     exp >>= 1;
   }
   return result;
@@ -129,7 +130,9 @@ uint64_t MinimalPrimitiveRoot(uint64_t degree, uint64_t modulus) {
 
   uint64_t root = GeneratePrimitiveRoot(degree, modulus);
 
-  uint64_t generator_sq = MultiplyMod(root, root, modulus);
+  Modulus mod_precon(modulus);
+
+  uint64_t generator_sq = MultiplyMod(root, root, mod_precon);
   uint64_t current_generator = root;
 
   uint64_t min_root = root;
@@ -139,7 +142,8 @@ uint64_t MinimalPrimitiveRoot(uint64_t degree, uint64_t modulus) {
     if (current_generator < min_root) {
       min_root = current_generator;
     }
-    current_generator = MultiplyMod(current_generator, generator_sq, modulus);
+    current_generator =
+        MultiplyMod(current_generator, generator_sq, mod_precon);
   }
 
   return min_root;

@@ -34,7 +34,7 @@ TEST(NumberTheory, Log2) {
 }
 
 TEST(NumberTheory, MultiplyMod) {
-  uint64_t modulus(2);
+  Modulus modulus(2);
   ASSERT_EQ(0ULL, MultiplyMod(0, 0, modulus));
   ASSERT_EQ(0ULL, MultiplyMod(0, 1, modulus));
   ASSERT_EQ(0ULL, MultiplyMod(1, 0, modulus));

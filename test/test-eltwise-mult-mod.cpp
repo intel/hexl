@@ -249,8 +249,8 @@ class ModulusInputModFactor
 TEST_P(ModulusInputModFactor, NativeRandom) {
   ModulusInputModData modulus_data(GetParam());
 
-  uint64_t modulus = GeneratePrimes(1, modulus_data.modulus_bits,
-                                    modulus_data.prefer_small_modulus)[0];
+  Modulus modulus(GeneratePrimes(1, modulus_data.modulus_bits,
+                                 modulus_data.prefer_small_modulus)[0]);
   uint64_t length = 1024;
 
   uint64_t data_bound = modulus_data.input_mod_factor;
@@ -266,17 +266,17 @@ TEST_P(ModulusInputModFactor, NativeRandom) {
   switch (modulus_data.input_mod_factor) {
     case 1: {
       EltwiseMultModNative<1>(output.data(), input_1.data(), input_2.data(),
-                              length, modulus);
+                              length, modulus.Value());
       break;
     }
     case 2: {
       EltwiseMultModNative<2>(output.data(), input_1.data(), input_2.data(),
-                              length, modulus);
+                              length, modulus.Value());
       break;
     }
     case 4: {
       EltwiseMultModNative<4>(output.data(), input_1.data(), input_2.data(),
-                              length, modulus);
+                              length, modulus.Value());
       break;
     }
   }

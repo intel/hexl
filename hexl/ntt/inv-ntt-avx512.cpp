@@ -349,7 +349,9 @@ void InverseTransformFromBitReverseAVX512(
     const uint64_t inv_n = mf_inv_n.Operand();
     const uint64_t inv_n_prime = mf_inv_n.BarrettFactor();
 
-    MultiplyFactor mf_inv_n_w(MultiplyMod(inv_n, W, modulus), BitShift,
+    Modulus mod_precon(modulus);
+
+    MultiplyFactor mf_inv_n_w(MultiplyMod(inv_n, W, mod_precon), BitShift,
                               modulus);
     const uint64_t inv_n_w = mf_inv_n_w.Operand();
     const uint64_t inv_n_w_prime = mf_inv_n_w.BarrettFactor();
