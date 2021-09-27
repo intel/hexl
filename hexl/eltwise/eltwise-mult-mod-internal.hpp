@@ -46,37 +46,13 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
                     "operand1 exceeds bound " << (InputModFactor * modulus));
   HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
                     "operand2 exceeds bound " << (InputModFactor * modulus));
-
-  constexpr int64_t beta = -2;
-  HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
-
-  constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
-
-  uint64_t gamma = Log2(InputModFactor);
-  HEXL_UNUSED(gamma);
-  HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
-
-  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
-  uint64_t prod_right_shift = ceil_log_mod + beta;
-
-  // Barrett factor "mu"
-  // TODO(fboemer): Allow MultiplyFactor to take bit shifts != 64
-  HEXL_CHECK(ceil_log_mod + alpha >= 64, "ceil_log_mod + alpha < 64");
-  uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
-          .BarrettFactor();
-
   Modulus m(modulus);
-
   const uint64_t twice_modulus = 2 * modulus;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < n; ++i) {
-    uint64_t prod_hi, prod_lo, c2_hi, c2_lo, Z;
-
     uint64_t x = ReduceMod<InputModFactor>(*operand1, modulus, &twice_modulus);
     uint64_t y = ReduceMod<InputModFactor>(*operand2, modulus, &twice_modulus);
-
     *result = MultiplyMod(x, y, m);
 
     ++operand1;
