@@ -257,5 +257,60 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
   return x;
 }
 
+class Modulus {
+ public:
+  explicit Modulus(uint64_t modulus) : m_modulus(modulus) {
+    constexpr int64_t beta = -2;
+    HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
+
+    constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
+
+    const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+    m_prod_right_shift = ceil_log_mod + beta;
+
+    uint64_t barr_lo =
+        MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
+            .BarrettFactor();
+    m_barr_lo = barr_lo;
+  }
+
+  uint64_t Value() const { return m_modulus; }
+  uint64_t BarrettFactor() const { return m_barr_lo; }
+  uint64_t RightShift() const { return m_prod_right_shift; }
+
+ private:
+  uint64_t m_modulus;
+  uint64_t m_barr_lo;
+  uint64_t m_prod_right_shift;
+};
+
+inline uint64_t BarrettReduce128(uint64_t x_hi, uint64_t x_lo, Modulus mod) {
+  uint64_t c2_hi, c2_lo;
+
+  // floor(U / 2^{n + beta})
+  uint64_t c1 =
+      (x_lo >> (mod.RightShift())) + (x_hi << (64 - (mod.RightShift())));
+
+  // c2 = floor(U / 2^{n + beta}) * mu
+  MultiplyUInt64(c1, mod.BarrettFactor(), &c2_hi, &c2_lo);
+
+  // alpha - beta == 64, so we only need high 64 bits
+  uint64_t q_hat = c2_hi;
+
+  // only compute low bits, since we know high bits will be 0
+  uint64_t Z = x_lo - q_hat * mod.Value();
+
+  // Conditional subtraction
+  return (Z >= mod.Value()) ? (Z - mod.Value()) : Z;
+}
+
+inline uint64_t MultiplyMod(uint64_t x, uint64_t y, Modulus mod) {
+  uint64_t prod_hi, prod_lo;
+
+  // Multiply inputs
+  MultiplyUInt64(x, y, &prod_hi, &prod_lo);
+  return BarrettReduce128(prod_hi, prod_lo, mod);
+}
+
 }  // namespace hexl
 }  // namespace intel

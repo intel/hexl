@@ -26,15 +26,6 @@
 namespace intel {
 namespace hexl {
 
-inline uint64_t BarrettReduce128(uint64_t input_hi, uint64_t input_lo,
-                                 uint64_t modulus) {
-  HEXL_CHECK(modulus != 0, "modulus == 0")
-  uint64_t remainder;
-  _udiv128(input_hi, input_lo, modulus, &remainder);
-
-  return remainder;
-}
-
 // Multiplies x * y as 128-bit integer.
 // @param prod_hi Stores high 64 bits of product
 // @param prod_lo Stores low 64 bits of product

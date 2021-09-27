@@ -17,16 +17,6 @@ inline uint128_t MultiplyUInt64(uint64_t x, uint64_t y) {
   return uint128_t(x) * uint128_t(y);
 }
 
-inline uint64_t BarrettReduce128(uint64_t input_hi, uint64_t input_lo,
-                                 uint64_t modulus) {
-  HEXL_CHECK(modulus != 0, "modulus == 0")
-  uint128_t n = (static_cast<uint128_t>(input_hi) << 64) |
-                (static_cast<uint128_t>(input_lo));
-
-  return static_cast<uint64_t>(n % modulus);
-  // TODO(fboemer): actually use barrett reduction if performance-critical
-}
-
 // Returns low 64bit of 128b/64b where x1=high 64b, x0=low 64b
 inline uint64_t DivideUInt128UInt64Lo(uint64_t x1, uint64_t x0, uint64_t y) {
   uint128_t n =

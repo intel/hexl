@@ -45,10 +45,8 @@ uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus) {
   HEXL_CHECK(modulus != 0, "modulus == 0");
   HEXL_CHECK(x < modulus, "x " << x << " >= modulus " << modulus);
   HEXL_CHECK(y < modulus, "y " << y << " >= modulus " << modulus);
-  uint64_t prod_hi, prod_lo;
-  MultiplyUInt64(x, y, &prod_hi, &prod_lo);
 
-  return BarrettReduce128(prod_hi, prod_lo, modulus);
+  return MultiplyMod(x, y, Modulus(modulus));
 }
 
 uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t y_precon,

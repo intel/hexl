@@ -66,6 +66,8 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
       MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
           .BarrettFactor();
 
+  Modulus m(modulus);
+
   const uint64_t twice_modulus = 2 * modulus;
 
   HEXL_LOOP_UNROLL_4
@@ -75,24 +77,7 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
     uint64_t x = ReduceMod<InputModFactor>(*operand1, modulus, &twice_modulus);
     uint64_t y = ReduceMod<InputModFactor>(*operand2, modulus, &twice_modulus);
 
-    // Multiply inputs
-    MultiplyUInt64(x, y, &prod_hi, &prod_lo);
-
-    // floor(U / 2^{n + beta})
-    uint64_t c1 = (prod_lo >> (prod_right_shift)) +
-                  (prod_hi << (64 - (prod_right_shift)));
-
-    // c2 = floor(U / 2^{n + beta}) * mu
-    MultiplyUInt64(c1, barr_lo, &c2_hi, &c2_lo);
-
-    // alpha - beta == 64, so we only need high 64 bits
-    uint64_t q_hat = c2_hi;
-
-    // only compute low bits, since we know high bits will be 0
-    Z = prod_lo - q_hat * modulus;
-
-    // Conditional subtraction
-    *result = (Z >= modulus) ? (Z - modulus) : Z;
+    *result = MultiplyMod(x, y, m);
 
     ++operand1;
     ++operand2;
