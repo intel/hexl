@@ -26,12 +26,14 @@ namespace hexl {
 /// input_mod_factor * p) Must be 1, 2 or 4.
 /// @details Computes \p result[i] = (\p operand1[i] * \p operand2[i]) mod \p
 /// modulus for i=0, ..., \p n - 1
-/// @details Algorithm 1 of
-/// https://hal.archives-ouvertes.fr/hal-01215845/document
+/// @details Algorithm 2 from
+/// https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
 template <int InputModFactor>
 void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
                           const uint64_t* operand2, uint64_t n,
                           uint64_t modulus) {
+  HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 || InputModFactor == 4,
+             "Require InputModFactor = 1, 2, or 4")
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(operand2 != nullptr, "Require operand2 != nullptr");
@@ -43,40 +45,52 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand2, n, InputModFactor * modulus,
                     "operand2 exceeds bound " << (InputModFactor * modulus));
 
-  const uint64_t logmod = MSB(modulus);
-  // modulus < 2**N
-  const uint64_t N = logmod + 1;
-  uint64_t L = 63 + N;  // Ensures L - N + 1 == 64
+  constexpr int64_t beta = -2;
+  HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
+
+  constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
+
+  uint64_t gamma = Log2(InputModFactor);
+  HEXL_UNUSED(gamma);
+  HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
+
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  uint64_t prod_right_shift = ceil_log_mod + beta;
+
+  // Barrett factor "mu"
+  // TODO(fboemer): Allow MultiplyFactor to take bit shifts != 64
+  HEXL_CHECK(ceil_log_mod + alpha >= 64, "ceil_log_mod + alpha < 64");
   uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (L - 64), 64, modulus).BarrettFactor();
+      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
+          .BarrettFactor();
 
   const uint64_t twice_modulus = 2 * modulus;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < n; ++i) {
-    uint64_t prod_hi, prod_lo, c2_hi, c2_lo, c4;
+    uint64_t prod_hi, prod_lo, c2_hi, c2_lo, Z;
 
     uint64_t x = ReduceMod<InputModFactor>(*operand1, modulus, &twice_modulus);
     uint64_t y = ReduceMod<InputModFactor>(*operand2, modulus, &twice_modulus);
 
     // Multiply inputs
     MultiplyUInt64(x, y, &prod_hi, &prod_lo);
-    // C1 = D >> (N-1)
 
-    uint64_t c1 = (prod_lo >> (N - 1)) + (prod_hi << (64 - (N - 1)));
+    // floor(U / 2^{n + beta})
+    uint64_t c1 = (prod_lo >> (prod_right_shift)) +
+                  (prod_hi << (64 - (prod_right_shift)));
 
-    // C2 = C1 * barr_lo
+    // c2 = floor(U / 2^{n + beta}) * mu
     MultiplyUInt64(c1, barr_lo, &c2_hi, &c2_lo);
 
-    // C3 = C2 >> (L - N + 1)
-    // L - N + 1 == 64, so we only need high 64 bits
-    uint64_t c3 = c2_hi;
+    // alpha - beta == 64, so we only need high 64 bits
+    uint64_t q_hat = c2_hi;
 
-    // C4 = prod_lo - (p * c3)_lo
-    c4 = prod_lo - c3 * modulus;
+    // only compute low bits, since we know high bits will be 0
+    Z = prod_lo - q_hat * modulus;
 
     // Conditional subtraction
-    *result = (c4 >= modulus) ? (c4 - modulus) : c4;
+    *result = (Z >= modulus) ? (Z - modulus) : Z;
 
     ++operand1;
     ++operand2;

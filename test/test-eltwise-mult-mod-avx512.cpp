@@ -120,10 +120,8 @@ TEST(EltwiseMultMod, avx512dqint_small) {
     CheckEqual(out_avx, out_native);
   }
 }
-#endif
 
 // Checks AVX512 and native eltwise mult out-of-place implementations match
-#ifdef HEXL_HAS_AVX512DQ
 TEST(EltwiseMultMod, avx512dqint_big) {
   if (!has_avx512dq) {
     GTEST_SKIP();
@@ -141,21 +139,18 @@ TEST(EltwiseMultMod, avx512dqint_big) {
          input_mod_factor *= 2) {
       for (size_t bits = 40; bits <= 60; ++bits) {
         uint64_t modulus = (1ULL << bits) + 7;
-        bool use_avx512_float = (input_mod_factor * modulus < MaximumValue(50));
+        uint64_t data_upper_bound = input_mod_factor * modulus;
+        bool use_avx512_float = (data_upper_bound < MaximumValue(50));
 
-#ifdef HEXL_DEBUG
         size_t num_trials = 1;
-#else
-        size_t num_trials = 10;
-#endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
-          auto op1 = GenerateInsecureUniformRandomValues(
-              length, 0, input_mod_factor * modulus);
-          auto op2 = GenerateInsecureUniformRandomValues(
-              length, 0, input_mod_factor * modulus);
+          auto op1 =
+              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
+          auto op2 =
+              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
 
-          op1[0] = input_mod_factor * modulus - 1;
-          op2[0] = input_mod_factor * modulus - 1;
+          op1[0] = data_upper_bound - 1;
+          op2[0] = data_upper_bound - 1;
 
           switch (input_mod_factor) {
             case 1:
@@ -218,7 +213,7 @@ TEST(EltwiseMultMod, avx512ifma_big) {
     GTEST_SKIP();
   }
 
-  for (size_t length = 1024; length <= 32768; length *= 2) {
+  for (size_t length = 8; length <= 8; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> result_native(length, 0);
@@ -228,9 +223,13 @@ TEST(EltwiseMultMod, avx512ifma_big) {
          input_mod_factor *= 2) {
       for (size_t bits = 40; bits <= 50; ++bits) {
         uint64_t modulus = (1ULL << bits) + 7;
-        if (input_mod_factor * modulus > MaximumValue(50)) {
+        uint64_t data_upper_bound = input_mod_factor * modulus;
+        if (data_upper_bound > MaximumValue(50)) {
           continue;
         }
+
+        HEXL_VLOG(2,
+                  "bits " << bits << " input_mod_factor " << input_mod_factor);
 
 #ifdef HEXL_DEBUG
         size_t num_trials = 1;
@@ -238,13 +237,13 @@ TEST(EltwiseMultMod, avx512ifma_big) {
         size_t num_trials = 10;
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
-          auto op1 = GenerateInsecureUniformRandomValues(
-              length, 0, input_mod_factor * modulus);
-          auto op2 = GenerateInsecureUniformRandomValues(
-              length, 0, input_mod_factor * modulus);
+          auto op1 =
+              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
+          auto op2 =
+              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
 
-          op1[0] = input_mod_factor * modulus - 1;
-          op2[0] = input_mod_factor * modulus - 1;
+          op1[0] = data_upper_bound - 1;
+          op2[0] = data_upper_bound - 1;
 
           switch (input_mod_factor) {
             case 1: {
