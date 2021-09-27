@@ -41,7 +41,6 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-20.04
-    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
@@ -54,7 +53,6 @@ jobs:
   coverage-build:
     name: coverage-build
     runs-on: ubuntu-20.04
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -94,7 +92,6 @@ jobs:
   nix-build:
     name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: '${{ matrix.os }}'
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -185,7 +182,6 @@ jobs:
   windows-build:
     name: 'Windows ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: windows-latest
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -221,7 +217,6 @@ jobs:
   experimental-build:
     name: 'experimental: ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: '${{ matrix.os }}'
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
