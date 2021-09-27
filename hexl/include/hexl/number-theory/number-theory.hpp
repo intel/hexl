@@ -265,7 +265,8 @@ class Modulus {
   explicit Modulus(uint64_t value) { Initialize(value); }
 
   uint64_t Value() const { return m_modulus; }
-  uint64_t BarrettFactor() const { return m_barr_lo; }
+  uint64_t BarrettFactor52() const { return m_barr_lo_52; }
+  uint64_t BarrettFactor64() const { return m_barr_lo_64; }
   uint64_t RightShift() const { return m_prod_right_shift; }
 
  private:
@@ -274,21 +275,24 @@ class Modulus {
     static constexpr int64_t beta = -2;
     HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
 
-    static constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
-
+    static constexpr int64_t alpha_64 = 62;  // ensures alpha - beta = 64
+    static constexpr int64_t alpha_52 = 50;  // ensures alpha - beta = 64
     const uint64_t ceil_log_mod = Log2(m_modulus) + 1;  // "n" from Algorithm 2
+
     m_prod_right_shift = ceil_log_mod + beta;
 
-    uint64_t barr_lo =
-        MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64,
-                       m_modulus)
-            .BarrettFactor();
-    m_barr_lo = barr_lo;
+    m_barr_lo_52 = MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha_52 - 52),
+                                  52, m_modulus)
+                       .BarrettFactor();
+    m_barr_lo_64 = MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha_64 - 64),
+                                  64, m_modulus)
+                       .BarrettFactor();
   }
 
   uint64_t m_modulus;
-  uint64_t m_barr_lo;
   uint64_t m_prod_right_shift;
+  uint64_t m_barr_lo_52;
+  uint64_t m_barr_lo_64;
 };
 
 inline uint64_t BarrettReduce128(uint64_t x_hi, uint64_t x_lo, Modulus mod) {
@@ -299,7 +303,7 @@ inline uint64_t BarrettReduce128(uint64_t x_hi, uint64_t x_lo, Modulus mod) {
       (x_lo >> (mod.RightShift())) + (x_hi << (64 - (mod.RightShift())));
 
   // c2 = floor(U / 2^{n + beta}) * mu
-  MultiplyUInt64(c1, mod.BarrettFactor(), &c2_hi, &c2_lo);
+  MultiplyUInt64(c1, mod.BarrettFactor64(), &c2_hi, &c2_lo);
 
   // alpha - beta == 64, so we only need high 64 bits
   uint64_t q_hat = c2_hi;

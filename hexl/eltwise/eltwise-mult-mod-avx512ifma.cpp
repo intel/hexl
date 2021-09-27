@@ -506,24 +506,10 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  constexpr int64_t beta = -2;
-  HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
-  constexpr int64_t alpha = 50;  // ensures alpha - beta = 52
-  uint64_t gamma = Log2(InputModFactor);
-  HEXL_UNUSED(gamma);
-  HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
+  Modulus modulus_precon(modulus);
 
-  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
-  uint64_t prod_right_shift = ceil_log_mod + beta;
-
-  // Barrett factor "mu"
-  // TODO(fboemer): Allow MultiplyFactor to take bit shifts != 52
-  HEXL_CHECK(ceil_log_mod + alpha >= 52, "ceil_log_mod + alpha < 52");
-  uint64_t barr_lo =
-      MultiplyFactor((1ULL << (ceil_log_mod + alpha - 52)), 52, modulus)
-          .BarrettFactor();
-
-  __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
+  __m512i v_barr_lo =
+      _mm512_set1_epi64(static_cast<int64_t>(modulus_precon.BarrettFactor52()));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
   __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
@@ -531,13 +517,16 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
+  constexpr int64_t beta = -2;
+
   // Let d be the product operand1 * operand2.
   // To ensure d >> prod_right_shift < (1ULL << 52), we need
   // (input_mod_factor * modulus)^2 >> (prod_right_shift) < (1ULL << 52)
   // This happens when 2*log_2(input_mod_factor) + ceil_log_mod - beta < 51
   // If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * Log2(InputModFactor) + prod_right_shift - beta >= 51;
+  bool reduce_mod =
+      2 * Log2(InputModFactor) + modulus_precon.RightShift() - beta >= 51;
 
   if (reduce_mod) {
     // Here, we assume beta = -2
@@ -547,7 +536,7 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
     // Additionally, modulus < (1ULL << 50) implies
     // prod_right_shift <= 49. So N == 45, 46, 47, 48, 49 are the
     // only cases here.
-    switch (prod_right_shift) {
+    switch (modulus_precon.RightShift()) {
       // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
       // which requires a compile-time constant for the shift.
       ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(45, InputModFactor)
@@ -561,7 +550,7 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
       }
     }
   } else {
-    switch (prod_right_shift) {
+    switch (modulus_precon.RightShift()) {
       // Smaller shifts are uncommon.
       // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(15, 1)
       // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(16, 1)
@@ -602,7 +591,7 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
       default: {
         EltwiseMultModAVX512IFMAIntLoopDefault<1>(
             vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-            v_neg_mod, v_twice_mod, n, prod_right_shift);
+            v_neg_mod, v_twice_mod, n, modulus_precon.RightShift());
       }
     }
   }

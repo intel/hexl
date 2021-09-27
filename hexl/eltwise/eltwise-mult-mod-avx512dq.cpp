@@ -488,37 +488,26 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     n -= n_mod_8;
   }
 
-  constexpr int64_t beta = -2;
-  HEXL_CHECK(beta <= -2, "beta must be <= -2 for correctness");
-  constexpr int64_t alpha = 62;  // ensures alpha - beta = 64
-  uint64_t gamma = Log2(InputModFactor);
-  HEXL_UNUSED(gamma);
-  HEXL_CHECK(alpha >= gamma + 1, "alpha must be >= gamma + 1 for correctness");
+  Modulus modulus_precon(modulus);
 
-  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
-  uint64_t prod_right_shift = ceil_log_mod + beta;
-
-  // Barrett factor "mu"
-  // TODO(fboemer): Allow MultiplyFactor to take bit shifts != 64
-  HEXL_CHECK(ceil_log_mod + alpha >= 64, "ceil_log_mod + alpha < 64");
-  uint64_t barr_lo =
-      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - 64), 64, modulus)
-          .BarrettFactor();
-
-  __m512i v_barr_lo = _mm512_set1_epi64(static_cast<int64_t>(barr_lo));
+  __m512i v_barr_lo =
+      _mm512_set1_epi64(static_cast<int64_t>(modulus_precon.BarrettFactor64()));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(2 * modulus));
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
+  constexpr int64_t beta = -2;
+
   // Let d be the product operand1 * operand2.
   // To ensure d >> prod_right_shift < (1ULL << 64), we need
   // (input_mod_factor * modulus)^2 >> (prod_right_shift) < (1ULL << 64)
-  // This happens when 2*log_2(input_mod_factor) + prod_right_shift - beta < 63
-  // If not, we need to reduce the inputs to be less than modulus for
+  // This happens when 2*log_2(input_mod_factor) + prod_right_shift - beta <
+  // 63 If not, we need to reduce the inputs to be less than modulus for
   // correctness. This is less efficient, so we avoid it when possible.
-  bool reduce_mod = 2 * Log2(InputModFactor) + prod_right_shift - beta >= 63;
+  bool reduce_mod =
+      2 * Log2(InputModFactor) + modulus_precon.RightShift() - beta >= 63;
 
   if (reduce_mod) {
     // Here, we assume beta = -2
@@ -528,21 +517,21 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
     // Additionally, modulus < (1ULL << 62) implies
     // prod_right_shift <= 61. So N == 57, 58, 59, 60, 61 are the
     // only cases here.
-    switch (prod_right_shift) {
+    switch (modulus_precon.RightShift()) {
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(57, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(58, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(59, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(60, InputModFactor)
       ELTWISE_MULT_MOD_AVX512_DQ_INT_PROD_RIGHT_SHIFT_CASE(61, InputModFactor)
       default: {
-        HEXL_CHECK(false,
-                   "Bad value for prod_right_shift: " << prod_right_shift);
+        HEXL_CHECK(false, "Bad value for prod_right_shift: "
+                              << modulus_precon.RightShift());
       }
     }
   } else {  // Input mod reduction not required; pass InputModFactor == 1.
     // The template arguments are required for use of _mm512_hexl_shrdi_epi64,
     // which requires a compile-time constant for the shift.
-    switch (prod_right_shift) {
+    switch (modulus_precon.RightShift()) {
       // For prod_right_shift < 50, we should prefer EltwiseMultModAVX512Float
       // or EltwiseMultModAVX512IFMAInt, so we don't generate those special
       // cases here
@@ -562,7 +551,7 @@ void EltwiseMultModAVX512DQInt(uint64_t* result, const uint64_t* operand1,
         HEXL_VLOG(2, "calling EltwiseMultModAVX512DQIntLoopDefault");
         EltwiseMultModAVX512DQIntLoopDefault<1>(
             vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-            v_twice_mod, n, prod_right_shift);
+            v_twice_mod, n, modulus_precon.RightShift());
       }
     }
   }
