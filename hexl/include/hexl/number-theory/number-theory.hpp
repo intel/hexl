@@ -80,10 +80,6 @@ uint64_t ReverseBits(uint64_t x, uint64_t bit_width);
 uint64_t InverseMod(uint64_t x, uint64_t modulus);
 
 /// @brief Returns (x * y) mod modulus
-/// @details Assumes x, y < modulus
-// uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus);
-
-/// @brief Returns (x * y) mod modulus
 /// @param[in] x
 /// @param[in] y
 /// @param[in] y_precon 64-bit precondition factor floor(2**64 / modulus)
@@ -315,6 +311,8 @@ inline uint64_t BarrettReduce128(uint64_t x_hi, uint64_t x_lo, Modulus mod) {
   return (Z >= mod.Value()) ? (Z - mod.Value()) : Z;
 }
 
+/// @brief Returns (x * y) mod modulus
+/// @details Assumes x, y < modulus
 inline uint64_t MultiplyMod(uint64_t x, uint64_t y, Modulus mod) {
   uint64_t prod_hi, prod_lo;
 

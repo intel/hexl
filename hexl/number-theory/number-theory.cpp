@@ -41,14 +41,6 @@ uint64_t InverseMod(uint64_t input, uint64_t modulus) {
   return uint64_t(x);
 }
 
-// uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t modulus) {
-//   HEXL_CHECK(modulus != 0, "modulus == 0");
-//   HEXL_CHECK(x < modulus, "x " << x << " >= modulus " << modulus);
-//   HEXL_CHECK(y < modulus, "y " << y << " >= modulus " << modulus);
-
-//   return MultiplyMod(x, y, Modulus(modulus));
-// }
-
 uint64_t MultiplyMod(uint64_t x, uint64_t y, uint64_t y_precon,
                      uint64_t modulus) {
   uint64_t q = MultiplyUInt64Hi<64>(x, y_precon);
