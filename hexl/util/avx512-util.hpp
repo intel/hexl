@@ -5,8 +5,10 @@
 
 #include <immintrin.h>
 
+#include <iostream>
 #include <vector>
 
+#include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/defines.hpp"
@@ -377,21 +379,25 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
   HEXL_CHECK(BitShift == 52 || BitShift == 64,
              "Invalid bitshift " << BitShift << "; need 52 or 64");
 
+  std::cout << "_mm512_hexl_barrett_reduce64 bit shift " << BitShift << "\n";
+
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
     int64_t beta = -2;
     uint64_t mod = ExtractValues(q)[0];
-    //    std::cout << "52 bit mod: " << mod << std::endl;
-    uint64_t ceil_log_mod = Log2(mod) + 1;
+    std::cout << "52 bit mod: " << mod << std::endl;
+    uint64_t ceil_log_mod = Log2(mod) + 1;  // "n"
     uint64_t prod_right_shift = ceil_log_mod + beta;
     __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(mod));
-    //    std::cout << "52 prod_right_shift: " << prod_right_shift << std::endl;
+    std::cout << "52 prod_right_shift: " << prod_right_shift << std::endl;
     __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
     __m512i x_intr = _mm512_slli_epi64(x, static_cast<unsigned int>(12ULL));
     __m512i x_lo = _mm512_srli_epi64(x_intr, static_cast<unsigned int>(12ULL));
 
     uint64_t input = ExtractValues(x)[0];
     std::cout << "input: " << input << std::endl;
+    std::cout << "x_hi " << ExtractValues(x_hi)[0] << "\n";
+    std::cout << "x_lo " << ExtractValues(x_lo)[0] << "\n";
 
     // c1 = floor(U / 2^{n + beta})
     __m512i c1_lo =
@@ -400,8 +406,12 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
         x_hi, static_cast<unsigned int>(52ULL - (prod_right_shift)));
     __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
+    std::cout << "c1 " << ExtractValues(c1)[0] << "\n";
+
     // alpha - beta == 52, so we only need high 52 bits
     __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, q_barr);
+
+    std::cout << "q_hat " << ExtractValues(q_hat)[0] << "\n";
 
     // Z = prod_lo - (p * q_hat)_lo
     x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
@@ -421,6 +431,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 #endif
   if (BitShift == 64) {
     __m512i rnd1_hi = _mm512_hexl_mulhi_epi<64>(x, q_barr);
+
     // Barrett subtraction
     // tmp[0] = input - tmp[1] * q;
     __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);

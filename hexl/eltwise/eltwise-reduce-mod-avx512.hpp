@@ -35,12 +35,26 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
              "input_mod_factor must not be equal to output_mod_factor ");
 
   uint64_t n_tmp = n;
+
+  // Multi-word Barrett reduction precomputation
+  constexpr int64_t alpha = BitShift - 2;
+  constexpr int64_t beta = -2;
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  uint64_t prod_right_shift = ceil_log_mod + beta;
   uint64_t barrett_factor =
-      MultiplyFactor(1, BitShift, modulus).BarrettFactor();
+      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - BitShift), BitShift,
+                     modulus)
+          .BarrettFactor();
+
+  if (BitShift == 64) {
+    // Single-worded Barrett reduction.
+    barrett_factor = MultiplyFactor(1, 64, modulus).BarrettFactor();
+  }
+
   __m512i v_bf = _mm512_set1_epi64(static_cast<int64_t>(barrett_factor));
 
   // Deals with n not divisible by 8
-  uint64_t n_mod_8 = n_tmp % 8;
+  uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
     EltwiseReduceModNative(result, operand, n_mod_8, modulus, input_mod_factor,
                            output_mod_factor);
