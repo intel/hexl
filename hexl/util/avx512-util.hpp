@@ -379,11 +379,44 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
-    __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr);
-    // Barrett subtraction
-    // tmp[0] = input - tmp[1] * q;
-    __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
-    x = _mm512_sub_epi64(x, tmp1_times_mod);
+    int64_t beta = -2;
+    uint64_t mod = ExtractValues(q)[0];
+    //    std::cout << "52 bit mod: " << mod << std::endl;
+    uint64_t ceil_log_mod = Log2(mod) + 1;
+    uint64_t prod_right_shift = ceil_log_mod + beta;
+    __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(mod));
+    //    std::cout << "52 prod_right_shift: " << prod_right_shift << std::endl;
+    __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
+    __m512i x_intr = _mm512_slli_epi64(x, static_cast<unsigned int>(12ULL));
+    __m512i x_lo = _mm512_srli_epi64(x_intr, static_cast<unsigned int>(12ULL));
+
+    uint64_t input = ExtractValues(x)[0];
+    std::cout << "input: " << input << std::endl;
+
+    // c1 = floor(U / 2^{n + beta})
+    __m512i c1_lo =
+        _mm512_srli_epi64(x_lo, static_cast<unsigned int>(prod_right_shift));
+    __m512i c1_hi = _mm512_slli_epi64(
+        x_hi, static_cast<unsigned int>(52ULL - (prod_right_shift)));
+    __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
+
+    // alpha - beta == 52, so we only need high 52 bits
+    __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, q_barr);
+
+    // Z = prod_lo - (p * q_hat)_lo
+    x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
+    x = _mm512_hexl_small_mod_epu64<2>(x, q);
+
+    uint64_t output = ExtractValues(x)[0];
+    std::cout << "output: " << output << std::endl;
+
+    return x;
+    /*
+        __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr);
+        // Barrett subtraction
+        // tmp[0] = input - tmp[1] * q;
+        __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
+        x = _mm512_sub_epi64(x, tmp1_times_mod);*/
   }
 #endif
   if (BitShift == 64) {
