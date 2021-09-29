@@ -10,7 +10,39 @@
 namespace intel {
 namespace hexl {
 
-/// @brief The Harvey butterfly: assume \p X, \p Y in [0, 4q), and return X', Y'
+
+/// @brief Out of place Harvey butterfly: assume \p X_op, \p Y_op in [0, 4q), and return X_r', Y_r'
+/// in [0, 4q) such that X_r = X_op + WY_op, Y_r = X_op - WY_op (mod q).
+/// @param[out] X_r Butterfly data
+/// @param[out] Y_r Butterfly data
+/// @param[in] X_op Butterfly data
+/// @param[in] Y_op Butterfly data
+/// @param[in] W Root of unity
+/// @param[in] W_precon Preconditioned \p W for BitShift-bit Barrett
+/// reduction
+/// @param[in] modulus Negative modulus, i.e. (-q) represented as 8 64-bit
+/// signed integers in SIMD form
+/// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
+/// signed integers in SIMD form
+/// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
+inline void FwdButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
+                               const uint64_t* X_op, const uint64_t* Y_op, 
+                               uint64_t W, uint64_t W_precon, 
+                               uint64_t modulus, uint64_t twice_modulus) {
+  HEXL_VLOG(5, "FwdButterflyRadix2");
+  HEXL_VLOG(5, "Inputs: X " << *X_op << ", Y " << *Y_op << ", W " << W << ", modulus "
+                            << modulus);
+  uint64_t tx = ReduceMod<2>(*X_op, twice_modulus);
+  uint64_t T = MultiplyModLazy<64>(*Y_op, W, W_precon, modulus);
+  HEXL_VLOG(5, "T " << T);
+  *X_r = tx + T;
+  *Y_r = tx + twice_modulus - T;
+
+  HEXL_VLOG(5, "Output X " << *X_r << ", Y " << *Y_r);
+}
+
+
+/// @brief In place Harvey butterfly: assume \p X, \p Y in [0, 4q), and return X', Y'
 /// in [0, 4q) such that X' = X + WY, Y' = X - WY (mod q).
 /// @param[in,out] X Butterfly data
 /// @param[in,out] Y Butterfly data
@@ -22,9 +54,9 @@ namespace hexl {
 /// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
-inline void FwdButterflyRadix2(uint64_t* X, uint64_t* Y, uint64_t W,
-                               uint64_t W_precon, uint64_t modulus,
-                               uint64_t twice_modulus) {
+inline void FwdButterflyRadix2(uint64_t* X, uint64_t* Y,
+                               uint64_t W, uint64_t W_precon, 
+                               uint64_t modulus, uint64_t twice_modulus) {
   HEXL_VLOG(5, "FwdButterflyRadix2");
   HEXL_VLOG(5, "Inputs: X " << *X << ", Y " << *Y << ", W " << W << ", modulus "
                             << modulus);

@@ -30,7 +30,7 @@ static void BM_FwdNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ForwardTransformToBitReverseRadix2(
-        input.data(), ntt_size, modulus, ntt.GetRootOfUnityPowers().data(),
+        input.data(), input.data(), ntt_size, modulus, ntt.GetRootOfUnityPowers().data(),
         ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
   }
 }
@@ -80,7 +80,7 @@ static void BM_FwdNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 2, 1);
   }
 }
@@ -109,7 +109,7 @@ static void BM_FwdNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 4, 4);
   }
 }
@@ -144,7 +144,7 @@ static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
       ntt.GetAVX512Precon32RootOfUnityPowers();
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<32>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 4, output_mod_factor);
   }
 }
@@ -175,7 +175,7 @@ static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
       ntt.GetAVX512Precon64RootOfUnityPowers();
   for (auto _ : state) {
     ForwardTransformToBitReverseAVX512<64>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 4, output_mod_factor);
   }
 }

@@ -31,7 +31,7 @@ namespace hexl {
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
 void ForwardTransformToBitReverseRadix2(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
     uint64_t output_mod_factor = 1);
