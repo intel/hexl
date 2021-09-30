@@ -11,7 +11,7 @@ namespace intel {
 namespace hexl {
 
 
-/// @brief Out of place Harvey butterfly: assume \p X_op, \p Y_op in [0, 4q), and return X_r', Y_r'
+/// @brief Out of place Harvey butterfly: assume \p X_op, \p Y_op in [0, 4q), and return X_r, Y_r
 /// in [0, 4q) such that X_r = X_op + WY_op, Y_r = X_op - WY_op (mod q).
 /// @param[out] X_r Butterfly data
 /// @param[out] Y_r Butterfly data
@@ -118,7 +118,37 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
   // *X3 = ReduceMod<2>(*X3, four_times_modulus);
 }
 
-/// @brief The Harvey butterfly: assume X, Y in [0, 2q), and return X', Y' in
+/// @brief Out-of-place Harvey butterfly: assume X_op, Y_op in [0, 2q), and return X_r, Y_r in
+/// [0, 2q) such that X_r = X_op + Y_op (mod q), Y_r = W(X_op - Y_op) (mod q).
+/// @param[out] X_r Butterfly data
+/// @param[out] Y_r Butterfly data
+/// @param[in] X_op Butterfly data
+/// @param[in] Y_op Butterfly data
+/// @param[in] W Root of unity
+/// @param[in] W_precon Preconditioned root of unity for 64-bit Barrett
+/// reduction
+/// @param[in] neg_modulus Negative modulus, i.e. (-q) represented as 8 64-bit
+/// signed integers in SIMD form
+/// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
+/// signed integers in SIMD form
+/// @details See Algorithm 3 of https://arxiv.org/pdf/1205.2926.pdf
+inline void InvButterflyRadix2(uint64_t* X_r, uint64_t* Y_r, 
+                               const uint64_t* X_op, const uint64_t* Y_op,
+                               uint64_t W, uint64_t W_precon, 
+                               uint64_t modulus, uint64_t twice_modulus) {
+  HEXL_VLOG(4, "InvButterflyRadix2 X " << *X << ", Y " << *Y << " W " << W
+                                       << " W_precon " << W_precon
+                                       << " modulus " << modulus);
+  uint64_t tx = *X_op + *Y_op;
+  uint64_t ty = *X_op + twice_modulus - *Y_op;
+
+  *X_r = ReduceMod<2>(tx, twice_modulus);
+  *Y_r = MultiplyModLazy<64>(ty, W, W_precon, modulus);
+
+  HEXL_VLOG(4, "InvButterflyRadix2 returning X " << *X << ", Y " << *Y);
+}
+
+/// @brief In-place Harvey butterfly: assume X, Y in [0, 2q), and return X', Y' in
 /// [0, 2q) such that X' = X + Y (mod q), Y' = W(X - Y) (mod q).
 /// @param[in,out] X Butterfly data
 /// @param[in,out] Y Butterfly data

@@ -261,10 +261,6 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
   HEXL_CHECK_BOUNDS(operand, m_degree, m_q * input_mod_factor,
                     "operand exceeds bound " << m_q * input_mod_factor);
 
-  if (operand != result) {
-    std::memcpy(result, operand, m_degree * sizeof(uint64_t));
-  }
-
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma && (m_q < s_max_inv_ifma_modulus) && (m_degree >= 16)) {
     HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA InvNTT");
@@ -272,7 +268,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
     const uint64_t* precon_inv_root_of_unity_powers =
         GetPrecon52InvRootOfUnityPowers().data();
     InverseTransformFromBitReverseAVX512<s_ifma_shift_bits>(
-        result, m_degree, m_q, inv_root_of_unity_powers,
+        result, operand, m_degree, m_q, inv_root_of_unity_powers,
         precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
     return;
   }
@@ -287,7 +283,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
       const uint64_t* precon_inv_root_of_unity_powers =
           GetPrecon32InvRootOfUnityPowers().data();
       InverseTransformFromBitReverseAVX512<32>(
-          result, m_degree, m_q, inv_root_of_unity_powers,
+          result, operand, m_degree, m_q, inv_root_of_unity_powers,
           precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
     } else {
       HEXL_VLOG(3, "Calling 64-bit AVX512 InvNTT");
@@ -297,7 +293,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
           GetPrecon64InvRootOfUnityPowers().data();
 
       InverseTransformFromBitReverseAVX512<s_default_shift_bits>(
-          result, m_degree, m_q, inv_root_of_unity_powers,
+          result, operand, m_degree, m_q, inv_root_of_unity_powers,
           precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
     }
     return;
@@ -309,7 +305,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
   const uint64_t* precon_inv_root_of_unity_powers =
       GetPrecon64InvRootOfUnityPowers().data();
   InverseTransformFromBitReverseRadix2(
-      result, m_degree, m_q, inv_root_of_unity_powers,
+      result, operand, m_degree, m_q, inv_root_of_unity_powers,
       precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
 }
 

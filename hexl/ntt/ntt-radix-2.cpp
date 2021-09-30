@@ -8,7 +8,7 @@
 #include "hexl/util/check.hpp"
 #include "ntt/ntt-default.hpp"
 #include "util/cpu-features.hpp"
-
+#include <cstring>
 namespace intel {
 namespace hexl {
 
@@ -231,7 +231,7 @@ void ReferenceForwardTransformToBitReverse(
 }
 
 void InverseTransformFromBitReverseRadix2(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor) {
@@ -264,10 +264,18 @@ void InverseTransformFromBitReverseRadix2(
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X = operand + j1;
-          uint64_t* Y = X + t;
-
-          InvButterflyRadix2(X, Y, W, W_precon, modulus, twice_modulus);
+          if(result != operand){
+            uint64_t* X_r = result + j1;
+            uint64_t* Y_r = X_r + t;
+            const uint64_t* X_op = operand + j1;
+            const uint64_t* Y_op = X_op + t;
+            InvButterflyRadix2(X_r, Y_r, X_op, Y_op, W, W_precon, modulus, twice_modulus);
+          }
+          else {
+            uint64_t* X = result + j1;
+            uint64_t* Y = X + t;
+            InvButterflyRadix2(X, Y, W, W_precon, modulus, twice_modulus);
+          }
         }
         break;
       }
@@ -279,7 +287,7 @@ void InverseTransformFromBitReverseRadix2(
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X = operand + j1;
+          uint64_t* X = result + j1;
           uint64_t* Y = X + t;
 
           InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
@@ -295,7 +303,7 @@ void InverseTransformFromBitReverseRadix2(
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X = operand + j1;
+          uint64_t* X = result + j1;
           uint64_t* Y = X + t;
 
           InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
@@ -313,7 +321,7 @@ void InverseTransformFromBitReverseRadix2(
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X = operand + j1;
+          uint64_t* X = result + j1;
           uint64_t* Y = X + t;
 
           InvButterflyRadix2(X++, Y++, W, W_precon, modulus, twice_modulus);
@@ -335,7 +343,7 @@ void InverseTransformFromBitReverseRadix2(
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X = operand + j1;
+          uint64_t* X = result + j1;
           uint64_t* Y = X + t;
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < t; j += 8) {
@@ -354,6 +362,10 @@ void InverseTransformFromBitReverseRadix2(
     t <<= 1;
   }
 
+  if(result != operand && n == 2){
+    std::memcpy(result, operand, n * sizeof(uint64_t));
+  } 
+
   // Fold multiplication by N^{-1} to final stage butterfly
   const uint64_t W = inv_root_of_unity_powers[n - 1];
 
@@ -363,7 +375,7 @@ void InverseTransformFromBitReverseRadix2(
   uint64_t inv_n_w_precon =
       MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
 
-  uint64_t* X = operand;
+  uint64_t* X = result;
   uint64_t* Y = X + n_div_2;
   for (size_t j = 0; j < n_div_2; ++j) {
     // Assume X, Y in [0, 2q) and compute
@@ -378,9 +390,9 @@ void InverseTransformFromBitReverseRadix2(
   if (output_mod_factor == 1) {
     // Reduce from [0, 2q) to [0,q)
     for (size_t i = 0; i < n; ++i) {
-      operand[i] = ReduceMod<2>(operand[i], modulus);
-      HEXL_CHECK(operand[i] < modulus, "Incorrect modulus reduction in InvNTT"
-                                           << operand[i] << " >= " << modulus);
+      result[i] = ReduceMod<2>(result[i], modulus);
+      HEXL_CHECK(result[i] < modulus, "Incorrect modulus reduction in InvNTT"
+                                           << result[i] << " >= " << modulus);
     }
   }
 }

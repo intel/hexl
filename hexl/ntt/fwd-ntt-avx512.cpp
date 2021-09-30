@@ -257,7 +257,7 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus, __m
       _mm512_storeu_si512(v_X_r_pt++, v_X);
       _mm512_storeu_si512(v_Y_r_pt++, v_Y);
 
-      // Increase operand pointer as well
+      // Increase operand pointers as well
       v_X_op_pt++;
       v_Y_op_pt++;
     }

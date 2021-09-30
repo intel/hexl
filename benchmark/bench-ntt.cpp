@@ -269,8 +269,8 @@ static void BM_InvNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
   const AlignedVector64<uint64_t> precon_root_of_unity =
       ntt.GetPrecon64InvRootOfUnityPowers();
   for (auto _ : state) {
-    InverseTransformFromBitReverseRadix2(input.data(), ntt_size, modulus,
-                                         root_of_unity.data(),
+    InverseTransformFromBitReverseRadix2(input.data(), input.data(), ntt_size, 
+                                         modulus, root_of_unity.data(),
                                          precon_root_of_unity.data(), 1, 1);
   }
 }
@@ -322,7 +322,7 @@ static void BM_InvNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
       ntt.GetPrecon52InvRootOfUnityPowers();
   for (auto _ : state) {
     InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 1, 1);
   }
 }
@@ -348,7 +348,7 @@ static void BM_InvNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
       ntt.GetPrecon52InvRootOfUnityPowers();
   for (auto _ : state) {
     InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), 2, 2);
   }
 }
@@ -379,7 +379,7 @@ static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     InverseTransformFromBitReverseAVX512<32>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), output_mod_factor, output_mod_factor);
   }
 }
@@ -407,7 +407,7 @@ static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     InverseTransformFromBitReverseAVX512<NTT::s_default_shift_bits>(
-        input.data(), ntt_size, modulus, root_of_unity.data(),
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
         precon_root_of_unity.data(), output_mod_factor, output_mod_factor);
   }
 }
