@@ -21,8 +21,8 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512IFMA
 template void InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
-    uint64_t*  result, const uint64_t* operand, uint64_t degree, uint64_t modulus,
-    const uint64_t* inv_root_of_unity_powers,
+    uint64_t*  result, const uint64_t* operand, uint64_t degree, 
+    uint64_t modulus, const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
@@ -30,15 +30,15 @@ template void InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
 
 #ifdef HEXL_HAS_AVX512DQ
 template void InverseTransformFromBitReverseAVX512<32>(
-    uint64_t*  result, const uint64_t* operand, uint64_t degree, uint64_t modulus,
-    const uint64_t* inv_root_of_unity_powers,
+    uint64_t*  result, const uint64_t* operand, uint64_t degree, 
+    uint64_t modulus, const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
 
 template void InverseTransformFromBitReverseAVX512<NTT::s_default_shift_bits>(
-    uint64_t*  result, const uint64_t* operand, uint64_t degree, uint64_t modulus,
-    const uint64_t* inv_root_of_unity_powers,
+    uint64_t*  result, const uint64_t* operand, uint64_t degree, 
+    uint64_t modulus, const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
@@ -218,8 +218,8 @@ void InvT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 // Out-of-place implementation
 template <int BitShift>
-void InvT8(uint64_t*  result, const uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t t, uint64_t m, const uint64_t* W,
+void InvT8(uint64_t*  result, const uint64_t* operand, __m512i v_neg_modulus,
+            __m512i v_twice_mod, uint64_t t, uint64_t m, const uint64_t* W,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
@@ -363,9 +363,10 @@ void InverseTransformFromBitReverseAVX512(
         precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor,
         recursion_depth + 1, 2 * recursion_half);
     InverseTransformFromBitReverseAVX512<BitShift>(
-        &result[n / 2], &operand[n / 2], n / 2, modulus, inv_root_of_unity_powers,
-        precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, 2 * recursion_half + 1);
+        &result[n / 2], &operand[n / 2], n / 2, modulus, 
+        inv_root_of_unity_powers, precon_inv_root_of_unity_powers, 
+        input_mod_factor, output_mod_factor, recursion_depth + 1, 
+        2 * recursion_half + 1);
 
     uint64_t W_idx_delta =
         m * ((1ULL << (recursion_depth + 1)) - recursion_half);

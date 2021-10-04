@@ -30,7 +30,8 @@ static void BM_FwdNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ForwardTransformToBitReverseRadix2(
-        input.data(), input.data(), ntt_size, modulus, ntt.GetRootOfUnityPowers().data(),
+        input.data(), input.data(), ntt_size, modulus, 
+        ntt.GetRootOfUnityPowers().data(),
         ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
   }
 }

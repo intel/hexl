@@ -220,8 +220,8 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 // Out-of-place implementation
 template <int BitShift, bool InputLessThanMod>
-void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t t, uint64_t m, const uint64_t* W,
+void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus, 
+           __m512i v_twice_mod, uint64_t t, uint64_t m, const uint64_t* W,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
@@ -423,8 +423,8 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
     if (result != operand) {
-      FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
-                             W_precon);
+      FwdT8<BitShift, false>(result, operand, v_neg_modulus,
+                              v_twice_mod, t, 1, W, W_precon);
     }
     else {
       FwdT8<BitShift, false>(result, v_neg_modulus, v_twice_mod, t, 1, W,

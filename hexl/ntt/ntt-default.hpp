@@ -118,8 +118,9 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
   // *X3 = ReduceMod<2>(*X3, four_times_modulus);
 }
 
-/// @brief Out-of-place Harvey butterfly: assume X_op, Y_op in [0, 2q), and return X_r, Y_r in
-/// [0, 2q) such that X_r = X_op + Y_op (mod q), Y_r = W(X_op - Y_op) (mod q).
+/// @brief Out-of-place Harvey butterfly: assume X_op, Y_op in [0, 2q), and 
+/// return X_r, Y_r in [0, 2q) such that X_r = X_op + Y_op (mod q), 
+/// Y_r = W(X_op - Y_op) (mod q).
 /// @param[out] X_r Butterfly data
 /// @param[out] Y_r Butterfly data
 /// @param[in] X_op Butterfly data
@@ -148,8 +149,8 @@ inline void InvButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
   HEXL_VLOG(4, "InvButterflyRadix2 returning X " << *X << ", Y " << *Y);
 }
 
-/// @brief In-place Harvey butterfly: assume X, Y in [0, 2q), and return X', Y' in
-/// [0, 2q) such that X' = X + Y (mod q), Y' = W(X - Y) (mod q).
+/// @brief In-place Harvey butterfly: assume X, Y in [0, 2q), and return X', Y' 
+/// in [0, 2q) such that X' = X + Y (mod q), Y' = W(X - Y) (mod q).
 /// @param[in,out] X Butterfly data
 /// @param[in,out] Y Butterfly data
 /// @param[in] W Root of unity
