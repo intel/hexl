@@ -245,7 +245,7 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
       GetPrecon64RootOfUnityPowers().data();
 
   ForwardTransformToBitReverseRadix2(
-      result, operand, m_degree, m_q, root_of_unity_powers, 
+      result, operand, m_degree, m_q, root_of_unity_powers,
       precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
 }
 

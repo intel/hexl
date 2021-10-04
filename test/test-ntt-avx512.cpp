@@ -252,7 +252,7 @@ TEST_P(DegreeModulusBoolTest, InvNTTAVX512IFMA) {
     // Compute reference
     NTT ntt(N, modulus);
     InverseTransformFromBitReverseRadix2(
-        input64.data(), input64.data(), N, modulus, 
+        input64.data(), input64.data(), N, modulus,
         ntt.GetInvRootOfUnityPowers().data(),
         ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
@@ -309,7 +309,7 @@ TEST(NTT, FwdNTT_AVX512_32) {
       AlignedVector64<uint64_t> input_avx_lazy = input;
 
       ForwardTransformToBitReverseRadix2(
-          input.data(), input.data(), N, modulus, 
+          input.data(), input.data(), N, modulus,
           ntt.GetRootOfUnityPowers().data(),
           ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
@@ -357,7 +357,7 @@ TEST(NTT, FwdNTT_AVX512_64) {
       AlignedVector64<uint64_t> input_avx_lazy = input;
 
       ForwardTransformToBitReverseRadix2(
-          input.data(), input.data(), N, modulus, 
+          input.data(), input.data(), N, modulus,
           ntt.GetRootOfUnityPowers().data(),
           ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
@@ -406,7 +406,7 @@ TEST(NTT, InvNTT_AVX512_32) {
       AlignedVector64<uint64_t> input_avx_lazy = input;
 
       InverseTransformFromBitReverseRadix2(
-          input.data(), input.data(), N, modulus, 
+          input.data(), input.data(), N, modulus,
           ntt.GetInvRootOfUnityPowers().data(),
           ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
@@ -454,7 +454,7 @@ TEST(NTT, InvNTT_AVX512_64) {
       AlignedVector64<uint64_t> input_avx_lazy = input;
 
       InverseTransformFromBitReverseRadix2(
-          input.data(), input.data(), N, modulus, 
+          input.data(), input.data(), N, modulus,
           ntt.GetInvRootOfUnityPowers().data(),
           ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 

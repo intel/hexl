@@ -184,43 +184,9 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   }
 }
 
-// In-place implementation
-template <int BitShift, bool InputLessThanMod>
-void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t t, uint64_t m, const uint64_t* W,
-           const uint64_t* W_precon) {
-  size_t j1 = 0;
-
-  HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < m; i++) {
-
-    uint64_t* X = operand + j1;
-    uint64_t* Y = X + t;
-
-    __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
-    __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
-
-    __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
-    __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
-
-    // assume 8 | t
-    for (size_t j = t / 8; j > 0; --j) {
-      __m512i v_X = _mm512_loadu_si512(v_X_pt);
-      __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
-
-      FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
-                                               v_neg_modulus, v_twice_mod);
-
-      _mm512_storeu_si512(v_X_pt++, v_X);
-      _mm512_storeu_si512(v_Y_pt++, v_Y);
-    }
-    j1 += (t << 1);
-  }
-}
-
 // Out-of-place implementation
 template <int BitShift, bool InputLessThanMod>
-void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus, 
+void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
            __m512i v_twice_mod, uint64_t t, uint64_t m, const uint64_t* W,
            const uint64_t* W_precon) {
   size_t j1 = 0;
@@ -263,6 +229,15 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
     }
     j1 += (t << 1);
   }
+}
+
+
+// In-place implementation
+template <int BitShift, bool InputLessThanMod>
+void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
+           uint64_t t, uint64_t m, const uint64_t* W,
+           const uint64_t* W_precon) {
+  FwdT8<BitShift, false>(operand, operand, v_neg_modulus, v_twice_mod, t, m, W, W_precon);
 }
 
 template <int BitShift>
@@ -422,14 +397,8 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-    if (result != operand) {
-      FwdT8<BitShift, false>(result, operand, v_neg_modulus,
-                              v_twice_mod, t, 1, W, W_precon);
-    }
-    else {
-      FwdT8<BitShift, false>(result, v_neg_modulus, v_twice_mod, t, 1, W,
-                             W_precon);
-    }
+    FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, 
+                           W, W_precon);
 
     ForwardTransformToBitReverseAVX512<BitShift>(
         result, result, n / 2, modulus, root_of_unity_powers,
