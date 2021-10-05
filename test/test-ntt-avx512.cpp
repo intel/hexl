@@ -240,7 +240,7 @@ TEST_P(NttAVX512Test, InvNTT_AVX512IFMA) {
     AssertEqual(input64, input_ifma_lazy);
   }
 }
-#endif
+#endif  // HEXL_HAS_AVX512IFMA
 
 // Checks AVX512 and native forward NTT implementations match
 TEST_P(NttAVX512Test, FwdNTT_AVX512_32) {
@@ -382,7 +382,6 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
     ASSERT_EQ(input, input_avx_lazy);
   }
 }
-#endif
 
 INSTANTIATE_TEST_SUITE_P(
     NTT, NttAVX512Test,
@@ -392,6 +391,7 @@ INSTANTIATE_TEST_SUITE_P(
                            27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59,
                            60}),
                        ::testing::ValuesIn(std::vector<bool>{false, true})));
+#endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl
 }  // namespace intel
