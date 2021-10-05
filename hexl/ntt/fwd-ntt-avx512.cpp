@@ -193,7 +193,6 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < m; i++) {
-
     // Referencing operand
     const uint64_t* X_op = operand + j1;
     const uint64_t* Y_op = X_op + t;
@@ -229,15 +228,6 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
     }
     j1 += (t << 1);
   }
-}
-
-
-// In-place implementation
-template <int BitShift, bool InputLessThanMod>
-void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t t, uint64_t m, const uint64_t* W,
-           const uint64_t* W_precon) {
-  FwdT8<BitShift, false>(operand, operand, v_neg_modulus, v_twice_mod, t, m, W, W_precon);
 }
 
 template <int BitShift>
@@ -283,11 +273,11 @@ void ForwardTransformToBitReverseAVX512(
   static const size_t base_ntt_size = 1024;
 
   if (n <= base_ntt_size) {  // Perform breadth-first NTT
-
     size_t t = (n >> 1);
     size_t m = 1;
     size_t W_idx = (m << recursion_depth) + (recursion_half * m);
 
+    // Copy for out-of-place in case m is <= base_ntt_size from start
     if (result != operand) {
       std::memcpy(result, operand, n * sizeof(uint64_t));
     }
@@ -298,11 +288,11 @@ void ForwardTransformToBitReverseAVX512(
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
       if ((input_mod_factor <= 2) && (recursion_depth == 0)) {
-        FwdT8<BitShift, true>(result, v_neg_modulus, v_twice_mod, t, m, W,
-                              W_precon);
+        FwdT8<BitShift, true>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                              W, W_precon);
       } else {
-        FwdT8<BitShift, false>(result, v_neg_modulus, v_twice_mod, t, m, W,
-                               W_precon);
+        FwdT8<BitShift, false>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                               W, W_precon);
       }
 
       t >>= 1;
@@ -312,8 +302,8 @@ void ForwardTransformToBitReverseAVX512(
     for (; m < (n >> 3); m <<= 1) {
       const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
-      FwdT8<BitShift, false>(result, v_neg_modulus, v_twice_mod, t, m, W,
-                             W_precon);
+      FwdT8<BitShift, false>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                             W, W_precon);
       t >>= 1;
       W_idx <<= 1;
     }
@@ -397,8 +387,8 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-    FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, 
-                           W, W_precon);
+    FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
+                           W_precon);
 
     ForwardTransformToBitReverseAVX512<BitShift>(
         result, result, n / 2, modulus, root_of_unity_powers,

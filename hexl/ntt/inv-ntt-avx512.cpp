@@ -21,7 +21,7 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512IFMA
 template void InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
-    uint64_t*  result, const uint64_t* operand, uint64_t degree,
+    uint64_t* result, const uint64_t* operand, uint64_t degree,
     uint64_t modulus, const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
@@ -30,14 +30,14 @@ template void InverseTransformFromBitReverseAVX512<NTT::s_ifma_shift_bits>(
 
 #ifdef HEXL_HAS_AVX512DQ
 template void InverseTransformFromBitReverseAVX512<32>(
-    uint64_t*  result, const uint64_t* operand, uint64_t degree,
+    uint64_t* result, const uint64_t* operand, uint64_t degree,
     uint64_t modulus, const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
 
 template void InverseTransformFromBitReverseAVX512<NTT::s_default_shift_bits>(
-    uint64_t*  result, const uint64_t* operand, uint64_t degree,
+    uint64_t* result, const uint64_t* operand, uint64_t degree,
     uint64_t modulus, const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
@@ -216,52 +216,6 @@ void InvT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   }
 }
 
-// Out-of-place implementation
-template <int BitShift>
-void InvT8(uint64_t*  result, const uint64_t* operand, __m512i v_neg_modulus,
-           __m512i v_twice_mod, uint64_t t, uint64_t m, const uint64_t* W,
-           const uint64_t* W_precon) {
-  size_t j1 = 0;
-
-  HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < m; i++) {
-    // Referencing operand
-    const uint64_t* X_op = operand + j1;
-    const uint64_t* Y_op = X_op + t;
-
-    const __m512i* v_X_op_pt = reinterpret_cast<const __m512i*>(X_op);
-    const __m512i* v_Y_op_pt = reinterpret_cast<const __m512i*>(Y_op);
-
-    // Referencing result
-    uint64_t* X_r = result + j1;
-    uint64_t* Y_r = X_r + t;
-
-    __m512i* v_X_r_pt = reinterpret_cast<__m512i*>(X_r);
-    __m512i* v_Y_r_pt = reinterpret_cast<__m512i*>(Y_r);
-
-    // Weights and weights' preconditions
-    __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
-    __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
-
-    // assume 8 | t
-    for (size_t j = t / 8; j > 0; --j) {
-      __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
-      __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
-
-      InvButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
-                                    v_twice_mod);
-
-      _mm512_storeu_si512(v_X_r_pt++, v_X);
-      _mm512_storeu_si512(v_Y_r_pt++, v_Y);
-
-      // Increase operand pointers as well
-      v_X_op_pt++;
-      v_Y_op_pt++;
-    }
-    j1 += (t << 1);
-  }
-}
-
 template <int BitShift>
 void InverseTransformFromBitReverseAVX512(
     uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
@@ -302,7 +256,6 @@ void InverseTransformFromBitReverseAVX512(
   static const size_t base_ntt_size = 1024;
 
   if (n <= base_ntt_size) {  // Perform breadth-first InvNTT
-
     if (operand != result) {
       std::memcpy(result, operand, n * sizeof(uint64_t));
     }

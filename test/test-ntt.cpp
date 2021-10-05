@@ -295,7 +295,8 @@ TEST_P(DegreeModulusInputOutput, API) {
 
   auto input_radix4 = input;
   InverseTransformFromBitReverseRadix4(
-      input_radix4.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+      input_radix4.data(), input_radix4.data(), N, modulus,
+      ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
   InverseTransformFromBitReverseRadix2(
@@ -403,7 +404,8 @@ TEST_P(DegreeModulusTest, ForwardRadix4Random) {
 
   auto input_radix4 = input;
   ForwardTransformToBitReverseRadix4(
-      input_radix4.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
+      input_radix4.data(), input_radix4.data(), N, modulus,
+      ntt.GetRootOfUnityPowers().data(),
       ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
   ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
@@ -428,7 +430,8 @@ TEST_P(DegreeModulusTest, InverseRadix4Random) {
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
   InverseTransformFromBitReverseRadix4(
-      input_radix4.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+      input_radix4.data(), input_radix4.data(), N, modulus,
+      ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
   AssertEqual(input, input_radix4);

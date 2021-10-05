@@ -52,7 +52,8 @@ static void BM_FwdNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ForwardTransformToBitReverseRadix4(
-        input.data(), ntt_size, modulus, ntt.GetRootOfUnityPowers().data(),
+        input.data(), input.data(), ntt_size, modulus,
+        ntt.GetRootOfUnityPowers().data(),
         ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
   }
 }
@@ -295,8 +296,8 @@ static void BM_InvNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
   const AlignedVector64<uint64_t> precon_root_of_unity =
       ntt.GetPrecon64InvRootOfUnityPowers();
   for (auto _ : state) {
-    InverseTransformFromBitReverseRadix4(input.data(), ntt_size, modulus,
-                                         root_of_unity.data(),
+    InverseTransformFromBitReverseRadix4(input.data(), input.data(), ntt_size,
+                                         modulus, root_of_unity.data(),
                                          precon_root_of_unity.data(), 1, 1);
   }
 }
