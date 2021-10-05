@@ -20,3 +20,9 @@ Please sign your commits before making a pull request. See instructions [here](h
 * ```/bin/sh: 1: pre-commit: not found```
 
   Install `pre-commit`. More info at https://pre-commit.com/
+
+* ```
+     error: gpg failed to sign the data
+     fatal: failed to write commit object
+  ```
+  Try adding ```export GPG_TTY=$(tty)``` to `~/.bashrc`
