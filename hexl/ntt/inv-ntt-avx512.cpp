@@ -1,8 +1,6 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ntt/inv-ntt-avx512.hpp"
-
 #include <immintrin.h>
 
 #include <functional>
@@ -11,6 +9,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
+#include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
 #include "util/avx512-util.hpp"
@@ -227,9 +226,10 @@ void InverseTransformFromBitReverseAVX512(
              "InverseTransformFromBitReverseAVX512 doesn't support small "
              "transforms. Need n >= 16, got n = "
                  << n);
-  HEXL_CHECK(modulus < MaximumValue(BitShift) / 2,
+  HEXL_CHECK(modulus < NTT::s_max_inv_modulus(BitShift),
              "modulus " << modulus << " too large for BitShift " << BitShift
-                        << " => maximum value " << MaximumValue(BitShift) / 2);
+                        << " => maximum value "
+                        << NTT::s_max_inv_modulus(BitShift));
   HEXL_CHECK_BOUNDS(precon_inv_root_of_unity_powers, n, MaximumValue(BitShift),
                     "precon_inv_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");
