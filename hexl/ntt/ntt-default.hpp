@@ -101,6 +101,9 @@ inline void FwdButterflyRadix4(uint64_t* X0, uint64_t* X1, uint64_t* X2,
 inline void InvButterflyRadix2(uint64_t* X, uint64_t* Y, uint64_t W,
                                uint64_t W_precon, uint64_t modulus,
                                uint64_t twice_modulus) {
+  HEXL_VLOG(4, "InvButterflyRadix2 X " << *X << ", Y " << *Y << " W " << W
+                                       << " W_precon " << W_precon
+                                       << " modulus " << modulus);
   uint64_t tx = *X + *Y;
   uint64_t ty = *X + twice_modulus - *Y;
 

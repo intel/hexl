@@ -1,6 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include "ntt/inv-ntt-avx512.hpp"
+
 #include <immintrin.h>
 
 #include <functional>
@@ -9,7 +11,6 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
-#include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
 #include "util/avx512-util.hpp"
