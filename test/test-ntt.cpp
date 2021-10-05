@@ -341,21 +341,23 @@ INSTANTIATE_TEST_SUITE_P(
                                   12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
                                   23, 24, 25, 26, 27, 28, 29, 30, 31, 32})));
 
-TEST_P(DegreeModulusBoolTest, ForwardZeros) {
+class NttNativeTest : public DegreeModulusBoolTest {};
+
+TEST_P(NttNativeTest, ForwardZeros) {
   std::vector<uint64_t> input(m_N, 0);
   std::vector<uint64_t> exp_output(m_N, 0);
   m_ntt.ComputeForward(input.data(), input.data(), 1, 1);
   AssertEqual(input, exp_output);
 }
 
-TEST_P(DegreeModulusBoolTest, InverseZeros) {
+TEST_P(NttNativeTest, InverseZeros) {
   std::vector<uint64_t> input(m_N, 0);
   std::vector<uint64_t> exp_output(m_N, 0);
   m_ntt.ComputeInverse(input.data(), input.data(), 1, 1);
   AssertEqual(input, exp_output);
 }
 
-TEST_P(DegreeModulusBoolTest, ForwardRadix4Random) {
+TEST_P(NttNativeTest, ForwardRadix4Random) {
   auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
   auto input_radix4 = input;
 
@@ -369,7 +371,7 @@ TEST_P(DegreeModulusBoolTest, ForwardRadix4Random) {
   AssertEqual(input, input_radix4);
 }
 
-TEST_P(DegreeModulusBoolTest, InverseRadix4Random) {
+TEST_P(NttNativeTest, InverseRadix4Random) {
   auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
   auto input_radix4 = input;
 
@@ -386,14 +388,14 @@ TEST_P(DegreeModulusBoolTest, InverseRadix4Random) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    NTT, DegreeModulusBoolTest,
-    ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
-                           1 << 4, 1 << 5, 1 << 6, 1 << 7, 1 << 8, 1 << 9,
-                           1 << 10, 1 << 11, 1 << 12, 1 << 13}),
-                       ::testing::ValuesIn(AlignedVector64<uint64_t>{
-                           27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59,
-                           60}),
-                       ::testing::ValuesIn(std::vector<bool>{false, true})));
+    NTT, NttNativeTest,
+    ::testing::Combine(
+        ::testing::ValuesIn(AlignedVector64<uint64_t>{
+            1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, 1 << 7, 1 << 8,
+            1 << 9, 1 << 10, 1 << 11, 1 << 12, 1 << 13}),
+        ::testing::ValuesIn(AlignedVector64<uint64_t>{
+            27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59, 60}),
+        ::testing::ValuesIn(std::vector<bool>{false, true})));
 
 }  // namespace hexl
 }  // namespace intel

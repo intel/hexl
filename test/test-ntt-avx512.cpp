@@ -166,8 +166,10 @@ TEST(NTT, WriteInvInterleavedT4) {
   AssertEqual(exp, out);
 }
 
+class NttAVX512Test : public DegreeModulusBoolTest {};
+
 #ifdef HEXL_HAS_AVX512IFMA
-TEST_P(DegreeModulusBoolTest, FwdNTT_AVX512IFMA) {
+TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
   if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(52))) {
     GTEST_SKIP();
   }
@@ -203,7 +205,7 @@ TEST_P(DegreeModulusBoolTest, FwdNTT_AVX512IFMA) {
   }
 }
 
-TEST_P(DegreeModulusBoolTest, InvNTT_AVX512IFMA) {
+TEST_P(NttAVX512Test, InvNTT_AVX512IFMA) {
   if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(52))) {
     GTEST_SKIP();
   }
@@ -241,7 +243,7 @@ TEST_P(DegreeModulusBoolTest, InvNTT_AVX512IFMA) {
 #endif
 
 // Checks AVX512 and native forward NTT implementations match
-TEST_P(DegreeModulusBoolTest, FwdNTT_AVX512_32) {
+TEST_P(NttAVX512Test, FwdNTT_AVX512_32) {
   if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(32))) {
     GTEST_SKIP();
   }
@@ -276,7 +278,7 @@ TEST_P(DegreeModulusBoolTest, FwdNTT_AVX512_32) {
 }
 
 // Checks AVX512 and native forward NTT implementations match
-TEST_P(DegreeModulusBoolTest, FwdNTT_AVX512_64) {
+TEST_P(NttAVX512Test, FwdNTT_AVX512_64) {
   if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(64))) {
     GTEST_SKIP();
   }
@@ -311,7 +313,7 @@ TEST_P(DegreeModulusBoolTest, FwdNTT_AVX512_64) {
 }
 
 // Checks 32-bit AVX512 and native InvNTT implementations match
-TEST_P(DegreeModulusBoolTest, InvNTT_AVX512_32) {
+TEST_P(NttAVX512Test, InvNTT_AVX512_32) {
   if (!has_avx512dq || (m_modulus >= NTT::s_max_inv_modulus(32))) {
     GTEST_SKIP();
   }
@@ -347,7 +349,7 @@ TEST_P(DegreeModulusBoolTest, InvNTT_AVX512_32) {
 }
 
 // Checks 64-bit AVX512 and native InvNTT implementations match
-TEST_P(DegreeModulusBoolTest, InvNTT_AVX512_64) {
+TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
   if (!has_avx512dq || (m_modulus >= NTT::s_max_inv_modulus(64))) {
     GTEST_SKIP();
   }
@@ -383,7 +385,7 @@ TEST_P(DegreeModulusBoolTest, InvNTT_AVX512_64) {
 #endif
 
 INSTANTIATE_TEST_SUITE_P(
-    NTT_AVX512, DegreeModulusBoolTest,
+    NTT, NttAVX512Test,
     ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
                            1 << 11, 1 << 12, 1 << 13}),
                        ::testing::ValuesIn(AlignedVector64<uint64_t>{
