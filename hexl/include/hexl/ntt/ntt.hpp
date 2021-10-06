@@ -212,7 +212,7 @@ class NTT {
 
   /// @brief Maximum modulus to use 32-bit AVX512-DQ acceleration for the
   /// inverse transform
-  static const size_t s_max_inv_32_modulus{1ULL << (32 - 1)};
+  static const size_t s_max_inv_32_modulus{1ULL << (32 - 2)};
 
   /// @brief Maximum modulus to use AVX512-IFMA acceleration for the forward
   /// transform
@@ -220,7 +220,35 @@ class NTT {
 
   /// @brief Maximum modulus to use AVX512-IFMA acceleration for the inverse
   /// transform
-  static const size_t s_max_inv_ifma_modulus{1ULL << (s_ifma_shift_bits - 1)};
+  static const size_t s_max_inv_ifma_modulus{1ULL << (s_ifma_shift_bits - 2)};
+
+  /// @brief Maximum modulus to use AVX512-DQ acceleration for the inverse
+  /// transform
+  static const size_t s_max_inv_dq_modulus{1ULL << (s_default_shift_bits - 2)};
+
+  static size_t s_max_fwd_modulus(int bit_shift) {
+    if (bit_shift == 32) {
+      return s_max_fwd_32_modulus;
+    } else if (bit_shift == 52) {
+      return s_max_fwd_ifma_modulus;
+    } else if (bit_shift == 64) {
+      return 1ULL << MaxModulusBits();
+    }
+    HEXL_CHECK(false, "Invalid bit_shift " << bit_shift);
+    return 0;
+  }
+
+  static size_t s_max_inv_modulus(int bit_shift) {
+    if (bit_shift == 32) {
+      return s_max_inv_32_modulus;
+    } else if (bit_shift == 52) {
+      return s_max_inv_ifma_modulus;
+    } else if (bit_shift == 64) {
+      return 1ULL << MaxModulusBits();
+    }
+    HEXL_CHECK(false, "Invalid bit_shift " << bit_shift);
+    return 0;
+  }
 
  private:
   void ComputeRootOfUnityPowers();

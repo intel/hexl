@@ -227,9 +227,10 @@ void InverseTransformFromBitReverseAVX512(
              "InverseTransformFromBitReverseAVX512 doesn't support small "
              "transforms. Need n >= 16, got n = "
                  << n);
-  HEXL_CHECK(modulus < MaximumValue(BitShift) / 2,
+  HEXL_CHECK(modulus < NTT::s_max_inv_modulus(BitShift),
              "modulus " << modulus << " too large for BitShift " << BitShift
-                        << " => maximum value " << MaximumValue(BitShift) / 2);
+                        << " => maximum value "
+                        << NTT::s_max_inv_modulus(BitShift));
   HEXL_CHECK_BOUNDS(precon_inv_root_of_unity_powers, n, MaximumValue(BitShift),
                     "precon_inv_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");

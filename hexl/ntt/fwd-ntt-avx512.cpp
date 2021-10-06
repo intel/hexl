@@ -223,9 +223,10 @@ void ForwardTransformToBitReverseAVX512(
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half) {
   HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
-  HEXL_CHECK(modulus < MaximumValue(BitShift) / 4,
+  HEXL_CHECK(modulus < NTT::s_max_fwd_modulus(BitShift),
              "modulus " << modulus << " too large for BitShift " << BitShift
-                        << " => maximum value " << MaximumValue(BitShift) / 4);
+                        << " => maximum value "
+                        << NTT::s_max_fwd_modulus(BitShift));
   HEXL_CHECK_BOUNDS(precon_root_of_unity_powers, n, MaximumValue(BitShift),
                     "precon_root_of_unity_powers too large");
   HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");

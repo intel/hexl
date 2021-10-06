@@ -40,8 +40,8 @@ class AlignedAllocator {
   explicit AlignedAllocator(AllocatorStrategyPtr strategy = nullptr) noexcept
       : m_alloc_impl((strategy != nullptr) ? strategy : mallocStrategy) {}
 
-  AlignedAllocator(const AlignedAllocator& src)
-      : m_alloc_impl(src.m_alloc_impl) {}
+  AlignedAllocator(const AlignedAllocator& src) = default;
+  AlignedAllocator& operator=(const AlignedAllocator& src) = default;
 
   template <typename U>
   AlignedAllocator(const AlignedAllocator<U, Alignment>& src)

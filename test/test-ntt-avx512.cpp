@@ -6,13 +6,13 @@
 #include <tuple>
 #include <vector>
 
-#include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
+#include "test-ntt-util.hpp"
 #include "test-util.hpp"
 #include "util/cpu-features.hpp"
 
@@ -166,59 +166,38 @@ TEST(NTT, WriteInvInterleavedT4) {
   AssertEqual(exp, out);
 }
 
+class NttAVX512Test : public DegreeModulusBoolTest {};
+
 #ifdef HEXL_HAS_AVX512IFMA
-// First parameter is the NTT degree
-// Second parameter is the number of bits in the NTT modulus
-// Third parameter is whether or not to prefer small primes
-class DegreeModulusBoolTest
-    : public ::testing::TestWithParam<std::tuple<uint64_t, uint64_t, bool>> {
- protected:
-  void SetUp() {}
-
-  void TearDown() {}
-
- public:
-};
-
-TEST_P(DegreeModulusBoolTest, FwdNTTAVX512IFMA) {
-  if (!has_avx512ifma) {
+TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
+  if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(52))) {
     GTEST_SKIP();
   }
-  uint64_t N = std::get<0>(GetParam());
-  uint64_t modulus_bits = std::get<1>(GetParam());
-  bool prefer_small_primes = std::get<2>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, prefer_small_primes, N)[0];
 
-#ifdef HEXL_DEBUG
-  size_t num_trials = 1;
-#else
-  size_t num_trials = 20;
-#endif
-
-  for (size_t trial = 0; trial < num_trials; ++trial) {
+  for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
-        GenerateInsecureUniformRandomValues(N, 0, modulus);
+        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
-    AlignedVector64<uint64_t> exp_output(N, 0);
+    AlignedVector64<uint64_t> exp_output(m_N, 0);
 
     // Compute reference
-    NTT ntt64(N, modulus);
-    ReferenceForwardTransformToBitReverse(input64.data(), N, modulus,
-                                          ntt64.GetRootOfUnityPowers().data());
+
+    ReferenceForwardTransformToBitReverse(input64.data(), m_N, m_modulus,
+                                          m_ntt.GetRootOfUnityPowers().data());
 
     ForwardTransformToBitReverseAVX512<52>(
-        input_ifma.data(), N, ntt64.GetModulus(),
-        ntt64.GetAVX512RootOfUnityPowers().data(),
-        ntt64.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
+        input_ifma.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     ForwardTransformToBitReverseAVX512<52>(
-        input_ifma_lazy.data(), N, ntt64.GetModulus(),
-        ntt64.GetAVX512RootOfUnityPowers().data(),
-        ntt64.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
+        input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
     for (auto& elem : input_ifma_lazy) {
-      elem = elem % modulus;
+      elem = elem % m_modulus;
     }
 
     AssertEqual(input64, input_ifma);
@@ -226,253 +205,193 @@ TEST_P(DegreeModulusBoolTest, FwdNTTAVX512IFMA) {
   }
 }
 
-TEST_P(DegreeModulusBoolTest, InvNTTAVX512IFMA) {
-  if (!has_avx512ifma) {
+TEST_P(NttAVX512Test, InvNTT_AVX512IFMA) {
+  if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(52))) {
     GTEST_SKIP();
   }
-  uint64_t N = std::get<0>(GetParam());
-  uint64_t modulus_bits = std::get<1>(GetParam());
-  bool prefer_small_primes = std::get<2>(GetParam());
-  uint64_t modulus = GeneratePrimes(1, modulus_bits, prefer_small_primes, N)[0];
 
-#ifdef HEXL_DEBUG
-  size_t num_trials = 1;
-#else
-  size_t num_trials = 20;
-#endif
-
-  for (size_t trial = 0; trial < num_trials; ++trial) {
+  for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
-        GenerateInsecureUniformRandomValues(N, 0, modulus);
+        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
-
-    AlignedVector64<uint64_t> exp_output(N, 0);
+    AlignedVector64<uint64_t> exp_output(m_N, 0);
 
     // Compute reference
-    NTT ntt(N, modulus);
     InverseTransformFromBitReverseRadix2(
-        input64.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
-        ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
+        input64.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     InverseTransformFromBitReverseAVX512<52>(
-        input_ifma.data(), N, ntt.GetModulus(),
-        ntt.GetInvRootOfUnityPowers().data(),
-        ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 1);
+        input_ifma.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     InverseTransformFromBitReverseAVX512<52>(
-        input_ifma_lazy.data(), N, ntt.GetModulus(),
-        ntt.GetInvRootOfUnityPowers().data(),
-        ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 2);
+        input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 2);
     for (auto& elem : input_ifma_lazy) {
-      elem = elem % modulus;
+      elem = elem % m_modulus;
     }
 
     AssertEqual(input64, input_ifma);
     AssertEqual(input64, input_ifma_lazy);
   }
 }
-
-// Test modulus around 50 bits to check IFMA behavior
-INSTANTIATE_TEST_SUITE_P(
-    NTT, DegreeModulusBoolTest,
-    ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
-                           1 << 11, 1 << 12, 1 << 13}),
-                       ::testing::ValuesIn(AlignedVector64<uint64_t>{48, 49}),
-                       ::testing::ValuesIn(std::vector<bool>{false, true})));
-
-#endif
+#endif  // HEXL_HAS_AVX512IFMA
 
 // Checks AVX512 and native forward NTT implementations match
-TEST(NTT, FwdNTT_AVX512_32) {
-  if (!has_avx512dq) {
+TEST_P(NttAVX512Test, FwdNTT_AVX512_32) {
+  if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(32))) {
     GTEST_SKIP();
   }
 
-#ifdef HEXL_DEBUG
-  size_t num_trials = 1;
-#else
-  size_t num_trials = 20;
-#endif
+  for (size_t trial = 0; trial < m_num_trials; ++trial) {
+    AlignedVector64<uint64_t> input =
+        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+    AlignedVector64<uint64_t> input_avx = input;
+    AlignedVector64<uint64_t> input_avx_lazy = input;
 
-  for (size_t N = 512; N <= 65536; N *= 2) {
-    uint64_t modulus = GeneratePrimes(1, 27, true, N)[0];
+    ForwardTransformToBitReverseRadix2(
+        input.data(), m_N, m_modulus, m_ntt.GetRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
-    NTT ntt(N, modulus);
+    ForwardTransformToBitReverseAVX512<32>(
+        input_avx.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 1);
 
-    for (size_t trial = 0; trial < num_trials; ++trial) {
-      AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, 0, modulus);
-      AlignedVector64<uint64_t> input_avx = input;
-      AlignedVector64<uint64_t> input_avx_lazy = input;
-
-      ForwardTransformToBitReverseRadix2(
-          input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
-          ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
-
-      ForwardTransformToBitReverseAVX512<32>(
-          input_avx.data(), N, ntt.GetModulus(),
-          ntt.GetAVX512RootOfUnityPowers().data(),
-          ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 1);
-
-      // Compute lazy
-      ForwardTransformToBitReverseAVX512<32>(
-          input_avx_lazy.data(), N, ntt.GetModulus(),
-          ntt.GetAVX512RootOfUnityPowers().data(),
-          ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 4);
-      for (auto& elem : input_avx_lazy) {
-        elem = elem % modulus;
-      }
-
-      ASSERT_EQ(input, input_avx);
-      ASSERT_EQ(input, input_avx_lazy);
+    // Compute lazy
+    ForwardTransformToBitReverseAVX512<32>(
+        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 4);
+    for (auto& elem : input_avx_lazy) {
+      elem = elem % m_modulus;
     }
+
+    ASSERT_EQ(input, input_avx);
+    ASSERT_EQ(input, input_avx_lazy);
   }
 }
 
 // Checks AVX512 and native forward NTT implementations match
-TEST(NTT, FwdNTT_AVX512_64) {
-  if (!has_avx512dq) {
+TEST_P(NttAVX512Test, FwdNTT_AVX512_64) {
+  if (!has_avx512dq || (m_modulus >= NTT::s_max_fwd_modulus(64))) {
     GTEST_SKIP();
   }
 
-#ifdef HEXL_DEBUG
-  size_t num_trials = 1;
-#else
-  size_t num_trials = 20;
-#endif
+  for (size_t trial = 0; trial < m_num_trials; ++trial) {
+    AlignedVector64<uint64_t> input =
+        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+    AlignedVector64<uint64_t> input_avx = input;
+    AlignedVector64<uint64_t> input_avx_lazy = input;
 
-  for (size_t N = 512; N <= 65536; N *= 2) {
-    uint64_t modulus = GeneratePrimes(1, 55, true, N)[0];
+    ForwardTransformToBitReverseRadix2(
+        input.data(), m_N, m_modulus, m_ntt.GetRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
-    NTT ntt(N, modulus);
+    ForwardTransformToBitReverseAVX512<64>(
+        input_avx.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 1);
 
-    for (size_t trial = 0; trial < num_trials; ++trial) {
-      AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, 0, modulus);
-      AlignedVector64<uint64_t> input_avx = input;
-      AlignedVector64<uint64_t> input_avx_lazy = input;
-
-      ForwardTransformToBitReverseRadix2(
-          input.data(), N, modulus, ntt.GetRootOfUnityPowers().data(),
-          ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
-
-      ForwardTransformToBitReverseAVX512<64>(
-          input_avx.data(), N, ntt.GetModulus(),
-          ntt.GetAVX512RootOfUnityPowers().data(),
-          ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 1);
-
-      // Compute lazy
-      ForwardTransformToBitReverseAVX512<64>(
-          input_avx_lazy.data(), N, ntt.GetModulus(),
-          ntt.GetAVX512RootOfUnityPowers().data(),
-          ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 4);
-      for (auto& elem : input_avx_lazy) {
-        elem = elem % modulus;
-      }
-
-      ASSERT_EQ(input, input_avx);
-      ASSERT_EQ(input, input_avx_lazy);
+    // Compute lazy
+    ForwardTransformToBitReverseAVX512<64>(
+        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 4);
+    for (auto& elem : input_avx_lazy) {
+      elem = elem % m_modulus;
     }
+
+    ASSERT_EQ(input, input_avx);
+    ASSERT_EQ(input, input_avx_lazy);
   }
 }
 
 // Checks 32-bit AVX512 and native InvNTT implementations match
-TEST(NTT, InvNTT_AVX512_32) {
-  if (!has_avx512dq) {
+TEST_P(NttAVX512Test, InvNTT_AVX512_32) {
+  if (!has_avx512dq || (m_modulus >= NTT::s_max_inv_modulus(32))) {
     GTEST_SKIP();
   }
 
-#ifdef HEXL_DEBUG
-  size_t num_trials = 1;
-#else
-  size_t num_trials = 20;
-#endif
+  for (size_t trial = 0; trial < m_num_trials; ++trial) {
+    AlignedVector64<uint64_t> input =
+        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
 
-  for (size_t N = 512; N <= 65536; N *= 2) {
-    uint64_t modulus = GeneratePrimes(1, 27, true, N)[0];
+    AlignedVector64<uint64_t> input_avx = input;
+    AlignedVector64<uint64_t> input_avx_lazy = input;
 
-    NTT ntt(N, modulus);
+    InverseTransformFromBitReverseRadix2(
+        input.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
-    for (size_t trial = 0; trial < num_trials; ++trial) {
-      AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, 0, modulus);
+    InverseTransformFromBitReverseAVX512<32>(
+        input_avx.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 1);
 
-      AlignedVector64<uint64_t> input_avx = input;
-      AlignedVector64<uint64_t> input_avx_lazy = input;
-
-      InverseTransformFromBitReverseRadix2(
-          input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
-          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
-
-      InverseTransformFromBitReverseAVX512<32>(
-          input_avx.data(), N, ntt.GetModulus(),
-          ntt.GetInvRootOfUnityPowers().data(),
-          ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 1);
-
-      // Compute lazy
-      InverseTransformFromBitReverseAVX512<32>(
-          input_avx_lazy.data(), N, ntt.GetModulus(),
-          ntt.GetInvRootOfUnityPowers().data(),
-          ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 2);
-      for (auto& elem : input_avx_lazy) {
-        elem = elem % modulus;
-      }
-
-      ASSERT_EQ(input, input_avx);
-      ASSERT_EQ(input, input_avx_lazy);
+    // Compute lazy
+    InverseTransformFromBitReverseAVX512<32>(
+        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 2);
+    for (auto& elem : input_avx_lazy) {
+      elem = elem % m_modulus;
     }
+
+    ASSERT_EQ(input, input_avx);
+    ASSERT_EQ(input, input_avx_lazy);
   }
 }
 
 // Checks 64-bit AVX512 and native InvNTT implementations match
-TEST(NTT, InvNTT_AVX512_64) {
-  if (!has_avx512dq) {
+TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
+  if (!has_avx512dq || (m_modulus >= NTT::s_max_inv_modulus(64))) {
     GTEST_SKIP();
   }
 
-#ifdef HEXL_DEBUG
-  size_t num_trials = 1;
-#else
-  size_t num_trials = 20;
-#endif
+  for (size_t trial = 0; trial < m_num_trials; ++trial) {
+    AlignedVector64<uint64_t> input =
+        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+    AlignedVector64<uint64_t> input_avx = input;
+    AlignedVector64<uint64_t> input_avx_lazy = input;
 
-  for (size_t N = 512; N <= 65536; N *= 2) {
-    uint64_t modulus = GeneratePrimes(1, 55, true, N)[0];
+    InverseTransformFromBitReverseRadix2(
+        input.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
-    NTT ntt(N, modulus);
+    InverseTransformFromBitReverseAVX512<64>(
+        input_avx.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
-    for (size_t trial = 0; trial < num_trials; ++trial) {
-      AlignedVector64<uint64_t> input =
-          GenerateInsecureUniformRandomValues(N, 0, modulus);
-      AlignedVector64<uint64_t> input_avx = input;
-      AlignedVector64<uint64_t> input_avx_lazy = input;
-
-      InverseTransformFromBitReverseRadix2(
-          input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
-          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
-
-      InverseTransformFromBitReverseAVX512<64>(
-          input_avx.data(), N, ntt.GetModulus(),
-          ntt.GetInvRootOfUnityPowers().data(),
-          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
-
-      // Compute lazy
-      InverseTransformFromBitReverseAVX512<64>(
-          input_avx_lazy.data(), N, ntt.GetModulus(),
-          ntt.GetInvRootOfUnityPowers().data(),
-          ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
-      for (auto& elem : input_avx_lazy) {
-        elem = elem % modulus;
-      }
-
-      ASSERT_EQ(input, input_avx);
-      ASSERT_EQ(input, input_avx_lazy);
+    // Compute lazy
+    InverseTransformFromBitReverseAVX512<64>(
+        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        m_ntt.GetInvRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
+    for (auto& elem : input_avx_lazy) {
+      elem = elem % m_modulus;
     }
+
+    ASSERT_EQ(input, input_avx);
+    ASSERT_EQ(input, input_avx_lazy);
   }
 }
-#endif
+
+INSTANTIATE_TEST_SUITE_P(
+    NTT, NttAVX512Test,
+    ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
+                           1 << 11, 1 << 12, 1 << 13}),
+                       ::testing::ValuesIn(AlignedVector64<uint64_t>{
+                           27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59,
+                           60}),
+                       ::testing::ValuesIn(std::vector<bool>{false, true})));
+#endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl
 }  // namespace intel
