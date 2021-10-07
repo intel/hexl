@@ -133,11 +133,6 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
-          /*if (m == 1) {
-            X_op = operand;
-            Y_op = X_op + t;
-          }*/
-
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
                              twice_modulus);
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
@@ -170,11 +165,6 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
-          /*if (m == 1) {
-            X_op = operand;
-            Y_op = X_op + t;
-          }*/
-
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
                              twice_modulus);
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
@@ -199,11 +189,6 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
-          /*if (m == 1) {
-            X_op = operand;
-            Y_op = X_op + t;
-          }*/
-
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
                              twice_modulus);
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
@@ -224,11 +209,6 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
-          /*if (m == 1) {
-            X_op = operand;
-            Y_op = X_op + t;
-          }*/
-
           FwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W, W_precon, modulus,
                              twice_modulus);
         }
@@ -246,11 +226,6 @@ void ForwardTransformToBitReverseRadix2(
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
-
-          /*if (m == 1) {
-            X_op = operand;
-            Y_op = X_op + t;
-          }*/
 
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < t; j += 8) {

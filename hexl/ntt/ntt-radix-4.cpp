@@ -220,13 +220,6 @@ void ForwardTransformToBitReverseRadix4(
           const uint64_t* X_op2 = X_r2;
           const uint64_t* X_op3 = X_r3;
 
-          /*if (m == 1) {
-            X_op0 = operand;
-            X_op1 = operand + t;
-            X_op2 = operand + 2 * t;
-            X_op3 = operand + 3 * t;
-          }*/
-
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
           uint64_t W3_ind = 2 * W1_ind + 1;
@@ -273,13 +266,6 @@ void ForwardTransformToBitReverseRadix4(
           const uint64_t* X_op2 = X_r2;
           const uint64_t* X_op3 = X_r3;
 
-          /*if (m == 1) {
-            X_op0 = operand;
-            X_op1 = operand + t;
-            X_op2 = operand + 2 * t;
-            X_op3 = operand + 3 * t;
-          }*/
-
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
           uint64_t W3_ind = 2 * W1_ind + 1;
@@ -312,13 +298,6 @@ void ForwardTransformToBitReverseRadix4(
           const uint64_t* X_op1 = X_r1;
           const uint64_t* X_op2 = X_r2;
           const uint64_t* X_op3 = X_r3;
-
-          /*if (m == 1) {
-            X_op0 = operand;
-            X_op1 = operand + t;
-            X_op2 = operand + 2 * t;
-            X_op3 = operand + 3 * t;
-          }*/
 
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
