@@ -45,11 +45,18 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
   uint64_t mu = MultiplyFactor(1, BitShift, modulus).BarrettFactor();
   __m512i v_mu = _mm512_set1_epi64(static_cast<int64_t>(mu));
 
+  // Multi-word Barrett reduction precomputation
+  constexpr int64_t beta = -2;
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  uint64_t prod_right_shift = ceil_log_mod + beta;
+  __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
+
   for (size_t i = n / 8; i > 0; --i) {
     __m512i v_op = _mm512_loadu_si512(v_op_ptr);
     __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
 
-    v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(v_op, v_modulus, v_mu);
+    v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
+        v_op, v_modulus, v_mu, prod_right_shift, v_neg_mod);
 
     __m512i v_to_add = _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
     v_to_add = _mm512_sub_epi64(v_to_add, v_diff);

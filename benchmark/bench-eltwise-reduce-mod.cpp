@@ -170,5 +170,57 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52)
 
 //=================================================================
 
+#ifdef HEXL_HAS_AVX512IFMA
+// state[0] is the degree
+static void BM_EltwiseReduceModAVX512BitShift52GT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1152921504606877697;
+
+  //  AlignedVector64<uint64_t> input1(input_size, 1);
+  auto input1 = GenerateInsecureUniformRandomValues(
+      input_size, 4503599627370496, 100 * modulus);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512<52>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512BitShift52GT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+static void BM_EltwiseReduceModAVX512BitShift52LT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1073741441;
+
+  //  AlignedVector64<uint64_t> input1(input_size, 1);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, 2 * modulus);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512<52>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512BitShift52LT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+#endif
+
+//=================================================================
+
 }  // namespace hexl
 }  // namespace intel

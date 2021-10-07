@@ -35,8 +35,27 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
              "input_mod_factor must not be equal to output_mod_factor ");
 
   uint64_t n_tmp = n;
+
+  // Multi-word Barrett reduction precomputation
+  constexpr int64_t alpha = BitShift - 2;
+  constexpr int64_t beta = -2;
+  const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
+  uint64_t prod_right_shift = ceil_log_mod + beta;
+  __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
+
   uint64_t barrett_factor =
-      MultiplyFactor(1, BitShift, modulus).BarrettFactor();
+      MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - BitShift), BitShift,
+                     modulus)
+          .BarrettFactor();
+
+  // Single-worded Barrett reduction.
+  uint64_t barrett_factor52 = MultiplyFactor(1, 52, modulus).BarrettFactor();
+
+  if (BitShift == 64) {
+    // Single-worded Barrett reduction.
+    barrett_factor = MultiplyFactor(1, 64, modulus).BarrettFactor();
+  }
+
   __m512i v_bf = _mm512_set1_epi64(static_cast<int64_t>(barrett_factor));
 
   // Deals with n not divisible by 8
@@ -59,7 +78,8 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
     if (output_mod_factor == 2) {
       for (size_t i = 0; i < n_tmp; i += 8) {
         __m512i v_op = _mm512_loadu_si512(v_operand);
-        v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(v_op, v_modulus, v_bf);
+        v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
+            v_op, v_modulus, v_bf, prod_right_shift, v_neg_mod);
         HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
                           "v_op exceeds bound " << modulus);
         _mm512_storeu_si512(v_result, v_op);
@@ -69,7 +89,8 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
     } else {
       for (size_t i = 0; i < n_tmp; i += 8) {
         __m512i v_op = _mm512_loadu_si512(v_operand);
-        v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(v_op, v_modulus, v_bf);
+        v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
+            v_op, v_modulus, v_bf, prod_right_shift, v_neg_mod);
         HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
                           "v_op exceeds bound " << modulus);
         _mm512_storeu_si512(v_result, v_op);
