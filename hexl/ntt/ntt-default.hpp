@@ -30,8 +30,8 @@ inline void FwdButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
                                uint64_t W, uint64_t W_precon, uint64_t modulus,
                                uint64_t twice_modulus) {
   HEXL_VLOG(5, "FwdButterflyRadix2");
-  HEXL_VLOG(5, "Inputs: X " << *X_op << ", Y " << *Y_op << ", W " << W
-                            << ", modulus " << modulus);
+  HEXL_VLOG(5, "Inputs: X_op " << *X_op << ", Y_op " << *Y_op << ", W " << W
+                               << ", modulus " << modulus);
   uint64_t tx = ReduceMod<2>(*X_op, twice_modulus);
   uint64_t T = MultiplyModLazy<64>(*Y_op, W, W_precon, modulus);
   HEXL_VLOG(5, "T " << T);
@@ -44,18 +44,17 @@ inline void FwdButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
 // Assume X, Y in [0, n*q) and return X_r, Y_r in [0, (n+2)*q)
 // such that X_r = X_op + WY_op mod q and Y_r = X_op - WY_op mod q
 inline void FwdButterflyRadix4Lazy(uint64_t* X_r, uint64_t* Y_r,
-                                   const uint64_t* X_op, const uint64_t* Y_op,
+                                   const uint64_t X_op, const uint64_t Y_op,
                                    uint64_t W, uint64_t W_precon,
                                    uint64_t modulus, uint64_t twice_modulus) {
   HEXL_VLOG(3, "FwdButterflyRadix4Lazy");
-  HEXL_VLOG(3, "Inputs: X_op " << *X_op << ", Y_op " << *Y_op << ", W " << W
+  HEXL_VLOG(3, "Inputs: X_op " << X_op << ", Y_op " << Y_op << ", W " << W
                                << ", modulus " << modulus);
 
-  uint64_t tx = *X_op;
-  uint64_t T = MultiplyModLazy<64>(*Y_op, W, W_precon, modulus);
+  uint64_t T = MultiplyModLazy<64>(Y_op, W, W_precon, modulus);
   HEXL_VLOG(3, "T " << T);
-  *X_r = tx + T;
-  *Y_r = tx + twice_modulus - T;
+  *X_r = X_op + T;
+  *Y_r = X_op + twice_modulus - T;
 
   HEXL_VLOG(3, "Outputs: X_r " << *X_r << ", Y_r " << *Y_r);
 }
@@ -74,9 +73,9 @@ inline void FwdButterflyRadix4(
                      twice_modulus);
   FwdButterflyRadix2(X_r1, X_r3, X_op1, X_op3, W1, W1_precon, modulus,
                      twice_modulus);
-  FwdButterflyRadix2(X_r0, X_r1, X_op0, X_op1, W2, W2_precon, modulus,
+  FwdButterflyRadix2(X_r0, X_r1, X_r0, X_r1, W2, W2_precon, modulus,
                      twice_modulus);
-  FwdButterflyRadix2(X_r2, X_r3, X_op2, X_op3, W3, W3_precon, modulus,
+  FwdButterflyRadix2(X_r2, X_r3, X_r2, X_r3, W3, W3_precon, modulus,
                      twice_modulus);
 
   // Alternate implementation
@@ -114,15 +113,13 @@ inline void InvButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
                                const uint64_t* X_op, const uint64_t* Y_op,
                                uint64_t W, uint64_t W_precon, uint64_t modulus,
                                uint64_t twice_modulus) {
-  HEXL_VLOG(4, "InvButterflyRadix2 X_r " << *X_r << ", Y_r " << *Y_r << " X_op "
-                                         << *X_op << ", Y_op " << *Y_op << " W "
-                                         << W << " W_precon " << W_precon
-                                         << " modulus " << modulus);
+  HEXL_VLOG(4, "InvButterflyRadix2 X_op "
+                   << *X_op << ", Y_op " << *Y_op << " W " << W << " W_precon "
+                   << W_precon << " modulus " << modulus);
   uint64_t tx = *X_op + *Y_op;
-  uint64_t ty = *X_op + twice_modulus - *Y_op;
-
+  *Y_r = *X_op + twice_modulus - *Y_op;
   *X_r = ReduceMod<2>(tx, twice_modulus);
-  *Y_r = MultiplyModLazy<64>(ty, W, W_precon, modulus);
+  *Y_r = MultiplyModLazy<64>(*Y_r, W, W_precon, modulus);
 
   HEXL_VLOG(4, "InvButterflyRadix2 returning X_r " << *X_r << ", Y_r " << *Y_r);
 }
@@ -148,9 +145,9 @@ inline void InvButterflyRadix4(uint64_t* X_r0, uint64_t* X_r1, uint64_t* X_r2,
                      twice_modulus);
   InvButterflyRadix2(X_r2, X_r3, X_op2, X_op3, W2, W2_precon, modulus,
                      twice_modulus);
-  InvButterflyRadix2(X_r0, X_r2, X_op0, X_op2, W3, W3_precon, modulus,
+  InvButterflyRadix2(X_r0, X_r2, X_r0, X_r2, W3, W3_precon, modulus,
                      twice_modulus);
-  InvButterflyRadix2(X_r1, X_r3, X_op1, X_op3, W3, W3_precon, modulus,
+  InvButterflyRadix2(X_r1, X_r3, X_r1, X_r3, W3, W3_precon, modulus,
                      twice_modulus);
 
   HEXL_VLOG(4, "InvButterflyRadix4 returning X0 " << *X_r0 << ", X_r1 " << *X_r1

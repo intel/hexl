@@ -133,6 +133,11 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
+          /*if (m == 1) {
+            X_op = operand;
+            Y_op = X_op + t;
+          }*/
+
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
                              twice_modulus);
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
@@ -165,6 +170,11 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
+          /*if (m == 1) {
+            X_op = operand;
+            Y_op = X_op + t;
+          }*/
+
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
                              twice_modulus);
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
@@ -189,6 +199,11 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
+          /*if (m == 1) {
+            X_op = operand;
+            Y_op = X_op + t;
+          }*/
+
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
                              twice_modulus);
           FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
@@ -209,6 +224,11 @@ void ForwardTransformToBitReverseRadix2(
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
 
+          /*if (m == 1) {
+            X_op = operand;
+            Y_op = X_op + t;
+          }*/
+
           FwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W, W_precon, modulus,
                              twice_modulus);
         }
@@ -226,6 +246,11 @@ void ForwardTransformToBitReverseRadix2(
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
+
+          /*if (m == 1) {
+            X_op = operand;
+            Y_op = X_op + t;
+          }*/
 
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < t; j += 8) {
@@ -444,7 +469,7 @@ void InverseTransformFromBitReverseRadix2(
     t <<= 1;
   }
 
-  // When M is to short it only needs the final stage butterfly. Copying here
+  // When M is too short it only needs the final stage butterfly. Copying here
   // in the case of out-of-place.
   if (result != operand && n == 2) {
     std::memcpy(result, operand, n * sizeof(uint64_t));

@@ -21,7 +21,7 @@ namespace hexl {
 
 //=================================================================
 
-static void BM_FwdNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
+static void BM_FwdNTTNativeRadix2InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
@@ -36,14 +36,37 @@ static void BM_FwdNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTTNativeRadix2)
+BENCHMARK(BM_FwdNTTNativeRadix2InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
 //=================================================================
 
-static void BM_FwdNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
+static void BM_FwdNTTNativeRadix2Copy(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  AlignedVector64<uint64_t> output(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  for (auto _ : state) {
+    ForwardTransformToBitReverseRadix2(
+        output.data(), input.data(), ntt_size, modulus,
+        ntt.GetRootOfUnityPowers().data(),
+        ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_FwdNTTNativeRadix2Copy)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+//=================================================================
+
+static void BM_FwdNTTNativeRadix4InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
@@ -58,11 +81,35 @@ static void BM_FwdNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTTNativeRadix4)
+BENCHMARK(BM_FwdNTTNativeRadix4InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
+//=================================================================
+
+static void BM_FwdNTTNativeRadix4Copy(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  AlignedVector64<uint64_t> output(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  for (auto _ : state) {
+    ForwardTransformToBitReverseRadix4(
+        output.data(), input.data(), ntt_size, modulus,
+        ntt.GetRootOfUnityPowers().data(),
+        ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_FwdNTTNativeRadix4Copy)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
 //=================================================================
 
 #ifdef HEXL_HAS_AVX512IFMA
@@ -236,6 +283,28 @@ BENCHMARK(BM_FwdNTTCopy)
     ->Args({4096})
     ->Args({16384});
 
+//=================================================================
+
+static void BM_InvNTTInPlace(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  for (auto _ : state) {
+    ntt.ComputeInverse(input.data(), input.data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_InvNTTInPlace)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+//=================================================================
+
 // state[0] is the degree
 static void BM_InvNTTCopy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
@@ -260,7 +329,7 @@ BENCHMARK(BM_InvNTTCopy)
 
 // Inverse transforms
 
-static void BM_InvNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
+static void BM_InvNTTNativeRadix2InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
@@ -277,7 +346,7 @@ static void BM_InvNTTNativeRadix2(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTTNativeRadix2)
+BENCHMARK(BM_InvNTTNativeRadix2InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
@@ -285,7 +354,33 @@ BENCHMARK(BM_InvNTTNativeRadix2)
 
 //=================================================================
 
-static void BM_InvNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
+static void BM_InvNTTNativeRadix2Copy(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  AlignedVector64<uint64_t> output(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon64InvRootOfUnityPowers();
+  for (auto _ : state) {
+    InverseTransformFromBitReverseRadix2(output.data(), input.data(), ntt_size,
+                                         modulus, root_of_unity.data(),
+                                         precon_root_of_unity.data(), 1, 1);
+  }
+}
+
+BENCHMARK(BM_InvNTTNativeRadix2Copy)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+//=================================================================
+
+static void BM_InvNTTNativeRadix4InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
@@ -302,7 +397,33 @@ static void BM_InvNTTNativeRadix4(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_InvNTTNativeRadix4)
+BENCHMARK(BM_InvNTTNativeRadix4InPlace)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+//=================================================================
+
+static void BM_InvNTTNativeRadix4Copy(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  AlignedVector64<uint64_t> output(ntt_size, 1);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon64InvRootOfUnityPowers();
+  for (auto _ : state) {
+    InverseTransformFromBitReverseRadix4(output.data(), input.data(), ntt_size,
+                                         modulus, root_of_unity.data(),
+                                         precon_root_of_unity.data(), 1, 1);
+  }
+}
+
+BENCHMARK(BM_InvNTTNativeRadix4Copy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})

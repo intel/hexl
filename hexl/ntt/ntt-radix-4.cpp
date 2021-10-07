@@ -66,13 +66,12 @@ void ForwardTransformToBitReverseRadix4(
                          twice_modulus);
     }
     // Data in [0, 4q)
+    HEXL_VLOG(3, "after radix 2 outputs "
+                     << std::vector<uint64_t>(result, result + n));
   }
 
-  HEXL_VLOG(3, "after radix 2 outputs "
-                   << std::vector<uint64_t>(operand, operand + n));
-
-  uint64_t m_start;
-  size_t t;
+  uint64_t m_start = 2;
+  size_t t = n >> 3;
   if (is_power_of_4) {
     t = n >> 2;
 
@@ -195,10 +194,10 @@ void ForwardTransformToBitReverseRadix4(
     }
     t >>= 2;
     m_start = 4;
-  } else {
-    t = n >> 3;
-    m_start = 2;
   }
+
+  // uint64_t m_start = is_power_of_4 ? 1 : 2;
+  // size_t t = (n >> m_start) >> 1;
 
   for (size_t m = m_start; m < n; m <<= 2) {
     HEXL_VLOG(3, "m " << m);
@@ -220,6 +219,13 @@ void ForwardTransformToBitReverseRadix4(
           const uint64_t* X_op1 = X_r1;
           const uint64_t* X_op2 = X_r2;
           const uint64_t* X_op3 = X_r3;
+
+          /*if (m == 1) {
+            X_op0 = operand;
+            X_op1 = operand + t;
+            X_op2 = operand + 2 * t;
+            X_op3 = operand + 3 * t;
+          }*/
 
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
@@ -267,6 +273,13 @@ void ForwardTransformToBitReverseRadix4(
           const uint64_t* X_op2 = X_r2;
           const uint64_t* X_op3 = X_r3;
 
+          /*if (m == 1) {
+            X_op0 = operand;
+            X_op1 = operand + t;
+            X_op2 = operand + 2 * t;
+            X_op3 = operand + 3 * t;
+          }*/
+
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
           uint64_t W3_ind = 2 * W1_ind + 1;
@@ -299,6 +312,13 @@ void ForwardTransformToBitReverseRadix4(
           const uint64_t* X_op1 = X_r1;
           const uint64_t* X_op2 = X_r2;
           const uint64_t* X_op3 = X_r3;
+
+          /*if (m == 1) {
+            X_op0 = operand;
+            X_op1 = operand + t;
+            X_op2 = operand + 2 * t;
+            X_op3 = operand + 3 * t;
+          }*/
 
           uint64_t W1_ind = m + i;
           uint64_t W2_ind = 2 * W1_ind;
@@ -577,7 +597,7 @@ void InverseTransformFromBitReverseRadix4(
     w3_root_index += m / 2;
   }
 
-  // When M is to short it only needs the final stage butterfly. Copying here
+  // When M is too short it only needs the final stage butterfly. Copying here
   // in the case of out-of-place.
   if (result != operand && n == 2) {
     std::memcpy(result, operand, n * sizeof(uint64_t));
