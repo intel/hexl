@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include <cmath>
 #include <stdint.h>
+
+#include <cmath>
 
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
