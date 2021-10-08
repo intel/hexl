@@ -377,6 +377,9 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
                                             __m512i q_barr_52,
                                             uint64_t prod_right_shift,
                                             __m512i v_neg_mod) {
+  HEXL_UNUSED(q_barr_52);
+  HEXL_UNUSED(prod_right_shift);
+  HEXL_UNUSED(v_neg_mod);
   HEXL_CHECK(BitShift == 52 || BitShift == 64,
              "Invalid bitshift " << BitShift << "; need 52 or 64");
 
