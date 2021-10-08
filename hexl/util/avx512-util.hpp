@@ -382,7 +382,6 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
-    uint64_t match_value = 1;
     __m512i two_pow_fiftytwo = _mm512_set1_epi64(2251799813685248);
     __mmask8 mask =
         _mm512_hexl_cmp_epu64_mask(x, two_pow_fiftytwo, CMPINT::NLT);
