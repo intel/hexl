@@ -93,7 +93,7 @@ BENCHMARK(BM_EltwiseReduceModNative)
 // state[0] is the degree
 static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  size_t modulus = 1152921504606877697;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
       GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
@@ -102,8 +102,8 @@ static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseReduceModAVX512(output.data(), input1.data(), input_size, modulus,
-                           input_mod_factor, output_mod_factor);
+    EltwiseReduceModAVX512<64>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
   }
 }
 
@@ -121,7 +121,7 @@ BENCHMARK(BM_EltwiseReduceModAVX512)
 static void BM_EltwiseReduceModAVX512BitShift64(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  size_t modulus = 1152921504606877697;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
       GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
@@ -142,14 +142,14 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift64)
     ->Args({16384});
 #endif
 
-//=================================================================
+////=================================================================
 
 #ifdef HEXL_HAS_AVX512IFMA
 // state[0] is the degree
 static void BM_EltwiseReduceModAVX512BitShift52(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  size_t modulus = 1152921504606877697;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
       GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
@@ -170,14 +170,14 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52)
     ->Args({16384});
 #endif
 
-//=================================================================
+////=================================================================
 
 #ifdef HEXL_HAS_AVX512IFMA
 // state[0] is the degree
 static void BM_EltwiseReduceModAVX512BitShift52GT(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  size_t modulus = 1152921504606877697;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 = GenerateInsecureUniformRandomValues(
       input_size, 4503599627370496, 100 * modulus);
@@ -200,7 +200,7 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52GT)
 static void BM_EltwiseReduceModAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
-  size_t modulus = 1073741441;
+  size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
       GenerateInsecureUniformRandomValues(input_size, 0, 2251799813685248);
