@@ -294,54 +294,31 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
   }
 
   // Small
-  //  {
-  //      __m512i a = _mm512_set_epi64(12, 11, 10, 8, 6, 4, 2, 0);
+  {
+    __m512i a = _mm512_set_epi64(12, 11, 10, 8, 6, 4, 2, 0);
 
-  //          std::vector<uint64_t> moduli{2, 2, 3, 4, 5, 6, 7, 8};
-  //          std::vector<uint64_t> barrs(moduli.size());
-  //          for (size_t i = 0; i < barrs.size(); ++i) {
-  //            barrs[i] = MultiplyFactor(1, 64, moduli[i]).BarrettFactor();
-  //          }
+    std::vector<uint64_t> moduli{5, 5, 5, 5, 5, 5, 5, 5};
+    std::vector<uint64_t> barrs(moduli.size());
+    for (size_t i = 0; i < barrs.size(); ++i) {
+      barrs[i] = MultiplyFactor(1, 64, moduli[i]).BarrettFactor();
+    }
 
-  //          // Multi-word Barrett reduction precomputation
-  //          std::vector<uint64_t> ceil_log_mod(moduli.size());
-  //          constexpr int64_t beta = -2;
-  //          for (size_t i = 0; i < ceil_log_mod.size(); ++i) {
-  //            ceil_log_mod[i] = Log2(moduli[i]) + 1;
-  //          }
+    // Multi-word Barrett reduction precomputation
+    constexpr int64_t beta = -2;
+    uint64_t ceil_log_mod = Log2(moduli[0]) + 1;
+    uint64_t prod_right_shift = ceil_log_mod + beta;
+    __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(moduli[0]));
 
-  //          std::vector<uint64_t> prod_right_shift(moduli.size());
-  //          for (size_t i = 0; i < prod_right_shift.size(); ++i) {
-  //            prod_right_shift[i] = ceil_log_mod[i] + beta;
-  //          }
+    __m512i vmoduli = _mm512_set1_epi64(moduli[0]);
+    __m512i vbarrs = _mm512_set_epi64(barrs[7], barrs[6], barrs[5], barrs[4],
+                                      barrs[3], barrs[2], barrs[1], barrs[0]);
 
-  //          //const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from
-  //          Algorithm 2
-  //      //    uint64_t prod_right_shift = ceil_log_mod + beta;
-  //          __m512i v_neg_mod =
-  //          _mm512_set_epi64(-static_cast<int64_t>(moduli[7]),
-  //          -static_cast<int64_t>(moduli[6]),
-  //                  -static_cast<int64_t>(moduli[5]),
-  //                  -static_cast<int64_t>(moduli[4]),
-  //                  -static_cast<int64_t>(moduli[3]),
-  //                  -static_cast<int64_t>(moduli[2]),
-  //                  -static_cast<int64_t>(moduli[1]),
-  //                  -static_cast<int64_t>(moduli[0]));
+    __m512i expected_out = _mm512_set_epi64(2, 1, 0, 3, 1, 4, 2, 0);
 
-  //          __m512i vmoduli =
-  //              _mm512_set_epi64(moduli[7], moduli[6], moduli[5], moduli[4],
-  //              moduli[3],
-  //                               moduli[2], moduli[1], moduli[0]);
-  //          __m512i vbarrs = _mm512_set_epi64(barrs[7], barrs[6], barrs[5],
-  //          barrs[4],
-  //                                            barrs[3], barrs[2], barrs[1],
-  //                                            barrs[0]);
-
-  //          __m512i expected_out = _mm512_set_epi64(4, 4, 4, 3, 2, 1, 0, 0);
-
-  //          __m512i c = _mm512_hexl_barrett_reduce64(a, vmoduli, vbarrs,
-  //          prod_right_shift, v_neg_mod); AssertEqual(c, expected_out);
-  //  }
+    __m512i c = _mm512_hexl_barrett_reduce64(a, vmoduli, vbarrs, vbarrs,
+                                             prod_right_shift, v_neg_mod);
+    AssertEqual(c, expected_out);
+  }
 
   // Random
   {
