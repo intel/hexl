@@ -297,21 +297,16 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
   {
     __m512i a = _mm512_set_epi64(12, 11, 10, 8, 6, 4, 2, 0);
 
-    std::vector<uint64_t> moduli{5, 5, 5, 5, 5, 5, 5, 5};
-    std::vector<uint64_t> barrs(moduli.size());
-    for (size_t i = 0; i < barrs.size(); ++i) {
-      barrs[i] = MultiplyFactor(1, 64, moduli[i]).BarrettFactor();
-    }
+    uint64_t modulus = 5;
+    uint64_t barrett_factor = MultiplyFactor(1, 64, modulus).BarrettFactor();
+    __m512i vmoduli = _mm512_set1_epi64(modulus);
+    __m512i vbarrs = _mm512_set1_epi64(barrett_factor);
 
     // Multi-word Barrett reduction precomputation
     constexpr int64_t beta = -2;
-    uint64_t ceil_log_mod = Log2(moduli[0]) + 1;
+    uint64_t ceil_log_mod = Log2(modulus) + 1;
     uint64_t prod_right_shift = ceil_log_mod + beta;
-    __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(moduli[0]));
-
-    __m512i vmoduli = _mm512_set1_epi64(moduli[0]);
-    __m512i vbarrs = _mm512_set_epi64(barrs[7], barrs[6], barrs[5], barrs[4],
-                                      barrs[3], barrs[2], barrs[1], barrs[0]);
+    __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
 
     __m512i expected_out = _mm512_set_epi64(2, 1, 0, 3, 1, 4, 2, 0);
 
