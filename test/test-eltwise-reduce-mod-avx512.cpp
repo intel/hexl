@@ -18,7 +18,24 @@ namespace intel {
 namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
-TEST(EltwiseReduceMod, avx512_mod_1) {
+TEST(EltwiseReduceMod, avx512_64_mod_1) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  std::vector<uint64_t> op{0, 111, 250, 340, 769, 900, 1200, 1530};
+  std::vector<uint64_t> exp_out{0, 111, 250, 340, 0, 131, 431, 761};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
+
+  uint64_t modulus = 769;
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  EltwiseReduceModAVX512<64>(result.data(), op.data(), op.size(), modulus,
+                             input_mod_factor, output_mod_factor);
+  CheckEqual(result, exp_out);
+}
+
+TEST(EltwiseReduceMod, avx512_52_mod_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }

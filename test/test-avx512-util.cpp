@@ -366,7 +366,7 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
       __m512i varg1 = _mm512_set_epi64(arg1[7], arg1[6], arg1[5], arg1[4],
                                        arg1[3], arg1[2], arg1[1], arg1[0]);
 
-      __m512i c = _mm512_hexl_barrett_reduce64(varg1, vmodulus, vbarr,
+      __m512i c = _mm512_hexl_barrett_reduce64(varg1, vmodulus, vbarr, vbarr,
                                                prod_right_shift, v_neg_mod);
       std::vector<uint64_t> result = ExtractValues(c);
 

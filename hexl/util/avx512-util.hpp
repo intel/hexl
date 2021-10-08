@@ -369,45 +369,11 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
   return _mm512_hexl_cmp_epi64(a, b, CMPINT::LE, match_value);
 }
 
-//// Returns x mod q, computed via Barrett reduction
-//// @param q_barr floor(2^BitShift / q)
-// template <int BitShift = 64, int OutputModFactor = 1>
-// inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
-//                                            __m512i q_barr) {
-//  HEXL_CHECK(BitShift == 52 || BitShift == 64,
-//               "Invalid bitshift " << BitShift << "; need 52 or 64");
-
-//  #ifdef HEXL_HAS_AVX512IFMA
-//    if (BitShift == 52) {
-//      __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr);
-//      // Barrett subtraction
-//      // tmp[0] = input - tmp[1] * q;
-//      __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
-//      x = _mm512_sub_epi64(x, tmp1_times_mod);
-//    }
-//  #endif
-//    if (BitShift == 64) {
-//      __m512i rnd1_hi = _mm512_hexl_mulhi_epi<64>(x, q_barr);
-//      // Barrett subtraction
-//      // tmp[0] = input - tmp[1] * q;
-//      __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
-//      x = _mm512_sub_epi64(x, tmp1_times_mod);
-//    }
-
-//    // Correction
-//    if (OutputModFactor == 2) {
-//      return x;
-//    } else {
-//      x = _mm512_hexl_small_mod_epu64(x, q);
-//      return x;
-//    }
-//}
-
 // Returns x mod q, computed via Barrett reduction
 // @param q_barr floor(2^BitShift / q)
 template <int BitShift = 64, int OutputModFactor = 1>
 inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
-                                            __m512i q_barr,
+                                            __m512i q_barr, __m512i q_barr_52,
                                             uint64_t prod_right_shift,
                                             __m512i v_neg_mod) {
   HEXL_CHECK(BitShift == 52 || BitShift == 64,
@@ -416,7 +382,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
     uint64_t match_value = 1;
-    __m512i two_pow_fiftytwo = _mm512_set1_epi64(4503599627370496);
+    __m512i two_pow_fiftytwo = _mm512_set1_epi64(2251799813685248);
     __m512i mask = _mm512_hexl_cmpge_epu64(x, two_pow_fiftytwo, match_value);
     uint64_t sum = _mm512_reduce_add_epi64(mask);
     if (sum > 0) {
@@ -437,10 +403,8 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 
       // Z = prod_lo - (p * q_hat)_lo
       x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
-      //    x = _mm512_hexl_small_mod_epu64<2>(x, q);
-
     } else {
-      __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr);
+      __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr_52);
       // Barrett subtraction
       // tmp[0] = input - tmp[1] * q;
       __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);

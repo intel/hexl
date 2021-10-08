@@ -56,7 +56,7 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
     __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
 
     v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
-        v_op, v_modulus, v_mu, prod_right_shift, v_neg_mod);
+        v_op, v_modulus, v_mu, v_mu, prod_right_shift, v_neg_mod);
 
     __m512i v_to_add = _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
     v_to_add = _mm512_sub_epi64(v_to_add, v_diff);

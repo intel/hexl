@@ -123,9 +123,10 @@ static void BM_EltwiseReduceModAVX512BitShift64(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 1;
+  const uint64_t output_mod_factor = 2;
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -150,9 +151,10 @@ static void BM_EltwiseReduceModAVX512BitShift52(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  AlignedVector64<uint64_t> input1(input_size, 1);
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 1;
+  const uint64_t output_mod_factor = 2;
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -177,11 +179,10 @@ static void BM_EltwiseReduceModAVX512BitShift52GT(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  //  AlignedVector64<uint64_t> input1(input_size, 1);
   auto input1 = GenerateInsecureUniformRandomValues(
       input_size, 4503599627370496, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 1;
+  const uint64_t output_mod_factor = 2;
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -201,10 +202,10 @@ static void BM_EltwiseReduceModAVX512BitShift52LT(
   size_t input_size = state.range(0);
   size_t modulus = 1073741441;
 
-  //  AlignedVector64<uint64_t> input1(input_size, 1);
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, 2 * modulus);
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 2251799813685248);
   const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 1;
+  const uint64_t output_mod_factor = 2;
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
