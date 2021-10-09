@@ -192,12 +192,16 @@ std::vector<uint64_t> GeneratePrimes(size_t num_primes, size_t bit_size,
 /// @param[in] input
 /// @param[in] modulus
 /// @param[in] q_barr floor(2^64 / modulus)
-inline uint64_t BarrettReduce64(uint64_t input, uint64_t modulus,
-                                uint64_t q_barr) {
+template <int OutputModFactor = 1>
+uint64_t BarrettReduce64(uint64_t input, uint64_t modulus, uint64_t q_barr) {
   HEXL_CHECK(modulus != 0, "modulus == 0");
   uint64_t q = MultiplyUInt64Hi<64>(input, q_barr);
   uint64_t q_times_input = input - q * modulus;
-  return q_times_input >= modulus ? q_times_input - modulus : q_times_input;
+  if (OutputModFactor == 2) {
+    return q_times_input;
+  } else {
+    return (q_times_input >= modulus) ? q_times_input - modulus : q_times_input;
+  }
 }
 
 /// @brief Returns x mod modulus, assuming x < InputModFactor * modulus
