@@ -18,7 +18,8 @@ namespace intel {
 namespace hexl {
 
 /// @brief Radix-2 native C++ NTT implementation of the forward NTT
-/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[out] result Output data. Overwritten with NTT output
+/// @param[in] operand Input data.
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
@@ -31,13 +32,14 @@ namespace hexl {
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
 void ForwardTransformToBitReverseRadix2(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
     uint64_t output_mod_factor = 1);
 
 /// @brief Radix-4 native C++ NTT implementation of the forward NTT
-/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[out] result Output data. Overwritten with NTT output
+/// @param[in] operand Input data.
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
@@ -50,7 +52,7 @@ void ForwardTransformToBitReverseRadix2(
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
 void ForwardTransformToBitReverseRadix4(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
     uint64_t output_mod_factor = 1);
@@ -67,7 +69,8 @@ void ReferenceForwardTransformToBitReverse(
     const uint64_t* root_of_unity_powers);
 
 /// @brief Radix-2 native C++ NTT implementation of the inverse NTT
-/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[out] result Output data. Overwritten with NTT output
+/// @param[in] operand Input data.
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
@@ -80,13 +83,14 @@ void ReferenceForwardTransformToBitReverse(
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
 void InverseTransformFromBitReverseRadix2(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
     const uint64_t* precon_inv_root_of_unity_powers,
     uint64_t input_mod_factor = 1, uint64_t output_mod_factor = 1);
 
 /// @brief Radix-4 native C++ NTT implementation of the inverse NTT
-/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[out] result Output data. Overwritten with NTT output
+/// @param[in] operand Input data.
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] modulus Prime modulus q. Must satisfy q == 1 mod 2n
@@ -99,7 +103,7 @@ void InverseTransformFromBitReverseRadix2(
 /// @param[in] output_mod_factor Upper bound for result; result must be in [0,
 /// output_mod_factor * q)
 void InverseTransformFromBitReverseRadix4(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
     uint64_t output_mod_factor = 1);

@@ -3,6 +3,7 @@
 
 #include "ntt/fwd-ntt-avx512.hpp"
 
+#include <cstring>
 #include <functional>
 #include <vector>
 
@@ -18,7 +19,7 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512IFMA
 template void ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
-    uint64_t* operand, uint64_t degree, uint64_t mod,
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
@@ -27,14 +28,14 @@ template void ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
 
 #ifdef HEXL_HAS_AVX512DQ
 template void ForwardTransformToBitReverseAVX512<32>(
-    uint64_t* operand, uint64_t degree, uint64_t mod,
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
 
 template void ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
-    uint64_t* operand, uint64_t degree, uint64_t mod,
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
@@ -183,33 +184,47 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   }
 }
 
+// Out-of-place implementation
 template <int BitShift, bool InputLessThanMod>
-void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
-           uint64_t t, uint64_t m, const uint64_t* W,
+void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
+           __m512i v_twice_mod, uint64_t t, uint64_t m, const uint64_t* W,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < m; i++) {
-    uint64_t* X = operand + j1;
-    uint64_t* Y = X + t;
+    // Referencing operand
+    const uint64_t* X_op = operand + j1;
+    const uint64_t* Y_op = X_op + t;
 
+    const __m512i* v_X_op_pt = reinterpret_cast<const __m512i*>(X_op);
+    const __m512i* v_Y_op_pt = reinterpret_cast<const __m512i*>(Y_op);
+
+    // Referencing result
+    uint64_t* X_r = result + j1;
+    uint64_t* Y_r = X_r + t;
+
+    __m512i* v_X_r_pt = reinterpret_cast<__m512i*>(X_r);
+    __m512i* v_Y_r_pt = reinterpret_cast<__m512i*>(Y_r);
+
+    // Weights and weights' preconditions
     __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
     __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
-    __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
-    __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
-
     // assume 8 | t
     for (size_t j = t / 8; j > 0; --j) {
-      __m512i v_X = _mm512_loadu_si512(v_X_pt);
-      __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
+      __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+      __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
 
       FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
                                                v_neg_modulus, v_twice_mod);
 
-      _mm512_storeu_si512(v_X_pt++, v_X);
-      _mm512_storeu_si512(v_Y_pt++, v_Y);
+      _mm512_storeu_si512(v_X_r_pt++, v_X);
+      _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+      // Increase operand pointers as well
+      v_X_op_pt++;
+      v_Y_op_pt++;
     }
     j1 += (t << 1);
   }
@@ -217,7 +232,7 @@ void FwdT8(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512(
-    uint64_t* operand, uint64_t n, uint64_t modulus,
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
@@ -262,17 +277,23 @@ void ForwardTransformToBitReverseAVX512(
     size_t t = (n >> 1);
     size_t m = 1;
     size_t W_idx = (m << recursion_depth) + (recursion_half * m);
+
+    // Copy for out-of-place in case m is <= base_ntt_size from start
+    if (result != operand) {
+      std::memcpy(result, operand, n * sizeof(uint64_t));
+    }
+
     // First iteration assumes input in [0,p)
     if (m < (n >> 3)) {
       const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
       if ((input_mod_factor <= 2) && (recursion_depth == 0)) {
-        FwdT8<BitShift, true>(operand, v_neg_modulus, v_twice_mod, t, m, W,
-                              W_precon);
+        FwdT8<BitShift, true>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                              W, W_precon);
       } else {
-        FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, m, W,
-                               W_precon);
+        FwdT8<BitShift, false>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                               W, W_precon);
       }
 
       t >>= 1;
@@ -282,8 +303,8 @@ void ForwardTransformToBitReverseAVX512(
     for (; m < (n >> 3); m <<= 1) {
       const uint64_t* W = &root_of_unity_powers[W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
-      FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, m, W,
-                             W_precon);
+      FwdT8<BitShift, false>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                             W, W_precon);
       t >>= 1;
       W_idx <<= 1;
     }
@@ -324,27 +345,27 @@ void ForwardTransformToBitReverseAVX512(
       size_t new_W_idx = compute_new_W_idx(W_idx);
       const uint64_t* W = &root_of_unity_powers[new_W_idx];
       const uint64_t* W_precon = &precon_root_of_unity_powers[new_W_idx];
-      FwdT4<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W, W_precon);
+      FwdT4<BitShift>(result, v_neg_modulus, v_twice_mod, m, W, W_precon);
 
       m <<= 1;
       W_idx <<= 1;
       new_W_idx = compute_new_W_idx(W_idx);
       W = &root_of_unity_powers[new_W_idx];
       W_precon = &precon_root_of_unity_powers[new_W_idx];
-      FwdT2<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W, W_precon);
+      FwdT2<BitShift>(result, v_neg_modulus, v_twice_mod, m, W, W_precon);
 
       m <<= 1;
       W_idx <<= 1;
       new_W_idx = compute_new_W_idx(W_idx);
       W = &root_of_unity_powers[new_W_idx];
       W_precon = &precon_root_of_unity_powers[new_W_idx];
-      FwdT1<BitShift>(operand, v_neg_modulus, v_twice_mod, m, W, W_precon);
+      FwdT1<BitShift>(result, v_neg_modulus, v_twice_mod, m, W, W_precon);
     }
 
     if (output_mod_factor == 1) {
       // n power of two at least 8 => n divisible by 8
       HEXL_CHECK(n % 8 == 0, "n " << n << " not a power of 2");
-      __m512i* v_X_pt = reinterpret_cast<__m512i*>(operand);
+      __m512i* v_X_pt = reinterpret_cast<__m512i*>(result);
       for (size_t i = 0; i < n; i += 8) {
         __m512i v_X = _mm512_loadu_si512(v_X_pt);
 
@@ -367,16 +388,16 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-    FwdT8<BitShift, false>(operand, v_neg_modulus, v_twice_mod, t, 1, W,
+    FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
                            W_precon);
 
     ForwardTransformToBitReverseAVX512<BitShift>(
-        operand, n / 2, modulus, root_of_unity_powers,
+        result, result, n / 2, modulus, root_of_unity_powers,
         precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
         recursion_depth + 1, recursion_half * 2);
 
     ForwardTransformToBitReverseAVX512<BitShift>(
-        &operand[n / 2], n / 2, modulus, root_of_unity_powers,
+        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
         precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
         recursion_depth + 1, recursion_half * 2 + 1);
   }

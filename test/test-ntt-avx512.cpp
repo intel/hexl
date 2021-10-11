@@ -187,13 +187,13 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
                                           m_ntt.GetRootOfUnityPowers().data());
 
     ForwardTransformToBitReverseAVX512<52>(
-        input_ifma.data(), m_N, m_ntt.GetModulus(),
+        input_ifma.data(), input_ifma.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     ForwardTransformToBitReverseAVX512<52>(
-        input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
+        input_ifma_lazy.data(), input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
     for (auto& elem : input_ifma_lazy) {
@@ -219,17 +219,18 @@ TEST_P(NttAVX512Test, InvNTT_AVX512IFMA) {
 
     // Compute reference
     InverseTransformFromBitReverseRadix2(
-        input64.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+        input64.data(), input64.data(), m_N, m_modulus,
+        m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     InverseTransformFromBitReverseAVX512<52>(
-        input_ifma.data(), m_N, m_ntt.GetModulus(),
+        input_ifma.data(), input_ifma.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     InverseTransformFromBitReverseAVX512<52>(
-        input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
+        input_ifma_lazy.data(), input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 2);
     for (auto& elem : input_ifma_lazy) {
@@ -255,17 +256,18 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512_32) {
     AlignedVector64<uint64_t> input_avx_lazy = input;
 
     ForwardTransformToBitReverseRadix2(
-        input.data(), m_N, m_modulus, m_ntt.GetRootOfUnityPowers().data(),
+        input.data(), input.data(), m_N, m_modulus,
+        m_ntt.GetRootOfUnityPowers().data(),
         m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
     ForwardTransformToBitReverseAVX512<32>(
-        input_avx.data(), m_N, m_ntt.GetModulus(),
+        input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 1);
 
     // Compute lazy
     ForwardTransformToBitReverseAVX512<32>(
-        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 4);
     for (auto& elem : input_avx_lazy) {
@@ -290,17 +292,18 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512_64) {
     AlignedVector64<uint64_t> input_avx_lazy = input;
 
     ForwardTransformToBitReverseRadix2(
-        input.data(), m_N, m_modulus, m_ntt.GetRootOfUnityPowers().data(),
+        input.data(), input.data(), m_N, m_modulus,
+        m_ntt.GetRootOfUnityPowers().data(),
         m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
     ForwardTransformToBitReverseAVX512<64>(
-        input_avx.data(), m_N, m_ntt.GetModulus(),
+        input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 1);
 
     // Compute lazy
     ForwardTransformToBitReverseAVX512<64>(
-        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 4);
     for (auto& elem : input_avx_lazy) {
@@ -326,17 +329,18 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_32) {
     AlignedVector64<uint64_t> input_avx_lazy = input;
 
     InverseTransformFromBitReverseRadix2(
-        input.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+        input.data(), input.data(), m_N, m_modulus,
+        m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     InverseTransformFromBitReverseAVX512<32>(
-        input_avx.data(), m_N, m_ntt.GetModulus(),
+        input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     InverseTransformFromBitReverseAVX512<32>(
-        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 2);
     for (auto& elem : input_avx_lazy) {
@@ -361,17 +365,18 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
     AlignedVector64<uint64_t> input_avx_lazy = input;
 
     InverseTransformFromBitReverseRadix2(
-        input.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+        input.data(), input.data(), m_N, m_modulus,
+        m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     InverseTransformFromBitReverseAVX512<64>(
-        input_avx.data(), m_N, m_ntt.GetModulus(),
+        input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     InverseTransformFromBitReverseAVX512<64>(
-        input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
+        input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
     for (auto& elem : input_avx_lazy) {

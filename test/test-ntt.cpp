@@ -282,14 +282,73 @@ TEST_P(DegreeModulusInputOutput, API) {
   }
   AssertEqual(input, input_copy);
 
-  auto input_radix4 = input;
-  InverseTransformFromBitReverseRadix4(
-      input_radix4.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+  // In-place Fwd Radix2
+  auto input_radix2 = input_copy;
+  ForwardTransformToBitReverseRadix2(
+      input_radix2.data(), input_radix2.data(), N, modulus,
+      ntt.GetRootOfUnityPowers().data(),
+      ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+
+  AssertEqual(input_radix2, exp_output);
+
+  // In-place Inv Radix2
+  InverseTransformFromBitReverseRadix2(
+      input_radix2.data(), input_radix2.data(), N, modulus,
+      ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
+  AssertEqual(input_radix2, input_copy);
+
+  // Out-of-place Fwd Radix2
+  input_radix2 = input_copy;
+  ForwardTransformToBitReverseRadix2(out_buffer.data(), input_radix2.data(), N,
+                                     modulus, ntt.GetRootOfUnityPowers().data(),
+                                     ntt.GetPrecon64RootOfUnityPowers().data(),
+                                     2, 1);
+
+  AssertEqual(out_buffer, exp_output);
+
+  // Out-of-place Inv Radix2
   InverseTransformFromBitReverseRadix2(
-      input.data(), N, modulus, ntt.GetInvRootOfUnityPowers().data(),
+      input_radix2.data(), out_buffer.data(), N, modulus,
+      ntt.GetInvRootOfUnityPowers().data(),
       ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
+
+  AssertEqual(input_radix2, input_copy);
+
+  // In-place Fwd Radix4
+  auto input_radix4 = input_copy;
+  ForwardTransformToBitReverseRadix4(
+      input_radix4.data(), input_radix4.data(), N, modulus,
+      ntt.GetRootOfUnityPowers().data(),
+      ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+
+  AssertEqual(input_radix4, exp_output);
+
+  // In-place Inv Radix4
+  InverseTransformFromBitReverseRadix4(
+      input_radix4.data(), input_radix4.data(), N, modulus,
+      ntt.GetInvRootOfUnityPowers().data(),
+      ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
+
+  AssertEqual(input_radix4, input_copy);
+
+  // Out-of-place Fwd Radix4
+  input_radix4 = input_copy;
+  ForwardTransformToBitReverseRadix4(out_buffer.data(), input_radix4.data(), N,
+                                     modulus, ntt.GetRootOfUnityPowers().data(),
+                                     ntt.GetPrecon64RootOfUnityPowers().data(),
+                                     2, 1);
+
+  AssertEqual(out_buffer, exp_output);
+
+  // Out-of-place Inv Radix4
+  InverseTransformFromBitReverseRadix4(
+      input_radix4.data(), out_buffer.data(), N, modulus,
+      ntt.GetInvRootOfUnityPowers().data(),
+      ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
+
+  AssertEqual(input_radix4, input_copy);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -362,7 +421,8 @@ TEST_P(NttNativeTest, ForwardRadix4Random) {
   auto input_radix4 = input;
 
   ForwardTransformToBitReverseRadix4(
-      input_radix4.data(), m_N, m_modulus, m_ntt.GetRootOfUnityPowers().data(),
+      input_radix4.data(), input_radix4.data(), m_N, m_modulus,
+      m_ntt.GetRootOfUnityPowers().data(),
       m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
   ReferenceForwardTransformToBitReverse(input.data(), m_N, m_modulus,
@@ -376,11 +436,12 @@ TEST_P(NttNativeTest, InverseRadix4Random) {
   auto input_radix4 = input;
 
   InverseTransformFromBitReverseRadix2(
-      input.data(), m_N, m_modulus, m_ntt.GetInvRootOfUnityPowers().data(),
+      input.data(), input.data(), m_N, m_modulus,
+      m_ntt.GetInvRootOfUnityPowers().data(),
       m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
   InverseTransformFromBitReverseRadix4(
-      input_radix4.data(), m_N, m_modulus,
+      input_radix4.data(), input_radix4.data(), m_N, m_modulus,
       m_ntt.GetInvRootOfUnityPowers().data(),
       m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
