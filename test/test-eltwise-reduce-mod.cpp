@@ -46,7 +46,7 @@ TEST(EltwiseReduceMod, 0_1) {
   std::vector<uint64_t> result{0, 0, 0, 0};
 
   const uint64_t modulus = 750;
-  const uint64_t input_mod_factor = 0;
+  const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
   EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
                    input_mod_factor, output_mod_factor);

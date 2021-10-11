@@ -71,9 +71,9 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
           }
         } else {
           // Perform RNS conversion (modular reduction)
-          intel::hexl::EltwiseReduceMod(t_ntt_ptr,
-                                        &t_target_ptr[j * coeff_count],
-                                        coeff_count, moduli[key_index], 0, 1);
+          intel::hexl::EltwiseReduceMod(
+              t_ntt_ptr, &t_target_ptr[j * coeff_count], coeff_count,
+              moduli[key_index], moduli[key_index], 1);
         }
 
         // NTT conversion lazy outputs in [0, 4q)
@@ -149,7 +149,7 @@ void CkksSwitchKey(uint64_t* result, const uint64_t* t_target_iter_ptr,
 
       // TODO(fboemer): Use input_mod_factor != 0 when qk / qi < 4
       // TODO(fboemer): Use output_mod_factor == 4?
-      uint64_t input_mod_factor = (qk > qi) ? 0 : 2;
+      uint64_t input_mod_factor = (qk > qi) ? moduli[i] : 2;
       if (qk > qi) {
         intel::hexl::EltwiseReduceMod(t_ntt_ptr, t_last, coeff_count, moduli[i],
                                       input_mod_factor, 1);
