@@ -441,7 +441,7 @@ TEST_P(NttNativeTest, InverseRadix4Random) {
       m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
   InverseTransformFromBitReverseRadix4(
-      input_radix4.data(), m_N, m_modulus,
+      input_radix4.data(), input_radix4.data(), m_N, m_modulus,
       m_ntt.GetInvRootOfUnityPowers().data(),
       m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
