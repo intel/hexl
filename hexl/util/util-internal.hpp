@@ -50,7 +50,7 @@ inline uint64_t GenerateInsecureUniformRandomValue(uint64_t min_value,
   HEXL_CHECK(min_value < max_value, "min_value must be > max_value");
 
   static std::random_device rd;
-  static std::mt19937 mersenne_engine(rd());
+  static std::mt19937 mersenne_engine(42);  // rd());
   std::uniform_int_distribution<uint64_t> distrib(min_value, max_value - 1);
 
   return distrib(mersenne_engine);

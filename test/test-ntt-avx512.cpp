@@ -174,6 +174,7 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
     GTEST_SKIP();
   }
 
+  m_num_trials = 1;
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
         GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
@@ -187,15 +188,20 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
     ReferenceForwardTransformToBitReverse(input64.data(), m_N, m_modulus,
                                           m_ntt.GetRootOfUnityPowers().data());
 
-    ForwardTransformToBitReverseAVX512<52>(
-        input_ifma.data(), input_ifma.data(), m_N, m_ntt.GetModulus(),
-        m_ntt.GetAVX512RootOfUnityPowers().data(),
-        m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
+    ForwardTransformToBitReverseRadix4(
+        input_ifma.data(), input_ifma.data(), m_N, m_modulus,
+        m_ntt.GetRootOfUnityPowers().data(),
+        m_ntt.GetPrecon64RootOfUnityPowers().data(), 1, 1);
+
+    // ForwardTransformToBitReverseAVX512<52>(
+    //     input_ifma.data(), input_ifma.data(), m_N, m_ntt.GetModulus(),
+    //     m_ntt.GetAVX512RootOfUnityPowers().data(),
+    //     m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
 
     ForwardTransformToBitReverseAVX512Radix4<52>(
         input_ifma_radix4.data(), input_ifma_radix4.data(), m_N,
-        m_ntt.GetModulus(), m_ntt.GetAVX512RootOfUnityPowers().data(),
-        m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
+        m_ntt.GetModulus(), m_ntt.GetRootOfUnityPowers().data(),
+        m_ntt.GetPrecon52RootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
     // ForwardTransformToBitReverseAVX512<52>(

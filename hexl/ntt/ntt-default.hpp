@@ -25,15 +25,16 @@ namespace hexl {
 /// @param[in] twice_modulus Twice the modulus, i.e. 2*q represented as 8 64-bit
 /// signed integers in SIMD form
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
+template <int BitShift = 64>
 inline void FwdButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
                                const uint64_t* X_op, const uint64_t* Y_op,
                                uint64_t W, uint64_t W_precon, uint64_t modulus,
                                uint64_t twice_modulus) {
-  HEXL_VLOG(5, "FwdButterflyRadix2");
+  HEXL_VLOG(5, "FwdButterflyRadix2 bit shift " << BitShift);
   HEXL_VLOG(5, "Inputs: X_op " << *X_op << ", Y_op " << *Y_op << ", W " << W
                                << ", modulus " << modulus);
   uint64_t tx = ReduceMod<2>(*X_op, twice_modulus);
-  uint64_t T = MultiplyModLazy<64>(*Y_op, W, W_precon, modulus);
+  uint64_t T = MultiplyModLazy<BitShift>(*Y_op, W, W_precon, modulus);
   HEXL_VLOG(5, "T " << T);
   *X_r = tx + T;
   *Y_r = tx + twice_modulus - T;
@@ -70,14 +71,14 @@ inline void FwdButterflyRadix4(
   HEXL_VLOG(3, "FwdButterflyRadix4 BitShift " << BitShift);
   HEXL_UNUSED(four_times_modulus);
 
-  FwdButterflyRadix2(X_r0, X_r2, X_op0, X_op2, W1, W1_precon, modulus,
-                     twice_modulus);
-  FwdButterflyRadix2(X_r1, X_r3, X_op1, X_op3, W1, W1_precon, modulus,
-                     twice_modulus);
-  FwdButterflyRadix2(X_r0, X_r1, X_r0, X_r1, W2, W2_precon, modulus,
-                     twice_modulus);
-  FwdButterflyRadix2(X_r2, X_r3, X_r2, X_r3, W3, W3_precon, modulus,
-                     twice_modulus);
+  FwdButterflyRadix2<BitShift>(X_r0, X_r2, X_op0, X_op2, W1, W1_precon, modulus,
+                               twice_modulus);
+  FwdButterflyRadix2<BitShift>(X_r1, X_r3, X_op1, X_op3, W1, W1_precon, modulus,
+                               twice_modulus);
+  FwdButterflyRadix2<BitShift>(X_r0, X_r1, X_r0, X_r1, W2, W2_precon, modulus,
+                               twice_modulus);
+  FwdButterflyRadix2<BitShift>(X_r2, X_r3, X_r2, X_r3, W3, W3_precon, modulus,
+                               twice_modulus);
 
   // Alternate implementation
   // // Returns Xs in [0, 6q)

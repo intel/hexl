@@ -33,6 +33,8 @@ void ForwardTransformToBitReverseRadix4(
   HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
              "output_mod_factor must be 1 or 4; got " << output_mod_factor);
 
+  HEXL_VLOG(3, "ForwardTransformToBitReverseRadix4");
+
   HEXL_VLOG(3, "modulus " << modulus);
   HEXL_VLOG(3, "n " << n);
 

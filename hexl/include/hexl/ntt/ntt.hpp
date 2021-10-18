@@ -132,6 +132,10 @@ class NTT {
     return m_precon32_root_of_unity_powers;
   }
 
+  const AlignedVector64<uint64_t>& GetPrecon52RootOfUnityPowers() const {
+    return m_precon52_root_of_unity_powers;
+  }
+
   /// @brief Returns 64-bit pre-conditioned root of unity powers in
   /// bit-reversed order
   const AlignedVector64<uint64_t>& GetPrecon64RootOfUnityPowers() const {
@@ -271,6 +275,7 @@ class NTT {
   AlignedVector64<uint64_t> m_precon32_root_of_unity_powers;
   // vector of floor(W * 2**64 / m_q), with W the root of unity powers
   AlignedVector64<uint64_t> m_precon64_root_of_unity_powers;
+  AlignedVector64<uint64_t> m_precon52_root_of_unity_powers;
 
   // powers of the minimal root of unity adjusted for use in AVX512
   // implementations

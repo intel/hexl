@@ -305,8 +305,8 @@ void ForwardTransformToBitReverseAVX512Radix4(
 
     HEXL_LOOP_UNROLL_8
     for (size_t j = 0; j < t; j++) {
-      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
-                         twice_modulus);
+      FwdButterflyRadix2<BitShift>(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                   modulus, twice_modulus);
     }
     // Data in [0, 4q)
     HEXL_VLOG(3, "after radix 2 outputs "

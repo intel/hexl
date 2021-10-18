@@ -30,6 +30,7 @@ NTT::NTT(uint64_t degree, uint64_t q, uint64_t root_of_unity,
       m_aligned_alloc(AlignedAllocator<uint64_t, 64>(m_alloc)),
       m_root_of_unity_powers(m_aligned_alloc),
       m_precon32_root_of_unity_powers(m_aligned_alloc),
+      m_precon52_root_of_unity_powers(m_aligned_alloc),
       m_precon64_root_of_unity_powers(m_aligned_alloc),
       m_avx512_root_of_unity_powers(m_aligned_alloc),
       m_avx512_precon32_root_of_unity_powers(m_aligned_alloc),
@@ -122,6 +123,8 @@ void NTT::ComputeRootOfUnityPowers() {
 
   m_precon32_root_of_unity_powers =
       compute_barrett_vector(root_of_unity_powers, 32);
+  m_precon52_root_of_unity_powers =
+      compute_barrett_vector(root_of_unity_powers, 52);
   m_precon64_root_of_unity_powers =
       compute_barrett_vector(root_of_unity_powers, 64);
 
