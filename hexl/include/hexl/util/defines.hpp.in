@@ -11,3 +11,10 @@
 
 // Avoid unused variable warnings
 #define HEXL_UNUSED(x) (void)(x)
+
+#define HEXL_REPEAT(x, N)
+#if N == 1
+(x)
+#else
+HEXL_REPEAT(x, N - 1)
+#endif

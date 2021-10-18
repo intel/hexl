@@ -3,7 +3,7 @@
 
 set(NATIVE_TEST_SRC main.cpp
     test-aligned-vector.cpp
-    test-number-theory.cpp
+    test-defines.cpp
     test-eltwise-add-mod.cpp
     test-eltwise-cmp-add.cpp
     test-eltwise-cmp-sub-mod.cpp
@@ -11,6 +11,7 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-mult-mod.cpp
     test-eltwise-reduce-mod.cpp
     test-eltwise-sub-mod.cpp
+    test-number-theory.cpp
     test-ntt.cpp
     test-util-internal.cpp
 )
