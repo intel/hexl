@@ -60,13 +60,14 @@ inline void FwdButterflyRadix4Lazy(uint64_t* X_r, uint64_t* Y_r,
 }
 
 // Assume X0, X1, X2, X3 in [0, 4q) and return X0, X1, X2, X3 in [0, 4q)
+template <int BitShift = 64>
 inline void FwdButterflyRadix4(
     uint64_t* X_r0, uint64_t* X_r1, uint64_t* X_r2, uint64_t* X_r3,
     const uint64_t* X_op0, const uint64_t* X_op1, const uint64_t* X_op2,
     const uint64_t* X_op3, uint64_t W1, uint64_t W1_precon, uint64_t W2,
     uint64_t W2_precon, uint64_t W3, uint64_t W3_precon, uint64_t modulus,
     uint64_t twice_modulus, uint64_t four_times_modulus) {
-  HEXL_VLOG(3, "FwdButterflyRadix4");
+  HEXL_VLOG(3, "FwdButterflyRadix4 BitShift " << BitShift);
   HEXL_UNUSED(four_times_modulus);
 
   FwdButterflyRadix2(X_r0, X_r2, X_op0, X_op2, W1, W1_precon, modulus,

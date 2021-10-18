@@ -178,6 +178,7 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
     AlignedVector64<uint64_t> input64 =
         GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
+    AlignedVector64<uint64_t> input_ifma_radix4 = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
     AlignedVector64<uint64_t> exp_output(m_N, 0);
 
@@ -191,17 +192,23 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
 
+    ForwardTransformToBitReverseAVX512Radix4<52>(
+        input_ifma_radix4.data(), input_ifma_radix4.data(), m_N,
+        m_ntt.GetModulus(), m_ntt.GetAVX512RootOfUnityPowers().data(),
+        m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
+
     // Compute lazy
-    ForwardTransformToBitReverseAVX512<52>(
-        input_ifma_lazy.data(), input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
-        m_ntt.GetAVX512RootOfUnityPowers().data(),
-        m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
-    for (auto& elem : input_ifma_lazy) {
-      elem = elem % m_modulus;
-    }
+    // ForwardTransformToBitReverseAVX512<52>(
+    //     input_ifma_lazy.data(), input_ifma_lazy.data(), m_N,
+    //     m_ntt.GetModulus(), m_ntt.GetAVX512RootOfUnityPowers().data(),
+    //     m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
+    // for (auto& elem : input_ifma_lazy) {
+    //   elem = elem % m_modulus;
+    // }
 
     AssertEqual(input64, input_ifma);
-    AssertEqual(input64, input_ifma_lazy);
+    AssertEqual(input64, input_ifma_radix4);
+    // AssertEqual(input64, input_ifma_lazy);
   }
 }
 
@@ -391,7 +398,7 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
 INSTANTIATE_TEST_SUITE_P(
     NTT, NttAVX512Test,
     ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
-                           1 << 11, 1 << 12, 1 << 13}),
+                           1 << 5, 1 << 11, 1 << 12, 1 << 13}),
                        ::testing::ValuesIn(AlignedVector64<uint64_t>{
                            27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59,
                            60}),
