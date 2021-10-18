@@ -61,6 +61,43 @@ inline std::vector<double> ExtractValues(__m512d x) {
   return ret;
 }
 
+// Hensel's Lemma for 2-adic numbers
+// Find solution for qX + 1 = 0 mod 2^r
+// Inputs: r and q such that gcd(2, q) = 1
+// Output: Integer x in [0, 2^r − 1] such that q*x ≡ −1 mod 2^r
+inline uint64_t HenselLemma2adicRoot(uint32_t r, uint64_t q) {
+  uint64_t a_prev = 1;
+  uint64_t c = 2;
+  uint64_t mod_mask = 3;
+
+  // Root:
+  //    f(x) = qX + 1 and a_(0) = 1 then f(1) ≡ 0 mod 2
+  // General Case:
+  //    - a_(n) ≡ a_(n-1) mod 2^(n)
+  //      => a_(n) = a_(n-1) + 2^(n)*t
+  //    - Find 't' such that f(a_(n)) = 0 mod  2^(n+1)
+  // First case in for:
+  //    - a_(1) ≡ 1 mod 2 or a_(1) = 1 + 2t
+  //    - Find 't' so f(a_(1)) ≡ 0 mod 4  => q(1 + 2t) + 1 ≡ 0 mod 4
+  for (uint64_t k = 2; k <= r; k++) {
+    uint64_t f = 0;
+    uint64_t t = 0;
+    uint64_t a = 0;
+
+    do {
+      a = a_prev + c * t++;
+      f = q * a + 1ULL;
+    } while (f & mod_mask);  // f(a) ≡ 0 mod 2^(k)
+
+    // Update vars
+    mod_mask = mod_mask * 2 + 1ULL;
+    c *= 2;
+    a_prev = a;
+  }
+
+  return a_prev;
+}
+
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of x
 // and y to form a 2*BitShift-bit intermediate result.
 // Returns the high BitShift-bit unsigned integer from the intermediate result
@@ -367,6 +404,46 @@ inline __m512i _mm512_hexl_cmplt_epu64(__m512i a, __m512i b,
 inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
                                        uint64_t match_value) {
   return _mm512_hexl_cmp_epi64(a, b, CMPINT::LE, match_value);
+}
+
+// Returns Montgomery form of ab mod q, computed via the REDC algorithm,
+// also known as Montgomery reduction.
+// Inputs: r and q with R = 2^r such that gcd(R, q) = 1. R > q.
+//         v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+//         T = ab in the range [0, Rq − 1].
+// Output: Integer S in the range [0, q − 1] such that S ≡ TR^−1 mod q
+template <int BitShift = 64>
+inline __m512i _mm512_hexl_montgomery_reduce64(__m512i T_hi, __m512i T_lo,
+                                               __m512i q, uint64_t r,
+                                               __m512i v_mod_R_msk,
+                                               __m512i v_inv_mod) {
+  HEXL_CHECK(BitShift == 52 || BitShift == 64,
+             "Invalid bitshift " << BitShift << "; need 52 or 64");
+
+#ifdef HEXL_HAS_AVX512IFMA
+
+  // Operation:
+  // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
+  __m512i m = _mm512_and_epi64(T_lo, v_mod_R_msk);
+  m = _mm512_hexl_mullo_epi<52>(m, v_inv_mod);
+  m = _mm512_and_epi64(m, v_mod_R_msk);
+
+  // Operation: t ← (T + mN) / R = (T + m*q) >> r
+  // Hi part
+  __m512i t_hi = _mm512_hexl_mulhi_epi<52>(m, q);
+  t_hi = _mm512_add_epi64(T_hi, t_hi);
+  t_hi = _mm512_slli_epi64(t_hi, 52 - r);
+  // Low part
+  __m512i t = _mm512_hexl_mullo_epi<52>(m, q);
+  t = _mm512_add_epi64(T_lo, t);
+  t = _mm512_srli_epi64(t, r);
+  // Join parts
+  t = _mm512_add_epi64(t_hi, t);
+
+  // Operation: t ≥ q? return (t - q) : return t
+  return _mm512_min_epu64(t, _mm512_sub_epi64(t, q));
+
+#endif
 }
 
 // Returns x mod q, computed via Barrett reduction

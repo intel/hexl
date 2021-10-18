@@ -139,6 +139,59 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
   }
 }
 
+template <int BitShift = 64>
+void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
+                                const uint64_t* b, uint64_t n, uint64_t modulus,
+                                uint64_t inv_mod, uint64_t r) {
+  HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
+  HEXL_CHECK(b != nullptr, "Require operand b != nullptr");
+  HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(modulus > 1, "Require modulus > 1");
+
+  uint64_t R = (1ULL << r);
+  HEXL_CHECK(std::__gcd(67280421310725, static_cast<int64_t>(R)), 1);
+
+  uint64_t n_tmp = n;
+
+  // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
+  uint64_t mod_R_mask = R - 1;
+
+  // Deals with n not divisible by 8
+  uint64_t n_mod_8 = n_tmp % 8;
+  if (n_mod_8 != 0) {
+    // To do> Implement native version
+
+    a += n_mod_8;
+    b += n_mod_8;
+    result += n_mod_8;
+    n_tmp -= n_mod_8;
+  }
+
+  uint64_t twice_mod = modulus << 1;
+  const __m512i* v_a = reinterpret_cast<const __m512i*>(a);
+  const __m512i* v_b = reinterpret_cast<const __m512i*>(b);
+  __m512i* v_result = reinterpret_cast<__m512i*>(result);
+  __m512i v_mod_R_mask = _mm512_set1_epi64(mod_R_mask);
+  __m512i v_modulus = _mm512_set1_epi64(modulus);
+  __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+
+  for (size_t i = 0; i < n_tmp; i += 8) {
+    __m512i v_a_op = _mm512_loadu_si512(v_a);
+    __m512i v_b_op = _mm512_loadu_si512(v_b);
+    __m512i v_T_hi = _mm512_hexl_mulhi_epi<52>(v_a_op, v_b_op);
+    __m512i v_T_lo = _mm512_hexl_mullo_epi<52>(v_a_op, v_b_op);
+
+    __m512i v_c = _mm512_hexl_montgomery_reduce64<BitShift>(
+        v_T_hi, v_T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod);
+    HEXL_CHECK_BOUNDS(ExtractValues(v_c).data(), 8, modulus,
+                      "v_op exceeds bound " << modulus);
+    _mm512_storeu_si512(v_result, v_c);
+    ++v_a;
+    ++v_b;
+    ++v_result;
+  }
+}
+
 #endif
 
 }  // namespace hexl
