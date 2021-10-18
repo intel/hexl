@@ -17,34 +17,6 @@
 namespace intel {
 namespace hexl {
 
-#ifdef HEXL_HAS_AVX512IFMA
-template void ForwardTransformToBitReverseAVX512Radix4<NTT::s_ifma_shift_bits>(
-    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
-    const uint64_t* root_of_unity_powers,
-    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
-    uint64_t output_mod_factor, uint64_t recursion_depth,
-    uint64_t recursion_half);
-#endif
-
-#ifdef HEXL_HAS_AVX512DQ
-template void ForwardTransformToBitReverseAVX512Radix4<32>(
-    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
-    const uint64_t* root_of_unity_powers,
-    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
-    uint64_t output_mod_factor, uint64_t recursion_depth,
-    uint64_t recursion_half);
-
-template void
-ForwardTransformToBitReverseAVX512Radix4<NTT::s_default_shift_bits>(
-    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
-    const uint64_t* root_of_unity_powers,
-    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
-    uint64_t output_mod_factor, uint64_t recursion_depth,
-    uint64_t recursion_half);
-#endif
-
-#ifdef HEXL_HAS_AVX512DQ
-
 /// @brief The Harvey butterfly: assume \p X, \p Y in [0, 4q), and return X', Y'
 /// in [0, 4q) such that X', Y' = X + WY, X - WY (mod q).
 /// @param[in,out] X Input representing 8 64-bit signed integers in SIMD form
@@ -61,8 +33,9 @@ ForwardTransformToBitReverseAVX512Radix4<NTT::s_default_shift_bits>(
 /// assumes \p X, \p Y < 4*\p q
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
 template <int BitShift, bool InputLessThanMod>
-void FwdButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
-                  __m512i neg_modulus, __m512i twice_modulus) {
+void FwdButterflyRadix2AVX512(__m512i* X, __m512i* Y, __m512i W,
+                              __m512i W_precon, __m512i neg_modulus,
+                              __m512i twice_modulus) {
   if (!InputLessThanMod) {
     *X = _mm512_hexl_small_mod_epu64(*X, twice_modulus);
   }
@@ -95,6 +68,121 @@ void FwdButterfly(__m512i* X, __m512i* Y, __m512i W, __m512i W_precon,
   *X = _mm512_add_epi64(*X, T);
 }
 
+// Assume X0, X1, X2, X3 in [0, 4q) and return X0, X1, X2, X3 in [0, 4q)
+template <int BitShift = 64>
+inline void FwdButterflyRadix4AVX512(__m512i* X_op0, __m512i* X_op1,
+                                     __m512i* X_op2, __m512i* X_op3, __m512i W1,
+                                     __m512i W1_precon, __m512i W2,
+                                     __m512i W2_precon, __m512i W3,
+                                     __m512i W3_precon, __m512i modulus,
+                                     __m512i twice_modulus) {
+  // uint64_t* X_r0, uint64_t* X_r1, uint64_t* X_r2, uint64_t* X_r3,
+  // const uint64_t* X_op0, const uint64_t* X_op1, const uint64_t* X_op2,
+  // const uint64_t* X_op3, uint64_t W1, uint64_t W1_precon, uint64_t W2,
+  // uint64_t W2_precon, uint64_t W3, uint64_t W3_precon, uint64_t modulus,
+  // uint64_t twice_modulus, uint64_t four_times_modulus) {
+  HEXL_VLOG(3, "FwdButterflyRadix4AVX512 BitShift " << BitShift);
+  // HEXL_UNUSED(four_times_modulus);
+
+  FwdButterflyRadix2AVX512<BitShift, false>(X_op0, X_op2, W1, W1_precon,
+                                            modulus, twice_modulus);
+  FwdButterflyRadix2AVX512<BitShift, false>(X_op1, X_op3, W1, W1_precon,
+                                            modulus, twice_modulus);
+  FwdButterflyRadix2AVX512<BitShift, false>(X_op0, X_op1, W2, W2_precon,
+                                            modulus, twice_modulus);
+  FwdButterflyRadix2AVX512<BitShift, false>(X_op2, X_op3, W3, W3_precon,
+                                            modulus, twice_modulus);
+  // Alternate implementation
+  // // Returns Xs in [0, 6q)
+  // FwdButterflyRadix4Lazy(X0, X2, W1, W1_precon, modulus, twice_modulus);
+  // FwdButterflyRadix4Lazy(X1, X3, W1, W1_precon, modulus, twice_modulus);
+
+  // // Returns Xs in [0, 8q)
+  // FwdButterflyRadix4Lazy(X0, X1, W2, W2_precon, modulus, twice_modulus);
+  // FwdButterflyRadix4Lazy(X2, X3, W3, W3_precon, modulus, twice_modulus);
+
+  // // Reduce Xs to [0, 4q)
+  // *X0 = ReduceMod<2>(*X0, four_times_modulus);
+  // *X1 = ReduceMod<2>(*X1, four_times_modulus);
+  // *X2 = ReduceMod<2>(*X2, four_times_modulus);
+  // *X3 = ReduceMod<2>(*X3, four_times_modulus);
+}
+
+// Out-of-place implementation
+template <int BitShift, bool InputLessThanMod>
+void FwdT8Radix2(uint64_t* result, const uint64_t* operand,
+                 __m512i v_neg_modulus, __m512i v_twice_mod, uint64_t t,
+                 uint64_t m, const uint64_t* W, const uint64_t* W_precon) {
+  HEXL_CHECK(t % 8 == 0, "Invalid t " << t << "; t must be divisible by 8")
+  size_t j1 = 0;
+
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = 0; i < m; i++) {
+    // Referencing operand
+    const uint64_t* X_op = operand + j1;
+    const uint64_t* Y_op = X_op + t;
+
+    const __m512i* v_X_op_pt = reinterpret_cast<const __m512i*>(X_op);
+    const __m512i* v_Y_op_pt = reinterpret_cast<const __m512i*>(Y_op);
+
+    // Referencing result
+    uint64_t* X_r = result + j1;
+    uint64_t* Y_r = X_r + t;
+
+    __m512i* v_X_r_pt = reinterpret_cast<__m512i*>(X_r);
+    __m512i* v_Y_r_pt = reinterpret_cast<__m512i*>(Y_r);
+
+    // Weights and weights' preconditions
+    __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
+    __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
+
+    // assume 8 | t
+    for (size_t j = t / 8; j > 0; --j) {
+      __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+      __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+
+      FwdButterflyRadix2AVX512<BitShift, InputLessThanMod>(
+          &v_X, &v_Y, v_W, v_W_precon, v_neg_modulus, v_twice_mod);
+
+      _mm512_storeu_si512(v_X_r_pt++, v_X);
+      _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+      // Increase operand pointers as well
+      v_X_op_pt++;
+      v_Y_op_pt++;
+    }
+    j1 += (t << 1);
+  }
+}
+
+#ifdef HEXL_HAS_AVX512IFMA
+template void ForwardTransformToBitReverseAVX512Radix4<NTT::s_ifma_shift_bits>(
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half);
+#endif
+
+#ifdef HEXL_HAS_AVX512DQ
+template void ForwardTransformToBitReverseAVX512Radix4<32>(
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half);
+
+template void
+ForwardTransformToBitReverseAVX512Radix4<NTT::s_default_shift_bits>(
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half);
+#endif
+
+#ifdef HEXL_HAS_AVX512DQ
+
 template <int BitShift>
 void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
            uint64_t m, const uint64_t* W, const uint64_t* W_precon) {
@@ -114,8 +202,8 @@ void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
     __m512i v_W = _mm512_loadu_si512(v_W_pt++);
     __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
 
-    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
-                                  v_twice_mod);
+    FwdButterflyRadix2<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon,
+                                        v_neg_modulus, v_twice_mod);
     WriteFwdInterleavedT1(v_X, v_Y, v_X_pt);
 
     j1 += 16;
@@ -146,8 +234,8 @@ void FwdT2(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
                "bad v_W " << ExtractValues(v_W));
     HEXL_CHECK(ExtractValues(v_W_precon)[0] == ExtractValues(v_W_precon)[1],
                "bad v_W_precon " << ExtractValues(v_W_precon));
-    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
-                                  v_twice_mod);
+    FwdButterflyRadix2<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon,
+                                        v_neg_modulus, v_twice_mod);
 
     _mm512_storeu_si512(v_X_pt++, v_X);
     _mm512_storeu_si512(v_X_pt, v_Y);
@@ -175,8 +263,8 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
     __m512i v_W = _mm512_loadu_si512(v_W_pt++);
     __m512i v_W_precon = _mm512_loadu_si512(v_W_precon_pt++);
-    FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
-                                  v_twice_mod);
+    FwdButterflyRadix2<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon,
+                                        v_neg_modulus, v_twice_mod);
 
     _mm512_storeu_si512(v_X_pt++, v_X);
     _mm512_storeu_si512(v_X_pt, v_Y);
@@ -217,8 +305,8 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
       __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
       __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
 
-      FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
-                                               v_neg_modulus, v_twice_mod);
+      FwdButterflyRadix2<BitShift, InputLessThanMod>(
+          &v_X, &v_Y, v_W, v_W_precon, v_neg_modulus, v_twice_mod);
 
       _mm512_storeu_si512(v_X_r_pt++, v_X);
       _mm512_storeu_si512(v_Y_r_pt++, v_Y);
@@ -289,25 +377,33 @@ void ForwardTransformToBitReverseAVX512Radix4(
   uint64_t twice_modulus = modulus << 1;
   uint64_t four_times_modulus = modulus << 2;
 
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_modulus));
+
   // Radix-2 step for non-powers of 4
   if (!is_power_of_4) {
     HEXL_VLOG(3, "Radix 2 step");
-
     size_t t = (n >> 1);
-
-    const uint64_t W = root_of_unity_powers[1];
-    const uint64_t W_precon = precon_root_of_unity_powers[1];
+    HEXL_VLOG(3, "radix 2 t " << t);
 
     uint64_t* X_r = result;
-    uint64_t* Y_r = X_r + t;
     const uint64_t* X_op = operand;
-    const uint64_t* Y_op = X_op + t;
+    const uint64_t* W = &root_of_unity_powers[1];
+    const uint64_t* W_precon = &precon_root_of_unity_powers[1];
 
-    HEXL_LOOP_UNROLL_8
-    for (size_t j = 0; j < t; j++) {
-      FwdButterflyRadix2<BitShift>(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
-                                   modulus, twice_modulus);
-    }
+    FwdT8Radix2<BitShift, false>(X_r, X_op, v_neg_modulus, v_twice_mod, t, 1, W,
+                                 W_precon);
+
+    //  uint64_t* Y_r = X_r + t;
+    //  const uint64_t* Y_op = X_op + t;
+    // HEXL_LOOP_UNROLL_8
+    // for (size_t j = 0; j < t; j++) {
+    //   const uint64_t W = root_of_unity_powers[1];
+    //   const uint64_t W_precon = precon_root_of_unity_powers[1];
+    //   FwdButterflyRadix2<BitShift>(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+    //                                modulus, twice_modulus);
+    // }
     // Data in [0, 4q)
     HEXL_VLOG(3, "after radix 2 outputs "
                      << std::vector<uint64_t>(result, result + n));
@@ -444,6 +540,7 @@ void ForwardTransformToBitReverseAVX512Radix4(
 
   for (size_t m = m_start; m < n; m <<= 2) {
     HEXL_VLOG(3, "m " << m);
+    HEXL_VLOG(3, "t " << t);
 
     size_t X0_offset = 0;
 
@@ -533,6 +630,7 @@ void ForwardTransformToBitReverseAVX512Radix4(
           if (i != 0) {
             X0_offset += 4 * t;
           }
+
           uint64_t* X_r0 = result + X0_offset;
           uint64_t* X_r1 = X_r0 + t;
           uint64_t* X_r2 = X_r0 + 2 * t;
@@ -554,71 +652,41 @@ void ForwardTransformToBitReverseAVX512Radix4(
           const uint64_t W2_precon = precon_root_of_unity_powers[W2_ind];
           const uint64_t W3_precon = precon_root_of_unity_powers[W3_ind];
 
-          for (size_t j = 0; j < t; j += 16) {
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
-            FwdButterflyRadix4<BitShift>(
-                X_r0++, X_r1++, X_r2++, X_r3++, X_op0++, X_op1++, X_op2++,
-                X_op3++, W1, W1_precon, W2, W2_precon, W3, W3_precon, modulus,
-                twice_modulus, four_times_modulus);
+          __m512i v_W1 = _mm512_set1_epi64(static_cast<int64_t>(W1));
+          __m512i v_W1_precon =
+              _mm512_set1_epi64(static_cast<int64_t>(W1_precon));
+          __m512i v_W2 = _mm512_set1_epi64(static_cast<int64_t>(W2));
+          __m512i v_W2_precon =
+              _mm512_set1_epi64(static_cast<int64_t>(W2_precon));
+          __m512i v_W3 = _mm512_set1_epi64(static_cast<int64_t>(W3));
+          __m512i v_W3_precon =
+              _mm512_set1_epi64(static_cast<int64_t>(W3_precon));
+
+          __m512i* v_X_op0_pt =
+              const_cast<__m512i*>(reinterpret_cast<const __m512i*>(X_op0));
+          __m512i* v_X_op1_pt =
+              const_cast<__m512i*>(reinterpret_cast<const __m512i*>(X_op1));
+          __m512i* v_X_op2_pt =
+              const_cast<__m512i*>(reinterpret_cast<const __m512i*>(X_op2));
+          __m512i* v_X_op3_pt =
+              const_cast<__m512i*>(reinterpret_cast<const __m512i*>(X_op3));
+
+          HEXL_CHECK(t % 8 == 0, "t % 8 must be 0");
+
+          for (size_t j = 0; j < t / 8; j++) {
+            __m512i v_Xop0 = _mm512_loadu_si512(v_X_op0_pt);
+            __m512i v_Xop1 = _mm512_loadu_si512(v_X_op1_pt);
+            __m512i v_Xop2 = _mm512_loadu_si512(v_X_op2_pt);
+            __m512i v_Xop3 = _mm512_loadu_si512(v_X_op3_pt);
+
+            FwdButterflyRadix4AVX512<BitShift>(
+                &v_Xop0, &v_Xop1, &v_Xop2, &v_Xop3, v_W1, v_W1_precon, v_W2,
+                v_W2_precon, v_W3, v_W3_precon, v_neg_modulus, v_twice_mod);
+
+            _mm512_storeu_si512(v_X_op0_pt++, v_Xop0);
+            _mm512_storeu_si512(v_X_op1_pt++, v_Xop1);
+            _mm512_storeu_si512(v_X_op2_pt++, v_Xop2);
+            _mm512_storeu_si512(v_X_op3_pt++, v_Xop3);
           }
         }
       }
@@ -640,10 +708,6 @@ void ForwardTransformToBitReverseAVX512Radix4(
   }
 
   HEXL_VLOG(3, "outputs " << std::vector<uint64_t>(result, result + n));
-
-  // __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
-  // __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
-  // __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   // HEXL_VLOG(5, "root_of_unity_powers " << std::vector<uint64_t>(
   //                  root_of_unity_powers, root_of_unity_powers + n))

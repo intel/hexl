@@ -404,7 +404,7 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
 INSTANTIATE_TEST_SUITE_P(
     NTT, NttAVX512Test,
     ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
-                           1 << 5, 1 << 11, 1 << 12, 1 << 13}),
+                           1 << 5, 1 << 7, 1 << 11, 1 << 12, 1 << 13}),
                        ::testing::ValuesIn(AlignedVector64<uint64_t>{
                            27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59,
                            60}),
