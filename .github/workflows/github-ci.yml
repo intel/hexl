@@ -22,7 +22,7 @@ on:
 # Define env vars #
 ###################
 env:
-  HEXL_VER: 1.2.1
+  HEXL_VER: 1.2.2
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   HEXL_HINT_DIR: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
