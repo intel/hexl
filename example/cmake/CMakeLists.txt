@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.5.1)
 set(CMAKE_CXX_STANDARD 11)
 
 # Example using source
-find_package(HEXL 1.2.1
+find_package(HEXL 1.2.2
     HINTS ${HEXL_HINT_DIR}
     REQUIRED)
 if (NOT TARGET HEXL::hexl)
