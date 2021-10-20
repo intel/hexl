@@ -115,7 +115,7 @@ jobs:
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.10
         with:
-          cmake-version: '3.13.x'
+          cmake-version: '3.12.x'
       - name: Default build
         run: |
           set -x
@@ -134,13 +134,14 @@ jobs:
           pwd
 
           # Build library
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
             -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
             -DCMAKE_INSTALL_PREFIX=./
-          cmake --build build -j
-          cmake --build build --target install
-          cmake --build build --target unittest
-          # Instead of calling cmake --build build --target bench,
+          make build -j
+          make install
+          make unittest
+          # Instead of calling make bench,
           # we run the executable directly to pass command-line arguments
           ./build/benchmark/bench_hexl \
             --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" \
@@ -148,17 +149,19 @@ jobs:
 
           # Build and run examples
           cd $GITHUB_WORKSPACE/example/cmake
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             ${{ env.HEXL_HINT_DIR }}
-          cmake --build build
+          make build
           build/example
 
           # Build example using pkgconfig
           cd $GITHUB_WORKSPACE/example/pkgconfig
           # Set PKG_CONFIG_PATH to locate hexl.pc
           export PKG_CONFIG_PATH=$GITHUB_WORKSPACE/lib/pkgconfig
-          cmake -S . -B build
-          cmake --build build
+          mkdir -p build && cd build
+          cmake ..
+          make
           build/example
 
           # Build example using vcpkg
@@ -246,14 +249,15 @@ jobs:
           pwd
 
           # Build library
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
-            -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
-            -DCMAKE_INSTALL_PREFIX=./ \
-            -DHEXL_EXPERIMENTAL=ON
-          cmake --build build -j
-          cmake --build build --target install
-          cmake --build build --target unittest
-          # Instead of calling cmake --build build --target bench,
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
+                   -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
+                   -DCMAKE_INSTALL_PREFIX=./ \
+                   -DHEXL_EXPERIMENTAL=ON
+          make build
+          make install
+          make unittest
+          # Instead of calling make bench,
           # we run the executable directly to pass command-line arguments
           ./build/benchmark/bench_hexl \
             --benchmark_out="${GITHUB_WORKFLOW}_${GITHUB_SHA}" \

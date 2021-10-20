@@ -84,26 +84,27 @@ The instructions to build Intel HEXL are common to Linux and MacOS.
 
 Then, to configure the build, call
 ```bash
-cmake -S . -B build
+mkdir -p build && cd build
+cmake ..
 ```
 adding the desired compile-time options with a `-D` flag. For instance, to build Intel HEXL as a shared library, call
 ```bash
-cmake -S . -B build -DHEXL_SHARED_LIB=ON
+cmake .. -DHEXL_SHARED_LIB=ON
 ```
 
 Then, to build Intel HEXL, call
 ```bash
-cmake --build build
+make build
 ```
 This will build the Intel HEXL library in the `build/hexl/lib/` directory.
 
 To install Intel HEXL to the installation directory, run
 ```bash
-cmake --install build
+make install
 ```
 To use a non-standard installation directory, configure the build with
 ```bash
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
+cmake .. -DCMAKE_INSTALL_PREFIX=/path/to/install
 ```
 before proceeding with the build and installation directions above.
 
@@ -143,16 +144,16 @@ Some speedup is still expected for moduli `q > 2^30` using the AVX512-DQ instruc
 
 ## Testing Intel HEXL
 To run a set of unit tests via [Googletest](https://github.com/google/googletest), configure and build Intel HEXL with `-DHEXL_TESTING=ON` (see [Compile-time options](#compile-time-options)).
-Then, run
+Then, from the `build` directory, run
 ```bash
-cmake --build build --target unittest
+make unittest
 ```
 The unit-test executable itself is located at `build/test/unit-test` on Linux and Mac, and at `build\test\Release\unit-test.exe` or `build\test\Debug\unit-test.exe` on Windows.
 ## Benchmarking Intel HEXL
 To run a set of benchmarks via [Google benchmark](https://github.com/google/benchmark), configure and build Intel HEXL with `-DHEXL_BENCHMARK=ON` (see [Compile-time options](#compile-time-options)).
-Then, run
+Then, from the `build` directory, run
 ```bash
-cmake --build build --target bench
+make bench
 ```
 On Windows, run
 ```bash
