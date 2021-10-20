@@ -455,5 +455,23 @@ TEST(NumberTheory, MSB) {
   EXPECT_EQ(0ULL, MSB(1));
 }
 
+TEST(NumberTheory, MontgomeryReduction) {
+  EXPECT_EQ(4ULL, MontgomeryReduce<64>(0, 12, 5, 3, 7, 11));
+  EXPECT_EQ(3ULL, MontgomeryReduce<64>(0, 9, 5, 3, 7, 11));
+  EXPECT_EQ(
+      1546598034044ULL,
+      MontgomeryReduce<64>(136630700ULL, 6847304339915631516ULL, 67280421310725,
+                           46, 70368744177663, 62463730494515));
+  EXPECT_EQ(
+      1546598034044ULL,
+      MontgomeryReduce<52>(559639348720ULL, 1832906312477596ULL, 67280421310725,
+                           46, 70368744177663, 62463730494515));
+}
+
+TEST(NumberTheory, HenselLemma) {
+  EXPECT_EQ(3ULL, HenselLemma2adicRoot(3, 5));
+  EXPECT_EQ(62463730494515ULL, HenselLemma2adicRoot(46, 67280421310725));
+}
+
 }  // namespace hexl
 }  // namespace intel
