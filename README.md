@@ -60,7 +60,7 @@ Intel HEXL requires the following dependencies:
 
 | Dependency  | Version                                      |
 |-------------|----------------------------------------------|
-| CMake       | >= 3.5.1                                     |
+| CMake       | >= 3.13                                      |
 | Compiler    | gcc >= 7.0, clang++ >= 5.0, MSVC >= 2019     |
 
 
