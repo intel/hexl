@@ -138,7 +138,7 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  \
             -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
             -DCMAKE_INSTALL_PREFIX=./
-          make build -j
+          make -j
           make install
           make unittest
           # Instead of calling make bench,
@@ -152,7 +152,7 @@ jobs:
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             ${{ env.HEXL_HINT_DIR }}
-          make build
+          make
           build/example
 
           # Build example using pkgconfig
@@ -254,7 +254,7 @@ jobs:
                    -DHEXL_SHARED_LIB=${{ matrix.shared_lib }} \
                    -DCMAKE_INSTALL_PREFIX=./ \
                    -DHEXL_EXPERIMENTAL=ON
-          make build
+          make
           make install
           make unittest
           # Instead of calling make bench,
