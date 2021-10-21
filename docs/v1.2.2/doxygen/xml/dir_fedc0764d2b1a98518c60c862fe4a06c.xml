@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="dir_fedc0764d2b1a98518c60c862fe4a06c" kind="dir">
+    <compoundname>experimental</compoundname>
+    <innerdir refid="dir_4f5356f08d318fe0635050595cfb3255">seal</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/gelila/Desktop/workspace/hexl/hexl/include/hexl/experimental/"/>
+  </compounddef>
+</doxygen>

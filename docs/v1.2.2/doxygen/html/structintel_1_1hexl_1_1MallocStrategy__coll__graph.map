@@ -1,0 +1,4 @@
+<map id="intel::hexl::MallocStrategy" name="intel::hexl::MallocStrategy">
+<area shape="rect" id="node1" title="Allocater implementation using malloc and free." alt="" coords="5,80,199,107"/>
+<area shape="rect" id="node2" href="$structintel_1_1hexl_1_1AllocatorBase.html" title="Base class for custom memory allocator." alt="" coords="9,5,195,32"/>
+</map>

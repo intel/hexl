@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="classintel_1_1hexl_1_1AlignedAllocator" kind="class"><name>intel::hexl::AlignedAllocator</name>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1a8a3b7b0531d253a37a59fe1ffe12ec8a" kind="typedef"><name>value_type</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1aaded07599020ca35e89e078674263c63" kind="friend"><name>AlignedAllocator</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1ae8314f7cfe3690382f638e9812e0fcf0" kind="variable"><name>m_alloc_impl</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1afb7109e1c05fc55412ecfdc36894f7e5" kind="function"><name>AlignedAllocator</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1a60bc693dbefeb259d375daab227bb82c" kind="function"><name>AlignedAllocator</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1ad8b750d8cb58695b1b6ee10f5a01173c" kind="function"><name>operator=</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1a7ef7928d5be819410959faf80f6746cc" kind="function"><name>AlignedAllocator</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1a6841e8cef5bedf494f47370062c73cbc" kind="function"><name>~AlignedAllocator</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1a6f8f9c34b0ddab249c945ddb6609c6dd" kind="function"><name>operator==</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1a6b59d9d7304cda06b8c166dd865ff5db" kind="function"><name>operator!=</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1ac007b85746672b4e777aa9561b54f8a9" kind="function"><name>allocate</name></member>
+    <member refid="classintel_1_1hexl_1_1AlignedAllocator_1af370e3d86c582bcf1370656080bab1ec" kind="function"><name>deallocate</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter" kind="struct"><name>intel::hexl::NTT::AllocatorAdapter</name>
+    <member refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1aea6b606a20cdea99cb8a1687ed7a5564" kind="variable"><name>alloc</name></member>
+    <member refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a4403f32f5ed5527a13c2bf12c20a68af" kind="function"><name>AllocatorAdapter</name></member>
+    <member refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1aee97fbd36cf2299db87f6dbe75f12396" kind="function"><name>AllocatorAdapter</name></member>
+    <member refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a408a6a4b42aef1db5ab7e9b5c8ec2670" kind="function"><name>allocate_impl</name></member>
+    <member refid="structintel_1_1hexl_1_1NTT_1_1AllocatorAdapter_1a123aa02665ce9f2b219ca9b88164e114" kind="function"><name>deallocate_impl</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1AllocatorBase" kind="struct"><name>intel::hexl::AllocatorBase</name>
+    <member refid="structintel_1_1hexl_1_1AllocatorBase_1ac8a2afdc70cef8b7c9342aa2281ea4d5" kind="function"><name>~AllocatorBase</name></member>
+    <member refid="structintel_1_1hexl_1_1AllocatorBase_1aadf587e7617fbace2e9d3b4f9d9e8af0" kind="function"><name>allocate</name></member>
+    <member refid="structintel_1_1hexl_1_1AllocatorBase_1a0f03686f9b78728d4d228ceaf4c2948e" kind="function"><name>deallocate</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1AllocatorInterface" kind="struct"><name>intel::hexl::AllocatorInterface</name>
+    <member refid="structintel_1_1hexl_1_1AllocatorInterface_1a02d2d7918ea916fce443ba2f5dbaa8d1" kind="function"><name>allocate</name></member>
+    <member refid="structintel_1_1hexl_1_1AllocatorInterface_1a2684feec3b8f3cfba626b46912b4cec5" kind="function"><name>deallocate</name></member>
+    <member refid="structintel_1_1hexl_1_1AllocatorInterface_1ae6870257f68a2d53d0f818bf3f5136ad" kind="function"><name>allocate_impl</name></member>
+    <member refid="structintel_1_1hexl_1_1AllocatorInterface_1ad50d01a0736610117e5fed4829522f6c" kind="function"><name>deallocate_impl</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1MallocStrategy" kind="struct"><name>intel::hexl::MallocStrategy</name>
+    <member refid="structintel_1_1hexl_1_1MallocStrategy_1a010052a3f5e39991d57a38742d853738" kind="function"><name>allocate</name></member>
+    <member refid="structintel_1_1hexl_1_1MallocStrategy_1af45ff5d0c9b1e867fac481f447a4569c" kind="function"><name>deallocate</name></member>
+  </compound>
+  <compound refid="classintel_1_1hexl_1_1MultiplyFactor" kind="class"><name>intel::hexl::MultiplyFactor</name>
+    <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a118507f8f18e2c8e87a0c1ca9f9b3ae1" kind="variable"><name>m_operand</name></member>
+    <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a97008cba5f4ba7eb9b29e0398c18f0b6" kind="variable"><name>m_barrett_factor</name></member>
+    <member refid="classintel_1_1hexl_1_1MultiplyFactor_1ad7b998b4a54203d6ad83237e3b3f4c51" kind="function"><name>MultiplyFactor</name></member>
+    <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a801de0aa37e108b21cdb6452a15f6c76" kind="function"><name>MultiplyFactor</name></member>
+    <member refid="classintel_1_1hexl_1_1MultiplyFactor_1aa1708edda697a2ebb93f6b2b9b2967aa" kind="function"><name>BarrettFactor</name></member>
+    <member refid="classintel_1_1hexl_1_1MultiplyFactor_1a143d0ed636511f3cd450286b89687822" kind="function"><name>Operand</name></member>
+  </compound>
+  <compound refid="classintel_1_1hexl_1_1NTT" kind="class"><name>intel::hexl::NTT</name>
+    <member refid="classintel_1_1hexl_1_1NTT_1ab0db0e033026cff37b7acba889500b6d" kind="variable"><name>s_default_shift_bits</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a5642931d7118e5a6304890f18a92c6dc" kind="variable"><name>s_ifma_shift_bits</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a4c42c952781ae97d1abf02ab5334143f" kind="variable"><name>s_max_fwd_32_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a33af06994139ae14c69d8958611487bd" kind="variable"><name>s_max_inv_32_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a248f7a613b187a7f71a67b93e4ca13ad" kind="variable"><name>s_max_fwd_ifma_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a741db1877b630638173b6ed5f9a6e6c7" kind="variable"><name>s_max_inv_ifma_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ae5c701d4ff1d90d465dfbf891f63644c" kind="variable"><name>s_max_inv_dq_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ac41484faffcc5c2b28e67e2e9434a050" kind="variable"><name>m_degree</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ab7ca32c10ef1e39fc80818d981a4459d" kind="variable"><name>m_q</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a2b6b5ebbca9b783e50d83c409d4fd307" kind="variable"><name>m_degree_bits</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ab317600c0da04b8f07f11beed2f6ccf0" kind="variable"><name>m_w_inv</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ab8b29317bf63f5e42552673506a0fa14" kind="variable"><name>m_w</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1aa0c4c11c8fe8cf7e321cdc9affd5bdf2" kind="variable"><name>m_alloc</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a5e114b624bb80345b5ede2f81461482c" kind="variable"><name>m_aligned_alloc</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a04bb6f1f6b82d10990253ecd16484756" kind="variable"><name>m_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ac836d4affd8489cc730557ea98f171ef" kind="variable"><name>m_precon32_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a4aa83d8ce07822401cc4c9f30d3bd52e" kind="variable"><name>m_precon64_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a32c0c87274355be249bd7b6402441e97" kind="variable"><name>m_avx512_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a70fcbf1ff8f2591d5f925f13247805ed" kind="variable"><name>m_avx512_precon32_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ac5697dcce55597a302e4c064e3d3cb91" kind="variable"><name>m_avx512_precon52_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1aec04ba2216d0c396c704bb04c120a8e2" kind="variable"><name>m_avx512_precon64_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a91abec33f5fa0ec5f6bc2c0ea335c575" kind="variable"><name>m_precon32_inv_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a2c90a66e40d2dfa6babe3ec369fb8325" kind="variable"><name>m_precon52_inv_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a9fc75f9773575158dbf57727cfd27a6d" kind="variable"><name>m_precon64_inv_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1afef36650ec9e3c35aa04021024117ae2" kind="variable"><name>m_inv_root_of_unity_powers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ad31a184065b07b50c3ff01260f6dad28" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a4fbb886db7389f6a5bac264a3e0cf66f" kind="function"><name>~NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a7a86355beefbe191d0e77618eeaaf6b7" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a716fd07255e9b68fec80e2a9b98841f4" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ac5ef577bf39789c1e200b7d5a7b65989" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a831df901cf9ea5a83e5d628cdbd36671" kind="function"><name>NTT</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a7f8dac5ff3fc117d3e7259762a716140" kind="function"><name>ComputeForward</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a31e78375dcafd5df85cb1259a9156a9a" kind="function"><name>ComputeInverse</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1af10476eb10c3b5723052bdf59d7f3d22" kind="function"><name>GetMinimalRootOfUnity</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a25172ec87ce3cbfe9bbc20cd9c52f2ab" kind="function"><name>GetDegree</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1aef2a5afbd559f7e27d5fa7d4e28bd252" kind="function"><name>GetModulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a71749beadc3fde1d2b80f2d99b739099" kind="function"><name>GetRootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1af0ab14a87e3f9e8cf46502c4c766fec5" kind="function"><name>GetRootOfUnityPower</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a1cbd65fb426faafbd22fcb8b7ee98807" kind="function"><name>GetPrecon32RootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a3bddde00a1832f4ac175e71469939e51" kind="function"><name>GetPrecon64RootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1ac93455767a667ef07aa41f747c77b4ae" kind="function"><name>GetAVX512RootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1acf8896d7c5ab8c47fe860f3d5a1be215" kind="function"><name>GetAVX512Precon32RootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1aca9903ac08ed7e06d343f85a0ced8b04" kind="function"><name>GetAVX512Precon52RootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1afb5b2c6cd1135f708c5e8a4e97d6f7da" kind="function"><name>GetAVX512Precon64RootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a509f384895cf97ef9cd2edd2902eb82a" kind="function"><name>GetInvRootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a7dd5b59ed992c5466099999ce1eb15d6" kind="function"><name>GetInvRootOfUnityPower</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a70d5480692fcd13418ae7f4c38345770" kind="function"><name>GetPrecon32InvRootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a9314e0edf36095233efaf72dc6cb9d5e" kind="function"><name>GetPrecon52InvRootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a0f7f195efe5166b0f3a8c9e71f3a405a" kind="function"><name>GetPrecon64InvRootOfUnityPowers</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a81e461e466f57c1c454564879121d8d3" kind="function"><name>CheckArguments</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a76d33e88bd12c2c91b7f8285f8525d72" kind="function"><name>MaxDegreeBits</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1afa71c9bf13109e0d07cacce9e752357c" kind="function"><name>MaxModulusBits</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1a000f6353bfff8062664e7086d27c8b06" kind="function"><name>s_max_fwd_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1abd4a2ad80ba21dd71c4753187cd6ddea" kind="function"><name>s_max_inv_modulus</name></member>
+    <member refid="classintel_1_1hexl_1_1NTT_1aae8497bb26c5421107c9b051eec724cb" kind="function"><name>ComputeRootOfUnityPowers</name></member>
+  </compound>
+  <compound refid="structintel_1_1hexl_1_1AlignedAllocator_1_1rebind" kind="struct"><name>intel::hexl::AlignedAllocator::rebind</name>
+    <member refid="structintel_1_1hexl_1_1AlignedAllocator_1_1rebind_1ac2db56c3df1c9b8ed9e8a6423a65a22e" kind="typedef"><name>other</name></member>
+  </compound>
+  <compound refid="namespaceintel" kind="namespace"><name>intel</name>
+  </compound>
+  <compound refid="namespaceintel_1_1hexl" kind="namespace"><name>intel::hexl</name>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006" kind="enum"><name>CMPINT</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a2dcbad7477fd40561e8b8198f173bd47" kind="enumvalue"><name>EQ</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac562607189d77eb9dfb707464c1e7b0b" kind="enumvalue"><name>LT</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006acfe6055d2e0503be378bb63449ec7ba6" kind="enumvalue"><name>LE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006a946003f97ccc52d5d3b54ac0ec31bbfc" kind="enumvalue"><name>FALSE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006adc33066c3993e0d50896e533fd692ce0" kind="enumvalue"><name>NE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ad7d6a13c7b311ec8a3c9fcfb1919a2f8" kind="enumvalue"><name>NLT</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006aacd748f300c5d189c47807e2a9d6ea57" kind="enumvalue"><name>NLE</name></member>
+    <member refid="namespaceintel_1_1hexl_1abdcc9d2d5bb10fa95d5f143874508006ac0d83f0b82a6b30de8811e69e6d95c61" kind="enumvalue"><name>TRUE</name></member>
+    <member refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" kind="typedef"><name>AllocatorStrategyPtr</name></member>
+    <member refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kind="typedef"><name>AlignedVector64</name></member>
+    <member refid="namespaceintel_1_1hexl_1aedc86b34ea92ac34d036acff6d84479a" kind="variable"><name>mallocStrategy</name></member>
+    <member refid="namespaceintel_1_1hexl_1a319244a133f57825ba7e593ad5c71709" kind="function"><name>EltwiseAddMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a8e0884463658eae11b6f1c6dfeb50b40" kind="function"><name>EltwiseAddMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a5c4fd2ceb53b94efa5f5a959d7ee9819" kind="function"><name>EltwiseCmpAdd</name></member>
+    <member refid="namespaceintel_1_1hexl_1a78bf86d32140e39d8f99d474ccd0e226" kind="function"><name>EltwiseCmpSubMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a5b65d563391b4a1a5041633aeb118aa5" kind="function"><name>EltwiseFMAMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a705bc0321d937ae4d1f8d50279e3cff1" kind="function"><name>EltwiseMultMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1af3ddae165283841d495a322275baf5ee" kind="function"><name>EltwiseReduceMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a6a45c30bc21b9b1e1410b23fce5424c8" kind="function"><name>EltwiseSubMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1abc13b8f383d3af6471a5261ee2213b40" kind="function"><name>EltwiseSubMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a287608abb254a6f0eeb3c7ca95e85a71" kind="function"><name>CkksMultiply</name></member>
+    <member refid="namespaceintel_1_1hexl_1ae983051ff4c3321db4db4569d7fbe796" kind="function"><name>CkksSwitchKey</name></member>
+    <member refid="namespaceintel_1_1hexl_1ada0fe74afb4384b54728cba8ec3f69cd" kind="function"><name>IsPowerOfTwo</name></member>
+    <member refid="namespaceintel_1_1hexl_1a066a83a4b122279313279a58cf440004" kind="function"><name>Log2</name></member>
+    <member refid="namespaceintel_1_1hexl_1a74a77227ebbd892a0cff5089f3d89010" kind="function"><name>IsPowerOfFour</name></member>
+    <member refid="namespaceintel_1_1hexl_1a9975ccaf5ec051c07ff4e3fef5c1fefb" kind="function"><name>MaximumValue</name></member>
+    <member refid="namespaceintel_1_1hexl_1aa48183a39af615227d5b14c0fdb46105" kind="function"><name>ReverseBits</name></member>
+    <member refid="namespaceintel_1_1hexl_1ac949027d43c64d65400c93a148d349c6" kind="function"><name>InverseMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a838d9c2d540f99b349546461dee63252" kind="function"><name>MultiplyMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a0b3d06107428b15f58be1680fbf1656d" kind="function"><name>MultiplyMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1ad16852e2b8114cd9c22dd25593c76f99" kind="function"><name>AddUIntMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a4411ec648d83bfbc3ecaf96859576054" kind="function"><name>SubUIntMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1aff7287aeef7fdb27e6ffb254adb40477" kind="function"><name>PowMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a8b04aa9aed381d3c976d953efbe0a4b6" kind="function"><name>IsPrimitiveRoot</name></member>
+    <member refid="namespaceintel_1_1hexl_1a130d3fb9218c1aaa9fbeb5d143eb288b" kind="function"><name>GeneratePrimitiveRoot</name></member>
+    <member refid="namespaceintel_1_1hexl_1adcc30a762adcbbdc9d7ebefa6fffe83b" kind="function"><name>MinimalPrimitiveRoot</name></member>
+    <member refid="namespaceintel_1_1hexl_1ad7a9d35f74908eca9240bc7675705976" kind="function"><name>MultiplyModLazy</name></member>
+    <member refid="namespaceintel_1_1hexl_1a8f6c714aff229c45fbba359cc67331a5" kind="function"><name>MultiplyModLazy</name></member>
+    <member refid="namespaceintel_1_1hexl_1a3ecce7e5a5591605703890fb3b2b6d80" kind="function"><name>AddUInt64</name></member>
+    <member refid="namespaceintel_1_1hexl_1a1155b31afc84bd8a7080d49b66480395" kind="function"><name>IsPrime</name></member>
+    <member refid="namespaceintel_1_1hexl_1a3a8c240e5282f1d89c281527a842ae3d" kind="function"><name>GeneratePrimes</name></member>
+    <member refid="namespaceintel_1_1hexl_1a0caa5a28d4ccd975250eb28407c7012b" kind="function"><name>BarrettReduce64</name></member>
+    <member refid="namespaceintel_1_1hexl_1ab716e0395cbfe58e76f866a9044f2a62" kind="function"><name>ReduceMod</name></member>
+    <member refid="namespaceintel_1_1hexl_1a8c654502a5e7fe2cfdd198f0fd920f2a" kind="function"><name>Not</name></member>
+  </compound>
+  <compound refid="aligned-allocator_8hpp" kind="file"><name>aligned-allocator.hpp</name>
+  </compound>
+  <compound refid="allocator_8hpp" kind="file"><name>allocator.hpp</name>
+  </compound>
+  <compound refid="check_8hpp" kind="file"><name>check.hpp</name>
+    <member refid="check_8hpp_1ad5baaea0d21e2ec8c058a3de9d0f93c6" kind="define"><name>HEXL_CHECK</name></member>
+    <member refid="check_8hpp_1a722fda94251bc03b3a57ccdaef17abbc" kind="define"><name>HEXL_CHECK_BOUNDS</name></member>
+  </compound>
+  <compound refid="ckks-multiply_8hpp" kind="file"><name>ckks-multiply.hpp</name>
+  </compound>
+  <compound refid="ckks-switch-key_8hpp" kind="file"><name>ckks-switch-key.hpp</name>
+  </compound>
+  <compound refid="clang_8hpp" kind="file"><name>clang.hpp</name>
+  </compound>
+  <compound refid="compiler_8hpp" kind="file"><name>compiler.hpp</name>
+  </compound>
+  <compound refid="CONTRIBUTING_8md" kind="file"><name>CONTRIBUTING.md</name>
+  </compound>
+  <compound refid="defines_8hpp" kind="file"><name>defines.hpp</name>
+    <member refid="defines_8hpp_1a852b9d6f29405cd131150f41f751c40e" kind="define"><name>HEXL_USE_GNU</name></member>
+    <member refid="defines_8hpp_1ab9e56468d5f53ec5d69ffeaf3c25679e" kind="define"><name>HEXL_UNUSED</name></member>
+  </compound>
+  <compound refid="eltwise-add-mod_8hpp" kind="file"><name>eltwise-add-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-cmp-add_8hpp" kind="file"><name>eltwise-cmp-add.hpp</name>
+  </compound>
+  <compound refid="eltwise-cmp-sub-mod_8hpp" kind="file"><name>eltwise-cmp-sub-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-fma-mod_8hpp" kind="file"><name>eltwise-fma-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-mult-mod_8hpp" kind="file"><name>eltwise-mult-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-reduce-mod_8hpp" kind="file"><name>eltwise-reduce-mod.hpp</name>
+  </compound>
+  <compound refid="eltwise-sub-mod_8hpp" kind="file"><name>eltwise-sub-mod.hpp</name>
+  </compound>
+  <compound refid="gcc_8hpp" kind="file"><name>gcc.hpp</name>
+  </compound>
+  <compound refid="hexl_8hpp" kind="file"><name>hexl.hpp</name>
+  </compound>
+  <compound refid="logging_8hpp" kind="file"><name>logging.hpp</name>
+    <member refid="logging_8hpp_1af5370a040d5e43db53a00e6126ca189c" kind="define"><name>HEXL_VLOG</name></member>
+    <member refid="logging_8hpp_1a9382a5697af55d4985fc5697efcd494c" kind="define"><name>START_EASYLOGGINGPP</name></member>
+  </compound>
+  <compound refid="msvc_8hpp" kind="file"><name>msvc.hpp</name>
+  </compound>
+  <compound refid="ntt_8hpp" kind="file"><name>ntt.hpp</name>
+  </compound>
+  <compound refid="number-theory_8hpp" kind="file"><name>number-theory.hpp</name>
+  </compound>
+  <compound refid="README_8md" kind="file"><name>README.md</name>
+  </compound>
+  <compound refid="types_8hpp" kind="file"><name>types.hpp</name>
+  </compound>
+  <compound refid="util_8hpp" kind="file"><name>util.hpp</name>
+  </compound>
+  <compound refid="md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING" kind="page"><name>md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING</name>
+  </compound>
+  <compound refid="dir_39ccd546f6f66dfa0601ecdd2198d1cd" kind="dir"><name>eltwise</name>
+  </compound>
+  <compound refid="dir_fedc0764d2b1a98518c60c862fe4a06c" kind="dir"><name>experimental</name>
+  </compound>
+  <compound refid="dir_f48abe268b3ce85504fe013aef76ede2" kind="dir"><name>hexl</name>
+  </compound>
+  <compound refid="dir_138f48ea0e5a566a607c4eba361f369f" kind="dir"><name>hexl</name>
+  </compound>
+  <compound refid="dir_7a1502d4688b3add3c6a1790553dec66" kind="dir"><name>include</name>
+  </compound>
+  <compound refid="dir_428aee766785ed03ff2d325f7888036f" kind="dir"><name>logging</name>
+  </compound>
+  <compound refid="dir_b99b5b9111a7dc9d17666ca9627e721f" kind="dir"><name>ntt</name>
+  </compound>
+  <compound refid="dir_e4c04582e59b4508a4e68fc6a764f4c1" kind="dir"><name>number-theory</name>
+  </compound>
+  <compound refid="dir_4f5356f08d318fe0635050595cfb3255" kind="dir"><name>seal</name>
+  </compound>
+  <compound refid="dir_73c34c91767e4126fcbbc3b749cad3d8" kind="dir"><name>util</name>
+  </compound>
+  <compound refid="indexpage" kind="page"><name>index</name>
+  </compound>
+</doxygenindex>

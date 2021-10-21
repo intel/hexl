@@ -1,0 +1,158 @@
+\hypertarget{classintel_1_1hexl_1_1AlignedAllocator}{}\doxysection{intel\+::hexl\+::Aligned\+Allocator$<$ T, Alignment $>$ Class Template Reference}
+\label{classintel_1_1hexl_1_1AlignedAllocator}\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+
+
+Allocates memory aligned to Alignment-\/byte sized boundaries.  
+
+
+
+
+{\ttfamily \#include $<$aligned-\/allocator.\+hpp$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structintel_1_1hexl_1_1AlignedAllocator_1_1rebind}{rebind}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a8a3b7b0531d253a37a59fe1ffe12ec8a}{value\+\_\+type}} = T
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_afb7109e1c05fc55412ecfdc36894f7e5}{Aligned\+Allocator}} (\mbox{\hyperlink{namespaceintel_1_1hexl_aced64250965d3b78827d8009634eef0c}{Allocator\+Strategy\+Ptr}} strategy=nullptr) noexcept
+\item 
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a60bc693dbefeb259d375daab227bb82c}{Aligned\+Allocator}} (const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} \&src)=default
+\item 
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} \& \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_ad8b750d8cb58695b1b6ee10f5a01173c}{operator=}} (const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} \&src)=default
+\item 
+{\footnotesize template$<$typename U $>$ }\\\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a7ef7928d5be819410959faf80f6746cc}{Aligned\+Allocator}} (const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}$<$ U, Alignment $>$ \&src)
+\item 
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a6841e8cef5bedf494f47370062c73cbc}{$\sim$\+Aligned\+Allocator}} ()
+\item 
+bool \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a6f8f9c34b0ddab249c945ddb6609c6dd}{operator==}} (const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} \&)
+\item 
+bool \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a6b59d9d7304cda06b8c166dd865ff5db}{operator!=}} (const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} \&)
+\item 
+T $\ast$ \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_ac007b85746672b4e777aa9561b54f8a9}{allocate}} (size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Allocates {\ttfamily n} elements aligned to Alignment-\/byte boundaries. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_af370e3d86c582bcf1370656080bab1ec}{deallocate}} (T $\ast$p, size\+\_\+t n)
+\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename , uint64\+\_\+t $>$ }\\class \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_aaded07599020ca35e89e078674263c63}{Aligned\+Allocator}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename T, uint64\+\_\+t Alignment$>$\newline
+class intel\+::hexl\+::\+Aligned\+Allocator$<$ T, Alignment $>$}
+
+Allocates memory aligned to Alignment-\/byte sized boundaries. 
+
+Alignment must be a power of two 
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_a8a3b7b0531d253a37a59fe1ffe12ec8a}\label{classintel_1_1hexl_1_1AlignedAllocator_a8a3b7b0531d253a37a59fe1ffe12ec8a}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+using \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator_a8a3b7b0531d253a37a59fe1ffe12ec8a}{value\+\_\+type}} =  T}
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_afb7109e1c05fc55412ecfdc36894f7e5}\label{classintel_1_1hexl_1_1AlignedAllocator_afb7109e1c05fc55412ecfdc36894f7e5}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!AlignedAllocator@{AlignedAllocator}}
+\index{AlignedAllocator@{AlignedAllocator}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{AlignedAllocator()}{AlignedAllocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceintel_1_1hexl_aced64250965d3b78827d8009634eef0c}{Allocator\+Strategy\+Ptr}}}]{strategy = {\ttfamily nullptr} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [noexcept]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_a60bc693dbefeb259d375daab227bb82c}\label{classintel_1_1hexl_1_1AlignedAllocator_a60bc693dbefeb259d375daab227bb82c}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!AlignedAllocator@{AlignedAllocator}}
+\index{AlignedAllocator@{AlignedAllocator}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{AlignedAllocator()}{AlignedAllocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}$<$ T, Alignment $>$ \&}]{src }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_a7ef7928d5be819410959faf80f6746cc}\label{classintel_1_1hexl_1_1AlignedAllocator_a7ef7928d5be819410959faf80f6746cc}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!AlignedAllocator@{AlignedAllocator}}
+\index{AlignedAllocator@{AlignedAllocator}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{AlignedAllocator()}{AlignedAllocator()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+template$<$typename U $>$ \\
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}$<$ U, Alignment $>$ \&}]{src }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_a6841e8cef5bedf494f47370062c73cbc}\label{classintel_1_1hexl_1_1AlignedAllocator_a6841e8cef5bedf494f47370062c73cbc}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!````~AlignedAllocator@{$\sim$AlignedAllocator}}
+\index{````~AlignedAllocator@{$\sim$AlignedAllocator}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{$\sim$AlignedAllocator()}{~AlignedAllocator()}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::$\sim$\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_ac007b85746672b4e777aa9561b54f8a9}\label{classintel_1_1hexl_1_1AlignedAllocator_ac007b85746672b4e777aa9561b54f8a9}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!allocate@{allocate}}
+\index{allocate@{allocate}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+T$\ast$ \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::allocate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{n }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Allocates {\ttfamily n} elements aligned to Alignment-\/byte boundaries. 
+
+\begin{DoxyReturn}{Returns}
+Pointer to the aligned allocated memory 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_af370e3d86c582bcf1370656080bab1ec}\label{classintel_1_1hexl_1_1AlignedAllocator_af370e3d86c582bcf1370656080bab1ec}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!deallocate@{deallocate}}
+\index{deallocate@{deallocate}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{deallocate()}{deallocate()}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+void \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::deallocate (\begin{DoxyParamCaption}\item[{T $\ast$}]{p,  }\item[{size\+\_\+t}]{n }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_a6b59d9d7304cda06b8c166dd865ff5db}\label{classintel_1_1hexl_1_1AlignedAllocator_a6b59d9d7304cda06b8c166dd865ff5db}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+bool \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}$<$ T, Alignment $>$ \&}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_ad8b750d8cb58695b1b6ee10f5a01173c}\label{classintel_1_1hexl_1_1AlignedAllocator_ad8b750d8cb58695b1b6ee10f5a01173c}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+\mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}\& \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}$<$ T, Alignment $>$ \&}]{src }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_a6f8f9c34b0ddab249c945ddb6609c6dd}\label{classintel_1_1hexl_1_1AlignedAllocator_a6f8f9c34b0ddab249c945ddb6609c6dd}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+bool \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{intel\+::hexl\+::\+Aligned\+Allocator}}$<$ T, Alignment $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}$<$ T, Alignment $>$ \&}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classintel_1_1hexl_1_1AlignedAllocator_aaded07599020ca35e89e078674263c63}\label{classintel_1_1hexl_1_1AlignedAllocator_aaded07599020ca35e89e078674263c63}} 
+\index{intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}!AlignedAllocator@{AlignedAllocator}}
+\index{AlignedAllocator@{AlignedAllocator}!intel::hexl::AlignedAllocator$<$ T, Alignment $>$@{intel::hexl::AlignedAllocator$<$ T, Alignment $>$}}
+\doxysubsubsection{\texorpdfstring{AlignedAllocator}{AlignedAllocator}}
+{\footnotesize\ttfamily template$<$typename T , uint64\+\_\+t Alignment$>$ \\
+template$<$typename , uint64\+\_\+t $>$ \\
+friend class \mbox{\hyperlink{classintel_1_1hexl_1_1AlignedAllocator}{Aligned\+Allocator}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{aligned-allocator_8hpp}{aligned-\/allocator.\+hpp}}\end{DoxyCompactItemize}

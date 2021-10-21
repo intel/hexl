@@ -1,0 +1,21 @@
+Intel H\+E\+XL welcomes pull requests from external contributors to the {\ttfamily main} branch.
+
+Before contributing, please run 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake -\/-\/build build -\/-\/target check unittest}
+\end{DoxyCode}
+
+
+to make sure the formatting checks and all unit tests pass.
+
+Please sign your commits before making a pull request. See instructions \href{https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits}{\texttt{ here}} for how to sign commits.\hypertarget{md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING_autotoc_md25}{}\doxysubsection{Known Issues}\label{md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING_autotoc_md25}
+
+\begin{DoxyItemize}
+\item {\ttfamily Executable \`{}cpplint\`{} not found}
+
+Make sure you install cpplint\+: {\ttfamily pip install cpplint}. If you install {\ttfamily cpplint} locally, make sure to add it to your {\ttfamily P\+A\+TH}.
+\item {\ttfamily /bin/sh\+: 1\+: pre-\/commit\+: not found}
+
+Install {\ttfamily pre-\/commit}. More info at \href{https://pre-commit.com/}{\texttt{ https\+://pre-\/commit.\+com/}}.
+\item \`{}\`{}\`{} error\+: gpg failed to sign the data fatal\+: failed to write commit object {\ttfamily  Try adding}export G\+P\+G\+\_\+\+T\+TY=\`{}\`{}{\ttfamily to}$\sim$/.bashrc\`{}. 
+\end{DoxyItemize}

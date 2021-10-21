@@ -1,0 +1,13 @@
+<map id="defines.hpp" name="defines.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="79,5,177,32"/>
+<area shape="rect" id="node2" href="$hexl_8hpp.html" title=" " alt="" coords="257,453,335,480"/>
+<area shape="rect" id="node3" href="$logging_8hpp.html" title=" " alt="" coords="43,304,141,331"/>
+<area shape="rect" id="node4" href="$aligned-allocator_8hpp.html" title=" " alt="" coords="217,304,375,331"/>
+<area shape="rect" id="node6" href="$compiler_8hpp.html" title=" " alt="" coords="165,155,272,181"/>
+<area shape="rect" id="node8" href="$types_8hpp.html" title=" " alt="" coords="502,80,589,107"/>
+<area shape="rect" id="node5" href="$ntt_8hpp.html" title=" " alt="" coords="262,379,330,405"/>
+<area shape="rect" id="node7" href="$number-theory_8hpp.html" title=" " alt="" coords="251,229,397,256"/>
+<area shape="rect" id="node9" href="$check_8hpp.html" title=" " alt="" coords="501,155,589,181"/>
+<area shape="rect" id="node10" href="$clang_8hpp.html" title=" " alt="" coords="552,229,637,256"/>
+<area shape="rect" id="node11" href="$gcc_8hpp.html" title=" " alt="" coords="661,229,733,256"/>
+</map>
