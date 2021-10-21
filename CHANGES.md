@@ -1,5 +1,18 @@
 # Changes
 
+## Version 1.2.2
+
+- Fixes Barrett reduce native benchmark (https://github.com/intel/hexl/pull/65)
+- Fixes 32 bit invntt (https://github.com/intel/hexl/pull/73)
+- Fixes CMake 3.13 compilation (https://github.com/intel/hexl/pull/67)
+- Added information of HElib integration to README (https://github.com/intel/hexl/pull/63)
+- Added random number generator which generates a vector of specified size with random values drawn uniformly from [0, modulus) (https://github.com/intel/hexl/pull/62)
+- Added random input values for benchmarks (https://github.com/intel/hexl/pull/66)
+- Uses Generalized Barrett Reduction algorithm for EltwiseMultMod (https://github.com/intel/hexl/pull/68)
+- Avoids memcpy operations on NTT (https://github.com/intel/hexl/pull/72)
+- Added performance tips to README (https://github.com/intel/hexl/pull/74)
+- Improves performance of Barrett Reduction (https://github.com/intel/hexl/pull/75)
+
 ## Version 1.2.1
 - Fixes a bug in AVX512 floating-point implementation of element-wise vector-vector modular multiplication (https://github.com/microsoft/SEAL/issues/385)
 - Fixes a bug in the NTT default constructor (https://gitlab.com/palisade/palisade-development/-/issues/329)

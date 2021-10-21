@@ -1,0 +1,5 @@
+<map id="intel::hexl::NTT::AllocatorAdapter&lt; Adaptee, Args &gt;" name="intel::hexl::NTT::AllocatorAdapter&lt; Adaptee, Args &gt;">
+<area shape="rect" id="node1" title="Helper class for custom memory allocation." alt="" coords="17,184,212,225"/>
+<area shape="rect" id="node2" href="$structintel_1_1hexl_1_1AllocatorInterface.html" title=" " alt="" coords="5,80,224,136"/>
+<area shape="rect" id="node3" href="$structintel_1_1hexl_1_1AllocatorBase.html" title="Base class for custom memory allocator." alt="" coords="22,5,207,32"/>
+</map>

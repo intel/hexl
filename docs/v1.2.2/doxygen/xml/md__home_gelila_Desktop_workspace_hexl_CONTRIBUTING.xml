@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING" kind="page">
+    <compoundname>md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING</compoundname>
+    <title>Pull Requests</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Intel HEXL welcomes pull requests from external contributors to the <computeroutput>main</computeroutput> branch.</para>
+<para>Before contributing, please run <programlisting filename=".bash"><codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>check<sp/>unittest</highlight></codeline>
+</programlisting></para>
+<para>to make sure the formatting checks and all unit tests pass.</para>
+<para>Please sign your commits before making a pull request. See instructions <ulink url="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits">here</ulink> for how to sign commits.</para>
+<sect2 id="md__home_gelila_Desktop_workspace_hexl_CONTRIBUTING_1autotoc_md25">
+<title>Known Issues</title>
+<para><itemizedlist>
+<listitem><para><computeroutput>Executable `cpplint` not found</computeroutput></para>
+<para>Make sure you install cpplint: <computeroutput>pip install cpplint</computeroutput>. If you install <computeroutput>cpplint</computeroutput> locally, make sure to add it to your <computeroutput>PATH</computeroutput>.</para>
+</listitem><listitem><para><computeroutput>/bin/sh: 1: pre-commit: not found</computeroutput></para>
+<para>Install <computeroutput>pre-commit</computeroutput>. More info at <ulink url="https://pre-commit.com/">https://pre-commit.com/</ulink>.</para>
+</listitem><listitem><para>``` error: gpg failed to sign the data fatal: failed to write commit object <computeroutput> Try adding</computeroutput>export GPG_TTY=``<computeroutput>to</computeroutput>~/.bashrc`. </para>
+</listitem></itemizedlist>
+</para>
+</sect2>
+    </detaileddescription>
+  </compounddef>
+</doxygen>
