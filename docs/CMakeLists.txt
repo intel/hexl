@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Build Doxygen documentation
-find_package(Doxygen REQUIRED)
+SET(DOXYGEN_MIN_VERSION "1.8.17")
+find_package(Doxygen ${DOXYGEN_MIN_VERSION} REQUIRED)
 
 set(DOXYGEN_INDEX_FILE ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/xml/indexl.html)
 set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doxygen)
