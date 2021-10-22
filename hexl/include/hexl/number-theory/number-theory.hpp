@@ -264,7 +264,7 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
 /// @param[in] v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
 /// @param[in] T_hi of T = ab in the range [0, Rq − 1].
 /// @param[in] T_lo of T.
-/// @param[out] S in the range [0, q − 1] such that S ≡ TR^−1 mod q
+/// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift>
 inline uint64_t MontgomeryReduce(uint64_t T_hi, uint64_t T_lo, uint64_t q,
                                  uint64_t r, uint64_t mod_R_msk,
@@ -273,28 +273,7 @@ inline uint64_t MontgomeryReduce(uint64_t T_hi, uint64_t T_lo, uint64_t q,
              "Unsupported BitShift " << BitShift);
   HEXL_CHECK((1ULL << r) > static_cast<uint64_t>(q),
              "R value should be greater than q = " << static_cast<uint64_t>(q));
-  HEXL_CHECK(
-      std::__gcd(static_cast<int64_t>((1 << r)), static_cast<int64_t>(q)) == 1,
-      "gcd(R, q) should be 1");
-  /*
-// Operation:
-// m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
-uint64_t m = ((T_lo & v_mod_R_msk) * v_inv_mod) & v_mod_R_msk;
-// Operation: t ← (T + mN) / R = (T + m*q) >> r
-uint64_t t_hi = (uint64_t)(((uint128_t)m) * ((uint128_t)q) >> BitShift);
-uint64_t t_lo;
 
-if (BitShift == 52) {
-t_lo = m * q & (4503599627370495);
-} else {
-t_lo = m * q;
-}
-
-t_hi = ((T_hi + t_hi) << (BitShift - r));
-t_lo = (t_lo + T_lo) >> r;
-
-t_lo = t_hi + t_lo;
-return (t_lo >= q) ? (t_lo - q) : t_lo;*/
   uint128_t T = (uint128_t(T_hi) << BitShift) + uint128_t(T_lo);
   uint128_t m = ((T & mod_R_msk) * inv_mod) & mod_R_msk;
   uint128_t t = (T + m * q) >> r;
@@ -306,14 +285,11 @@ return (t_lo >= q) ? (t_lo - q) : t_lo;*/
 /// Find solution for qX + 1 = 0 mod 2^r
 /// @param[in] r
 /// @param[in] q such that gcd(2, q) = 1
-/// @param[out] x in [0, 2^r − 1] such that q*x ≡ −1 mod 2^r
+/// @return Unsigned long int in [0, 2^r − 1] such that q*x ≡ −1 mod 2^r
 inline uint64_t HenselLemma2adicRoot(uint32_t r, uint64_t q) {
   uint64_t a_prev = 1;
   uint64_t c = 2;
   uint64_t mod_mask = 3;
-
-  HEXL_CHECK(std::__gcd(static_cast<int64_t>(2), static_cast<int64_t>(q)) == 1,
-             "gcd(2,q) should be 1");
 
   // Root:
   //    f(x) = qX + 1 and a_(0) = 1 then f(1) ≡ 0 mod 2
