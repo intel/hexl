@@ -4,16 +4,9 @@
 find_library(EASYLOGGINGPP_LIBRARY easyloggingpp)
 find_path(EASYLOGGINGPP_INCLUDEDIR easylogging++.h PATH_SUFFIXES include)
 
-find_package_handle_standard_args(EASYLOGGINGPP REQUIRED_VARS EASYLOGGINGPP_INCLUDEDIR)
-find_package_handle_standard_args(EASYLOGGINGPP_LIB REQUIRED_VARS EASYLOGGINGPP_LIBRARY)
+find_package_handle_standard_args(EASYLOGGINGPP REQUIRED_VARS EASYLOGGINGPP_LIBRARY EASYLOGGINGPP_INCLUDEDIR)
 
 if(EASYLOGGINGPP_FOUND)
-    message(STATUS "easyloggingpp include directory found")
-else()
-    message(STATUS "easyloggingpp include directory not found, using EASYLOGGINGPP packaged with HEXL")
-endif()
-
-if(EASYLOGGINGPP_LIB_FOUND)
     message(STATUS "easyloggingpp library found")
 else()
     message(STATUS "easyloggingpp library not found, using EASYLOGGINGPP packaged with HEXL")
