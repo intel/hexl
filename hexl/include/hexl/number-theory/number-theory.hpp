@@ -267,33 +267,39 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
 /// @param[out] S in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift>
 inline uint64_t MontgomeryReduce(uint64_t T_hi, uint64_t T_lo, uint64_t q,
-                                 uint64_t r, uint64_t v_mod_R_msk,
-                                 uint64_t v_inv_mod) {
+                                 uint64_t r, uint64_t mod_R_msk,
+                                 uint64_t inv_mod) {
   HEXL_CHECK(BitShift == 64 || BitShift == 52,
              "Unsupported BitShift " << BitShift);
-  HEXL_CHECK((1ULL << r) > q, "R value should be greater than q = " << q);
+  HEXL_CHECK((1ULL << r) > static_cast<uint64_t>(q),
+             "R value should be greater than q = " << static_cast<uint64_t>(q));
   HEXL_CHECK(
       std::__gcd(static_cast<int64_t>((1 << r)), static_cast<int64_t>(q)) == 1,
       "gcd(R, q) should be 1");
+  /*
+// Operation:
+// m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
+uint64_t m = ((T_lo & v_mod_R_msk) * v_inv_mod) & v_mod_R_msk;
+// Operation: t ← (T + mN) / R = (T + m*q) >> r
+uint64_t t_hi = (uint64_t)(((uint128_t)m) * ((uint128_t)q) >> BitShift);
+uint64_t t_lo;
 
-  // Operation:
-  // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
-  uint64_t m = ((T_lo & v_mod_R_msk) * v_inv_mod) & v_mod_R_msk;
-  // Operation: t ← (T + mN) / R = (T + m*q) >> r
-  uint64_t t_hi = (uint64_t)(((uint128_t)m) * ((uint128_t)q) >> BitShift);
-  uint64_t t_lo;
+if (BitShift == 52) {
+t_lo = m * q & (4503599627370495);
+} else {
+t_lo = m * q;
+}
 
-  if (BitShift == 52) {
-    t_lo = m * q & (4503599627370495);
-  } else {
-    t_lo = m * q;
-  }
+t_hi = ((T_hi + t_hi) << (BitShift - r));
+t_lo = (t_lo + T_lo) >> r;
 
-  t_hi = ((T_hi + t_hi) << (BitShift - r));
-  t_lo = (t_lo + T_lo) >> r;
-
-  t_lo = t_hi + t_lo;
-  return (t_lo >= q) ? (t_lo - q) : t_lo;
+t_lo = t_hi + t_lo;
+return (t_lo >= q) ? (t_lo - q) : t_lo;*/
+  uint128_t T = (uint128_t(T_hi) << BitShift) + uint128_t(T_lo);
+  uint128_t m = ((T & mod_R_msk) * inv_mod) & mod_R_msk;
+  uint128_t t = (T + m * q) >> r;
+  t = (t >= q) ? (t - q) : t;
+  return (uint64_t)(t & (((uint128_t)1ULL << BitShift) - 1));
 }
 
 /// @brief Hensel's Lemma for 2-adic numbers

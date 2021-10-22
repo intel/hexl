@@ -153,14 +153,24 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
   uint64_t mod_R_mask = R - 1;
-  uint64_t prod_rs = (1ULL << (52 - r));
+  uint64_t prod_rs;
+  if (BitShift == 64) {
+    prod_rs = (9223372036854775807ULL);
+  } else {
+    prod_rs = (1ULL << (52 - r));
+  }
   uint64_t n_tmp = n;
 
   // Deals with n not divisible by 8
   uint64_t n_mod_8 = n_tmp % 8;
   if (n_mod_8 != 0) {
-    // To do> Implement native version
-
+    for (size_t i = 0; i < n_mod_8; ++i) {
+      uint128_t T = (uint128_t)a[i] * (uint128_t)b[i];
+      uint64_t T_hi = (uint64_t)(T >> BitShift);
+      uint64_t T_lo = (uint64_t)(T);
+      result[i] = MontgomeryReduce<BitShift>(T_hi, T_lo, modulus, r, mod_R_mask,
+                                             inv_mod);
+    }
     a += n_mod_8;
     b += n_mod_8;
     result += n_mod_8;
@@ -178,8 +188,15 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   for (size_t i = 0; i < n_tmp; i += 8) {
     __m512i v_a_op = _mm512_loadu_si512(v_a);
     __m512i v_b_op = _mm512_loadu_si512(v_b);
-    __m512i v_T_hi = _mm512_hexl_mulhi_epi<52>(v_a_op, v_b_op);
-    __m512i v_T_lo = _mm512_hexl_mullo_epi<52>(v_a_op, v_b_op);
+    __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b_op);
+    __m512i v_T_lo = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_b_op);
+
+    if (BitShift == 64) {
+      v_T_hi = _mm512_slli_epi64(v_T_hi, 1);
+      __m512i tmp = _mm512_srli_epi64(v_T_lo, 63);
+      v_T_hi = _mm512_add_epi64(v_T_hi, tmp);
+      v_T_lo = _mm512_and_epi64(v_T_lo, v_prod_rs);
+    }
 
     __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift>(
         v_T_hi, v_T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
@@ -206,14 +223,24 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
   uint64_t mod_R_mask = R - 1;
-  uint64_t prod_rs = (1ULL << (52 - r));
+  uint64_t prod_rs;
+  if (BitShift == 64) {
+    prod_rs = (9223372036854775807ULL);
+  } else {
+    prod_rs = (1ULL << (52 - r));
+  }
   uint64_t n_tmp = n;
 
   // Deals with n not divisible by 8
   uint64_t n_mod_8 = n_tmp % 8;
   if (n_mod_8 != 0) {
-    // To do> Implement native version
-
+    for (size_t i = 0; i < n_mod_8; ++i) {
+      uint128_t T = (uint128_t)a[i] * (uint128_t)R2_mod_q;
+      uint64_t T_hi = (uint64_t)(T >> BitShift);
+      uint64_t T_lo = (uint64_t)(T);
+      result[i] = MontgomeryReduce<BitShift>(T_hi, T_lo, modulus, r, mod_R_mask,
+                                             inv_mod);
+    }
     a += n_mod_8;
     result += n_mod_8;
     n_tmp -= n_mod_8;
@@ -229,8 +256,15 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
 
   for (size_t i = 0; i < n_tmp; i += 8) {
     __m512i v_a_op = _mm512_loadu_si512(v_a);
-    __m512i v_T_hi = _mm512_hexl_mulhi_epi<52>(v_a_op, v_b);
-    __m512i v_T_lo = _mm512_hexl_mullo_epi<52>(v_a_op, v_b);
+    __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b);
+    __m512i v_T_lo = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_b);
+
+    if (BitShift == 64) {
+      v_T_hi = _mm512_slli_epi64(v_T_hi, 1);
+      __m512i tmp = _mm512_srli_epi64(v_T_lo, 63);
+      v_T_hi = _mm512_add_epi64(v_T_hi, tmp);
+      v_T_lo = _mm512_and_epi64(v_T_lo, v_prod_rs);
+    }
 
     __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift>(
         v_T_hi, v_T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
