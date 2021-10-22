@@ -19,7 +19,8 @@ namespace hexl {
 /// @param[in] bound Scalar to compare against
 /// @param[in] diff Scalar to subtract by
 /// @details Computes \p operand1[i] = (\p cmp(\p operand1, \p bound)) ? (\p
-/// operand1 - \p diff) mod \p modulus : \p operand1 for all i=0, ..., n-1
+/// operand1 - \p diff) mod \p modulus : \p operand1 mod \p modulus for all i=0,
+/// ..., n-1
 void EltwiseCmpSubMod(uint64_t* result, const uint64_t* operand1, uint64_t n,
                       uint64_t modulus, CMPINT cmp, uint64_t bound,
                       uint64_t diff);
