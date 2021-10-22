@@ -232,7 +232,7 @@ static void BM_EltwiseReduceModMontMultAVX512BitShift52LT(
   auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
-  uint64_t r = 46;  // R^2 mod N = 42006526039321
+  int r = 46;  // R^2 mod N = 42006526039321
   uint64_t inv_mod = 62463730494515ULL;
 
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -258,7 +258,7 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift52LT(
   auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
-  uint64_t r = 46;  // R^2 mod N = 42006526039321
+  int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
   uint64_t inv_mod = 62463730494515ULL;
 
@@ -284,7 +284,7 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift64LT(
   auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
-  uint64_t r = 46;  // R^2 mod N = 42006526039321
+  int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
   uint64_t inv_mod = 62463730494515ULL;
 
@@ -310,7 +310,7 @@ static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
   auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
-  uint64_t r = 46;  // R^2 mod N = 42006526039321
+  int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
   uint64_t inv_mod = 62463730494515ULL;
 

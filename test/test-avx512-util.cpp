@@ -376,7 +376,7 @@ TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
     __m512i expected_out = _mm512_set_epi64(2, 4, 3, 1, 2, 3, 2, 0);
 
     uint64_t modulus = 5;
-    uint64_t r = 3;
+    int r = 3;
     uint64_t R = (1ULL << r);
     uint64_t prod_rs = (1ULL << (52 - r));
     HEXL_CHECK(std::__gcd(67280421310725, static_cast<int64_t>(R)), 1);
@@ -420,7 +420,7 @@ TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
     __m512i T_hi = _mm512_set_epi64(559639348720ULL, 0, 0, 0, 0, 0, 0, 0);
     __m512i T_lo = _mm512_set_epi64(1832906312477596ULL, 0, 0, 0, 0, 0, 0, 0);
 
-    uint64_t r = 46;
+    int r = 46;
     __m512i v_modulus = _mm512_set_epi64(
         67280421310725, 67280421310725, 67280421310725, 67280421310725,
         67280421310725, 67280421310725, 67280421310725, 67280421310725);
@@ -451,7 +451,7 @@ TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
 
   // 52 bits R and 51 bits modulus
   {
-    uint64_t r = 51;
+    int r = 51;
     uint64_t modulus = 2251799813684809;
     uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
     uint64_t mod_R_mask = (1ULL << r) - 1;
@@ -471,7 +471,7 @@ TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
 
   // 62 bits R and 61 bits modulus
   {
-    uint64_t r = 61;
+    int r = 61;
     uint64_t modulus = 2305843009213693487;
     uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
     uint64_t mod_R_mask = (1ULL << r) - 1ULL;
@@ -492,7 +492,7 @@ TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
 
   // 63 bits R and 62 bits modulus
   {
-    uint64_t r = 62;
+    int r = 62;
     uint64_t modulus = 4611686018427387631;
     uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
     uint64_t mod_R_mask = (1ULL << r) - 1;

@@ -267,8 +267,7 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
 /// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift>
 inline uint64_t MontgomeryReduce(uint64_t T_hi, uint64_t T_lo, uint64_t q,
-                                 uint64_t r, uint64_t mod_R_msk,
-                                 uint64_t inv_mod) {
+                                 int r, uint64_t mod_R_msk, uint64_t inv_mod) {
   HEXL_CHECK(BitShift == 64 || BitShift == 52,
              "Unsupported BitShift " << BitShift);
   HEXL_CHECK((1ULL << r) > static_cast<uint64_t>(q),

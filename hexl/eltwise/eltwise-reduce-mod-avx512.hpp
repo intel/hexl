@@ -142,7 +142,7 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 template <int BitShift = 64>
 void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
                                 const uint64_t* b, uint64_t n, uint64_t modulus,
-                                uint64_t inv_mod, uint64_t r) {
+                                uint64_t inv_mod, int r) {
   HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
   HEXL_CHECK(b != nullptr, "Require operand b != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
@@ -212,8 +212,7 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
 template <int BitShift = 64>
 void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
                                  uint64_t R2_mod_q, uint64_t n,
-                                 uint64_t modulus, uint64_t inv_mod,
-                                 uint64_t r) {
+                                 uint64_t modulus, uint64_t inv_mod, int r) {
   HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");

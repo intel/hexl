@@ -378,7 +378,7 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
 // Output: Integer S in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift = 64>
 inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
-                                             __m512i q, uint64_t r,
+                                             __m512i q, int r,
                                              __m512i v_mod_R_msk,
                                              __m512i v_inv_mod,
                                              __m512i v_rs_or_msk) {
