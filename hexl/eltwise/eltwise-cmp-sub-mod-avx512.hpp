@@ -57,6 +57,12 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
       MultiplyFactor(uint64_t(1) << (ceil_log_mod + alpha - BitShift), BitShift,
                      modulus)
           .BarrettFactor();
+
+  if (BitShift == 64) {
+    // Single-worded Barrett reduction.
+    mu_64 = MultiplyFactor(1, 64, modulus).BarrettFactor();
+  }
+
   __m512i v_mu_64 = _mm512_set1_epi64(static_cast<int64_t>(mu_64));
 
   for (size_t i = n / 8; i > 0; --i) {

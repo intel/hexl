@@ -392,6 +392,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
     __mmask8 mask =
         _mm512_hexl_cmp_epu64_mask(x, two_pow_fiftytwo, CMPINT::NLT);
     if (mask != 0) {
+      // values above 2^52
       HEXL_VLOG(5, "mask != 0");
       __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
       __m512i x_intr = _mm512_slli_epi64(x, static_cast<unsigned int>(12ULL));
@@ -422,18 +423,17 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
       HEXL_VLOG(5, "x " << x[0]);
     } else {
       __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr_52);
-      // Barrett subtraction
-      // tmp[0] = input - tmp[1] * q;
       __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
       x = _mm512_sub_epi64(x, tmp1_times_mod);
     }
   }
 #endif
   if (BitShift == 64) {
+    HEXL_VLOG(5, "q_barr_64 " << q_barr_64[0]);
     __m512i rnd1_hi = _mm512_hexl_mulhi_epi<64>(x, q_barr_64);
-    // Barrett subtraction
-    // tmp[0] = input - tmp[1] * q;
+    HEXL_VLOG(5, "rnd1_hi " << rnd1_hi[0]);
     __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
+    HEXL_VLOG(5, "tmp1_times_mod " << tmp1_times_mod[0]);
     x = _mm512_sub_epi64(x, tmp1_times_mod);
   }
 
