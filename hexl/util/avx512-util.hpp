@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/defines.hpp"
