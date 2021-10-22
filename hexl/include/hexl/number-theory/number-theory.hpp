@@ -274,11 +274,30 @@ inline uint64_t MontgomeryReduce(uint64_t T_hi, uint64_t T_lo, uint64_t q,
   HEXL_CHECK((1ULL << r) > static_cast<uint64_t>(q),
              "R value should be greater than q = " << static_cast<uint64_t>(q));
 
-  uint128_t T = (uint128_t(T_hi) << BitShift) + uint128_t(T_lo);
-  uint128_t m = ((T & mod_R_msk) * inv_mod) & mod_R_msk;
-  uint128_t t = (T + m * q) >> r;
-  t = (t >= q) ? (t - q) : t;
-  return (uint64_t)(t & (((uint128_t)1ULL << BitShift) - 1));
+  uint64_t mq_hi;
+  uint64_t mq_lo;
+
+  uint64_t m = ((T_lo & mod_R_msk) * inv_mod) & mod_R_msk;
+  MultiplyUInt64(m, q, &mq_hi, &mq_lo);
+
+  if (BitShift == 52) {
+    mq_hi = (mq_hi << 12) | (mq_lo >> 52);
+    mq_lo &= (4503599627370495);
+  }
+
+  uint64_t t_hi;
+  uint64_t t_lo;
+
+  // first 64bit block
+  t_lo = T_lo + mq_lo;
+  unsigned int carry = static_cast<unsigned int>(t_lo < T_lo);
+  t_hi = T_hi + mq_hi + carry;
+
+  t_hi = t_hi << (BitShift - r);
+  t_lo = t_lo >> r;
+  t_lo = t_hi + t_lo;
+
+  return (t_lo >= q) ? (t_lo - q) : t_lo;
 }
 
 /// @brief Hensel's Lemma for 2-adic numbers
