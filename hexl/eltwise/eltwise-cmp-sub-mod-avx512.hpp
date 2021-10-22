@@ -48,7 +48,6 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
   // Multi-word Barrett reduction precomputation
   constexpr int64_t beta = -2;
   const uint64_t ceil_log_mod = Log2(modulus) + 1;  // "n" from Algorithm 2
-  HEXL_VLOG(5, "ceil_log_mod " << ceil_log_mod);
   uint64_t prod_right_shift = ceil_log_mod + beta;
   __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
 
@@ -69,14 +68,8 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
     __m512i v_op = _mm512_loadu_si512(v_op_ptr);
     __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
 
-    uint64_t x_0 = v_op[0];
-
     v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
         v_op, v_modulus, v_mu_64, v_mu, prod_right_shift, v_neg_mod);
-
-    uint64_t x_mod_p = v_op[0];
-    HEXL_CHECK(x_0 % modulus == x_mod_p,
-               "x_0 " << x_0 << " mod " << modulus << " != " << x_mod_p);
 
     __m512i v_to_add = _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
     v_to_add = _mm512_sub_epi64(v_to_add, v_diff);

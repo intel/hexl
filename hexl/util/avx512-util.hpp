@@ -384,8 +384,6 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
   HEXL_CHECK(BitShift == 52 || BitShift == 64,
              "Invalid bitshift " << BitShift << "; need 52 or 64");
 
-  HEXL_VLOG(5, "_mm512_hexl_barrett_reduce64 BitShift " << BitShift);
-
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
     __m512i two_pow_fiftytwo = _mm512_set1_epi64(2251799813685248);
@@ -393,17 +391,10 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
         _mm512_hexl_cmp_epu64_mask(x, two_pow_fiftytwo, CMPINT::NLT);
     if (mask != 0) {
       // values above 2^52
-      HEXL_VLOG(5, "mask != 0");
       __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
       __m512i x_intr = _mm512_slli_epi64(x, static_cast<unsigned int>(12ULL));
       __m512i x_lo =
           _mm512_srli_epi64(x_intr, static_cast<unsigned int>(12ULL));
-
-      HEXL_VLOG(5, "x " << x[0]);
-      HEXL_VLOG(5, "x_lo " << x_lo[0]);
-      HEXL_VLOG(5, "q_barr_64 " << q_barr_64[0]);
-      HEXL_VLOG(5, "q_barr_52 " << q_barr_52[0]);
-      HEXL_VLOG(5, "prod_right_shift " << prod_right_shift);
 
       // c1 = floor(U / 2^{n + beta})
       __m512i c1_lo =
@@ -412,15 +403,11 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
           x_hi, static_cast<unsigned int>(52ULL - (prod_right_shift)));
       __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
-      HEXL_VLOG(5, "c1 " << c1[0]);
-
       // alpha - beta == 52, so we only need high 52 bits
       __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, q_barr_64);
-      HEXL_VLOG(5, "q_hat " << q_hat[0]);
 
       // Z = prod_lo - (p * q_hat)_lo
       x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
-      HEXL_VLOG(5, "x " << x[0]);
     } else {
       __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr_52);
       __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
@@ -429,11 +416,8 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
   }
 #endif
   if (BitShift == 64) {
-    HEXL_VLOG(5, "q_barr_64 " << q_barr_64[0]);
     __m512i rnd1_hi = _mm512_hexl_mulhi_epi<64>(x, q_barr_64);
-    HEXL_VLOG(5, "rnd1_hi " << rnd1_hi[0]);
     __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
-    HEXL_VLOG(5, "tmp1_times_mod " << tmp1_times_mod[0]);
     x = _mm512_sub_epi64(x, tmp1_times_mod);
   }
 
