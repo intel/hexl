@@ -15,7 +15,7 @@ namespace intel {
 namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
-template <int BitShift = 64>
+template <int BitShift>
 void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
                             uint64_t n, uint64_t modulus, CMPINT cmp,
                             uint64_t bound, uint64_t diff) {

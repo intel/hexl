@@ -52,10 +52,8 @@ void EltwiseCmpSubModNative(uint64_t* result, const uint64_t* operand1,
 
   for (size_t i = 0; i < n; ++i) {
     uint64_t op = operand1[i];
-
     bool op_cmp = Compare(cmp, op, bound);
     op %= modulus;
-
     if (op_cmp) {
       op = SubUIntMod(op, diff, modulus);
     }
