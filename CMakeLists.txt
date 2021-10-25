@@ -1,7 +1,8 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.5.1)
+# target_link_options and cmake -S . -B build require cmake 3.13
+cmake_minimum_required(VERSION 3.13)
 project(HEXL VERSION 1.2.2 LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
