@@ -12,14 +12,13 @@
 #include "hexl/util/check.hpp"
 #include "util/cpu-features.hpp"
 
-const bool USE_ADDER_TREE = true;
-
 namespace intel {
 namespace hexl {
 
-// operand1: num_weights x 2 x n x num_moduli [num_weights x |Ciphertext|].
-// operand2: num_weights x 2 x n x num_moduli [num_weights x
-// |Ciphertext/Plaintext|]. results: num_weights x 3 x n x num_moduli
+// operand1: num_weights x 2 x n x num_moduli
+// operand2: num_weights x 2 x n x num_moduli
+//
+// results:  num_weights x 3 x n x num_moduli
 // [num_weights x {x[0].*y[0], x[0].*y[1]+x[1].*y[0], x[1].*y[1]} x num_moduli].
 // TODO(@fdiasmor): Ideally, the size of results can be optimized to [3 x n x
 // num_moduli].
@@ -89,6 +88,7 @@ void LinRegMatrixVectorMultiply(uint64_t* result, const uint64_t* operand1,
     }
   }
 
+  const bool USE_ADDER_TREE = true;
   if (USE_ADDER_TREE) {
     // Accumulate with the adder-tree algorithm in O(logn)
     for (size_t dist = 1; dist < num_weights; dist += dist) {
