@@ -281,7 +281,7 @@ inline uint64_t MontgomeryReduce(uint64_t T_hi, uint64_t T_lo, uint64_t q,
 
   if (BitShift == 52) {
     mq_hi = (mq_hi << 12) | (mq_lo >> 52);
-    mq_lo &= (4503599627370495);
+    mq_lo &= (1ULL << 52) - 1;
   }
 
   uint64_t t_hi;

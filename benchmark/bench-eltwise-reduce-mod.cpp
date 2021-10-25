@@ -224,7 +224,7 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52LT)
 ////=================================================================
 
 #ifdef HEXL_HAS_AVX512IFMA
-static void BM_EltwiseReduceModMontMultAVX512BitShift52LT(
+static void BM_EltwiseReduceModMontAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 67280421310725ULL;
@@ -233,6 +233,7 @@ static void BM_EltwiseReduceModMontMultAVX512BitShift52LT(
   AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
   int r = 46;  // R^2 mod N = 42006526039321
+  // inv_mod*modulus = -1 mod R. Can be obtained via Hensel's Lemma.
   uint64_t inv_mod = 62463730494515ULL;
 
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -244,7 +245,7 @@ static void BM_EltwiseReduceModMontMultAVX512BitShift52LT(
   }
 }
 
-BENCHMARK(BM_EltwiseReduceModMontMultAVX512BitShift52LT)
+BENCHMARK(BM_EltwiseReduceModMontAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})

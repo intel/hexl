@@ -139,6 +139,14 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
   }
 }
 
+/// @brief Returns Montgomery form of modular product ab mod q, computed via the
+///  REDC algorithm, also known as Montgomery reduction.
+/// @param[in] r
+/// @param[in] q with R = 2^r such that gcd(R, q) = 1. R > q.
+/// @param[in] v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+/// @param[in] T_hi of T = ab in the range [0, Rq − 1].
+/// @param[in] T_lo of T.
+/// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift = 64>
 void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
                                 const uint64_t* b, uint64_t n, uint64_t modulus,
@@ -149,13 +157,14 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
 
   uint64_t R = (1ULL << r);
-  HEXL_CHECK(std::__gcd(67280421310725, static_cast<int64_t>(R)), 1);
+  HEXL_CHECK(std::__gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
+             1);
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
   uint64_t mod_R_mask = R - 1;
   uint64_t prod_rs;
   if (BitShift == 64) {
-    prod_rs = (9223372036854775807ULL);
+    prod_rs = (1ULL << 63) - 1;
   } else {
     prod_rs = (1ULL << (52 - r));
   }
@@ -165,9 +174,9 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   uint64_t n_mod_8 = n_tmp % 8;
   if (n_mod_8 != 0) {
     for (size_t i = 0; i < n_mod_8; ++i) {
-      uint128_t T = (uint128_t)a[i] * (uint128_t)b[i];
-      uint64_t T_hi = (uint64_t)(T >> BitShift);
-      uint64_t T_lo = (uint64_t)(T);
+      uint64_t T_hi;
+      uint64_t T_lo;
+      MultiplyUInt64(a[i], b[i], &T_hi, &T_lo);
       result[i] = MontgomeryReduce<BitShift>(T_hi, T_lo, modulus, r, mod_R_mask,
                                              inv_mod);
     }
@@ -209,6 +218,14 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   }
 }
 
+/// @brief Returns Montgomery form of a mod q, computed via the REDC algorithm,
+/// also known as Montgomery reduction.
+/// @param[in] q with R = 2^r such that gcd(R, q) = 1. R > q.
+/// @param[in] R2_mod_q R^2 mod q.
+/// @param[in] v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+/// @param[in] T_hi of T = ab in the range [0, Rq − 1].
+/// @param[in] T_lo of T.
+/// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift = 64>
 void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
                                  uint64_t R2_mod_q, uint64_t n,
@@ -218,13 +235,14 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
 
   uint64_t R = (1ULL << r);
-  HEXL_CHECK(std::__gcd(67280421310725, static_cast<int64_t>(R)), 1);
+  HEXL_CHECK(std::__gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
+             1);
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
   uint64_t mod_R_mask = R - 1;
   uint64_t prod_rs;
   if (BitShift == 64) {
-    prod_rs = (9223372036854775807ULL);
+    prod_rs = (1ULL << 63) - 1;
   } else {
     prod_rs = (1ULL << (52 - r));
   }
@@ -234,9 +252,9 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
   uint64_t n_mod_8 = n_tmp % 8;
   if (n_mod_8 != 0) {
     for (size_t i = 0; i < n_mod_8; ++i) {
-      uint128_t T = (uint128_t)a[i] * (uint128_t)R2_mod_q;
-      uint64_t T_hi = (uint64_t)(T >> BitShift);
-      uint64_t T_lo = (uint64_t)(T);
+      uint64_t T_hi;
+      uint64_t T_lo;
+      MultiplyUInt64(a[i], R2_mod_q, &T_hi, &T_lo);
       result[i] = MontgomeryReduce<BitShift>(T_hi, T_lo, modulus, r, mod_R_mask,
                                              inv_mod);
     }
