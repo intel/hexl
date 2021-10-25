@@ -233,8 +233,8 @@ static void BM_EltwiseReduceModMontAVX512BitShift52LT(
   AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
   int r = 46;  // R^2 mod N = 42006526039321
-  // inv_mod*modulus = -1 mod R. Can be obtained via Hensel's Lemma.
-  uint64_t inv_mod = 62463730494515ULL;
+  // inv_mod*modulus = -1 mod R.
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
 
   AlignedVector64<uint64_t> output(input_size, 0);
 
@@ -261,7 +261,7 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift52LT(
 
   int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
-  uint64_t inv_mod = 62463730494515ULL;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
 
   AlignedVector64<uint64_t> output(input_size, 0);
 
@@ -287,7 +287,7 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift64LT(
 
   int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
-  uint64_t inv_mod = 62463730494515ULL;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
 
   AlignedVector64<uint64_t> output(input_size, 0);
 
@@ -313,7 +313,7 @@ static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
 
   int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
-  uint64_t inv_mod = 62463730494515ULL;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
 
   AlignedVector64<uint64_t> output(input_size, 0);
 
