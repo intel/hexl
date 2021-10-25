@@ -182,7 +182,7 @@ static void BM_EltwiseReduceModAVX512BitShift52GT(
   auto input1 = GenerateInsecureUniformRandomValues(
       input_size, 4503599627370496, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 2;
+  const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -205,7 +205,7 @@ static void BM_EltwiseReduceModAVX512BitShift52LT(
   auto input1 =
       GenerateInsecureUniformRandomValues(input_size, 0, 2251799813685248);
   const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 2;
+  const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -219,6 +219,118 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52LT)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
+#endif
+
+////=================================================================
+
+#ifdef HEXL_HAS_AVX512IFMA
+static void BM_EltwiseReduceModMontAVX512BitShift52LT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  uint64_t modulus = 67280421310725ULL;
+
+  auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
+
+  int r = 46;  // R^2 mod N = 42006526039321
+  // inv_mod*modulus = -1 mod R.
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseMontReduceModAVX512<52>(output.data(), input_a.data(),
+                                   input_b.data(), input_size, modulus, inv_mod,
+                                   r);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModMontAVX512BitShift52LT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+static void BM_EltwiseReduceModMontFormAVX512BitShift52LT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  uint64_t modulus = 67280421310725ULL;
+
+  auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
+
+  int r = 46;  // R^2 mod N = 42006526039321
+  const uint64_t R2_mod_q = 42006526039321;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseMontgomeryFormAVX512<52>(output.data(), input_a.data(), R2_mod_q,
+                                    input_size, modulus, inv_mod, r);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModMontFormAVX512BitShift52LT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+static void BM_EltwiseReduceModMontFormAVX512BitShift64LT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  uint64_t modulus = 67280421310725ULL;
+
+  auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
+
+  int r = 46;  // R^2 mod N = 42006526039321
+  const uint64_t R2_mod_q = 42006526039321;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseMontgomeryFormAVX512<64>(output.data(), input_a.data(), R2_mod_q,
+                                    input_size, modulus, inv_mod, r);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModMontFormAVX512BitShift64LT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
+static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  uint64_t modulus = 67280421310725ULL;
+
+  auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
+
+  int r = 46;  // R^2 mod N = 42006526039321
+  const uint64_t R2_mod_q = 42006526039321;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseMontgomeryFormAVX512<52>(output.data(), input_a.data(), R2_mod_q,
+                                    input_size, modulus, inv_mod, r);
+    EltwiseMontgomeryFormAVX512<52>(output.data(), output.data(), 1ULL,
+                                    input_size, modulus, inv_mod, r);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
+
 #endif
 
 //=================================================================

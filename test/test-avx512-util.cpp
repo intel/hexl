@@ -3,6 +3,7 @@
 
 #include <immintrin.h>
 
+#include <algorithm>
 #include <vector>
 
 #include "gtest/gtest.h"
@@ -346,6 +347,184 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
     }
   }
 }
+#endif
+
+#ifdef HEXL_HAS_AVX512IFMA
+TEST(AVX512, _mm512_hexl_montgomery_reduce52) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  // Small Montgomery multiplication
+  {
+    // x' = xR mod N   &   T = (aR mond N)*(bR mod N)   &   c' = abR mod N
+    // R = 8  &  N = 5
+    // a * b = c mod N    a'* b'= c'  =>   T
+    // 3 * 3  =   4       4 * 4 = 2   =>   16
+    // 1 * 3  =   3       3 * 4 = 4   =>   12
+    // 1 * 1  =   1       3 * 3 = 3   =>   9
+    // 3 * 4  =   2       4 * 2 = 1   =>   8
+    // 1 * 4  =   4       3 * 2 = 2   =>   6
+    // 2 * 3  =   1       1 * 4 = 3   =>   4
+    // 2 * 2  =   4       1 * 1 = 2   =>   1
+    // 0 * 5  =   0       0 * 0 = 0   =>   0
+
+    // T:
+    __m512i T_hi = _mm512_set_epi64(0, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_lo = _mm512_set_epi64(16, 12, 9, 8, 6, 4, 1, 0);
+    // c:
+    __m512i expected_c_out = _mm512_set_epi64(4, 3, 1, 2, 4, 1, 4, 0);
+    // c':
+    __m512i expected_out = _mm512_set_epi64(2, 4, 3, 1, 2, 3, 2, 0);
+
+    uint64_t modulus = 5;
+    int r = 3;
+    uint64_t R = (1ULL << r);
+    uint64_t prod_rs = (1ULL << (52 - r));
+    uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+    // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
+    __m512i v_mod_R_mask = _mm512_set1_epi64(R - 1);
+    __m512i v_modulus = _mm512_set1_epi64(modulus);
+    __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+    __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+
+    __m512i _c = _mm512_hexl_montgomery_reduce<52>(
+        T_hi, T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    AssertEqual(_c, expected_out);
+
+    // Out of Montgomery form
+    _c = _mm512_hexl_montgomery_reduce<52>(T_hi, _c, v_modulus, r, v_mod_R_mask,
+                                           v_inv_mod, v_prod_rs);
+
+    AssertEqual(_c, expected_c_out);
+  }
+
+  // Large Values in Montgomery
+  {
+    // Example expected output of 'a' in Montgomery form:
+    // R = 70368744177664
+    // N = 67280421310725
+    // a = 127280421310721
+    // aR = 8956563406039419276171935744
+    // aR mod N = 1546598034044
+    __m512i expected_out = _mm512_set_epi64(1546598034044, 0, 0, 0, 0, 0, 0, 0);
+    // Respective Input:
+    // R^2 = 4951760157141521099596496896
+    // R^2 mod N = 42006526039321
+    // a mod N = 59999999999996
+    // T = (a mod N)*(R^2 mod N) = 2520391562359091973895842716
+    // T_hi = 0000000000001000001001001101000110101100010111110000
+    // T_lo = 0110100000110000010011000001101010010110101110011100
+    // Also, for r = 46 and N = 67280421310725 then N' = 62463730494515
+    __m512i T_hi = _mm512_set_epi64(559639348720ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_lo = _mm512_set_epi64(1832906312477596ULL, 0, 0, 0, 0, 0, 0, 0);
+
+    int r = 46;
+    __m512i v_modulus = _mm512_set1_epi64(67280421310725);
+    __m512i v_inv_mod = _mm512_set1_epi64(62463730494515);
+    __m512i v_mod_R_mask = _mm512_set1_epi64(70368744177663);
+    __m512i v_prod_rs = _mm512_set1_epi64(64);
+
+    // 52 bits
+    __m512i c = _mm512_hexl_montgomery_reduce<52>(
+        T_hi, T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    AssertEqual(c, expected_out);
+  }
+
+  // 52 bits R and 51 bits modulus
+  {
+    int r = 51;
+    uint64_t modulus = 2251799813684809;
+    uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+    uint64_t mod_R_mask = (1ULL << r) - 1;
+    uint64_t prod_rs = (1ULL << (52 - r));
+    __m512i expected_out =
+        _mm512_set_epi64(1832909426971103, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_hi = _mm512_set_epi64(5446ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_lo = _mm512_set_epi64(3006504763740625ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i v_modulus = _mm512_set1_epi64(modulus);
+    __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+    __m512i v_mod_R_mask = _mm512_set1_epi64(mod_R_mask);
+    __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+    __m512i c = _mm512_hexl_montgomery_reduce<52>(
+        T_hi, T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    AssertEqual(c, expected_out);
+  }
+}
+#endif
+
+#ifdef HEXL_HAS_AVX512DQ
+TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  // Large Values in Montgomery
+  {
+    __m512i expected_out = _mm512_set_epi64(1546598034044, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_hi = _mm512_set_epi64(559639348720ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_lo = _mm512_set_epi64(1832906312477596ULL, 0, 0, 0, 0, 0, 0, 0);
+
+    int r = 46;
+    __m512i v_modulus = _mm512_set1_epi64(67280421310725);
+    __m512i v_inv_mod = _mm512_set1_epi64(62463730494515);
+    __m512i v_mod_R_mask = _mm512_set1_epi64(70368744177663);
+
+    // 64 bits
+    uint64_t prod_rs = (1ULL << 63) - 1;
+    __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+
+    T_hi = _mm512_set_epi64(273261400, 0, 0, 0, 0, 0, 0, 0);
+    T_lo = _mm512_set_epi64(6847304339915631516, 0, 0, 0, 0, 0, 0, 0);
+
+    __m512i c = _mm512_hexl_montgomery_reduce<64>(
+        T_hi, T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    AssertEqual(c, expected_out);
+  }
+
+  // 62 bits R and 61 bits modulus
+  {
+    int r = 61;
+    uint64_t modulus = 2305843009213693487;
+    uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+    uint64_t mod_R_mask = (1ULL << r) - 1ULL;
+    uint64_t prod_rs = (1ULL << 63) - 1;
+    __m512i expected_out =
+        _mm512_set_epi64(59185395909485265, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_hi = _mm512_set_epi64(2ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_lo =
+        _mm512_set_epi64(9074465024201096609ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i v_modulus = _mm512_set1_epi64(modulus);
+    __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+    __m512i v_mod_R_mask = _mm512_set1_epi64(mod_R_mask);
+    __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+    __m512i c = _mm512_hexl_montgomery_reduce<64>(
+        T_hi, T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    AssertEqual(c, expected_out);
+  }
+
+  // 63 bits R and 62 bits modulus
+  {
+    int r = 62;
+    uint64_t modulus = 4611686018427387631;
+    uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+    uint64_t mod_R_mask = (1ULL << r) - 1;
+    uint64_t prod_rs = (1ULL << 63) - 1;
+    __m512i expected_out =
+        _mm512_set_epi64(34747555017826833, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_hi = _mm512_set_epi64(1ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i T_lo = _mm512_set_epi64(262710483011949601ULL, 0, 0, 0, 0, 0, 0, 0);
+    __m512i v_modulus = _mm512_set1_epi64(modulus);
+    __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+    __m512i v_mod_R_mask = _mm512_set1_epi64(mod_R_mask);
+    __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+    __m512i c = _mm512_hexl_montgomery_reduce<64>(
+        T_hi, T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    AssertEqual(c, expected_out);
+  }
+}
+
 #endif
 
 }  // namespace hexl
