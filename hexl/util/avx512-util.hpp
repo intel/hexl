@@ -378,49 +378,51 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
 // T_hi and T_lo for BitShift = 64 should be given in 63 bits.
 // Output: Integer S in the range [0, q − 1] such that S ≡ TR^−1 mod q
 template <int BitShift>
-inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
-                                             __m512i q, int r,
-                                             __m512i v_mod_R_msk,
-                                             __m512i v_inv_mod,
-                                             __m512i v_rs_or_msk) {
-  HEXL_CHECK(BitShift == 52 || BitShift == 64,
-             "Invalid bitshift " << BitShift << "; need 52 or 64");
+__m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo, __m512i q,
+                                      int r, __m512i v_mod_R_msk,
+                                      __m512i v_inv_mod, __m512i v_rs_or_msk);
 
 #ifdef HEXL_HAS_AVX512IFMA
-  if (BitShift == 52) {
-    // Operation:
-    // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
-    __m512i m = _mm512_and_epi64(T_lo, v_mod_R_msk);
-    m = _mm512_hexl_mullo_epi<BitShift>(m, v_inv_mod);
-    m = _mm512_and_epi64(m, v_mod_R_msk);
-
-    // Operation: t ← (T + mN) / R = (T + m*q) >> r
-    // Hi part
-    __m512i t_hi = _mm512_madd52hi_epu64(T_hi, m, q);
-    // Low part
-    __m512i t = _mm512_madd52lo_epu64(T_lo, m, q);
-    t = _mm512_srli_epi64(t, r);
-    // Join parts
-    t = _mm512_madd52lo_epu64(t, t_hi, v_rs_or_msk);
-
-    // If this function exists for 52 bits we could save 1 cycle
-    // t = _mm512_shrdi_epi64 (t_hi, t, r)
-
-    // Operation: t ≥ q? return (t - q) : return t
-    return _mm512_hexl_small_mod_epu64<2>(t, q);
-  }
-#endif
-
-  HEXL_CHECK(BitShift == 64, "Invalid bitshift " << BitShift << "; need 64");
-
+template <>
+inline __m512i _mm512_hexl_montgomery_reduce<52>(__m512i T_hi, __m512i T_lo,
+                                                 __m512i q, int r,
+                                                 __m512i v_mod_R_msk,
+                                                 __m512i v_inv_mod,
+                                                 __m512i v_rs_or_msk) {
   // Operation:
   // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
   __m512i m = _mm512_and_epi64(T_lo, v_mod_R_msk);
-  m = _mm512_hexl_mullo_epi<BitShift>(m, v_inv_mod);
+  m = _mm512_hexl_mullo_epi<52>(m, v_inv_mod);
   m = _mm512_and_epi64(m, v_mod_R_msk);
 
-  __m512i mq_hi = _mm512_hexl_mulhi_epi<BitShift>(m, q);
-  __m512i mq_lo = _mm512_hexl_mullo_epi<BitShift>(m, q);
+  // Operation: t ← (T + mN) / R = (T + m*q) >> r
+  // Hi part
+  __m512i t_hi = _mm512_madd52hi_epu64(T_hi, m, q);
+  // Low part
+  __m512i t = _mm512_madd52lo_epu64(T_lo, m, q);
+  t = _mm512_srli_epi64(t, r);
+  // Join parts
+  t = _mm512_madd52lo_epu64(t, t_hi, v_rs_or_msk);
+
+  // Operation: t ≥ q? return (t - q) : return t
+  return _mm512_hexl_small_mod_epu64<2>(t, q);
+}
+#endif
+
+template <>
+inline __m512i _mm512_hexl_montgomery_reduce<64>(__m512i T_hi, __m512i T_lo,
+                                                 __m512i q, int r,
+                                                 __m512i v_mod_R_msk,
+                                                 __m512i v_inv_mod,
+                                                 __m512i v_rs_or_msk) {
+  // Operation:
+  // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
+  __m512i m = _mm512_and_epi64(T_lo, v_mod_R_msk);
+  m = _mm512_hexl_mullo_epi<64>(m, v_inv_mod);
+  m = _mm512_and_epi64(m, v_mod_R_msk);
+
+  __m512i mq_hi = _mm512_hexl_mulhi_epi<64>(m, q);
+  __m512i mq_lo = _mm512_hexl_mullo_epi<64>(m, q);
 
   // to 63 bits
   mq_hi = _mm512_slli_epi64(mq_hi, 1);
