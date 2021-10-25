@@ -134,9 +134,6 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
     GTEST_SKIP();
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   size_t length = 1024;
 
   for (size_t bits = 50; bits <= 62; ++bits) {
@@ -169,9 +166,6 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
   size_t length = 1024;
 
@@ -263,6 +257,7 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
     }
   }
 }
+
 #endif
 
 }  // namespace hexl

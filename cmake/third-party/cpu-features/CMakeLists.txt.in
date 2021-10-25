@@ -8,7 +8,7 @@ project(cpu-features-download NONE)
 include(ExternalProject)
 ExternalProject_Add(cpu_features
   GIT_REPOSITORY    https://github.com/google/cpu_features.git
-  GIT_TAG           master
+  GIT_TAG           32b49eb5e7809052a28422cfde2f2745fbb0eb76 # master branch on Oct 20, 2021
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/cpu-features-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/cpu-features-build"
   CONFIGURE_COMMAND ""

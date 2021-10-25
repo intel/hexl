@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/defines.hpp"
@@ -389,6 +390,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
     __mmask8 mask =
         _mm512_hexl_cmp_epu64_mask(x, two_pow_fiftytwo, CMPINT::NLT);
     if (mask != 0) {
+      // values above 2^52
       __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
       __m512i x_intr = _mm512_slli_epi64(x, static_cast<unsigned int>(12ULL));
       __m512i x_lo =
@@ -408,8 +410,6 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
       x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
     } else {
       __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr_52);
-      // Barrett subtraction
-      // tmp[0] = input - tmp[1] * q;
       __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);
       x = _mm512_sub_epi64(x, tmp1_times_mod);
     }
@@ -417,24 +417,15 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 #endif
   if (BitShift == 64) {
     __m512i rnd1_hi = _mm512_hexl_mulhi_epi<64>(x, q_barr_64);
-    // Barrett subtraction
-    // tmp[0] = input - tmp[1] * q;
     __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<64>(rnd1_hi, q);
     x = _mm512_sub_epi64(x, tmp1_times_mod);
   }
 
   // Correction
-  if (OutputModFactor == 2) {
-    return x;
-  } else {
-    if (BitShift == 64) {
-      x = _mm512_hexl_small_mod_epu64(x, q);
-    }
-    if (BitShift == 52) {
-      x = _mm512_hexl_small_mod_epu64<2>(x, q);
-    }
-    return x;
+  if (OutputModFactor == 1) {
+    x = _mm512_hexl_small_mod_epu64<2>(x, q);
   }
+  return x;
 }
 
 // Concatenate packed 64-bit integers in x and y, producing an intermediate

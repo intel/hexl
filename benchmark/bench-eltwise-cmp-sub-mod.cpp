@@ -42,7 +42,7 @@ BENCHMARK(BM_EltwiseCmpSubModNative)
 
 #ifdef HEXL_HAS_AVX512DQ
 // state[0] is the degree
-static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
+static void BM_EltwiseCmpSubModAVX512_64(benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 100;
   uint64_t bound = GenerateInsecureUniformRandomValue(0, modulus);
@@ -50,12 +50,12 @@ static void BM_EltwiseCmpSubModAVX512(benchmark::State& state) {  //  NOLINT
   auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
 
   for (auto _ : state) {
-    EltwiseCmpSubModAVX512(input1.data(), input1.data(), input_size, modulus,
-                           CMPINT::NLT, bound, diff);
+    EltwiseCmpSubModAVX512<64>(input1.data(), input1.data(), input_size,
+                               modulus, CMPINT::NLT, bound, diff);
   }
 }
 
-BENCHMARK(BM_EltwiseCmpSubModAVX512)
+BENCHMARK(BM_EltwiseCmpSubModAVX512_64)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
