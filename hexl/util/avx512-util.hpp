@@ -410,8 +410,7 @@ inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
   }
 #endif
 
-  HEXL_CHECK(BitShift == 64,
-             "Invalid bitshift " << BitShift << "; need 52 or 64");
+  HEXL_CHECK(BitShift == 64, "Invalid bitshift " << BitShift << "; need 64");
 
   // Operation:
   // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask

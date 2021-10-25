@@ -347,7 +347,9 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
     }
   }
 }
+#endif
 
+#ifdef HEXL_HAS_AVX512IFMA
 TEST(AVX512, _mm512_hexl_montgomery_reduce52) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
@@ -450,7 +452,9 @@ TEST(AVX512, _mm512_hexl_montgomery_reduce52) {
     AssertEqual(c, expected_out);
   }
 }
+#endif
 
+#ifdef HEXL_HAS_AVX512DQ
 TEST(AVX512, _mm512_hexl_montgomery_reduce64) {
   if (!has_avx512dq) {
     GTEST_SKIP();
