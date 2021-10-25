@@ -141,13 +141,15 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 
 /// @brief Returns Montgomery form of modular product ab mod q, computed via the
 ///  REDC algorithm, also known as Montgomery reduction.
-/// @param[in] r
-/// @param[in] q with R = 2^r such that gcd(R, q) = 1. R > q.
-/// @param[in] v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
-/// @param[in] T_hi of T = ab in the range [0, Rq − 1].
-/// @param[in] T_lo of T.
-/// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
-template <int BitShift = 64>
+/// @param[in] a input vector. T = ab in the range [0, Rq − 1].
+/// @param[in] b input vector.
+/// @param[in] r 2 pow r is R.
+/// @param[in] modulus with R = 2^r such that gcd(R, modulus) = 1. R > modulus.
+/// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+/// @param[in] n number of elements in input vector.
+/// @param[out] result unsigned long int vector in the range [0, q − 1] such
+/// that S ≡ TR^−1 mod q
+template <int BitShift>
 void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
                                 const uint64_t* b, uint64_t n, uint64_t modulus,
                                 uint64_t inv_mod, int r) {
@@ -220,13 +222,15 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
 
 /// @brief Returns Montgomery form of a mod q, computed via the REDC algorithm,
 /// also known as Montgomery reduction.
-/// @param[in] q with R = 2^r such that gcd(R, q) = 1. R > q.
+/// @param[in] a input vector. T = a(R^2 mod q) in the range [0, Rq − 1].
 /// @param[in] R2_mod_q R^2 mod q.
-/// @param[in] v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
-/// @param[in] T_hi of T = ab in the range [0, Rq − 1].
-/// @param[in] T_lo of T.
-/// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
-template <int BitShift = 64>
+/// @param[in] r 2 pow r is R.
+/// @param[in] modulus with R = 2^r such that gcd(R, modulus) = 1. R > modulus.
+/// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+/// @param[in] n number of elements in input vector.
+/// @param[out] result unsigned long int vector in the range [0, q − 1] such
+/// that S ≡ TR^−1 mod q
+template <int BitShift>
 void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
                                  uint64_t R2_mod_q, uint64_t n,
                                  uint64_t modulus, uint64_t inv_mod, int r) {

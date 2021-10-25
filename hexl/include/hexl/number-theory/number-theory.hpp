@@ -261,7 +261,8 @@ uint64_t ReduceMod(uint64_t x, uint64_t modulus,
 /// also known as Montgomery reduction.
 /// @param[in] r
 /// @param[in] q with R = 2^r such that gcd(R, q) = 1. R > q.
-/// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+/// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R.
+/// @param[in] mod_R_msk take r last bits to apply mod R.
 /// @param[in] T_hi of T = ab in the range [0, Rq − 1].
 /// @param[in] T_lo of T.
 /// @return Unsigned long int in the range [0, q − 1] such that S ≡ TR^−1 mod q
