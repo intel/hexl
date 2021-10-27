@@ -60,5 +60,33 @@ TEST_P(EltwiseCmpSubModTest, Native) {
   CheckEqual(input, exp_output);
 }
 
+INSTANTIATE_TEST_SUITE_P(
+    EltwiseCmpSubModTest, EltwiseCmpSubModTest,
+    ::testing::Values(
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::EQ, 4, 5,
+                        std::vector<uint64_t>{1, 2, 3, 9, 5, 6, 7}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::LT, 4, 5,
+                        std::vector<uint64_t>{6, 7, 8, 4, 5, 6, 7}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::LE, 4, 5,
+                        std::vector<uint64_t>{6, 7, 8, 9, 5, 6, 7}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::FALSE, 4, 5,
+                        std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::NE, 4, 5,
+                        std::vector<uint64_t>{6, 7, 8, 4, 0, 1, 2}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::NLT, 4, 5,
+                        std::vector<uint64_t>{1, 2, 3, 9, 0, 1, 2}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::NLE, 4, 5,
+                        std::vector<uint64_t>{1, 2, 3, 4, 0, 1, 2}),
+        std::make_tuple(std::vector<uint64_t>{1, 2, 3, 4, 5, 6, 7}, 10,
+                        CMPINT::TRUE, 4, 5,
+                        std::vector<uint64_t>{6, 7, 8, 9, 0, 1, 2})));
+
 }  // namespace hexl
 }  // namespace intel
