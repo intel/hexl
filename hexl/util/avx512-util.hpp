@@ -18,6 +18,13 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
+#ifndef HEXL_CONST
+
+static const __m512i low52b_mask = _mm512_set1_epi64((1ULL << 52) - 1);
+
+#define HEXL_CONST
+#endif
+
 /// @brief Returns the unsigned 64-bit integer values in x as a vector
 inline std::vector<uint64_t> ExtractValues(__m512i x) {
   __m256i x0 = _mm512_extracti64x4_epi64(x, 0);
@@ -60,6 +67,12 @@ inline std::vector<double> ExtractValues(__m512d x) {
     ret[i] = x_data[i];
   }
   return ret;
+}
+
+// Returns lower 52 bits
+inline __m512i ClearTop12b(__m512d x) {
+  // static const __m512i low52b_mask = _mm512_set1_epi64((1ULL << 52) - 1);
+  return _mm512_and_epi64(x, low52b_mask);
 }
 
 // Multiply packed unsigned BitShift-bit integers in each 64-bit element of x
@@ -231,8 +244,7 @@ inline __m512i _mm512_hexl_mullo_add_lo_epi<52>(__m512i x, __m512i y,
   __m512i result = _mm512_madd52lo_epu64(x, y, z);
 
   // Clear high 12 bits from result
-  const __m512i two_pow52_min1 = _mm512_set1_epi64((1ULL << 52) - 1);
-  result = _mm512_and_epi64(result, two_pow52_min1);
+  result = ClearTop12b(result);
   return result;
 }
 #endif
@@ -455,15 +467,12 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
-    __m512i two_pow_fiftytwo = _mm512_set1_epi64(2251799813685248);
-    __mmask8 mask =
-        _mm512_hexl_cmp_epu64_mask(x, two_pow_fiftytwo, CMPINT::NLT);
+    // __m512i two_pow_fiftytwo = _mm512_set1_epi64(2251799813685248);
+    __mmask8 mask = _mm512_hexl_cmp_epu64_mask(x, low52b_mask, CMPINT::NLT);
     if (mask != 0) {
       // values above 2^52
       __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
-      __m512i x_intr = _mm512_slli_epi64(x, static_cast<unsigned int>(12ULL));
-      __m512i x_lo =
-          _mm512_srli_epi64(x_intr, static_cast<unsigned int>(12ULL));
+      __m512i x_lo = ClearTop12b(x);
 
       // c1 = floor(U / 2^{n + beta})
       __m512i c1_lo =
