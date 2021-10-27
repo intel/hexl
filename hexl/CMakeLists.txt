@@ -19,6 +19,7 @@ if (HEXL_EXPERIMENTAL)
     list(APPEND NATIVE_SRC
         experimental/seal/ckks-multiply.cpp
         experimental/seal/ckks-switch-key.cpp
+        experimental/misc/lr-mat-vec-mult.cpp
     )
 endif()
 
