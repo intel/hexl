@@ -65,7 +65,7 @@ inline std::vector<double> ExtractValues(__m512d x) {
 // Returns lower 52 bits from a 64-bit value
 template <int NumBits>
 inline __m512i ClearTopBits64(__m512i x) {
-  const __m512i low52b_mask = _mm512_set1_epi64((1ULL << (64 - NumBits)) - 1);
+  const __m512i low52b_mask = _mm512_set1_epi64((1ULL << NumBits) - 1);
   return _mm512_and_epi64(x, low52b_mask);
 }
 
@@ -378,7 +378,8 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
 
 // Returns Montgomery form of ab mod q, computed via the REDC algorithm,
 // also known as Montgomery reduction.
-// Inputs: r and q with R = 2^r such that gcd(R, q) = 1. R > q.
+// Template: r with R = 2^r
+// Inputs: q such that gcd(R, q) = 1. R > q.
 //         v_inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
 //         T = ab in the range [0, Rq − 1].
 // T_hi and T_lo for BitShift = 64 should be given in 63 bits.
