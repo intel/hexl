@@ -62,7 +62,7 @@ inline std::vector<double> ExtractValues(__m512d x) {
   return ret;
 }
 
-// Returns lower 52 bits from a 64-bit value
+// Returns lower NumBits bits from a 64-bit value
 template <int NumBits>
 inline __m512i ClearTopBits64(__m512i x) {
   const __m512i low52b_mask = _mm512_set1_epi64((1ULL << NumBits) - 1);
