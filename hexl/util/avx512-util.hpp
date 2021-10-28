@@ -63,8 +63,9 @@ inline std::vector<double> ExtractValues(__m512d x) {
 }
 
 // Returns lower 52 bits from a 64-bit value
-inline __m512i ClearTop12b_64(__m512i x) {
-  const __m512i low52b_mask = _mm512_set1_epi64((1ULL << 52) - 1);
+template <int NumBits>
+inline __m512i ClearTopBits64(__m512i x) {
+  const __m512i low52b_mask = _mm512_set1_epi64((1ULL << (64 - NumBits)) - 1);
   return _mm512_and_epi64(x, low52b_mask);
 }
 
@@ -237,7 +238,7 @@ inline __m512i _mm512_hexl_mullo_add_lo_epi<52>(__m512i x, __m512i y,
   __m512i result = _mm512_madd52lo_epu64(x, y, z);
 
   // Clear high 12 bits from result
-  result = ClearTop12b_64(result);
+  result = ClearTopBits64<52>(result);
   return result;
 }
 #endif
@@ -382,11 +383,9 @@ inline __m512i _mm512_hexl_cmple_epu64(__m512i a, __m512i b,
 //         T = ab in the range [0, Rq − 1].
 // T_hi and T_lo for BitShift = 64 should be given in 63 bits.
 // Output: Integer S in the range [0, q − 1] such that S ≡ TR^−1 mod q
-template <int BitShift>
+template <int BitShift, int r>
 inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
-                                             __m512i q, int r,
-                                             __m512i v_mod_R_msk,
-                                             __m512i v_inv_mod,
+                                             __m512i q, __m512i v_inv_mod,
                                              __m512i v_rs_or_msk) {
   HEXL_CHECK(BitShift == 52 || BitShift == 64,
              "Invalid bitshift " << BitShift << "; need 52 or 64");
@@ -395,9 +394,9 @@ inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
   if (BitShift == 52) {
     // Operation:
     // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
-    __m512i m = _mm512_and_epi64(T_lo, v_mod_R_msk);
+    __m512i m = ClearTopBits64<r>(T_lo);
     m = _mm512_hexl_mullo_epi<BitShift>(m, v_inv_mod);
-    m = _mm512_and_epi64(m, v_mod_R_msk);
+    m = ClearTopBits64<r>(m);
 
     // Operation: t ← (T + mN) / R = (T + m*q) >> r
     // Hi part
@@ -420,9 +419,9 @@ inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
 
   // Operation:
   // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
-  __m512i m = _mm512_and_epi64(T_lo, v_mod_R_msk);
+  __m512i m = ClearTopBits64<r>(T_lo);
   m = _mm512_hexl_mullo_epi<BitShift>(m, v_inv_mod);
-  m = _mm512_and_epi64(m, v_mod_R_msk);
+  m = ClearTopBits64<r>(m);
 
   __m512i mq_hi = _mm512_hexl_mulhi_epi<BitShift>(m, q);
   __m512i mq_lo = _mm512_hexl_mullo_epi<BitShift>(m, q);
@@ -466,7 +465,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
     if (mask != 0) {
       // values above 2^52
       __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
-      __m512i x_lo = ClearTop12b_64(x);
+      __m512i x_lo = ClearTopBits64<52>(x);
 
       // c1 = floor(U / 2^{n + beta})
       __m512i c1_lo =

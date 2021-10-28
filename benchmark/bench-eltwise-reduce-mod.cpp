@@ -239,9 +239,9 @@ static void BM_EltwiseReduceModMontAVX512BitShift52LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontReduceModAVX512<52>(output.data(), input_a.data(),
-                                   input_b.data(), input_size, modulus, inv_mod,
-                                   r);
+    EltwiseMontReduceModAVX512<52, 46>(output.data(), input_a.data(),
+                                       input_b.data(), input_size, modulus,
+                                       inv_mod);
   }
 }
 
@@ -266,8 +266,8 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift52LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontgomeryFormAVX512<52>(output.data(), input_a.data(), R2_mod_q,
-                                    input_size, modulus, inv_mod, r);
+    EltwiseMontgomeryFormAVX512<52, 46>(output.data(), input_a.data(), R2_mod_q,
+                                        input_size, modulus, inv_mod);
   }
 }
 
@@ -292,8 +292,8 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift64LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontgomeryFormAVX512<64>(output.data(), input_a.data(), R2_mod_q,
-                                    input_size, modulus, inv_mod, r);
+    EltwiseMontgomeryFormAVX512<64, 46>(output.data(), input_a.data(), R2_mod_q,
+                                        input_size, modulus, inv_mod);
   }
 }
 
@@ -318,10 +318,10 @@ static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontgomeryFormAVX512<52>(output.data(), input_a.data(), R2_mod_q,
-                                    input_size, modulus, inv_mod, r);
-    EltwiseMontgomeryFormAVX512<52>(output.data(), output.data(), 1ULL,
-                                    input_size, modulus, inv_mod, r);
+    EltwiseMontgomeryFormAVX512<52, 46>(output.data(), input_a.data(), R2_mod_q,
+                                        input_size, modulus, inv_mod);
+    EltwiseMontgomeryFormAVX512<52, 46>(output.data(), output.data(), 1ULL,
+                                        input_size, modulus, inv_mod);
   }
 }
 
