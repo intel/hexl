@@ -137,11 +137,6 @@ class EltwiseReduceModTest
     m_prefer_small_primes = std::get<1>(GetParam());
     m_modulus =
         GeneratePrimes(1, m_modulus_bits, m_prefer_small_primes, m_N)[0];
-#ifdef HEXL_DEBUG
-    m_num_trials = 1;
-#else
-    m_num_trials = 10;
-#endif
   }
 
   void TearDown() override {}
@@ -151,9 +146,9 @@ class EltwiseReduceModTest
   uint64_t m_modulus_bits;
   bool m_prefer_small_primes;
   uint64_t m_modulus;
-  uint64_t m_num_trials;
 };
 
+// Test public API matches Native implementation on random values
 TEST_P(EltwiseReduceModTest, Random) {
   uint64_t upper_bound =
       m_modulus < (1ULL << 32) ? m_modulus * m_modulus : 1ULL << 63;
