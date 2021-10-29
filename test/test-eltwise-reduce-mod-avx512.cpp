@@ -257,8 +257,24 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
     }
   }
 }
-
 #endif
+
+TEST(EltwiseReduceMod, LargeModError) {
+  uint64_t num = 8;
+  std::vector<uint64_t> op;
+  for (uint64_t i = 0; i < num; i++) op.push_back(124498721298790);
+  std::vector<uint64_t> exp_out;
+  for (uint64_t i = 0; i < num; i++) exp_out.push_back(253924022517);
+  std::vector<uint64_t> result;
+  for (uint64_t i = 0; i < num; i++) result.push_back(0);
+
+  const uint64_t modulus = 1099511480321;
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
+                         input_mod_factor, output_mod_factor);
+  CheckEqual(result, exp_out);
+}
 
 }  // namespace hexl
 }  // namespace intel
