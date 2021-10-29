@@ -97,6 +97,7 @@ void EltwiseReduceMod(uint64_t* result, const uint64_t* operand, uint64_t n,
     }
     return;
   }
+
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma && modulus < (1ULL << 52)) {
     EltwiseReduceModAVX512<52>(result, operand, n, modulus, input_mod_factor,
