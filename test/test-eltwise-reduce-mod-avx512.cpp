@@ -153,8 +153,8 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
 
       EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus,
                              modulus, 1);
-      EltwiseReduceMod(result2.data(), op2.data(), op1.size(), modulus, modulus,
-                       1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus,
+                             modulus, 1);
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);
@@ -257,6 +257,7 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
     }
   }
 }
+
 #endif
 
 }  // namespace hexl

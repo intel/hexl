@@ -88,8 +88,7 @@ class EltwiseReduceModTest
   void SetUp() override {
     m_modulus_bits = std::get<0>(GetParam());
     m_prefer_small_primes = std::get<1>(GetParam());
-    m_modulus =
-        GeneratePrimes(1, m_modulus_bits, m_prefer_small_primes, m_N)[0];
+    m_modulus = GeneratePrimes(1, m_modulus_bits, m_prefer_small_primes)[0];
   }
 
   void TearDown() override {}
@@ -108,13 +107,13 @@ TEST_P(EltwiseReduceModTest, Random) {
 
   auto input = GenerateInsecureUniformRandomValues(m_N, 0, upper_bound);
   std::vector<uint64_t> result_native(m_N, 0);
-  std::vector<uint64_t> result_avx512(m_N, 0);
+  std::vector<uint64_t> result_public_api(m_N, 0);
 
   EltwiseReduceModNative(result_native.data(), input.data(), m_N, m_modulus,
                          m_modulus, 1);
-  EltwiseReduceMod(result_avx512.data(), input.data(), m_N, m_modulus,
+  EltwiseReduceMod(result_public_api.data(), input.data(), m_N, m_modulus,
                    m_modulus, 1);
-  AssertEqual(result_native, result_avx512);
+  AssertEqual(result_native, result_public_api);
 }
 
 INSTANTIATE_TEST_SUITE_P(
