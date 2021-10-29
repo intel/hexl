@@ -79,20 +79,5 @@ TEST(EltwiseReduceMod, 4_2) {
   CheckEqual(result, exp_out);
 }
 
-// https://github.com/intel/hexl/issues/86
-TEST(EltwiseReduceMod, LargeModError) {
-  uint64_t num = 8;
-  std::vector<uint64_t> op(num, 124498721298790);
-  std::vector<uint64_t> exp_out(num, 253924022517);
-  std::vector<uint64_t> result(num, 0);
-
-  const uint64_t modulus = 1099511480321;
-  const uint64_t input_mod_factor = modulus;
-  const uint64_t output_mod_factor = 1;
-  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
-                   input_mod_factor, output_mod_factor);
-  CheckEqual(result, exp_out);
-}
-
 }  // namespace hexl
 }  // namespace intel
