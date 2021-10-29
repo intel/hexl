@@ -141,18 +141,20 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 
 /// @brief Returns Montgomery form of modular product ab mod q, computed via the
 ///  REDC algorithm, also known as Montgomery reduction.
+/// @tparam BitShift denotes the operational length, in bits, of the operands
+/// and result values.
+/// @tparam r defines the value of R, being R = 2^r. R > modulus.
 /// @param[in] a input vector. T = ab in the range [0, Rq − 1].
 /// @param[in] b input vector.
-/// @param[in] r 2 pow r is R.
-/// @param[in] modulus with R = 2^r such that gcd(R, modulus) = 1. R > modulus.
+/// @param[in] modulus such that gcd(R, modulus) = 1.
 /// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
 /// @param[in] n number of elements in input vector.
 /// @param[out] result unsigned long int vector in the range [0, q − 1] such
 /// that S ≡ TR^−1 mod q
-template <int BitShift>
+template <int BitShift, int r>
 void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
                                 const uint64_t* b, uint64_t n, uint64_t modulus,
-                                uint64_t inv_mod, int r) {
+                                uint64_t inv_mod) {
   HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
   HEXL_CHECK(b != nullptr, "Require operand b != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
@@ -192,7 +194,6 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   const __m512i* v_a = reinterpret_cast<const __m512i*>(a);
   const __m512i* v_b = reinterpret_cast<const __m512i*>(b);
   __m512i* v_result = reinterpret_cast<__m512i*>(result);
-  __m512i v_mod_R_mask = _mm512_set1_epi64(mod_R_mask);
   __m512i v_modulus = _mm512_set1_epi64(modulus);
   __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
   __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
@@ -210,8 +211,8 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
       v_T_lo = _mm512_and_epi64(v_T_lo, v_prod_rs);
     }
 
-    __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift>(
-        v_T_hi, v_T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift, r>(
+        v_T_hi, v_T_lo, v_modulus, v_inv_mod, v_prod_rs);
     HEXL_CHECK_BOUNDS(ExtractValues(v_c).data(), 8, modulus,
                       "v_op exceeds bound " << modulus);
     _mm512_storeu_si512(v_result, v_c);
@@ -223,18 +224,20 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
 
 /// @brief Returns Montgomery form of a mod q, computed via the REDC algorithm,
 /// also known as Montgomery reduction.
+/// @tparam BitShift denotes the operational length, in bits, of the operands
+/// and result values.
+/// @tparam r defines the value of R, being R = 2^r. R > modulus.
 /// @param[in] a input vector. T = a(R^2 mod q) in the range [0, Rq − 1].
 /// @param[in] R2_mod_q R^2 mod q.
-/// @param[in] r 2 pow r is R.
-/// @param[in] modulus with R = 2^r such that gcd(R, modulus) = 1. R > modulus.
+/// @param[in] modulus such that gcd(R, modulus) = 1.
 /// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
 /// @param[in] n number of elements in input vector.
 /// @param[out] result unsigned long int vector in the range [0, q − 1] such
 /// that S ≡ TR^−1 mod q
-template <int BitShift>
+template <int BitShift, int r>
 void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
                                  uint64_t R2_mod_q, uint64_t n,
-                                 uint64_t modulus, uint64_t inv_mod, int r) {
+                                 uint64_t modulus, uint64_t inv_mod) {
   HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
@@ -271,7 +274,6 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
 
   const __m512i* v_a = reinterpret_cast<const __m512i*>(a);
   __m512i* v_result = reinterpret_cast<__m512i*>(result);
-  __m512i v_mod_R_mask = _mm512_set1_epi64(mod_R_mask);
   __m512i v_b = _mm512_set1_epi64(R2_mod_q);
   __m512i v_modulus = _mm512_set1_epi64(modulus);
   __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
@@ -289,8 +291,8 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
       v_T_lo = _mm512_and_epi64(v_T_lo, v_prod_rs);
     }
 
-    __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift>(
-        v_T_hi, v_T_lo, v_modulus, r, v_mod_R_mask, v_inv_mod, v_prod_rs);
+    __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift, r>(
+        v_T_hi, v_T_lo, v_modulus, v_inv_mod, v_prod_rs);
     HEXL_CHECK_BOUNDS(ExtractValues(v_c).data(), 8, modulus,
                       "v_op exceeds bound " << modulus);
     _mm512_storeu_si512(v_result, v_c);
