@@ -290,6 +290,61 @@ void ReferenceForwardTransformToBitReverse(
   }
 }
 
+void ReferenceInverseTransformFromBitReverse(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* inv_root_of_unity_powers) {
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
+  HEXL_CHECK(inv_root_of_unity_powers != nullptr,
+             "inv_root_of_unity_powers == nullptr");
+  HEXL_CHECK(operand != nullptr, "operand == nullptr");
+
+  uint64_t n_div_2 = (n >> 1);
+  size_t t = 1;
+  size_t root_index = 1;
+
+  for (size_t m = n_div_2; m > 1; m >>= 1) {
+    size_t j1 = 0;
+
+    for (size_t i = 0; i < m; i++, root_index++) {
+      const uint64_t W = inv_root_of_unity_powers[root_index];
+
+      uint64_t* X_r = operand + j1;
+      uint64_t* Y_r = X_r + t;
+      for (size_t j = 0; j < t; j++) {
+        uint64_t X_op = *X_r;
+        uint64_t Y_op = *Y_r;
+        *X_r = AddUIntMod(X_op, Y_op, modulus);
+        *Y_r = MultiplyMod(W, SubUIntMod(X_op, Y_op, modulus), modulus);
+        X_r++;
+        Y_r++;
+      }
+      j1 += (t << 1);
+    }
+    t <<= 1;
+  }
+
+  // Fold multiplication by N^{-1} to final stage butterfly
+  const uint64_t W = inv_root_of_unity_powers[n - 1];
+
+  const uint64_t inv_n = InverseMod(n, modulus);
+  uint64_t inv_n_precon = MultiplyFactor(inv_n, 64, modulus).BarrettFactor();
+  const uint64_t inv_n_w = MultiplyMod(inv_n, W, modulus);
+  uint64_t inv_n_w_precon =
+      MultiplyFactor(inv_n_w, 64, modulus).BarrettFactor();
+
+  uint64_t* X = operand;
+  uint64_t* Y = X + n_div_2;
+  for (size_t j = 0; j < n_div_2; ++j) {
+    // Assume X, Y in [0, q) and compute
+    // X' = N^{-1} (X + Y) (mod q)
+    // Y' = N^{-1} * W * (X - Y) (mod q)
+    uint64_t tx = AddUIntMod(X[j], Y[j], modulus);
+    uint64_t ty = SubUIntMod(X[j], Y[j], modulus);
+    X[j] = MultiplyMod(tx, inv_n, modulus);
+    Y[j] = MultiplyMod(ty, MultiplyMod(W, inv_n, modulus), modulus);
+  }
+}
+
 void InverseTransformFromBitReverseRadix2(
     uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* inv_root_of_unity_powers,
