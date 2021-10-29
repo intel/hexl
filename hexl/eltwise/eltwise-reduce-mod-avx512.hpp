@@ -141,9 +141,12 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 
 /// @brief Returns Montgomery form of modular product ab mod q, computed via the
 ///  REDC algorithm, also known as Montgomery reduction.
+/// @tparam BitShift denotes the operational length, in bits, of the operands
+/// and result values.
+/// @tparam r defines the value of R, being R = 2^r. R > modulus.
 /// @param[in] a input vector. T = ab in the range [0, Rq − 1].
 /// @param[in] b input vector.
-/// @param[in] modulus with R = 2^r such that gcd(R, modulus) = 1. R > modulus.
+/// @param[in] modulus such that gcd(R, modulus) = 1.
 /// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
 /// @param[in] n number of elements in input vector.
 /// @param[out] result unsigned long int vector in the range [0, q − 1] such
@@ -221,9 +224,12 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
 
 /// @brief Returns Montgomery form of a mod q, computed via the REDC algorithm,
 /// also known as Montgomery reduction.
+/// @tparam BitShift denotes the operational length, in bits, of the operands
+/// and result values.
+/// @tparam r defines the value of R, being R = 2^r. R > modulus.
 /// @param[in] a input vector. T = a(R^2 mod q) in the range [0, Rq − 1].
 /// @param[in] R2_mod_q R^2 mod q.
-/// @param[in] modulus with R = 2^r such that gcd(R, modulus) = 1. R > modulus.
+/// @param[in] modulus such that gcd(R, modulus) = 1.
 /// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
 /// @param[in] n number of elements in input vector.
 /// @param[out] result unsigned long int vector in the range [0, q − 1] such
