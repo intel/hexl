@@ -113,10 +113,15 @@ inline void InvButterflyRadix2(uint64_t* X_r, uint64_t* Y_r,
                                const uint64_t* X_op, const uint64_t* Y_op,
                                uint64_t W, uint64_t W_precon, uint64_t modulus,
                                uint64_t twice_modulus) {
+  HEXL_VLOG(4, "InvButterflyRadix2 X_op "
+                   << *X_op << ", Y_op " << *Y_op << " W " << W << " W_precon "
+                   << W_precon << " modulus " << modulus);
   uint64_t tx = *X_op + *Y_op;
   *Y_r = *X_op + twice_modulus - *Y_op;
   *X_r = ReduceMod<2>(tx, twice_modulus);
   *Y_r = MultiplyModLazy<64>(*Y_r, W, W_precon, modulus);
+
+  HEXL_VLOG(4, "InvButterflyRadix2 returning X_r " << *X_r << ", Y_r " << *Y_r);
 }
 
 // Assume X0, X1, X2, X3 in [0, 2q) and return X0, X1, X2, X3 in [0, 2q)

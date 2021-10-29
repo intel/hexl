@@ -68,7 +68,6 @@ uint64_t AddUIntMod(uint64_t x, uint64_t y, uint64_t modulus) {
 uint64_t SubUIntMod(uint64_t x, uint64_t y, uint64_t modulus) {
   HEXL_CHECK(x < modulus, "x " << x << " >= modulus " << modulus);
   HEXL_CHECK(y < modulus, "y " << y << " >= modulus " << modulus);
-
   uint64_t diff = (x + modulus) - y;
   return (diff >= modulus) ? (diff - modulus) : diff;
 }
