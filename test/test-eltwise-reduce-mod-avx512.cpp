@@ -127,50 +127,6 @@ TEST(EltwiseReduceMod, avx512_4_2) {
   CheckEqual(result, exp_out);
 }
 
-// First parameter is the number of bits in the modulus
-// Second parameter is whether or not to prefer small moduli
-class EltwiseReduceModTest
-    : public ::testing::TestWithParam<std::tuple<uint64_t, bool>> {
- protected:
-  void SetUp() override {
-    m_modulus_bits = std::get<0>(GetParam());
-    m_prefer_small_primes = std::get<1>(GetParam());
-    m_modulus =
-        GeneratePrimes(1, m_modulus_bits, m_prefer_small_primes, m_N)[0];
-  }
-
-  void TearDown() override {}
-
- public:
-  uint64_t m_N{1024};
-  uint64_t m_modulus_bits;
-  bool m_prefer_small_primes;
-  uint64_t m_modulus;
-};
-
-// Test public API matches Native implementation on random values
-TEST_P(EltwiseReduceModTest, Random) {
-  uint64_t upper_bound =
-      m_modulus < (1ULL << 32) ? m_modulus * m_modulus : 1ULL << 63;
-
-  auto input = GenerateInsecureUniformRandomValues(m_N, 0, upper_bound);
-  std::vector<uint64_t> result_native(m_N, 0);
-  std::vector<uint64_t> result_avx512(m_N, 0);
-
-  EltwiseReduceModNative(result_native.data(), input.data(), m_N, m_modulus,
-                         m_modulus, 1);
-  EltwiseReduceMod(result_avx512.data(), input.data(), m_N, m_modulus,
-                   m_modulus, 1);
-  AssertEqual(result_native, result_avx512);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    EltwiseReduceMod, EltwiseReduceModTest,
-    ::testing::Combine(::testing::ValuesIn(AlignedVector64<uint64_t>{
-                           20, 25, 30, 31, 32, 33, 35, 40, 48, 49, 50, 51, 52,
-                           55, 58, 59, 60}),
-                       ::testing::ValuesIn(std::vector<bool>{false, true})));
-
 // Checks AVX512 and native EltwiseReduceMod implementations match with randomly
 // generated inputs
 TEST(EltwiseReduceMod, AVX512Big_0_1) {
