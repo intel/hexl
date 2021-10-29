@@ -271,8 +271,8 @@ TEST(EltwiseReduceMod, LargeModError) {
   const uint64_t modulus = 1099511480321;
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
-                         input_mod_factor, output_mod_factor);
+  EltwiseReduceMod(result.data(), op.data(), op.size(), modulus,
+                   input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
 
