@@ -57,7 +57,8 @@ void ForwardTransformToBitReverseRadix4(
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
     uint64_t output_mod_factor = 1);
 
-/// @brief Reference NTT which is written for clarity rather than performance
+/// @brief Reference forward NTT which is written for clarity rather than
+/// performance
 /// @param[in, out] operand Input data. Overwritten with NTT output
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
@@ -67,6 +68,18 @@ void ForwardTransformToBitReverseRadix4(
 void ReferenceForwardTransformToBitReverse(
     uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers);
+
+/// @brief Reference inverse NTT which is written for clarity rather than
+/// performance
+/// @param[in, out] operand Input data. Overwritten with NTT output
+/// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
+/// power of two.
+/// @param[in] modulus Prime modulus. Must satisfy q == 1 mod 2n
+/// @param[in] inv_root_of_unity_powers Powers of inverse 2n'th root of unity in
+/// F_q. In bit-reversed order.
+void ReferenceInverseTransformFromBitReverse(
+    uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* inv_root_of_unity_powers);
 
 /// @brief Radix-2 native C++ NTT implementation of the inverse NTT
 /// @param[out] result Output data. Overwritten with NTT output

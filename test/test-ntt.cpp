@@ -255,6 +255,9 @@ TEST_P(DegreeModulusInputOutput, API) {
   ReferenceForwardTransformToBitReverse(input.data(), N, modulus,
                                         ntt.GetRootOfUnityPowers().data());
   AssertEqual(input, exp_output);
+  ReferenceInverseTransformFromBitReverse(input.data(), N, modulus,
+                                          ntt.GetInvRootOfUnityPowers().data());
+  AssertEqual(input, input_copy);
 
   // Test round-trip
   input = input_copy;
@@ -446,6 +449,22 @@ TEST_P(NttNativeTest, InverseRadix4Random) {
       m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
 
   AssertEqual(input, input_radix4);
+}
+
+TEST_P(NttNativeTest, InverseRadix2Random) {
+  auto input = GenerateInsecureUniformRandomValues(m_N, 1, 2);
+  auto input_reference = input;
+
+  InverseTransformFromBitReverseRadix2(
+      input.data(), input.data(), m_N, m_modulus,
+      m_ntt.GetInvRootOfUnityPowers().data(),
+      m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 2, 1);
+
+  ReferenceInverseTransformFromBitReverse(
+      input_reference.data(), m_N, m_modulus,
+      m_ntt.GetInvRootOfUnityPowers().data());
+
+  AssertEqual(input, input_reference);
 }
 
 INSTANTIATE_TEST_SUITE_P(
