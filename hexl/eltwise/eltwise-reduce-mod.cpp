@@ -97,18 +97,23 @@ void EltwiseReduceMod(uint64_t* result, const uint64_t* operand, uint64_t n,
     }
     return;
   }
-#ifdef HEXL_HAS_AVX512DQ
-  if (has_avx512dq) {
-    if (modulus < (1ULL << 52)) {
-      EltwiseReduceModAVX512<52>(result, operand, n, modulus, input_mod_factor,
-                                 output_mod_factor);
-    } else {
-      EltwiseReduceModAVX512<64>(result, operand, n, modulus, input_mod_factor,
-                                 output_mod_factor);
-    }
+
+#ifdef HEXL_HAS_AVX512IFMA
+  if (has_avx512ifma && modulus < (1ULL << 52)) {
+    EltwiseReduceModAVX512<52>(result, operand, n, modulus, input_mod_factor,
+                               output_mod_factor);
     return;
   }
 #endif
+
+#ifdef HEXL_HAS_AVX512DQ
+  if (has_avx512dq) {
+    EltwiseReduceModAVX512<64>(result, operand, n, modulus, input_mod_factor,
+                               output_mod_factor);
+    return;
+  }
+#endif
+
   HEXL_VLOG(3, "Calling EltwiseReduceModNative");
   EltwiseReduceModNative(result, operand, n, modulus, input_mod_factor,
                          output_mod_factor);
