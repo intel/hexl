@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="dir_428aee766785ed03ff2d325f7888036f" kind="dir">
+    <compoundname>logging</compoundname>
+    <innerfile refid="logging_8hpp">logging.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/logging/"/>
+  </compounddef>
+</doxygen>

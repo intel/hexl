@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="dir_e4c04582e59b4508a4e68fc6a764f4c1" kind="dir">
+    <compoundname>number-theory</compoundname>
+    <innerfile refid="number-theory_8hpp">number-theory.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/number-theory/"/>
+  </compounddef>
+</doxygen>

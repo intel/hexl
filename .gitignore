@@ -13,3 +13,6 @@ docs/conf.py
 cmake/IntelHEXLConfig.cmake
 *.log
 Doxyfile
+hexl/
+pkgconfig/
+cmake/

@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="aligned-allocator_8hpp" kind="file" language="C++">
+    <compoundname>aligned-allocator.hpp</compoundname>
+    <includes local="no">cstdlib</includes>
+    <includes local="no">memory</includes>
+    <includes local="no">vector</includes>
+    <includes refid="number-theory_8hpp" local="yes">hexl/number-theory/number-theory.hpp</includes>
+    <includes refid="allocator_8hpp" local="yes">hexl/util/allocator.hpp</includes>
+    <includes refid="defines_8hpp" local="yes">hexl/util/defines.hpp</includes>
+    <includedby refid="ntt_8hpp" local="yes">ntt.hpp</includedby>
+    <incdepgraph>
+      <node id="5">
+        <label>hexl/number-theory/number-theory.hpp</label>
+        <link refid="number-theory_8hpp"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>aligned-allocator.hpp</label>
+        <link refid="aligned-allocator_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>hexl/util/allocator.hpp</label>
+        <link refid="allocator_8hpp"/>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>hexl/util/check.hpp</label>
+        <link refid="check_8hpp"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>hexl/util/compiler.hpp</label>
+        <link refid="compiler_8hpp"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>hexl/util/defines.hpp</label>
+        <link refid="defines_8hpp"/>
+      </node>
+      <node id="9">
+        <label>hexl/util/types.hpp</label>
+        <link refid="types_8hpp"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>cstddef</label>
+      </node>
+      <node id="2">
+        <label>cstdlib</label>
+      </node>
+      <node id="7">
+        <label>limits</label>
+      </node>
+      <node id="3">
+        <label>memory</label>
+      </node>
+      <node id="6">
+        <label>stdint.h</label>
+      </node>
+      <node id="4">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="3">
+        <label>hexl.hpp</label>
+        <link refid="hexl_8hpp"/>
+      </node>
+      <node id="2">
+        <label>ntt.hpp</label>
+        <link refid="ntt_8hpp"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>aligned-allocator.hpp</label>
+        <link refid="aligned-allocator_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structintel_1_1hexl_1_1_malloc_strategy" prot="public">intel::hexl::MallocStrategy</innerclass>
+    <innerclass refid="classintel_1_1hexl_1_1_aligned_allocator" prot="public">intel::hexl::AlignedAllocator</innerclass>
+    <innerclass refid="structintel_1_1hexl_1_1_aligned_allocator_1_1rebind" prot="public">intel::hexl::AlignedAllocator::rebind</innerclass>
+    <innernamespace refid="namespaceintel">intel</innernamespace>
+    <innernamespace refid="namespaceintel_1_1hexl">intel::hexl</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>(C)<sp/>2020-2021<sp/>Intel<sp/>Corporation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstdlib&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="number-theory_8hpp" kindref="compound">hexl/number-theory/number-theory.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="allocator_8hpp" kindref="compound">hexl/util/allocator.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="defines_8hpp" kindref="compound">hexl/util/defines.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespaceintel" kindref="compound">intel</ref><sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">hexl<sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18" refid="structintel_1_1hexl_1_1_malloc_strategy" refkind="compound"><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structintel_1_1hexl_1_1_malloc_strategy" kindref="compound">MallocStrategy</ref><sp/>:<sp/><ref refid="structintel_1_1hexl_1_1_allocator_base" kindref="compound">AllocatorBase</ref><sp/>{</highlight></codeline>
+<codeline lineno="19" refid="structintel_1_1hexl_1_1_malloc_strategy_1a010052a3f5e39991d57a38742d853738" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/><ref refid="structintel_1_1hexl_1_1_malloc_strategy_1a010052a3f5e39991d57a38742d853738" kindref="member">allocate</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>bytes_count)<sp/></highlight><highlight class="keyword">final</highlight><highlight class="normal"><sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>std::malloc(bytes_count);<sp/>}</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21" refid="structintel_1_1hexl_1_1_malloc_strategy_1af45ff5d0c9b1e867fac481f447a4569c" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="structintel_1_1hexl_1_1_malloc_strategy_1af45ff5d0c9b1e867fac481f447a4569c" kindref="member">deallocate</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>p,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>n)<sp/></highlight><highlight class="keyword">final</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="defines_8hpp_1ab9e56468d5f53ec5d69ffeaf3c25679e" kindref="member">HEXL_UNUSED</ref>(n);</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/>std::free(p);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="25"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27" refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" kindref="member">AllocatorStrategyPtr</ref><sp/>=<sp/>std::shared_ptr&lt;AllocatorBase&gt;;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" kindref="member">AllocatorStrategyPtr</ref><sp/><ref refid="namespaceintel_1_1hexl_1aedc86b34ea92ac34d036acff6d84479a" kindref="member">mallocStrategy</ref>;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T,<sp/>u</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">64_t<sp/>Alignment&gt;</highlight></codeline>
+<codeline lineno="33" refid="classintel_1_1hexl_1_1_aligned_allocator" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref><sp/>{</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal">,<sp/>u</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">64_t&gt;</highlight></codeline>
+<codeline lineno="36" refid="classintel_1_1hexl_1_1_aligned_allocator_1aaded07599020ca35e89e078674263c63" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">friend</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref>;</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38" refid="classintel_1_1hexl_1_1_aligned_allocator_1a8a3b7b0531d253a37a59fe1ffe12ec8a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1a8a3b7b0531d253a37a59fe1ffe12ec8a" kindref="member">value_type</ref><sp/>=<sp/>T;</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight></codeline>
+<codeline lineno="40" refid="classintel_1_1hexl_1_1_aligned_allocator_1afb7109e1c05fc55412ecfdc36894f7e5" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1afb7109e1c05fc55412ecfdc36894f7e5" kindref="member">AlignedAllocator</ref>(<ref refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" kindref="member">AllocatorStrategyPtr</ref><sp/>strategy<sp/>=<sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">)<sp/>noexcept</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/>m_alloc_impl((strategy<sp/>!=<sp/></highlight><highlight class="keywordtype">nullptr</highlight><highlight class="normal">)<sp/>?<sp/>strategy<sp/>:<sp/><ref refid="namespaceintel_1_1hexl_1aedc86b34ea92ac34d036acff6d84479a" kindref="member">mallocStrategy</ref>)<sp/>{}</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43" refid="classintel_1_1hexl_1_1_aligned_allocator_1a60bc693dbefeb259d375daab227bb82c" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1a60bc693dbefeb259d375daab227bb82c" kindref="member">AlignedAllocator</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref>&amp;<sp/>src)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="44" refid="classintel_1_1hexl_1_1_aligned_allocator_1ad8b750d8cb58695b1b6ee10f5a01173c" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref>&amp;<sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1ad8b750d8cb58695b1b6ee10f5a01173c" kindref="member">operator=</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref>&amp;<sp/>src)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>U&gt;</highlight></codeline>
+<codeline lineno="47" refid="classintel_1_1hexl_1_1_aligned_allocator_1a7ef7928d5be819410959faf80f6746cc" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1a7ef7928d5be819410959faf80f6746cc" kindref="member">AlignedAllocator</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator&lt;U, Alignment&gt;</ref>&amp;<sp/>src)</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/>m_alloc_impl(src.m_alloc_impl)<sp/>{}</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight></codeline>
+<codeline lineno="50" refid="classintel_1_1hexl_1_1_aligned_allocator_1a6841e8cef5bedf494f47370062c73cbc" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1a6841e8cef5bedf494f47370062c73cbc" kindref="member">~AlignedAllocator</ref>()<sp/>{}</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>U&gt;</highlight></codeline>
+<codeline lineno="53" refid="structintel_1_1hexl_1_1_aligned_allocator_1_1rebind" refkind="compound"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structintel_1_1hexl_1_1_aligned_allocator_1_1rebind" kindref="compound">rebind</ref><sp/>{</highlight></codeline>
+<codeline lineno="54" refid="structintel_1_1hexl_1_1_aligned_allocator_1_1rebind_1ac2db56c3df1c9b8ed9e8a6423a65a22e" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">other</ref><sp/>=<sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator&lt;U, Alignment&gt;</ref>;</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/>};</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57" refid="classintel_1_1hexl_1_1_aligned_allocator_1a6f8f9c34b0ddab249c945ddb6609c6dd" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1a6f8f9c34b0ddab249c945ddb6609c6dd" kindref="member">operator==</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref>&amp;)<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;<sp/>}</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight></codeline>
+<codeline lineno="59" refid="classintel_1_1hexl_1_1_aligned_allocator_1a6b59d9d7304cda06b8c166dd865ff5db" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1a6b59d9d7304cda06b8c166dd865ff5db" kindref="member">operator!=</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator" kindref="compound">AlignedAllocator</ref>&amp;)<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/>}</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63" refid="classintel_1_1hexl_1_1_aligned_allocator_1ac007b85746672b4e777aa9561b54f8a9" refkind="member"><highlight class="normal"><sp/><sp/>T*<sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1ac007b85746672b4e777aa9561b54f8a9" kindref="member">allocate</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>n)<sp/>{</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!<ref refid="namespaceintel_1_1hexl_1ada0fe74afb4384b54728cba8ec3f69cd" kindref="member">IsPowerOfTwo</ref>(Alignment))<sp/>{</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Allocate<sp/>enough<sp/>space<sp/>to<sp/>ensure<sp/>the<sp/>alignment<sp/>can<sp/>be<sp/>satisfied</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>buffer_size<sp/>=<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(T)<sp/>*<sp/>n<sp/>+<sp/>Alignment;</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Additionally,<sp/>allocate<sp/>a<sp/>prefix<sp/>to<sp/>store<sp/>the<sp/>memory<sp/>location<sp/>of<sp/>the</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>unaligned<sp/>buffer</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>alloc_size<sp/>=<sp/>buffer_size<sp/>+<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*);</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>buffer<sp/>=<sp/>m_alloc_impl-&gt;allocate(alloc_size);</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!buffer)<sp/>{</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Reserve<sp/>first<sp/>location<sp/>for<sp/>pointer<sp/>to<sp/>originally-allocated<sp/>space</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>aligned_buffer<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(buffer)<sp/>+<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*);</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/>std::align(Alignment,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(T)<sp/>*<sp/>n,<sp/>aligned_buffer,<sp/>buffer_size);</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!aligned_buffer)<sp/>{</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Store<sp/>allocated<sp/>buffer<sp/>address<sp/>at<sp/>aligned_buffer<sp/>-<sp/>sizeof(void*).</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>store_buffer_addr<sp/>=</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(aligned_buffer)<sp/>-<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*);</highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/>*(</highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">**</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(store_buffer_addr))<sp/>=<sp/>buffer;</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">T*</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(aligned_buffer);</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="92" refid="classintel_1_1hexl_1_1_aligned_allocator_1af370e3d86c582bcf1370656080bab1ec" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classintel_1_1hexl_1_1_aligned_allocator_1af370e3d86c582bcf1370656080bab1ec" kindref="member">deallocate</ref>(T*<sp/>p,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>n)<sp/>{</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!p)<sp/>{</highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>store_buffer_addr<sp/>=<sp/>(</highlight><highlight class="keyword">reinterpret_cast&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(p)<sp/>-<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*));</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>free_address<sp/>=<sp/>*(</highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">**</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(store_buffer_addr));</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/>m_alloc_impl-&gt;deallocate(free_address,<sp/>n);</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><ref refid="namespaceintel_1_1hexl_1aced64250965d3b78827d8009634eef0c" kindref="member">AllocatorStrategyPtr</ref><sp/>m_alloc_impl;</highlight></codeline>
+<codeline lineno="103"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"></highlight></codeline>
+<codeline lineno="106"><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="107" refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="namespaceintel_1_1hexl_1afbdf0d2cc4209ee547a88ff22a02801b" kindref="member">AlignedVector64</ref><sp/>=<sp/>std::vector&lt;T,<sp/>AlignedAllocator&lt;T,<sp/>64&gt;<sp/>&gt;;</highlight></codeline>
+<codeline lineno="108"><highlight class="normal"></highlight></codeline>
+<codeline lineno="109"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>hexl</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="110"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>intel</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/aligned-allocator.hpp"/>
+  </compounddef>
+</doxygen>

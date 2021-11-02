@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="structintel_1_1hexl_1_1_allocator_base" kind="struct" language="C++" prot="public" abstract="yes">
+    <compoundname>intel::hexl::AllocatorBase</compoundname>
+    <derivedcompoundref refid="structintel_1_1hexl_1_1_allocator_interface" prot="public" virt="non-virtual">intel::hexl::AllocatorInterface&lt; AllocatorAdapter&lt; Adaptee, Args... &gt; &gt;</derivedcompoundref>
+    <derivedcompoundref refid="structintel_1_1hexl_1_1_allocator_interface" prot="public" virt="non-virtual">intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;</derivedcompoundref>
+    <derivedcompoundref refid="structintel_1_1hexl_1_1_malloc_strategy" prot="public" virt="non-virtual">intel::hexl::MallocStrategy</derivedcompoundref>
+    <includes refid="allocator_8hpp" local="no">allocator.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_base_1ac8a2afdc70cef8b7c9342aa2281ea4d5" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type></type>
+        <definition>virtual intel::hexl::AllocatorBase::~AllocatorBase</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>~AllocatorBase</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="13" column="11" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="13" bodyend="13"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_base_1aadf587e7617fbace2e9d3b4f9d9e8af0" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>void *</type>
+        <definition>virtual void* intel::hexl::AllocatorBase::allocate</definition>
+        <argsstring>(size_t bytes_count)=0</argsstring>
+        <name>allocate</name>
+        <reimplementedby refid="structintel_1_1hexl_1_1_malloc_strategy_1a010052a3f5e39991d57a38742d853738">allocate</reimplementedby>
+        <reimplementedby refid="structintel_1_1hexl_1_1_allocator_interface_1a02d2d7918ea916fce443ba2f5dbaa8d1">allocate</reimplementedby>
+        <reimplementedby refid="structintel_1_1hexl_1_1_allocator_interface_1a02d2d7918ea916fce443ba2f5dbaa8d1">allocate</reimplementedby>
+        <param>
+          <type>size_t</type>
+          <declname>bytes_count</declname>
+        </param>
+        <briefdescription>
+<para>Allocates byte_count bytes of memory. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">bytes_count</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of bytes to allocate </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A pointer to the allocated memory </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="18" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_base_1a0f03686f9b78728d4d228ceaf4c2948e" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void intel::hexl::AllocatorBase::deallocate</definition>
+        <argsstring>(void *p, size_t n)=0</argsstring>
+        <name>deallocate</name>
+        <reimplementedby refid="structintel_1_1hexl_1_1_malloc_strategy_1af45ff5d0c9b1e867fac481f447a4569c">deallocate</reimplementedby>
+        <reimplementedby refid="structintel_1_1hexl_1_1_allocator_interface_1a2684feec3b8f3cfba626b46912b4cec5">deallocate</reimplementedby>
+        <reimplementedby refid="structintel_1_1hexl_1_1_allocator_interface_1a2684feec3b8f3cfba626b46912b4cec5">deallocate</reimplementedby>
+        <param>
+          <type>void *</type>
+          <declname>p</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+<para>Deallocate memory. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">p</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to memory to deallocate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of bytes to deallocate </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="23" column="16"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Base class for custom memory allocator. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>intel::hexl::AllocatorInterface&lt; AllocatorAdapter&lt; Adaptee, Args... &gt; &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_interface"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>intel::hexl::AllocatorBase</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_base"/>
+      </node>
+      <node id="4">
+        <label>intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_interface"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>intel::hexl::MallocStrategy</label>
+        <link refid="structintel_1_1hexl_1_1_malloc_strategy"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>intel::hexl::NTT::AllocatorAdapter&lt; Adaptee, Args &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_n_t_t_1_1_allocator_adapter"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="12" column="1" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="12" bodyend="24"/>
+    <listofallmembers>
+      <member refid="structintel_1_1hexl_1_1_allocator_base_1aadf587e7617fbace2e9d3b4f9d9e8af0" prot="public" virt="pure-virtual"><scope>intel::hexl::AllocatorBase</scope><name>allocate</name></member>
+      <member refid="structintel_1_1hexl_1_1_allocator_base_1a0f03686f9b78728d4d228ceaf4c2948e" prot="public" virt="pure-virtual"><scope>intel::hexl::AllocatorBase</scope><name>deallocate</name></member>
+      <member refid="structintel_1_1hexl_1_1_allocator_base_1ac8a2afdc70cef8b7c9342aa2281ea4d5" prot="public" virt="virtual"><scope>intel::hexl::AllocatorBase</scope><name>~AllocatorBase</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="check_8hpp" kind="file" language="C++">
+    <compoundname>check.hpp</compoundname>
+    <includes local="no">stdint.h</includes>
+    <includes refid="types_8hpp" local="yes">hexl/util/types.hpp</includes>
+    <includedby refid="gcc_8hpp" local="yes">gcc.hpp</includedby>
+    <includedby refid="clang_8hpp" local="yes">clang.hpp</includedby>
+    <includedby refid="hexl_8hpp" local="yes">hexl.hpp</includedby>
+    <includedby refid="number-theory_8hpp" local="yes">number-theory.hpp</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>check.hpp</label>
+        <link refid="check_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>hexl/util/defines.hpp</label>
+        <link refid="defines_8hpp"/>
+      </node>
+      <node id="3">
+        <label>hexl/util/types.hpp</label>
+        <link refid="types_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>stdint.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="4">
+        <label>hexl.hpp</label>
+        <link refid="hexl_8hpp"/>
+      </node>
+      <node id="7">
+        <label>ntt.hpp</label>
+        <link refid="ntt_8hpp"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>number-theory.hpp</label>
+        <link refid="number-theory_8hpp"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>aligned-allocator.hpp</label>
+        <link refid="aligned-allocator_8hpp"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>check.hpp</label>
+        <link refid="check_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>clang.hpp</label>
+        <link refid="clang_8hpp"/>
+      </node>
+      <node id="2">
+        <label>gcc.hpp</label>
+        <link refid="gcc_8hpp"/>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="check_8hpp_1ad5baaea0d21e2ec8c058a3de9d0f93c6" prot="public" static="no">
+        <name>HEXL_CHECK</name>
+        <param><defname>cond</defname></param>
+        <param><defname>expr</defname></param>
+        <initializer>  {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/check.hpp" line="39" column="9" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/check.hpp" bodystart="39" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="check_8hpp_1a722fda94251bc03b3a57ccdaef17abbc" prot="public" static="no">
+        <name>HEXL_CHECK_BOUNDS</name>
+        <param><defname>...</defname></param>
+        <initializer>  {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/check.hpp" line="41" column="9" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/check.hpp" bodystart="41" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>(C)<sp/>2020-2021<sp/>Intel<sp/>Corporation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdint.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="types_8hpp" kindref="compound">hexl/util/types.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Create<sp/>logging/debug<sp/>macros<sp/>with<sp/>no<sp/>run-time<sp/>overhead<sp/>unless<sp/>HEXL_DEBUG<sp/>is</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="comment">//<sp/>enabled</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>HEXL_DEBUG</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="logging_8hpp" kindref="compound">hexl/logging/logging.hpp</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="preprocessor">#define<sp/>HEXL_CHECK(cond,<sp/>expr)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="20"><highlight class="preprocessor"><sp/><sp/>if<sp/>(!(cond))<sp/>{<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="21"><highlight class="preprocessor"><sp/><sp/><sp/><sp/>LOG(ERROR)<sp/>&lt;&lt;<sp/>expr<sp/>&lt;&lt;<sp/>&quot;<sp/>in<sp/>function:<sp/>&quot;</highlight><highlight class="normal"><sp/>&lt;&lt;<sp/>__FUNCTION__<sp/><sp/>\</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&lt;&lt;<sp/>&quot;<sp/>in<sp/>file:<sp/>&quot;<sp/>__FILE__<sp/>&lt;&lt;<sp/>&quot;:&quot;<sp/>&lt;&lt;<sp/>__LINE__;<sp/>\</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/>throw<sp/>std::runtime_error(&quot;Error.<sp/>Check<sp/>log<sp/>output&quot;);<sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="preprocessor">#define<sp/>HEXL_CHECK_BOUNDS(arg,<sp/>n,<sp/>bound,<sp/>expr)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="33"><highlight class="preprocessor"><sp/><sp/>for<sp/>(size_t<sp/>hexl_check_idx<sp/>=<sp/>0;<sp/>hexl_check_idx<sp/>&lt;<sp/>n;<sp/>++hexl_check_idx)<sp/>{<sp/>\</highlight></codeline>
+<codeline lineno="34"><highlight class="preprocessor"><sp/><sp/><sp/><sp/>HEXL_CHECK((arg)[hexl_check_idx]<sp/>&lt;<sp/>bound,<sp/>expr);<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="35"><highlight class="preprocessor"><sp/><sp/>}</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="preprocessor">#else<sp/><sp/></highlight><highlight class="comment">//<sp/>HEXL_DEBUG=OFF</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39" refid="check_8hpp_1ad5baaea0d21e2ec8c058a3de9d0f93c6" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>HEXL_CHECK(cond,<sp/>expr)<sp/>\</highlight></codeline>
+<codeline lineno="40"><highlight class="preprocessor"><sp/><sp/>{}</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="41" refid="check_8hpp_1a722fda94251bc03b3a57ccdaef17abbc" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>HEXL_CHECK_BOUNDS(...)<sp/>\</highlight></codeline>
+<codeline lineno="42"><highlight class="preprocessor"><sp/><sp/>{}</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/><sp/></highlight><highlight class="comment">//<sp/>HEXL_DEBUG</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/check.hpp"/>
+  </compounddef>
+</doxygen>

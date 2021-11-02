@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="_c_o_n_t_r_i_b_u_t_i_n_g_8md" kind="file" language="Markdown">
+    <compoundname>CONTRIBUTING.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/>Pull<sp/>Requests</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Intel<sp/>HEXL<sp/>welcomes<sp/>pull<sp/>requests<sp/>from<sp/>external<sp/>contributors<sp/>to<sp/>the<sp/>`main`<sp/>branch.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Before<sp/>contributing,<sp/>please<sp/>run</highlight></codeline>
+<codeline><highlight class="normal">```bash</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>build<sp/>--target<sp/>check<sp/>unittest</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">to<sp/>make<sp/>sure<sp/>the<sp/>formatting<sp/>checks<sp/>and<sp/>all<sp/>unit<sp/>tests<sp/>pass.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Please<sp/>sign<sp/>your<sp/>commits<sp/>before<sp/>making<sp/>a<sp/>pull<sp/>request.<sp/>See<sp/>instructions<sp/>[here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)<sp/>for<sp/>how<sp/>to<sp/>sign<sp/>commits.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Known<sp/>Issues<sp/>###</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>```Executable<sp/>`cpplint`<sp/>not<sp/>found```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/>Make<sp/>sure<sp/>you<sp/>install<sp/>cpplint:<sp/>```pip<sp/>install<sp/>cpplint```.</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>If<sp/>you<sp/>install<sp/>`cpplint`<sp/>locally,<sp/>make<sp/>sure<sp/>to<sp/>add<sp/>it<sp/>to<sp/>your<sp/>`PATH`.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>```/bin/sh:<sp/>1:<sp/>pre-commit:<sp/>not<sp/>found```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/><sp/>Install<sp/>`pre-commit`.<sp/>More<sp/>info<sp/>at<sp/>https://pre-commit.com/.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>```</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/>error:<sp/>gpg<sp/>failed<sp/>to<sp/>sign<sp/>the<sp/>data</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/>fatal:<sp/>failed<sp/>to<sp/>write<sp/>commit<sp/>object</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>```</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>Try<sp/>adding<sp/>```export<sp/>GPG_TTY=$(tty)```<sp/>to<sp/>`~/.bashrc`.</highlight></codeline>
+    </programlisting>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/CONTRIBUTING.md"/>
+  </compounddef>
+</doxygen>

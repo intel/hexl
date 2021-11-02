@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="structintel_1_1hexl_1_1_allocator_interface" kind="struct" language="C++" prot="public">
+    <compoundname>intel::hexl::AllocatorInterface</compoundname>
+    <basecompoundref refid="structintel_1_1hexl_1_1_allocator_base" prot="public" virt="non-virtual">intel::hexl::AllocatorBase</basecompoundref>
+    <includes refid="allocator_8hpp" local="no">allocator.hpp</includes>
+    <templateparamlist>
+      <param>
+        <type>class AllocatorImpl</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_interface_1a02d2d7918ea916fce443ba2f5dbaa8d1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void *</type>
+        <definition>void* intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;::allocate</definition>
+        <argsstring>(size_t bytes_count) override</argsstring>
+        <name>allocate</name>
+        <reimplements refid="structintel_1_1hexl_1_1_allocator_base_1aadf587e7617fbace2e9d3b4f9d9e8af0">allocate</reimplements>
+        <param>
+          <type>size_t</type>
+          <declname>bytes_count</declname>
+        </param>
+        <briefdescription>
+<para>Override interface and delegate implementation to AllocatorImpl. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="31" column="8" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="31" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_interface_1a2684feec3b8f3cfba626b46912b4cec5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;::deallocate</definition>
+        <argsstring>(void *p, size_t n) override</argsstring>
+        <name>deallocate</name>
+        <reimplements refid="structintel_1_1hexl_1_1_allocator_base_1a0f03686f9b78728d4d228ceaf4c2948e">deallocate</reimplements>
+        <param>
+          <type>void *</type>
+          <declname>p</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+<para>Override interface and delegate implementation to AllocatorImpl. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="36" column="8" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="36" bodyend="38"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_interface_1ae6870257f68a2d53d0f818bf3f5136ad" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void *</type>
+        <definition>void* intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;::allocate_impl</definition>
+        <argsstring>(size_t bytes_count)</argsstring>
+        <name>allocate_impl</name>
+        <param>
+          <type>size_t</type>
+          <declname>bytes_count</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="43" column="8" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="43" bodyend="46"/>
+      </memberdef>
+      <memberdef kind="function" id="structintel_1_1hexl_1_1_allocator_interface_1ad50d01a0736610117e5fed4829522f6c" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;::deallocate_impl</definition>
+        <argsstring>(void *p, size_t n)</argsstring>
+        <name>deallocate_impl</name>
+        <param>
+          <type>void *</type>
+          <declname>p</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="47" column="8" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="47" bodyend="50"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Helper memory allocation struct which delegates implementation to AllocatorImpl. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>intel::hexl::AllocatorBase</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_base"/>
+      </node>
+      <node id="1">
+        <label>intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_interface"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>intel::hexl::AllocatorBase</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_base"/>
+      </node>
+      <node id="1">
+        <label>intel::hexl::AllocatorInterface&lt; AllocatorImpl &gt;</label>
+        <link refid="structintel_1_1hexl_1_1_allocator_interface"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" line="29" column="1" bodyfile="/Users/fboemer/repos/DBIO/intel-hexl/hexl/include/hexl/util/allocator.hpp" bodystart="29" bodyend="51"/>
+    <listofallmembers>
+      <member refid="structintel_1_1hexl_1_1_allocator_interface_1a02d2d7918ea916fce443ba2f5dbaa8d1" prot="public" virt="virtual"><scope>intel::hexl::AllocatorInterface</scope><name>allocate</name></member>
+      <member refid="structintel_1_1hexl_1_1_allocator_interface_1ae6870257f68a2d53d0f818bf3f5136ad" prot="private" virt="non-virtual"><scope>intel::hexl::AllocatorInterface</scope><name>allocate_impl</name></member>
+      <member refid="structintel_1_1hexl_1_1_allocator_interface_1a2684feec3b8f3cfba626b46912b4cec5" prot="public" virt="virtual"><scope>intel::hexl::AllocatorInterface</scope><name>deallocate</name></member>
+      <member refid="structintel_1_1hexl_1_1_allocator_interface_1ad50d01a0736610117e5fed4829522f6c" prot="private" virt="non-virtual"><scope>intel::hexl::AllocatorInterface</scope><name>deallocate_impl</name></member>
+      <member refid="structintel_1_1hexl_1_1_allocator_base_1ac8a2afdc70cef8b7c9342aa2281ea4d5" prot="public" virt="virtual"><scope>intel::hexl::AllocatorInterface</scope><name>~AllocatorBase</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

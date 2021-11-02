@@ -1,0 +1,36 @@
+\hypertarget{aligned-allocator_8hpp}{}\doxysection{aligned-\/allocator.hpp File Reference}
+\label{aligned-allocator_8hpp}\index{aligned-\/allocator.hpp@{aligned-\/allocator.hpp}}
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include \char`\"{}hexl/number-\/theory/number-\/theory.\+hpp\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hexl/util/allocator.\+hpp\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hexl/util/defines.\+hpp\char`\"{}}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structintel_1_1hexl_1_1_malloc_strategy}{intel\+::hexl\+::\+Malloc\+Strategy}}
+\begin{DoxyCompactList}\small\item\em Allocater implementation using malloc and free. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classintel_1_1hexl_1_1_aligned_allocator}{intel\+::hexl\+::\+Aligned\+Allocator$<$ T, Alignment $>$}}
+\begin{DoxyCompactList}\small\item\em Allocates memory aligned to Alignment-\/byte sized boundaries. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structintel_1_1hexl_1_1_aligned_allocator_1_1rebind}{intel\+::hexl\+::\+Aligned\+Allocator$<$ T, Alignment $>$\+::rebind$<$ U $>$}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceintel}{intel}}
+\item 
+namespace \mbox{\hyperlink{namespaceintel_1_1hexl}{intel\+::hexl}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespaceintel_1_1hexl_aced64250965d3b78827d8009634eef0c}{intel\+::hexl\+::\+Allocator\+Strategy\+Ptr}} = std\+::shared\+\_\+ptr$<$ Allocator\+Base $>$
+\item 
+{\footnotesize template$<$typename T $>$ }\\using \mbox{\hyperlink{namespaceintel_1_1hexl_afbdf0d2cc4209ee547a88ff22a02801b}{intel\+::hexl\+::\+Aligned\+Vector64}} = std\+::vector$<$ T, Aligned\+Allocator$<$ T, 64 $>$ $>$
+\begin{DoxyCompactList}\small\item\em 64-\/byte aligned memory allocator \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+Allocator\+Strategy\+Ptr \mbox{\hyperlink{namespaceintel_1_1hexl_aedc86b34ea92ac34d036acff6d84479a}{intel\+::hexl\+::malloc\+Strategy}}
+\end{DoxyCompactItemize}
