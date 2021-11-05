@@ -169,6 +169,7 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   uint64_t mod_R_mask = R - 1;
   uint64_t prod_rs;
   if (BitShift == 64) {
+    HEXL_CHECK(r <= 62, "With r > 62 internal ops might overflow");
     prod_rs = (1ULL << 63) - 1;
   } else {
     prod_rs = (1ULL << (52 - r));
@@ -204,6 +205,7 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
     __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b_op);
     __m512i v_T_lo = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_b_op);
 
+    // Convert to 63 bits to save intermediate carry
     if (BitShift == 64) {
       v_T_hi = _mm512_slli_epi64(v_T_hi, 1);
       __m512i tmp = _mm512_srli_epi64(v_T_lo, 63);
@@ -235,9 +237,9 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
 /// @param[out] result unsigned long int vector in the range [0, q − 1] such
 /// that S ≡ TR^−1 mod q
 template <int BitShift, int r>
-void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
-                                 uint64_t R2_mod_q, uint64_t n,
-                                 uint64_t modulus, uint64_t inv_mod) {
+void EltwiseMontgomeryFormInAVX512(uint64_t* result, const uint64_t* a,
+                                   uint64_t R2_mod_q, uint64_t n,
+                                   uint64_t modulus, uint64_t inv_mod) {
   HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
@@ -251,6 +253,7 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
   uint64_t mod_R_mask = R - 1;
   uint64_t prod_rs;
   if (BitShift == 64) {
+    HEXL_CHECK(r <= 62, "With r > 62 internal ops might overflow");
     prod_rs = (1ULL << 63) - 1;
   } else {
     prod_rs = (1ULL << (52 - r));
@@ -284,6 +287,7 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
     __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b);
     __m512i v_T_lo = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_b);
 
+    // Convert to 63 bits to save intermediate carry
     if (BitShift == 64) {
       v_T_hi = _mm512_slli_epi64(v_T_hi, 1);
       __m512i tmp = _mm512_srli_epi64(v_T_lo, 63);
@@ -297,6 +301,164 @@ void EltwiseMontgomeryFormAVX512(uint64_t* result, const uint64_t* a,
                       "v_op exceeds bound " << modulus);
     _mm512_storeu_si512(v_result, v_c);
     ++v_a;
+    ++v_result;
+  }
+}
+
+/// @brief Converse out of the Montgomery Form computed via the REDC algorithm,
+/// also known as Montgomery reduction.
+/// @tparam BitShift denotes the operational length, in bits, of the operands
+/// and result values.
+/// @tparam r defines the value of R, being R = 2^r. R > modulus.
+/// @param[in] a input vector in Montgomery Form.
+/// @param[in] modulus such that gcd(R, modulus) = 1.
+/// @param[in] inv_mod in [0, R − 1] such that q*v_inv_mod ≡ −1 mod R,
+/// @param[in] n number of elements in input vector.
+/// @param[out] result unsigned long int vector in the range [0, q − 1] such
+/// that S ≡ TR^−1 mod q
+template <int BitShift, int r>
+void EltwiseMontgomeryFormOutAVX512(uint64_t* result, const uint64_t* a,
+                                    uint64_t n, uint64_t modulus,
+                                    uint64_t inv_mod) {
+  HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
+  HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(modulus > 1, "Require modulus > 1");
+
+  uint64_t R = (1ULL << r);
+  HEXL_CHECK(std::__gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
+             1);
+  HEXL_CHECK(R > modulus, "Needs R bigger than q.");
+
+  // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
+  uint64_t mod_R_mask = R - 1;
+  uint64_t prod_rs;
+  if (BitShift == 64) {
+    HEXL_CHECK(r <= 62, "With r > 62 internal ops might overflow");
+    prod_rs = (1ULL << 63) - 1;
+  } else {
+    prod_rs = (1ULL << (52 - r));
+  }
+  uint64_t n_tmp = n;
+
+  // Deals with n not divisible by 8
+  uint64_t n_mod_8 = n_tmp % 8;
+  if (n_mod_8 != 0) {
+    for (size_t i = 0; i < n_mod_8; ++i) {
+      result[i] =
+          MontgomeryReduce<BitShift>(0, a[i], modulus, r, mod_R_mask, inv_mod);
+    }
+    a += n_mod_8;
+    result += n_mod_8;
+    n_tmp -= n_mod_8;
+  }
+
+  const __m512i* v_a = reinterpret_cast<const __m512i*>(a);
+  __m512i* v_result = reinterpret_cast<__m512i*>(result);
+  __m512i v_modulus = _mm512_set1_epi64(modulus);
+  __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+  __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+  __m512i v_T_hi = _mm512_set1_epi64(0);
+
+  for (size_t i = 0; i < n_tmp; i += 8) {
+    __m512i v_T_lo = _mm512_loadu_si512(v_a);
+    __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift, r>(
+        v_T_hi, v_T_lo, v_modulus, v_inv_mod, v_prod_rs);
+    HEXL_CHECK_BOUNDS(ExtractValues(v_c).data(), 8, modulus,
+                      "v_op exceeds bound " << modulus);
+    _mm512_storeu_si512(v_result, v_c);
+    ++v_a;
+    ++v_result;
+  }
+}
+
+template <int BitShift, int r, int InputModFactor>
+void EltwiseMontReduceModAVX512Mult(uint64_t* result, const uint64_t* a,
+                                    const uint64_t* b, uint64_t n,
+                                    uint64_t modulus, uint64_t inv_mod) {
+  HEXL_CHECK(InputModFactor == 1 || InputModFactor == 2 || InputModFactor == 4,
+             "Require InputModFactor = 1, 2, or 4")
+  HEXL_CHECK(a != nullptr, "Require operand a != nullptr");
+  HEXL_CHECK(b != nullptr, "Require operand b != nullptr");
+  HEXL_CHECK(n != 0, "Require n != 0");
+  HEXL_CHECK(modulus > 1, "Require modulus > 1");
+
+  uint64_t R = (1ULL << r);
+  HEXL_CHECK(std::__gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
+             1);
+  HEXL_CHECK(R > modulus, "Needs R bigger than q.");
+
+  // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
+  uint64_t mod_R_mask = R - 1;
+  uint64_t prod_rs;
+  uint64_t n_tmp = n;
+  uint64_t n_mod_8 = n_tmp % 8;
+  uint64_t R_mod_q = R - modulus;
+
+  if (BitShift == 64) {
+    HEXL_CHECK(((floor(log2(modulus)) + 1) + (floor(log2(R_mod_q)) + 1)) <= 63,
+               "Op (modulus - 1)*R_mod_q can overflow 63 bits");
+    prod_rs = (1ULL << 63) - 1;
+  } else {
+    HEXL_CHECK(((floor(log2(modulus)) + 1) + (floor(log2(R_mod_q)) + 1)) <= 52,
+               "Op (modulus - 1)*R_mod_q can overflow 52 bits");
+    prod_rs = (1ULL << (52 - r));
+  }
+
+  // Deals with n not divisible by 8
+  if (n_mod_8 != 0) {
+    for (size_t i = 0; i < n_mod_8; ++i) {
+      uint64_t T_hi;
+      uint64_t T_lo;
+      MultiplyUInt64(a[i], R_mod_q, &T_hi, &T_lo);
+      MultiplyUInt64(T_lo, b[i], &T_hi, &T_lo);
+      result[i] = MontgomeryReduce<BitShift>(T_hi, T_lo, modulus, r, mod_R_mask,
+                                             inv_mod);
+    }
+    a += n_mod_8;
+    b += n_mod_8;
+    result += n_mod_8;
+    n_tmp -= n_mod_8;
+  }
+
+  const __m512i* v_a = reinterpret_cast<const __m512i*>(a);
+  const __m512i* v_b = reinterpret_cast<const __m512i*>(b);
+  __m512i* v_result = reinterpret_cast<__m512i*>(result);
+  __m512i v_modulus = _mm512_set1_epi64(modulus);
+  __m512i v_twice_mod = _mm512_set1_epi64(2 * modulus);
+  __m512i v_inv_mod = _mm512_set1_epi64(inv_mod);
+  __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
+  __m512i v_R_mod_q = _mm512_set1_epi64(R_mod_q);
+
+  for (size_t i = 0; i < n_tmp; i += 8) {
+    __m512i v_a_op = _mm512_loadu_si512(v_a);
+    __m512i v_b_op = _mm512_loadu_si512(v_b);
+
+    // Inputs mod q
+    v_a_op = _mm512_hexl_small_mod_epu64<InputModFactor>(v_a_op, v_modulus,
+                                                         &v_twice_mod);
+    v_b_op = _mm512_hexl_small_mod_epu64<InputModFactor>(v_b_op, v_modulus,
+                                                         &v_twice_mod);
+
+    // a*b
+    v_a_op = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_R_mod_q);
+    __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b_op);
+    __m512i v_T_lo = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_b_op);
+
+    // Convert to 63 bits to save intermediate carry
+    if (BitShift == 64) {
+      v_T_hi = _mm512_slli_epi64(v_T_hi, 1);
+      __m512i tmp = _mm512_srli_epi64(v_T_lo, 63);
+      v_T_hi = _mm512_add_epi64(v_T_hi, tmp);
+      v_T_lo = _mm512_and_epi64(v_T_lo, v_prod_rs);
+    }
+
+    __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift, r>(
+        v_T_hi, v_T_lo, v_modulus, v_inv_mod, v_prod_rs);
+    HEXL_CHECK_BOUNDS(ExtractValues(v_c).data(), 8, modulus,
+                      "v_op exceeds bound " << modulus);
+    _mm512_storeu_si512(v_result, v_c);
+    ++v_a;
+    ++v_b;
     ++v_result;
   }
 }

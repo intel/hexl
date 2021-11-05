@@ -7,6 +7,7 @@
 
 #include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
+#include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
@@ -170,6 +171,170 @@ static void BM_EltwiseMultModAVX512IFMAInt(
 BENCHMARK(BM_EltwiseMultModAVX512IFMAInt)
     ->Unit(benchmark::kMicrosecond)
     ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+#endif
+
+//=================================================================
+
+#ifdef HEXL_HAS_AVX512IFMA
+
+// state[0] is the degree
+// state[1] is repeated multiplications
+static void BM_EltwiseMultModAVX512IFMAIntRep(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t input_mod_factor = state.range(1);
+  int repetitions = state.range(2);
+  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                    input_mod_factor * modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                    input_mod_factor * modulus);
+  auto output = input1;
+
+  for (auto _ : state) {
+    for (int i = 0; i < repetitions; i++) {
+      switch (input_mod_factor) {
+        case 1:
+          EltwiseMultModAVX512IFMAInt<1>(output.data(), output.data(),
+                                         input2.data(), input_size, modulus);
+          break;
+        case 2:
+          EltwiseMultModAVX512IFMAInt<2>(output.data(), output.data(),
+                                         input2.data(), input_size, modulus);
+          break;
+        case 4:
+          EltwiseMultModAVX512IFMAInt<4>(output.data(), output.data(),
+                                         input2.data(), input_size, modulus);
+          break;
+      }
+    }
+  }
+}
+
+BENCHMARK(BM_EltwiseMultModAVX512IFMAIntRep)
+    ->Unit(benchmark::kMicrosecond)
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}, {1, 3, 6}});
+
+// state[0] is the degree
+// state[1] is repeated multiplications
+static void BM_EltwiseMultModMontAVX512IFMAIntEConv(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t input_mod_factor = state.range(1);
+  int repetitions = state.range(2);
+  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+  auto op1 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                 input_mod_factor * modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                 input_mod_factor * modulus);
+  AlignedVector64<uint64_t> output(input_size, 3);
+
+  int r = 51;  // R = 2251799813685248
+  // mod(2251799813685248*2251799813685248;1125899906842631)
+  const uint64_t R2_mod_q = 196;
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  for (auto _ : state) {
+    if (input_mod_factor != 1) {
+      EltwiseReduceModAVX512(op1.data(), op1.data(), input_size, modulus,
+                             input_mod_factor, 1);
+      EltwiseReduceModAVX512(op2.data(), op2.data(), input_size, modulus,
+                             input_mod_factor, 1);
+    }
+  }
+  for (auto _ : state) {
+    EltwiseMontgomeryFormInAVX512<52, 51>(output.data(), op1.data(), R2_mod_q,
+                                          input_size, modulus, inv_mod);
+    for (int i = 0; i < repetitions; i++) {
+      EltwiseMontReduceModAVX512<52, 51>(output.data(), output.data(),
+                                         op2.data(), input_size, modulus,
+                                         inv_mod);
+    }
+  }
+}
+
+BENCHMARK(BM_EltwiseMultModMontAVX512IFMAIntEConv)
+    ->Unit(benchmark::kMicrosecond)
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}, {1, 3, 6}});
+
+// state[0] is the degree
+// state[1] is repeated multiplications
+static void BM_EltwiseMultModMontAVX512IFMAIntIConv(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t input_mod_factor = state.range(1);
+  int repetitions = state.range(2);
+  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+  auto op1 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                 input_mod_factor * modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                 input_mod_factor * modulus);
+  AlignedVector64<uint64_t> output(input_size, 3);
+
+  int r = 51;  // R = 2251799813685248
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  for (auto _ : state) {
+    for (int i = 0; i < repetitions; i++) {
+      switch (input_mod_factor) {
+        case 1:
+          EltwiseMontReduceModAVX512Mult<52, 51, 1>(output.data(), op1.data(),
+                                                    op2.data(), input_size,
+                                                    modulus, inv_mod);
+          break;
+        case 2:
+          EltwiseMontReduceModAVX512Mult<52, 51, 2>(output.data(), op1.data(),
+                                                    op2.data(), input_size,
+                                                    modulus, inv_mod);
+          break;
+        case 4:
+          EltwiseMontReduceModAVX512Mult<52, 51, 4>(output.data(), op1.data(),
+                                                    op2.data(), input_size,
+                                                    modulus, inv_mod);
+          break;
+      }
+    }
+  }
+}
+
+BENCHMARK(BM_EltwiseMultModMontAVX512IFMAIntIConv)
+    ->Unit(benchmark::kMicrosecond)
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}, {1, 3, 6}});
+
+// state[0] is the degree
+// state[1] is repeated multiplications
+static void BM_EltwiseMultModMontAVX512IFMAIntNoConv(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t input_mod_factor = state.range(1);
+  int repetitions = state.range(2);
+  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+  auto op1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto output = op1;
+
+  int r = 51;  // R = 2251799813685248
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+  for (auto _ : state) {
+    if (input_mod_factor != 1) {
+      EltwiseReduceModAVX512(op1.data(), op1.data(), input_size, modulus,
+                             input_mod_factor, 1);
+      EltwiseReduceModAVX512(output.data(), output.data(), input_size, modulus,
+                             input_mod_factor, 1);
+    }
+    for (int i = 0; i < repetitions; i++) {
+      EltwiseMontReduceModAVX512<52, 51>(output.data(), output.data(),
+                                         op2.data(), input_size, modulus,
+                                         inv_mod);
+    }
+  }
+}
+
+BENCHMARK(BM_EltwiseMultModMontAVX512IFMAIntNoConv)
+    ->Unit(benchmark::kMicrosecond)
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}, {1, 3, 6}});
+
 #endif
 
 //=================================================================

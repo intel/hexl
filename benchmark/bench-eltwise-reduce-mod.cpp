@@ -251,7 +251,7 @@ BENCHMARK(BM_EltwiseReduceModMontAVX512BitShift52LT)
     ->Args({4096})
     ->Args({16384});
 
-static void BM_EltwiseReduceModMontFormAVX512BitShift52LT(
+static void BM_EltwiseReduceModMontFormInAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 67280421310725ULL;
@@ -266,18 +266,18 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift52LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontgomeryFormAVX512<52, 46>(output.data(), input_a.data(), R2_mod_q,
-                                        input_size, modulus, inv_mod);
+    EltwiseMontgomeryFormInAVX512<52, 46>(
+        output.data(), input_a.data(), R2_mod_q, input_size, modulus, inv_mod);
   }
 }
 
-BENCHMARK(BM_EltwiseReduceModMontFormAVX512BitShift52LT)
+BENCHMARK(BM_EltwiseReduceModMontFormInAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
 
-static void BM_EltwiseReduceModMontFormAVX512BitShift64LT(
+static void BM_EltwiseReduceModMontFormInAVX512BitShift64LT(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
   uint64_t modulus = 67280421310725ULL;
@@ -292,12 +292,12 @@ static void BM_EltwiseReduceModMontFormAVX512BitShift64LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontgomeryFormAVX512<64, 46>(output.data(), input_a.data(), R2_mod_q,
-                                        input_size, modulus, inv_mod);
+    EltwiseMontgomeryFormInAVX512<64, 46>(
+        output.data(), input_a.data(), R2_mod_q, input_size, modulus, inv_mod);
   }
 }
 
-BENCHMARK(BM_EltwiseReduceModMontFormAVX512BitShift64LT)
+BENCHMARK(BM_EltwiseReduceModMontFormInAVX512BitShift64LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
@@ -309,7 +309,6 @@ static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
   uint64_t modulus = 67280421310725ULL;
 
   auto input_a = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  AlignedVector64<uint64_t> input_b(input_size, 42006526039321);
 
   int r = 46;  // R^2 mod N = 42006526039321
   const uint64_t R2_mod_q = 42006526039321;
@@ -318,10 +317,10 @@ static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
-    EltwiseMontgomeryFormAVX512<52, 46>(output.data(), input_a.data(), R2_mod_q,
-                                        input_size, modulus, inv_mod);
-    EltwiseMontgomeryFormAVX512<52, 46>(output.data(), output.data(), 1ULL,
-                                        input_size, modulus, inv_mod);
+    EltwiseMontgomeryFormInAVX512<52, 46>(
+        output.data(), input_a.data(), R2_mod_q, input_size, modulus, inv_mod);
+    EltwiseMontgomeryFormOutAVX512<52, 46>(output.data(), output.data(),
+                                           input_size, modulus, inv_mod);
   }
 }
 
