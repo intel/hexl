@@ -1,6 +1,6 @@
 # Pull Requests
 
-Intel HEXL welcomes pull requests from external contributors to the `main` branch.
+Intel HEXL welcomes pull requests from external contributors to the `development` branch.
 
 Before contributing, please run
 ```bash

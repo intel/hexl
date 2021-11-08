@@ -78,7 +78,15 @@ For convenience, they are listed below:
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF | OFF     | Set to ON to treat all warnings as error                    |
 
 ### Compiling Intel HEXL
-To compile Intel HEXL from source code, first clone the repository and change directories to the where the source has been cloned.
+To compile Intel HEXL from source code, first clone the repository. For latest changes, checkout the `development` branch. For more stable code, checkout the `main` branch, which will store the latest release.
+```bash
+# For development
+git clone --branch development https://github.com/intel/hexl
+# For latest release
+git clone --branch main https://github.com/intel/hexl
+```
+Then change directories to the where the source has been cloned, e.g. via `cd hexl`
+
 #### Linux and Mac
 The instructions to build Intel HEXL are common to Linux and MacOS.
 

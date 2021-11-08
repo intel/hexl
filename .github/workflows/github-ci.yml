@@ -8,11 +8,13 @@ on:
   pull_request:
     branches:
       - main
+      - development
       - "[0-9]+.[0-9]+.[0-9]+" # Run on release branch, e.g. 1.2.0
   # Run when protected branches are pushed to, e.g. via merge
   push:
     branches:
       - main
+      - development
       - "[0-9]+.[0-9]+.[0-9]+" # Run on release branch, e.g. 1.2.0
 
   # Manually run this workflow on any specified branch.
