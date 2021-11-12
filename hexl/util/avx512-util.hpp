@@ -395,7 +395,6 @@ inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
   if (BitShift == 52) {
     // Operation:
     // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
-    // __m512i m = ClearTopBits64<r>(T_lo);
     __m512i m = _mm512_hexl_mullo_epi<BitShift>(T_lo, v_inv_mod);
     m = ClearTopBits64<r>(m);
 
