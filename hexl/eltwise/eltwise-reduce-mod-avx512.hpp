@@ -395,11 +395,13 @@ void EltwiseMontReduceModAVX512Mult(uint64_t* result, const uint64_t* a,
   uint64_t R_mod_q = R - modulus;
 
   if (BitShift == 64) {
-    HEXL_CHECK(((floor(log2(modulus)) + 1) + (floor(log2(R_mod_q)) + 1)) <= 63,
+    HEXL_CHECK(((floor(log2(static_cast<double>(modulus))) + 1) +
+                (floor(log2(static_cast<double>(R_mod_q))) + 1)) <= 63,
                "Op (modulus - 1)*R_mod_q can overflow 63 bits");
     prod_rs = (1ULL << 63) - 1;
   } else {
-    HEXL_CHECK(((floor(log2(modulus)) + 1) + (floor(log2(R_mod_q)) + 1)) <= 52,
+    HEXL_CHECK(((floor(log2(static_cast<double>(modulus))) + 1) +
+                (floor(log2(static_cast<double>(R_mod_q))) + 1)) <= 52,
                "Op (modulus - 1)*R_mod_q can overflow 52 bits");
     prod_rs = (1ULL << (52 - r));
   }

@@ -184,7 +184,7 @@ static void BM_EltwiseMultModAVX512IFMAIntRep(
   size_t input_size = state.range(0);
   size_t input_mod_factor = state.range(1);
   int repetitions = state.range(2);
-  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+  uint64_t modulus = (1ULL << 49) + 7;  // 1125899906842631
 
   auto input1 = GenerateInsecureUniformRandomValues(input_size, 0,
                                                     input_mod_factor * modulus);

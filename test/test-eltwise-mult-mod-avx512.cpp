@@ -208,7 +208,7 @@ TEST(EltwiseMultMod, avx512dqint_big) {
 }
 
 // Checks Montgomery and AVX512DQInt eltwise mult implementations match
-TEST(EltwiseMultModMont_PConv, avx512dqint_big) {
+TEST(EltwiseMultModMont_EConv, avx512dqint_big) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -329,7 +329,7 @@ TEST(EltwiseMultMod, avx512ifma_big) {
   }
 }
 
-// Checks Montgomery and AVX512DQInt eltwise mult implementations match
+// Checks Montgomery and AVX512ifmaInt eltwise mult implementations match
 TEST(EltwiseMultModMont, avx512ifmaint_big) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
@@ -339,20 +339,20 @@ TEST(EltwiseMultModMont, avx512ifmaint_big) {
   std::vector<uint64_t> rs2(length, 0);
   std::vector<uint64_t> rs3(length, 0);
 
-  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+  uint64_t modulus = (1ULL << 49) + 7;  // 562949953421319
   auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
   auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
 
-  int r = 51;  // R = 2251799813685248
-  // mod(2251799813685248*2251799813685248;1125899906842631)
+  int r = 50;  // R = 1125899906842624
+  // mod(1125899906842624*1125899906842624;562949953421319)
   const uint64_t R2_mod_q = 196;
   uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
 
   EltwiseMultModAVX512IFMAInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
                                  modulus);
-  EltwiseMontgomeryFormInAVX512<52, 51>(op1.data(), op1.data(), R2_mod_q,
+  EltwiseMontgomeryFormInAVX512<52, 50>(op1.data(), op1.data(), R2_mod_q,
                                         op1.size(), modulus, inv_mod);
-  EltwiseMontReduceModAVX512<52, 51>(rs2.data(), op1.data(), op2.data(),
+  EltwiseMontReduceModAVX512<52, 50>(rs2.data(), op1.data(), op2.data(),
                                      rs2.size(), modulus, inv_mod);
   ASSERT_EQ(rs2, rs1);
 }
