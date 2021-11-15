@@ -196,7 +196,7 @@ static void BM_EltwiseMultModMontAVX512IFMAIntEConv(
   int r = 51;  // R = 2251799813685248
   // mod(2251799813685248*2251799813685248;1125899906842631)
   const uint64_t R2_mod_q = 196;
-  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+  uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
 
   for (auto _ : state) {
     if (input_mod_factor != 1) {
@@ -205,12 +205,10 @@ static void BM_EltwiseMultModMontAVX512IFMAIntEConv(
       EltwiseReduceModAVX512(op2.data(), op2.data(), input_size, modulus,
                              input_mod_factor, 1);
     }
-    //}
-    // for (auto _ : state) {
     EltwiseMontgomeryFormInAVX512<52, 51>(output.data(), op1.data(), R2_mod_q,
-                                          input_size, modulus, inv_mod);
+                                          input_size, modulus, neg_inv_mod);
     EltwiseMontReduceModAVX512<52, 51>(output.data(), output.data(), op2.data(),
-                                       input_size, modulus, inv_mod);
+                                       input_size, modulus, neg_inv_mod);
   }
 }
 
