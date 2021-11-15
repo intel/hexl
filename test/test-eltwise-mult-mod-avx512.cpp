@@ -236,7 +236,7 @@ TEST(EltwiseMultModMont_EConv, avx512dqint_big) {
 }
 
 // Checks Montgomery and AVX512DQInt eltwise mult implementations match
-TEST(EltwiseMultModMont_IConv, avx512dqint_big) {
+TEST(EltwiseMultModMont_NoConv, avx512dqint_big) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -254,8 +254,8 @@ TEST(EltwiseMultModMont_IConv, avx512dqint_big) {
 
   EltwiseMultModAVX512DQInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
                                modulus);
-  EltwiseMontReduceModAVX512Mult<64, 61, 1>(rs2.data(), op1.data(), op2.data(),
-                                            rs2.size(), modulus, inv_mod);
+  EltwiseMontReduceModAVX512<64, 61>(rs2.data(), op1.data(), op2.data(),
+                                     rs2.size(), modulus, inv_mod);
   ASSERT_EQ(rs2, rs1);
 }
 #endif
