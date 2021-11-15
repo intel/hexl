@@ -223,12 +223,13 @@ TEST(EltwiseMultModMont_EConv, avx512dqint_big) {
 
   int r = 61;  // R = 2305843009213693952
   // mod(2305843009213693952*2305843009213693952;1152921504606846983)
-  const uint64_t R2_mod_q = 196;
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
   uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
 
   EltwiseMultModAVX512DQInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
                                modulus);
-  EltwiseMontgomeryFormInAVX512<64, 61>(op1.data(), op1.data(), R2_mod_q,
+  EltwiseMontgomeryFormInAVX512<64, 61>(op1.data(), op1.data(), R_square_mod_q,
                                         op1.size(), modulus, neg_inv_mod);
   EltwiseMontReduceModAVX512<64, 61>(rs2.data(), op1.data(), op2.data(),
                                      rs2.size(), modulus, neg_inv_mod);
@@ -345,12 +346,13 @@ TEST(EltwiseMultModMont, avx512ifmaint_big) {
 
   int r = 50;  // R = 1125899906842624
   // mod(1125899906842624*1125899906842624;562949953421319)
-  const uint64_t R2_mod_q = 196;
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
   uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
 
   EltwiseMultModAVX512IFMAInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
                                  modulus);
-  EltwiseMontgomeryFormInAVX512<52, 50>(op1.data(), op1.data(), R2_mod_q,
+  EltwiseMontgomeryFormInAVX512<52, 50>(op1.data(), op1.data(), R_square_mod_q,
                                         op1.size(), modulus, neg_inv_mod);
   EltwiseMontReduceModAVX512<52, 50>(rs2.data(), op1.data(), op2.data(),
                                      rs2.size(), modulus, neg_inv_mod);
