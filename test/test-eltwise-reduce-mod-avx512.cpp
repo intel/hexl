@@ -35,6 +35,35 @@ TEST(EltwiseReduceMod, avx512_64_mod_1) {
   CheckEqual(result, exp_out);
 }
 
+TEST(EltwiseReduceModMontInOut, avx512_64_mod_1) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  uint64_t modulus = 67280421310725ULL;
+  std::vector<uint64_t> input_a{0,
+                                67280421310000,
+                                25040294381203,
+                                340231313,
+                                769231483400,
+                                90032324,
+                                120042353,
+                                1530};
+  std::vector<uint64_t> output{0, 0, 0, 0, 0, 0, 0, 0};
+
+  int r = 46;  // R^2 mod N = 42006526039321
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  EltwiseMontgomeryFormInAVX512<64, 46>(output.data(), input_a.data(),
+                                        R_square_mod_q, input_a.size(), modulus,
+                                        inv_mod);
+  EltwiseMontgomeryFormOutAVX512<64, 46>(output.data(), output.data(),
+                                         input_a.size(), modulus, inv_mod);
+  CheckEqual(input_a, output);
+}
+
 #ifdef HEXL_HAS_AVX512IFMA
 TEST(EltwiseReduceMod, avx512_52_mod_1) {
   if (!has_avx512dq) {
@@ -74,6 +103,36 @@ TEST(EltwiseReduceMod, avx512Big_mod_1) {
                              input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
+
+TEST(EltwiseReduceModMontInOut, avx512_52_mod_1) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  uint64_t modulus = 67280421310725ULL;
+  std::vector<uint64_t> input_a{0,
+                                67280421310000,
+                                25040294381203,
+                                340231313,
+                                769231483400,
+                                90032324,
+                                120042353,
+                                1530};
+  std::vector<uint64_t> output{0, 0, 0, 0, 0, 0, 0, 0};
+
+  int r = 46;  // R^2 mod N = 42006526039321
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
+  uint64_t inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  EltwiseMontgomeryFormInAVX512<52, 46>(output.data(), input_a.data(),
+                                        R_square_mod_q, input_a.size(), modulus,
+                                        inv_mod);
+  EltwiseMontgomeryFormOutAVX512<52, 46>(output.data(), output.data(),
+                                         input_a.size(), modulus, inv_mod);
+  CheckEqual(input_a, output);
+}
+
 #endif
 
 TEST(EltwiseReduceMod, avx512_2_1) {

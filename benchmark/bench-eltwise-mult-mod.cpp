@@ -7,6 +7,7 @@
 
 #include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
+#include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
@@ -145,8 +146,10 @@ static void BM_EltwiseMultModAVX512IFMAInt(
   size_t input_mod_factor = state.range(1);
   size_t modulus = 100;
 
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                    input_mod_factor * modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                    input_mod_factor * modulus);
   AlignedVector64<uint64_t> output(input_size, 3);
 
   for (auto _ : state) {
@@ -170,6 +173,51 @@ static void BM_EltwiseMultModAVX512IFMAInt(
 BENCHMARK(BM_EltwiseMultModAVX512IFMAInt)
     ->Unit(benchmark::kMicrosecond)
     ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+#endif
+
+//=================================================================
+
+#ifdef HEXL_HAS_AVX512IFMA
+
+// state[0] is the degree
+// state[1] is the input_mod_factor
+static void BM_EltwiseMultModMontAVX512IFMAIntEConv(
+    benchmark::State& state) {  //  NOLINT
+
+  size_t input_size = state.range(0);
+  size_t input_mod_factor = state.range(1);
+  uint64_t modulus = (1ULL << 50) + 7;  // 1125899906842631
+  auto op1 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                 input_mod_factor * modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(input_size, 0,
+                                                 input_mod_factor * modulus);
+  AlignedVector64<uint64_t> output(input_size, 3);
+
+  int r = 51;  // R = 2251799813685248
+  // mod(2251799813685248*2251799813685248;1125899906842631)
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
+  uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  for (auto _ : state) {
+    if (input_mod_factor != 1) {
+      EltwiseReduceModAVX512(op1.data(), op1.data(), input_size, modulus,
+                             input_mod_factor, 1);
+      EltwiseReduceModAVX512(op2.data(), op2.data(), input_size, modulus,
+                             input_mod_factor, 1);
+    }
+    EltwiseMontgomeryFormInAVX512<52, 51>(output.data(), op1.data(),
+                                          R_square_mod_q, input_size, modulus,
+                                          neg_inv_mod);
+    EltwiseMontReduceModAVX512<52, 51>(output.data(), output.data(), op2.data(),
+                                       input_size, modulus, neg_inv_mod);
+  }
+}
+
+BENCHMARK(BM_EltwiseMultModMontAVX512IFMAIntEConv)
+    ->Unit(benchmark::kMicrosecond)
+    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+
 #endif
 
 //=================================================================

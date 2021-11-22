@@ -7,6 +7,7 @@
 
 #include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
+#include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
@@ -205,6 +206,59 @@ TEST(EltwiseMultMod, avx512dqint_big) {
     }
   }
 }
+
+// Checks Montgomery and AVX512DQInt eltwise mult implementations match
+TEST(EltwiseMultModMont_EConv, avx512dqint_big) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  size_t length = 1024;
+  std::vector<uint64_t> rs1(length, 0);
+  std::vector<uint64_t> rs2(length, 0);
+
+  uint64_t modulus = (1ULL << 60) + 7;  // 1152921504606846983
+  auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+
+  int r = 61;  // R = 2305843009213693952
+  // mod(2305843009213693952*2305843009213693952;1152921504606846983)
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
+  uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  EltwiseMultModAVX512DQInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
+                               modulus);
+  EltwiseMontgomeryFormInAVX512<64, 61>(op1.data(), op1.data(), R_square_mod_q,
+                                        op1.size(), modulus, neg_inv_mod);
+  EltwiseMontReduceModAVX512<64, 61>(rs2.data(), op1.data(), op2.data(),
+                                     rs2.size(), modulus, neg_inv_mod);
+  ASSERT_EQ(rs2, rs1);
+}
+
+// Checks Montgomery and AVX512DQInt eltwise mult implementations match
+TEST(EltwiseMultModMont_NoConv, avx512dqint_big) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  size_t length = 1024;
+  std::vector<uint64_t> rs1(length, 0);
+  std::vector<uint64_t> rs2(length, 0);
+
+  uint64_t modulus = 2305843009213693951;
+  auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+
+  int r = 61;  // R = 2305843009213693952
+  uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  EltwiseMultModAVX512DQInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
+                               modulus);
+  EltwiseMontReduceModAVX512<64, 61>(rs2.data(), op1.data(), op2.data(),
+                                     rs2.size(), modulus, neg_inv_mod);
+  ASSERT_EQ(rs2, rs1);
+}
 #endif
 
 #ifdef HEXL_HAS_AVX512IFMA
@@ -275,6 +329,36 @@ TEST(EltwiseMultMod, avx512ifma_big) {
     }
   }
 }
+
+// Checks Montgomery and AVX512ifmaInt eltwise mult implementations match
+TEST(EltwiseMultModMont, avx512ifmaint_big) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+  size_t length = 1024;
+  std::vector<uint64_t> rs1(length, 0);
+  std::vector<uint64_t> rs2(length, 0);
+  std::vector<uint64_t> rs3(length, 0);
+
+  uint64_t modulus = (1ULL << 49) + 7;  // 562949953421319
+  auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+
+  int r = 50;  // R = 1125899906842624
+  // mod(1125899906842624*1125899906842624;562949953421319)
+  uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
+  const uint64_t R_square_mod_q = MultiplyMod(R_reduced, R_reduced, modulus);
+  uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
+
+  EltwiseMultModAVX512IFMAInt<1>(rs1.data(), op1.data(), op2.data(), op1.size(),
+                                 modulus);
+  EltwiseMontgomeryFormInAVX512<52, 50>(op1.data(), op1.data(), R_square_mod_q,
+                                        op1.size(), modulus, neg_inv_mod);
+  EltwiseMontReduceModAVX512<52, 50>(rs2.data(), op1.data(), op2.data(),
+                                     rs2.size(), modulus, neg_inv_mod);
+  ASSERT_EQ(rs2, rs1);
+}
+
 #endif
 
 }  // namespace hexl
