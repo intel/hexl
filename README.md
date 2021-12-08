@@ -86,6 +86,7 @@ git clone --branch development https://github.com/intel/hexl
 git clone --branch main https://github.com/intel/hexl
 ```
 Then change directories to the where the source has been cloned, e.g. via `cd hexl`
+test
 
 #### Linux and Mac
 The instructions to build Intel HEXL are common to Linux and MacOS.
