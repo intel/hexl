@@ -35,6 +35,7 @@ if (HEXL_HAS_AVX512DQ)
         eltwise/eltwise-fma-mod-avx512.cpp
         ntt/fwd-ntt-avx512.cpp
         ntt/inv-ntt-avx512.cpp
+        fft/fwd-fft-avx512.cpp
     )
 endif()
 
