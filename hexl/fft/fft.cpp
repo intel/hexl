@@ -13,14 +13,14 @@ namespace hexl {
 AllocatorStrategyPtr mallocStrategy = AllocatorStrategyPtr(new MallocStrategy);
 
 FFT::FFT(uint64_t degree, double_t* roots_of_unity_real,
-         double_t* roots_of_unity_imag, double_t scalar,
+         double_t* roots_of_unity_imag, double_t in_scalar,
          std::shared_ptr<AllocatorBase> alloc_ptr)
     : m_degree(degree),
       m_alloc(alloc_ptr),
       m_aligned_alloc(AlignedAllocator<double_t, 64>(m_alloc)),
       m_complex_root_of_unity_powers_real(m_aligned_alloc),
       m_complex_root_of_unity_powers_imag(m_aligned_alloc),
-      scalar(scalar) {
+      scalar(in_scalar) {
   // HEXL_CHECK(CheckArguments(degree, q), "");
   // HEXL_CHECK(IsPrimitiveRoot(m_w, 2 * degree, q),
   //           m_w << " is not a primitive 2*" << degree << "'th root of

@@ -51,12 +51,12 @@ class FFT {
   /// @details  Performs pre-computation necessary for forward and inverse
   /// transforms
   FFT(uint64_t degree, double_t* roots_of_unity_real,
-      double_t* roots_of_unity_imag, double_t scalar,
+      double_t* roots_of_unity_imag, double_t in_scalar,
       std::shared_ptr<AllocatorBase> alloc_ptr = {});
 
   template <class Allocator, class... AllocatorArgs>
   FFT(uint64_t degree, double_t* roots_of_unity_real,
-      double_t* roots_of_unity_imag, double_t scalar, Allocator&& a,
+      double_t* roots_of_unity_imag, double_t in_scalar, Allocator&& a,
       AllocatorArgs&&... args)
       : FFT(degree, roots_of_unity_real, roots_of_unity_imag, scalar,
             std::static_pointer_cast<AllocatorBase>(
