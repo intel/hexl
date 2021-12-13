@@ -169,8 +169,8 @@ inline void WriteFwdInterleavedT1(__m512d arg1, __m512d arg2, __m512d* out) {
   arg1 = _mm512_permutexvar_pd(v_X_out_idx, perm_hi);
   arg2 = _mm512_permutexvar_pd(v_Y_out_idx, perm_lo);
 
-  _mm512_storeu_si512(out++, arg1);
-  _mm512_storeu_si512(out, arg2);
+  _mm512_storeu_pd(out++, arg1);
+  _mm512_storeu_pd(out, arg2);
 }
 
 #endif  // HEXL_HAS_AVX512DQ
