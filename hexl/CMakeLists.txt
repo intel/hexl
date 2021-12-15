@@ -13,6 +13,7 @@ set(NATIVE_SRC
     ntt/ntt-radix-2.cpp
     ntt/ntt-radix-4.cpp
     number-theory/number-theory.cpp
+    fft/fft.cpp
 )
 
 if (HEXL_EXPERIMENTAL)

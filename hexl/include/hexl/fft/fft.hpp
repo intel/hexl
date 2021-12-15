@@ -50,15 +50,13 @@ class FFT {
   /// calculations
   /// @details  Performs pre-computation necessary for forward and inverse
   /// transforms
-  FFT(uint64_t degree, double_t* roots_of_unity_real,
-      double_t* roots_of_unity_imag, double_t in_scalar,
+  FFT(uint64_t degree, double_t* in_scalar,
       std::shared_ptr<AllocatorBase> alloc_ptr = {});
 
   template <class Allocator, class... AllocatorArgs>
-  FFT(uint64_t degree, double_t* roots_of_unity_real,
-      double_t* roots_of_unity_imag, double_t in_scalar, Allocator&& a,
+  FFT(uint64_t degree, double_t* in_scalar, Allocator&& a,
       AllocatorArgs&&... args)
-      : FFT(degree, roots_of_unity_real, roots_of_unity_imag, scalar,
+      : FFT(degree, in_scalar,
             std::static_pointer_cast<AllocatorBase>(
                 std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
@@ -79,7 +77,19 @@ class FFT {
   /// output_mod_factor * q). Must be 1 or 4.
   void ComputeForwardFFT(double_t* result_real, double_t* result_imag,
                          const double_t* operand_real,
-                         const double_t* operand_imag);
+                         const double_t* operand_imag,
+                         const double_t* roots_real,
+                         const double_t* roots_imag);
+
+  /// @brief Returns the root of unity powers in bit-reversed order
+  const AlignedVector64<double_t>& GetComplexRootOfUnityPowers_real() const {
+    return m_complex_root_of_unity_powers_real;
+  }
+
+  /// @brief Returns the root of unity powers in bit-reversed order
+  const AlignedVector64<double_t>& GetComplexRootOfUnityPowers_imag() const {
+    return m_complex_root_of_unity_powers_imag;
+  }
 
  private:
   // Primitive 2n-th root, m = 2n
@@ -90,7 +100,11 @@ class FFT {
 
   static constexpr double PI_ = 3.1415926535897932384626433832795028842;
 
-  double_t scalar;  //
+  std::shared_ptr<AllocatorBase> m_alloc;
+
+  AlignedAllocator<double_t, 64> m_aligned_alloc;
+
+  double_t* scalar;  //
 
   uint64_t m_degree;  // N: size of FFT transform, should be power of 2
 
