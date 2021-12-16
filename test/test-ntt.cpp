@@ -19,7 +19,7 @@ namespace intel {
 namespace hexl {
 
 #ifdef HEXL_DEBUG
-/*TEST(NTT, bad_input) {
+TEST(NTT, bad_input) {
   uint64_t N = 8;
   uint64_t modulus = 769;
   std::vector<uint64_t> input;
@@ -90,19 +90,18 @@ namespace hexl {
   init_inputs();
   EXPECT_ANY_THROW(ntt.ComputeInverse(input.data(), input.data(), 1, 123));
   init_inputs();
-}*/
+}
 #endif
 
 TEST(NTT, Powers) {
   uint64_t modulus = 0xffffffffffc0001ULL;
-  /*
   {
     uint64_t N = 2;
     NTT ntt(N, modulus);
 
     ASSERT_EQ(1ULL, ntt.GetRootOfUnityPower(0));
     ASSERT_EQ(288794978602139552ULL, ntt.GetRootOfUnityPower(1));
-  }*/
+  }
 
   {
     uint64_t N = 4;
@@ -112,16 +111,9 @@ TEST(NTT, Powers) {
     ASSERT_EQ(288794978602139552ULL, ntt.GetRootOfUnityPower(1));
     ASSERT_EQ(178930308976060547ULL, ntt.GetRootOfUnityPower(2));
     ASSERT_EQ(748001537669050592ULL, ntt.GetRootOfUnityPower(3));
-
-    std::vector<double_t> result_real{0, 1, 2, 3, 4, 5, 6, 7,
-                                      8, 9, 1, 2, 3, 4, 5, 6};
-    std::vector<double_t> operand_real{0, 1, 2, 3, 4, 5, 6, 7,
-                                       8, 9, 1, 2, 3, 4, 5, 6};
-
-    AssertEqual(result_real, operand_real);
   }
 }
-/*
+
 namespace allocators {
 struct CustomAllocator {
   using T = size_t;
@@ -206,7 +198,7 @@ TEST(NTT, root_of_unity_with_allocator) {
   AssertEqual(input, input3);
   AssertEqual(input, input4);
 }
-/*
+
 TEST(NTT, root_of_unity) {
   uint64_t N = 8;
   uint64_t modulus = 769;
@@ -484,6 +476,6 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::ValuesIn(AlignedVector64<uint64_t>{
             27, 28, 29, 30, 31, 32, 33, 48, 49, 50, 51, 58, 59, 60}),
         ::testing::ValuesIn(std::vector<bool>{false, true})));
-*/
+
 }  // namespace hexl
 }  // namespace intel

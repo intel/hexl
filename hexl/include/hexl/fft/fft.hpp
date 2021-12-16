@@ -81,6 +81,8 @@ class FFT {
                          const double_t* roots_real,
                          const double_t* roots_imag);
 
+  void DummyFunc() {}
+
   /// @brief Returns the root of unity powers in bit-reversed order
   const AlignedVector64<double_t>& GetComplexRootOfUnityPowers_real() const {
     return m_complex_root_of_unity_powers_real;

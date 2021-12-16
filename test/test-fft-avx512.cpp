@@ -9,6 +9,7 @@
 #include "hexl/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
+#include "test-util.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
@@ -109,8 +110,10 @@ TEST(FFT, Powers) {
     fft.ComputeForwardFFT(result_real.data(), result_imag.data(),
                           operand_real.data(), operand_imag.data(),
                           roots_real.data(), roots_imag.data());
+    fft.DummyFunc();
 
-    // AssertEqual(result_real, operand_real);
+    AssertEqual(result_real, operand_real);
+    HEXL_VLOG(1, "result_real[5] " << result_real[5]);
     // ASSERT_EQ(1ULL, 1);
   }
 }
