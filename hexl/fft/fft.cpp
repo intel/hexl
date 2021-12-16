@@ -36,12 +36,7 @@ bool FFT::CheckArguments(uint64_t degree, uint64_t modulus) {
   HEXL_UNUSED(modulus);
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
-  HEXL_CHECK(degree <= (1ULL << NTT::MaxDegreeBits()),
-             "degree should be less than 2^" << NTT::MaxDegreeBits() << " got "
-                                             << degree);
-  HEXL_CHECK(modulus <= (1ULL << NTT::MaxModulusBits()),
-             "modulus should be less than 2^" << NTT::MaxModulusBits()
-                                              << " got " << modulus);
+
   HEXL_CHECK(modulus % (2 * degree) == 1,
              "modulus mod 2n != 1");  // IS this needed?
   HEXL_CHECK(IsPrime(modulus), "modulus is not prime");
@@ -92,8 +87,8 @@ void FFT::ComputeForwardFFT(double_t* result_real, double_t* result_imag,
   HEXL_CHECK(result_imag != nullptr, "result_imag == nullptr");
   HEXL_CHECK(operand_real != nullptr, "operand_real == nullptr");
   HEXL_CHECK(operand_imag != nullptr, "operand_imag == nullptr");
-  HEXL_CHECK(W_real != nullptr, "W_real == nullptr");
-  HEXL_CHECK(W_imag != nullptr, "W_imag == nullptr");
+  HEXL_CHECK(roots_real != nullptr, "W_real == nullptr");
+  HEXL_CHECK(roots_imag != nullptr, "W_imag == nullptr");
 
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
