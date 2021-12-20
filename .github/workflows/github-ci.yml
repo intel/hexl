@@ -180,40 +180,40 @@ jobs:
           path: ${{ github.workspace }}/${{ github.workflow }}_${{ github.sha }}
           retention-days: 90 # Maximum for free version
 
-  # windows-build:
-  #   name: 'Windows ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   strategy:
-  #     matrix:
-  #       build_type: [Release, Debug]
-  #       # Shared lib in Windows requires exporting symbols
-  #       shared_lib: [OFF]
+  windows-build:
+    name: 'Windows ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        build_type: [Release, Debug]
+        # Shared lib in Windows requires exporting symbols
+        shared_lib: [OFF]
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Default build
-  #       run: |
-  #         set -x
-  #         # Build library
-  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
-  #           -DCMAKE_INSTALL_PREFIX=./ \
-  #           -DHEXL_SHARED_LIB=${{ matrix.shared_lib }}
-  #         cmake --build build -j --config ${{ matrix.build_type}}
-  #         cmake --build build --target install --config ${{ matrix.build_type}}
-  #         cmake --build build --target unittest --config ${{ matrix.build_type}}
-  #         cmake --build build --target bench --config ${{ matrix.build_type}}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Default build
+        run: |
+          set -x
+          # Build library
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
+            -DCMAKE_INSTALL_PREFIX=./ \
+            -DHEXL_SHARED_LIB=${{ matrix.shared_lib }}
+          cmake --build build -j --config ${{ matrix.build_type}}
+          cmake --build build --target install --config ${{ matrix.build_type}}
+          cmake --build build --target unittest --config ${{ matrix.build_type}}
+          cmake --build build --target bench --config ${{ matrix.build_type}}
 
-  #         # Build and run examples
-  #         cd example/cmake
-  #         cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
-  #           ${{ env.HEXL_HINT_DIR }}
-  #         cmake --build build --config ${{ matrix.build_type}}
-  #         build/${{ matrix.build_type}}/example.exe
+          # Build and run examples
+          cd example/cmake
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type}} \
+            ${{ env.HEXL_HINT_DIR }}
+          cmake --build build --config ${{ matrix.build_type}}
+          build/${{ matrix.build_type}}/example.exe
 
-  #         # TODO: add pkgconfig and vcpkg examples
+          # TODO: add pkgconfig and vcpkg examples
 
   experimental-build:
     name: 'experimental: ${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
