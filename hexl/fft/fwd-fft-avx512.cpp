@@ -5,10 +5,10 @@
 
 #include <cstring>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 #include "hexl/fft/fft-avx512-util.hpp"
-#include "hexl/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 
 namespace intel {
@@ -35,6 +35,8 @@ namespace hexl {
 void FwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
                   __m512d* Y_imag, __m512d W_real, __m512d W_imag) {
   // U = X
+  __m512d U_real = *X_real;
+  __m512d U_imag = *X_imag;
 
   // V = Y*W. Complex multiplication:
   // (y_r + iy_b)*(w_a + iw_b) = (y_a*w_a - y_b*w_b) + i(y_a*w_b + y_b*w_a)
@@ -47,11 +49,11 @@ void FwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
   V_imag = _mm512_add_pd(V_imag, tmp);
 
   // X = U + V
-  *X_real = _mm512_add_pd(*X_real, V_real);
-  *X_imag = _mm512_add_pd(*X_imag, V_imag);
+  *X_real = _mm512_add_pd(U_real, V_real);
+  *X_imag = _mm512_add_pd(U_imag, V_imag);
   // Y = U - V
-  *Y_real = _mm512_sub_pd(*X_real, V_real);
-  *Y_imag = _mm512_sub_pd(*X_imag, V_imag);
+  *Y_real = _mm512_sub_pd(U_real, V_real);
+  *Y_imag = _mm512_sub_pd(U_imag, V_imag);
 }
 
 void ComplexFwdT1(double_t* operand_real, double_t* operand_imag,
@@ -61,10 +63,14 @@ void ComplexFwdT1(double_t* operand_real, double_t* operand_imag,
   const __m512d* v_W_pt_imag = reinterpret_cast<const __m512d*>(W_imag);
   size_t offset = 0;
 
-  __m512d v_scalar = _mm512_set1_pd(*scalar);
+  __m512d v_scalar;
+  if (scalar != nullptr) {
+    v_scalar = _mm512_set1_pd(*scalar);
+  }
 
   // 8 | m guaranteed by n >= 16
-  HEXL_LOOP_UNROLL_8
+  HEXL_LOOP_UNROLL_4
+
   for (size_t i = 0; i < m; i += 8) {
     double_t* X_real = operand_real + offset;
     double_t* X_imag = operand_imag + offset;
@@ -89,13 +95,11 @@ void ComplexFwdT1(double_t* operand_real, double_t* operand_imag,
       v_X_imag = _mm512_mul_pd(v_X_imag, v_scalar);
     }
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_real, v_W_real,
+    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                  v_W_imag);
 
-    _mm512_storeu_pd(v_X_pt_real++, v_X_real);
-    _mm512_storeu_pd(v_X_pt_imag++, v_X_imag);
-    _mm512_storeu_pd(v_X_pt_real, v_Y_real);
-    _mm512_storeu_pd(v_X_pt_imag, v_Y_imag);
+    WriteFwdInterleavedT1(v_X_real, v_Y_real, v_X_pt_real);
+    WriteFwdInterleavedT1(v_X_imag, v_Y_imag, v_X_pt_imag);
 
     offset += 16;
   }
@@ -104,6 +108,7 @@ void ComplexFwdT1(double_t* operand_real, double_t* operand_imag,
 void ComplexFwdT2(double_t* operand_real, double_t* operand_imag,
                   const double_t* W_real, const double_t* W_imag, uint64_t m) {
   size_t offset = 0;
+
   // 4 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < m; i += 4) {
@@ -132,7 +137,7 @@ void ComplexFwdT2(double_t* operand_real, double_t* operand_imag,
     W_real += 4;
     W_imag += 4;
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_real, v_W_real,
+    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                  v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real++, v_X_real);
@@ -172,10 +177,11 @@ void ComplexFwdT4(double_t* operand_real, double_t* operand_imag,
     __m512d v_W_imag =
         _mm512_set_pd(W_imag[1], W_imag[1], W_imag[1], W_imag[1], W_imag[0],
                       W_imag[0], W_imag[0], W_imag[0]);
+
     W_real += 2;
     W_imag += 2;
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_real, v_W_real,
+    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                  v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real++, v_X_real);
@@ -233,7 +239,7 @@ void ComplexFwdT8(double_t* result_real, double_t* result_imag,
       __m512d v_Y_real = _mm512_loadu_pd(v_Y_op_pt_real);
       __m512d v_Y_imag = _mm512_loadu_pd(v_Y_op_pt_imag);
 
-      FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_real, v_W_real,
+      FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                    v_W_imag);
 
       _mm512_storeu_pd(v_X_r_pt_real++, v_X_real);
