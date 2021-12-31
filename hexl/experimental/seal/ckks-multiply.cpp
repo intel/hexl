@@ -55,9 +55,9 @@ void CkksMultiply(uint64_t* result, const uint64_t* operand1,
 
       // Compute second output polynomial
       // result[1] = x[1] * y[0]
-      intel::hexl::EltwiseMultMod(
-          temp2.data(), operand1 + poly1_offset,
-          operand2 + poly0_offset, tile_size, moduli[i], 1);
+      intel::hexl::EltwiseMultMod(temp2.data(), operand1 + poly1_offset,
+                                  operand2 + poly0_offset, tile_size, moduli[i],
+                                  1);
       // result[1] = x[0] * y[1]
       intel::hexl::EltwiseMultMod(temp.data(), operand1 + poly0_offset,
                                   operand2 + poly1_offset, tile_size, moduli[i],
