@@ -59,6 +59,46 @@ TEST(CkksMultiply, small_one_mod_inplace) {
   CheckEqual(op1, exp_out);
 }
 
+TEST(CkksMultiply, small_one_mod_square_same_op) {
+  size_t coeff_count = 3;
+  std::vector<uint64_t> moduli{10};
+
+  std::vector<uint64_t> op1{1, 2, 3,  //
+                            4, 5, 6};
+  std::vector<uint64_t> out(3 * coeff_count * moduli.size(), 0);
+
+  std::vector<uint64_t> exp_out{
+      (op1[0] * op1[0] % 10),                   (op1[1] * op1[1] % 10),                   (op1[2] * op1[2] % 10),                    //
+      (op1[0] * op1[3] + op1[3] * op1[0]) % 10, (op1[1] * op1[4] + op1[4] * op1[1]) % 10, (op1[2] * op1[5] + op1[5] * op1[2]) % 10,  //
+      (op1[3] * op1[3] % 10),                   (op1[4] * op1[4] % 10),                   (op1[5] * op1[5] % 10)                     //
+  };
+
+  CkksMultiply(out.data(), op1.data(), op1.data(), coeff_count, moduli.data(),
+               moduli.size());
+
+  CheckEqual(out, exp_out);
+}
+
+TEST(CkksMultiply, small_one_mod_square_same_op_inline) {
+  size_t coeff_count = 3;
+  std::vector<uint64_t> moduli{10};
+
+  std::vector<uint64_t> op1{1, 2, 3,  //
+                            4, 5, 6,
+                            0, 0, 0};
+
+  std::vector<uint64_t> exp_out{
+      (op1[0] * op1[0] % 10),                   (op1[1] * op1[1] % 10),                   (op1[2] * op1[2] % 10),                    //
+      (op1[0] * op1[3] + op1[3] * op1[0]) % 10, (op1[1] * op1[4] + op1[4] * op1[1]) % 10, (op1[2] * op1[5] + op1[5] * op1[2]) % 10,  //
+      (op1[3] * op1[3] % 10),                   (op1[4] * op1[4] % 10),                   (op1[5] * op1[5] % 10)                     //
+  };
+
+  CkksMultiply(op1.data(), op1.data(), op1.data(), coeff_count, moduli.data(),
+               moduli.size());
+
+  CheckEqual(op1, exp_out);
+}
+
 TEST(CkksMultiply, small_two_mod) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10, 20};

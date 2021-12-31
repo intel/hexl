@@ -35,6 +35,7 @@ void CkksMultiply(uint64_t* result, const uint64_t* operand1,
   size_t num_tiles = n / tile_size;
 
   AlignedVector64<uint64_t> temp(tile_size, 0);
+  AlignedVector64<uint64_t> temp2(tile_size, 0);
 
   // Modulus by modulus
   for (size_t i = 0; i < num_moduli; i++) {
@@ -55,14 +56,14 @@ void CkksMultiply(uint64_t* result, const uint64_t* operand1,
       // Compute second output polynomial
       // result[1] = x[1] * y[0]
       intel::hexl::EltwiseMultMod(
-          &result[poly1_offset], operand1 + poly1_offset,
+          temp2.data(), operand1 + poly1_offset,
           operand2 + poly0_offset, tile_size, moduli[i], 1);
       // result[1] = x[0] * y[1]
       intel::hexl::EltwiseMultMod(temp.data(), operand1 + poly0_offset,
                                   operand2 + poly1_offset, tile_size, moduli[i],
                                   1);
       // result[1] += temp_poly
-      intel::hexl::EltwiseAddMod(&result[poly1_offset], &result[poly1_offset],
+      intel::hexl::EltwiseAddMod(&result[poly1_offset], temp2.data(),
                                  temp.data(), tile_size, moduli[i]);
 
       // Compute first output polynomial
