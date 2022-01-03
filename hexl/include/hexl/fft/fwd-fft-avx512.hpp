@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include "hexl/fft/fft.hpp"
 
 namespace intel {
@@ -37,6 +39,17 @@ void ComplexFwdTransformToBitReverseAVX512(
     const double_t* operand_imag, const double_t* root_of_unity_powers_real,
     const double_t* root_of_unity_powers_imag, uint64_t n,
     const double_t* scalar = nullptr);
+
+void ComplexFwdTransformToBitReverseAVX512I(
+    double_t* result_interleaved, const double_t* operand_interleaved,
+    const double_t* root_of_unity_powers_interleaved, uint64_t n,
+    const double_t* scalar = nullptr);
+
+void BuildFloatingPointsAVX512(double_t* res, const uint64_t* plain,
+                               const uint64_t* threshold,
+                               const uint64_t* decryption_modulus,
+                               const double_t inv_scale, const size_t mod_size,
+                               const size_t coeff_count);
 
 #endif  // HEXL_HAS_AVX512DQ
 

@@ -3,7 +3,8 @@
 
 #include "hexl/fft/fft.hpp"
 
-#include "hexl/fft/fwd-fft-avx512.hpp"
+#include <iostream>
+
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
@@ -44,39 +45,9 @@ bool FFT::CheckArguments(uint64_t degree, uint64_t modulus) {
   return true;
 }
 
-void FFT::ComputeComplexPrimitiveRootOfUnityPowers() {
-  /*uint64_t m = coeff_degree << 1;
+void FFT::ComputeComplexPrimitiveRootOfUnityPowers() {}
 
-  // Generate 1/8 of all roots.
-  for (size_t i = 0; i <= m / 8; i++) {
-    complex_root_of_unity_powers_phase[i] =
-        2 * PI_ * static_cast<double>(i) / static_cast<double>(m);
-  }*/
-}
-
-void FFT::ComputeComplexRootOfUnityPowers() {
-  /*uint64_t m = coeff_degree << 1;
-  uint64_t m_bits = Log2(m);
-
-  AlignedVector64<uint64_t> complex_root_of_unity_powers_phase;
-
-  // Powers of the primitive 2n-th root have 4-fold symmetry
-  if (m >= 8) {
-    complex_roots_ = make_shared<util::ComplexRoots>(
-        util::ComplexRoots(static_cast<size_t>(m), pool_));
-    for (size_t i = 1; i < coeff_degree; i++) {
-      m_complex_root_of_unity_powers_phase[i] =
-          complex_roots_->get_root(ReverseBits(i, m_bits));
-      m_inv_complex_root_of_unity_powers_phase[i] =
-          conj(complex_roots_->get_root(ReverseBits(i - 1, m_bits) + 1));
-    }
-  } else if (m == 4) {
-    m_complex_root_of_unity_powers_phase[1] = 0;
-    m_inv_complex_root_of_unity_powers_phase[1] = 0;
-    m_complex_root_of_unity_powers_phase[2] = 1;
-    m_inv_complex_root_of_unity_powers_phase[2] = -1;
-  }*/
-}
+void FFT::ComputeComplexRootOfUnityPowers() {}
 
 void FFT::ComputeForwardFFT(double_t* result_real, double_t* result_imag,
                             const double_t* operand_real,
@@ -92,9 +63,41 @@ void FFT::ComputeForwardFFT(double_t* result_real, double_t* result_imag,
 
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+
   ComplexFwdTransformToBitReverseAVX512(result_real, result_imag, operand_real,
                                         operand_imag, roots_real, roots_imag,
                                         m_degree, scalar);
+  return;
+#endif
+}
+
+void FFT::ComputeForwardFFTI(double_t* result_interleaved,
+                             const double_t* operand_interleaved,
+                             const double_t* roots_interleaved) {
+  HEXL_CHECK(result_interleaved != nullptr, "result_real == nullptr");
+  HEXL_CHECK(operand_interleaved != nullptr, "operand_real == nullptr");
+  HEXL_CHECK(roots_interleaved != nullptr, "W_real == nullptr");
+
+#ifdef HEXL_HAS_AVX512DQ
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+
+  ComplexFwdTransformToBitReverseAVX512I(result_interleaved,
+                                         operand_interleaved, roots_interleaved,
+                                         m_degree, scalar);
+  return;
+#endif
+}
+
+void FFT::BuildFloatingPoints(double_t* res, const uint64_t* plain,
+                              const uint64_t* threshold,
+                              const uint64_t* decryption_modulus,
+                              const double_t inv_scale, size_t mod_size,
+                              size_t coeff_count) {
+#ifdef HEXL_HAS_AVX512DQ
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+
+  BuildFloatingPointsAVX512(res, plain, threshold, decryption_modulus,
+                            inv_scale, mod_size, coeff_count);
   return;
 #endif
 }

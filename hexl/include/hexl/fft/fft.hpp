@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "hexl/fft/fwd-fft-avx512.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/allocator.hpp"
 
@@ -81,7 +82,15 @@ class FFT {
                          const double_t* roots_real,
                          const double_t* roots_imag);
 
-  void DummyFunc() {}
+  void ComputeForwardFFTI(double_t* result_interleaved,
+                          const double_t* operand_interleaved,
+                          const double_t* roots_interleaved);
+
+  void BuildFloatingPoints(double_t* res, const uint64_t* plain,
+                           const uint64_t* threshold,
+                           const uint64_t* decryption_modulus,
+                           const double_t inv_scale, size_t mod_size,
+                           size_t coeff_count);
 
   /// @brief Returns the root of unity powers in bit-reversed order
   const AlignedVector64<double_t>& GetComplexRootOfUnityPowers_real() const {
@@ -116,6 +125,7 @@ class FFT {
   // AlignedVector64<uint64_t> m_root_of_unity_powers_real;
   AlignedVector64<double_t> m_complex_root_of_unity_powers_real;
   AlignedVector64<double_t> m_complex_root_of_unity_powers_imag;
+  AlignedVector64<double_t> m_complex_root_of_unity_powers_interleaved;
 };
 
 }  // namespace hexl
