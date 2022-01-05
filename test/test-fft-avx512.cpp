@@ -107,10 +107,9 @@ TEST(FFT, Powers) {
     uint64_t degree = 16;
     double_t in_scalar = 4;
     FFT fft(degree, &in_scalar);
-    fft.ComputeForwardFFT(result_real.data(), result_imag.data(),
-                          operand_real.data(), operand_imag.data(),
-                          roots_real.data(), roots_imag.data());
-    fft.DummyFunc();
+    fft.ComputeForwardFFTRI(result_real.data(), result_imag.data(),
+                            operand_real.data(), operand_imag.data(),
+                            roots_real.data(), roots_imag.data());
 
     AssertEqual(result_real, operand_real);
     HEXL_VLOG(1, "result_real[5] " << result_real[5]);

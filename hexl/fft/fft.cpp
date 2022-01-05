@@ -3,8 +3,6 @@
 
 #include "hexl/fft/fft.hpp"
 
-#include <iostream>
-
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
@@ -49,11 +47,11 @@ void FFT::ComputeComplexPrimitiveRootOfUnityPowers() {}
 
 void FFT::ComputeComplexRootOfUnityPowers() {}
 
-void FFT::ComputeForwardFFT(double_t* result_real, double_t* result_imag,
-                            const double_t* operand_real,
-                            const double_t* operand_imag,
-                            const double_t* roots_real,
-                            const double_t* roots_imag) {
+void FFT::ComputeForwardFFTRI(double_t* result_real, double_t* result_imag,
+                              const double_t* operand_real,
+                              const double_t* operand_imag,
+                              const double_t* roots_real,
+                              const double_t* roots_imag) {
   HEXL_CHECK(result_real != nullptr, "result_real == nullptr");
   HEXL_CHECK(result_imag != nullptr, "result_imag == nullptr");
   HEXL_CHECK(operand_real != nullptr, "operand_real == nullptr");
@@ -64,26 +62,42 @@ void FFT::ComputeForwardFFT(double_t* result_real, double_t* result_imag,
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
-  ComplexFwdTransformToBitReverseAVX512(result_real, result_imag, operand_real,
-                                        operand_imag, roots_real, roots_imag,
-                                        m_degree, scalar);
+  FwdFFTToBitReverseAVX512RI(result_real, result_imag, operand_real,
+                             operand_imag, roots_real, roots_imag, m_degree,
+                             scalar);
   return;
 #endif
 }
 
-void FFT::ComputeForwardFFTI(double_t* result_interleaved,
-                             const double_t* operand_interleaved,
-                             const double_t* roots_interleaved) {
-  HEXL_CHECK(result_interleaved != nullptr, "result_real == nullptr");
-  HEXL_CHECK(operand_interleaved != nullptr, "operand_real == nullptr");
-  HEXL_CHECK(roots_interleaved != nullptr, "W_real == nullptr");
+void FFT::ComputeForwardFFT(double_t* result_8C_intrlvd,
+                            const double_t* operand_8C_intrlvd,
+                            const double_t* roots_1C_intrlvd) {
+  HEXL_CHECK(result_8C_intrlvd != nullptr, "result_8C_intrlvd == nullptr");
+  HEXL_CHECK(operand_8C_intrlvd != nullptr, "operand_8C_intrlvd == nullptr");
+  HEXL_CHECK(roots_1C_intrlvd != nullptr, "roots_1C_intrlvd == nullptr");
 
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
-  ComplexFwdTransformToBitReverseAVX512I(result_interleaved,
-                                         operand_interleaved, roots_interleaved,
-                                         m_degree, scalar);
+  FwdFFTToBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
+                           roots_1C_intrlvd, m_degree, scalar);
+  return;
+#endif
+}
+
+void FFT::ComputeInverseFFT(double_t* result_8C_intrlvd,
+                            const double_t* operand_8C_intrlvd,
+                            const double_t* inv_roots_1C_intrlvd,
+                            const double_t* in_scalar) {
+  HEXL_CHECK(result_8C_intrlvd != nullptr, "result_8C_intrlvd==nullptr");
+  HEXL_CHECK(operand_8C_intrlvd != nullptr, "operand_8C_intrlvd==nullptr");
+  HEXL_CHECK(inv_roots_1C_intrlvd != nullptr, "inv_roots_1C_intrlvd==nullptr");
+
+#ifdef HEXL_HAS_AVX512DQ
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+
+  InvFFTFromBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
+                             inv_roots_1C_intrlvd, m_degree, in_scalar);
   return;
 #endif
 }

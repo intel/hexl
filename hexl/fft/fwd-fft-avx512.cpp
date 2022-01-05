@@ -35,8 +35,8 @@ namespace hexl {
 /// assumes \p X, \p Y < 4*\p q
 /// @details See Algorithm 4 of https://arxiv.org/pdf/1205.2926.pdf
 
-void FwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
-                  __m512d* Y_imag, __m512d W_real, __m512d W_imag) {
+void ComplexFwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
+                         __m512d* Y_imag, __m512d W_real, __m512d W_imag) {
   // U = X
   __m512d U_real = *X_real;
   __m512d U_imag = *X_imag;
@@ -138,8 +138,8 @@ void ComplexFwdT1(double_t* operand_real, double_t* operand_imag,
        v_Y_real[7] << "," << v_Y_imag[7] << ")"; myfile1 << " w = (" <<
        v_W_real[7] << "," << v_W_imag[7] << ")      " << std::endl;
     */
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                 v_W_imag);
+    ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                        v_W_imag);
 
     WriteFwdInterleavedT1(v_X_real, v_Y_real, v_X_pt_real);
     WriteFwdInterleavedT1(v_X_imag, v_Y_imag, v_X_pt_imag);
@@ -218,8 +218,8 @@ void ComplexFwdT2(double_t* operand_real, double_t* operand_imag,
     W_real += 4;
     W_imag += 4;
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                 v_W_imag);
+    ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                        v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real++, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag++, v_X_imag);
@@ -302,8 +302,8 @@ void ComplexFwdT4(double_t* operand_real, double_t* operand_imag,
     W_real += 2;
     W_imag += 2;
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                 v_W_imag);
+    ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                        v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real++, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag++, v_X_imag);
@@ -400,8 +400,8 @@ void ComplexFwdT8(double_t* result_real, double_t* result_imag,
          ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")"; myfile1 << " w =
          (" << v_W_real[0] << "," << v_W_imag[0] << ")      " << std::endl;
       */
-      FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                   v_W_imag);
+      ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                          v_W_imag);
       /*
             myfile1 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y =
          (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl; myfile1 <<
@@ -439,11 +439,11 @@ void ComplexFwdT8(double_t* result_real, double_t* result_imag,
   }
 }
 
-void ComplexFwdT1I(double_t* operand_interleaved, const double_t* W_interleaved,
-                   uint64_t m, const double_t* scalar = nullptr) {
+void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+                  uint64_t m, const double_t* scalar = nullptr) {
   // const __m512d* v_W_pt_real = reinterpret_cast<const
-  // __m512d*>(W_interleaved); const __m512d* v_W_pt_imag =
-  // reinterpret_cast<const __m512d*>(W_interleaved + 8);
+  // __m512d*>(W_1C_intrlvd); const __m512d* v_W_pt_imag =
+  // reinterpret_cast<const __m512d*>(W_1C_intrlvd + 8);
   size_t offset = 0;
   // std::size_t xc = 0;
   // std::size_t yc = 0;
@@ -458,8 +458,8 @@ void ComplexFwdT1I(double_t* operand_interleaved, const double_t* W_interleaved,
   HEXL_LOOP_UNROLL_4
 
   for (size_t i = 0; i < (m >> 1); i += 8) {
-    double_t* X_real = operand_interleaved + offset;
-    double_t* X_imag = operand_interleaved + 8 + offset;
+    double_t* X_real = operand_8C_intrlvd + offset;
+    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
 
@@ -468,21 +468,19 @@ void ComplexFwdT1I(double_t* operand_interleaved, const double_t* W_interleaved,
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    LoadFwdComplexInterleavedT1(X_real, &v_X_real, &v_Y_real);
-    LoadFwdComplexInterleavedT1(X_imag, &v_X_imag, &v_Y_imag);
+    ComplexLoadFwdInterleavedT1(X_real, &v_X_real, &v_Y_real);
+    ComplexLoadFwdInterleavedT1(X_imag, &v_X_imag, &v_Y_imag);
 
     // xc = offset;
     // yc = xc + 2;
 
-    __m512d v_W_real =
-        _mm512_set_pd(W_interleaved[14], W_interleaved[12], W_interleaved[10],
-                      W_interleaved[8], W_interleaved[6], W_interleaved[4],
-                      W_interleaved[2], W_interleaved[0]);
-    __m512d v_W_imag =
-        _mm512_set_pd(W_interleaved[15], W_interleaved[13], W_interleaved[11],
-                      W_interleaved[9], W_interleaved[7], W_interleaved[5],
-                      W_interleaved[3], W_interleaved[1]);
-    W_interleaved += 16;
+    __m512d v_W_real = _mm512_set_pd(
+        W_1C_intrlvd[14], W_1C_intrlvd[12], W_1C_intrlvd[10], W_1C_intrlvd[8],
+        W_1C_intrlvd[6], W_1C_intrlvd[4], W_1C_intrlvd[2], W_1C_intrlvd[0]);
+    __m512d v_W_imag = _mm512_set_pd(
+        W_1C_intrlvd[15], W_1C_intrlvd[13], W_1C_intrlvd[11], W_1C_intrlvd[9],
+        W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[3], W_1C_intrlvd[1]);
+    W_1C_intrlvd += 16;
 
     if (scalar != nullptr) {
       v_W_real = _mm512_mul_pd(v_W_real, v_scalar);
@@ -524,18 +522,18 @@ void ComplexFwdT1I(double_t* operand_interleaved, const double_t* W_interleaved,
        v_Y_real[7] << "," << v_Y_imag[7] << ")"; myfile2 << " w = (" <<
        v_W_real[7] << "," << v_W_imag[7] << ")      " << std::endl; rc+=16;
     */
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                 v_W_imag);
+    ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                        v_W_imag);
 
-    WriteFwdComplexInterleavedT1(v_X_real, v_Y_real, v_X_pt_real);
-    WriteFwdComplexInterleavedT1(v_X_imag, v_Y_imag, v_X_pt_imag);
+    ComplexWriteFwdInterleavedT1(v_X_real, v_Y_real, v_X_pt_real);
+    ComplexWriteFwdInterleavedT1(v_X_imag, v_Y_imag, v_X_pt_imag);
 
     offset += 32;
   }
 }
 
-void ComplexFwdT2I(double_t* operand_interleaved, const double_t* W_interleaved,
-                   uint64_t m) {
+void ComplexFwdT2(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+                  uint64_t m) {
   size_t offset = 0;
   // std::size_t xc = 0;
   // std::size_t yc = 0;
@@ -544,8 +542,8 @@ void ComplexFwdT2I(double_t* operand_interleaved, const double_t* W_interleaved,
   // 4 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i += 4) {
-    double_t* X_real = operand_interleaved + offset;
-    double_t* X_imag = operand_interleaved + 8 + offset;
+    double_t* X_real = operand_8C_intrlvd + offset;
+    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -556,20 +554,20 @@ void ComplexFwdT2I(double_t* operand_interleaved, const double_t* W_interleaved,
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    LoadFwdComplexInterleavedT2(X_real, &v_X_real, &v_Y_real);
-    LoadFwdComplexInterleavedT2(X_imag, &v_X_imag, &v_Y_imag);
+    ComplexLoadFwdInterleavedT2(X_real, &v_X_real, &v_Y_real);
+    ComplexLoadFwdInterleavedT2(X_imag, &v_X_imag, &v_Y_imag);
 
     // xc = offset;
     // yc = xc + 4;
 
     // Weights and weights' preconditions
     __m512d v_W_real = _mm512_set_pd(
-        W_interleaved[6], W_interleaved[6], W_interleaved[4], W_interleaved[4],
-        W_interleaved[2], W_interleaved[2], W_interleaved[0], W_interleaved[0]);
+        W_1C_intrlvd[6], W_1C_intrlvd[6], W_1C_intrlvd[4], W_1C_intrlvd[4],
+        W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[0], W_1C_intrlvd[0]);
     __m512d v_W_imag = _mm512_set_pd(
-        W_interleaved[7], W_interleaved[7], W_interleaved[5], W_interleaved[5],
-        W_interleaved[3], W_interleaved[3], W_interleaved[1], W_interleaved[1]);
-    W_interleaved += 8;
+        W_1C_intrlvd[7], W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[5],
+        W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[1], W_1C_intrlvd[1]);
+    W_1C_intrlvd += 8;
     /*
     myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0 <<"
     "; myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = (" <<
@@ -602,8 +600,8 @@ void ComplexFwdT2I(double_t* operand_interleaved, const double_t* W_interleaved,
     ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")"; myfile2 << " w = ("
     << v_W_real[7] << "," << v_W_imag[7] << ")      " << std::endl; rc+=8;*/
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                 v_W_imag);
+    ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                        v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
@@ -616,8 +614,8 @@ void ComplexFwdT2I(double_t* operand_interleaved, const double_t* W_interleaved,
   }
 }
 
-void ComplexFwdT4I(double_t* operand_interleaved, const double_t* W_interleaved,
-                   uint64_t m) {
+void ComplexFwdT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+                  uint64_t m) {
   size_t offset = 0;
   // std::size_t xc = 0;
   // std::size_t yc = 0;
@@ -626,8 +624,8 @@ void ComplexFwdT4I(double_t* operand_interleaved, const double_t* W_interleaved,
   // 2 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i += 2) {
-    double_t* X_real = operand_interleaved + offset;
-    double_t* X_imag = operand_interleaved + 8 + offset;
+    double_t* X_real = operand_8C_intrlvd + offset;
+    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -637,21 +635,21 @@ void ComplexFwdT4I(double_t* operand_interleaved, const double_t* W_interleaved,
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    LoadFwdComplexInterleavedT4(X_real, &v_X_real, &v_Y_real);
-    LoadFwdComplexInterleavedT4(X_imag, &v_X_imag, &v_Y_imag);
+    ComplexLoadFwdInterleavedT4(X_real, &v_X_real, &v_Y_real);
+    ComplexLoadFwdInterleavedT4(X_imag, &v_X_imag, &v_Y_imag);
 
     // xc = offset;
     // yc = xc + 8;
 
     // Weights and weights' preconditions
     __m512d v_W_real = _mm512_set_pd(
-        W_interleaved[2], W_interleaved[2], W_interleaved[2], W_interleaved[2],
-        W_interleaved[0], W_interleaved[0], W_interleaved[0], W_interleaved[0]);
+        W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[2],
+        W_1C_intrlvd[0], W_1C_intrlvd[0], W_1C_intrlvd[0], W_1C_intrlvd[0]);
     __m512d v_W_imag = _mm512_set_pd(
-        W_interleaved[3], W_interleaved[3], W_interleaved[3], W_interleaved[3],
-        W_interleaved[1], W_interleaved[1], W_interleaved[1], W_interleaved[1]);
+        W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[3],
+        W_1C_intrlvd[1], W_1C_intrlvd[1], W_1C_intrlvd[1], W_1C_intrlvd[1]);
 
-    W_interleaved += 4;
+    W_1C_intrlvd += 4;
 
     /*
         myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
@@ -687,8 +685,8 @@ void ComplexFwdT4I(double_t* operand_interleaved, const double_t* W_interleaved,
        v_Y_real[7] << "," << v_Y_imag[7] << ")"; myfile2 << " w = (" <<
        v_W_real[7] << "," << v_W_imag[7] << ")      " << std::endl; rc+=4;*/
 
-    FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                 v_W_imag);
+    ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                        v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
@@ -701,9 +699,9 @@ void ComplexFwdT4I(double_t* operand_interleaved, const double_t* W_interleaved,
   }
 }
 
-void ComplexFwdT8I(double_t* result_interleaved,
-                   const double_t* operand_interleaved,
-                   const double_t* W_interleaved, uint64_t gap, uint64_t m) {
+void ComplexFwdT8(double_t* result_8C_intrlvd,
+                  const double_t* operand_8C_intrlvd,
+                  const double_t* W_1C_intrlvd, uint64_t gap, uint64_t m) {
   size_t offset = 0;
 
   // std::size_t xc = 0;
@@ -713,8 +711,8 @@ void ComplexFwdT8I(double_t* result_interleaved,
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
     // Referencing operand
-    const double_t* X_op_real = operand_interleaved + offset;
-    const double_t* X_op_imag = operand_interleaved + 8 + offset;
+    const double_t* X_op_real = operand_8C_intrlvd + offset;
+    const double_t* X_op_imag = operand_8C_intrlvd + 8 + offset;
 
     const double_t* Y_op_real = X_op_real + gap;
     const double_t* Y_op_imag = X_op_imag + gap;
@@ -726,8 +724,8 @@ void ComplexFwdT8I(double_t* result_interleaved,
     const __m512d* v_Y_op_pt_imag = reinterpret_cast<const __m512d*>(Y_op_imag);
 
     // Referencing result
-    double_t* X_r_real = result_interleaved + offset;
-    double_t* X_r_imag = result_interleaved + 8 + offset;
+    double_t* X_r_real = result_8C_intrlvd + offset;
+    double_t* X_r_imag = result_8C_intrlvd + 8 + offset;
 
     double_t* Y_r_real = X_r_real + gap;
     double_t* Y_r_imag = X_r_imag + gap;
@@ -742,8 +740,8 @@ void ComplexFwdT8I(double_t* result_interleaved,
     // yc = xc + gap;
 
     // Weights and weights' preconditions
-    __m512d v_W_real = _mm512_set1_pd(*W_interleaved++);
-    __m512d v_W_imag = _mm512_set1_pd(*W_interleaved++);
+    __m512d v_W_real = _mm512_set1_pd(*W_1C_intrlvd++);
+    __m512d v_W_imag = _mm512_set1_pd(*W_1C_intrlvd++);
 
     // assume 8 | t
     for (size_t j = 0; j < gap; j += 16) {
@@ -786,8 +784,8 @@ void ComplexFwdT8I(double_t* result_interleaved,
          ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")"; myfile2 << " w =
          (" << v_W_real[7] << "," << v_W_imag[7] << ")      " << std::endl;
       */
-      FwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                   v_W_imag);
+      ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
+                          v_W_imag);
       /*
             myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y =
          (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl; myfile2 <<
@@ -830,11 +828,12 @@ void ComplexFwdT8I(double_t* result_interleaved,
   }
 }
 
-void ComplexFwdTransformToBitReverseAVX512(
-    double_t* result_real, double_t* result_imag, const double_t* operand_real,
-    const double_t* operand_imag, const double_t* root_of_unity_powers_real,
-    const double_t* root_of_unity_powers_imag, uint64_t n,
-    const double_t* scalar) {
+void FwdFFTToBitReverseAVX512RI(double_t* result_real, double_t* result_imag,
+                                const double_t* operand_real,
+                                const double_t* operand_imag,
+                                const double_t* root_of_unity_powers_real,
+                                const double_t* root_of_unity_powers_imag,
+                                uint64_t n, const double_t* scalar) {
   // myfile1.open ("2.txt");
 
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
@@ -892,53 +891,51 @@ void ComplexFwdTransformToBitReverseAVX512(
   // myfile1.close();
 }
 
-void ComplexFwdTransformToBitReverseAVX512I(
-    double_t* result_interleaved, const double_t* operand_interleaved,
-    const double_t* root_of_unity_powers_interleaved, uint64_t n,
-    const double_t* scalar) {
+void FwdFFTToBitReverseAVX512(double_t* result_8C_intrlvd,
+                              const double_t* operand_8C_intrlvd,
+                              const double_t* root_of_unity_powers_1C_intrlvd,
+                              const uint64_t n, const double_t* scalar) {
   // myfile2.open ("1.txt");
 
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
-  size_t gap = n;  // (2*n >> 1);
-  size_t m = 2;
+  size_t gap = n;  // (2*n >> 1) Interleaved complex numbers
+  size_t m = 2;    // require twice the size
   size_t W_idx = m;
 
   // T8. First pass in case of out of place
   if (gap >= 16) {
-    const double_t* W_interleaved = &root_of_unity_powers_interleaved[W_idx];
-    ComplexFwdT8I(result_interleaved, operand_interleaved, W_interleaved, gap,
-                  m);
+    const double_t* W_1C_intrlvd = &root_of_unity_powers_1C_intrlvd[W_idx];
+    ComplexFwdT8(result_8C_intrlvd, operand_8C_intrlvd, W_1C_intrlvd, gap, m);
     m <<= 1;
     W_idx = m;
     gap >>= 1;
   }
 
   for (; gap >= 16; gap >>= 1) {
-    const double_t* W_interleaved = &root_of_unity_powers_interleaved[W_idx];
-    ComplexFwdT8I(result_interleaved, result_interleaved, W_interleaved, gap,
-                  m);
+    const double_t* W_1C_intrlvd = &root_of_unity_powers_1C_intrlvd[W_idx];
+    ComplexFwdT8(result_8C_intrlvd, result_8C_intrlvd, W_1C_intrlvd, gap, m);
     m <<= 1;
     W_idx = m;
   }
 
   {
     // T4
-    const double_t* W_interleaved = &root_of_unity_powers_interleaved[W_idx];
-    ComplexFwdT4I(result_interleaved, W_interleaved, m);
+    const double_t* W_1C_intrlvd = &root_of_unity_powers_1C_intrlvd[W_idx];
+    ComplexFwdT4(result_8C_intrlvd, W_1C_intrlvd, m);
     m <<= 1;
     W_idx = m;
 
     // T2
-    W_interleaved = &root_of_unity_powers_interleaved[W_idx];
-    ComplexFwdT2I(result_interleaved, W_interleaved, m);
+    W_1C_intrlvd = &root_of_unity_powers_1C_intrlvd[W_idx];
+    ComplexFwdT2(result_8C_intrlvd, W_1C_intrlvd, m);
     m <<= 1;
     W_idx = m;
 
     // T1
-    W_interleaved = &root_of_unity_powers_interleaved[W_idx];
-    ComplexFwdT1I(result_interleaved, W_interleaved, m, scalar);
+    W_1C_intrlvd = &root_of_unity_powers_1C_intrlvd[W_idx];
+    ComplexFwdT1(result_8C_intrlvd, W_1C_intrlvd, m, scalar);
     m <<= 1;
     W_idx = m;
   }

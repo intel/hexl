@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "hexl/fft/fwd-fft-avx512.hpp"
+#include "hexl/fft/inv-fft-avx512.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/allocator.hpp"
 
@@ -76,15 +77,27 @@ class FFT {
   /// input_mod_factor * q). Must be 1, 2 or 4.
   /// @param[in] output_mod_factor Returns output \p result in [0,
   /// output_mod_factor * q). Must be 1 or 4.
-  void ComputeForwardFFT(double_t* result_real, double_t* result_imag,
-                         const double_t* operand_real,
-                         const double_t* operand_imag,
-                         const double_t* roots_real,
-                         const double_t* roots_imag);
+  void ComputeForwardFFTRI(double_t* result_real, double_t* result_imag,
+                           const double_t* operand_real,
+                           const double_t* operand_imag,
+                           const double_t* roots_real,
+                           const double_t* roots_imag);
 
-  void ComputeForwardFFTI(double_t* result_interleaved,
-                          const double_t* operand_interleaved,
-                          const double_t* roots_interleaved);
+  void ComputeForwardFFT(double_t* result_8C_intrlvd,
+                         const double_t* operand_8C_intrlvd,
+                         const double_t* roots_1C_intrlvd);
+
+  /// Compute inverse NTT. Results are bit-reversed.
+  /// @param[out] result Stores the result
+  /// @param[in] operand Data on which to compute the NTT
+  /// @param[in] input_mod_factor Assume input \p operand are in [0,
+  /// input_mod_factor * q). Must be 1 or 2.
+  /// @param[in] output_mod_factor Returns output \p result in [0,
+  /// output_mod_factor * q). Must be 1 or 2.
+  void ComputeInverseFFT(double_t* result_8C_intrlvd,
+                         const double_t* operand_8C_intrlvd,
+                         const double_t* inv_roots_1C_intrlvd,
+                         const double_t* scalar);
 
   void BuildFloatingPoints(double_t* res, const uint64_t* plain,
                            const uint64_t* threshold,
