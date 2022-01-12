@@ -1,7 +1,7 @@
 [![Build and Test](https://github.com/intel/hexl/actions/workflows/github-ci.yml/badge.svg?branch=main)](https://github.com/intel/hexl/actions/workflows/github-ci.yml)
 
 # Intel Homomorphic Encryption (HE) Acceleration Library
-Intel:registered: Intel HE Acceleration Library is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HE Acceleration Library targets integer arithmetic with word-sized primes, typically 30-60 bits. Intel HE Acceleration Library provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HE Acceleration Library, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best performance, see [Performance](#performance)
+Intel:registered: HE Acceleration Library is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HE Acceleration Library targets integer arithmetic with word-sized primes, typically 30-60 bits. Intel HE Acceleration Library provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HE Acceleration Library, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best performance, see [Performance](#performance)
 
 ## Contents
 - [Intel Homomorphic Encryption (HE) Acceleration Library](#intel-homomorphic-encryption-acceleration-library-hexl)
