@@ -1,7 +1,7 @@
 [![Build and Test](https://github.com/intel/hexl/actions/workflows/github-ci.yml/badge.svg?branch=main)](https://github.com/intel/hexl/actions/workflows/github-ci.yml)
 
 # Intel Homomorphic Encryption (HE) Acceleration Library
-Intel:registered: Intel HE Acceleration Library is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HE Acceleration Library targets integer arithmetic with word-sized primes, typically 30-60 bits. Intel HE Acceleration Library provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HE Acceleration Library, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best performance, see [Performance](#performance)
+Intel:registered: HE Acceleration Library is an open-source library which provides efficient implementations of integer arithmetic on Galois fields. Such arithmetic is prevalent in cryptography, particularly in homomorphic encryption (HE) schemes. Intel HE Acceleration Library targets integer arithmetic with word-sized primes, typically 30-60 bits. Intel HE Acceleration Library provides an API for 64-bit unsigned integers and targets Intel CPUs. For more details on Intel HE Acceleration Library, see our [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best performance, see [Performance](#performance)
 
 ## Contents
 - [Intel Homomorphic Encryption (HE) Acceleration Library](#intel-homomorphic-encryption-acceleration-library-hexl)
@@ -250,10 +250,11 @@ To cite Intel HE Acceleration Library, please use the following BibTeX entry.
 The Intel contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
-  - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/) (lead)
+  - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/) (lead)
   - [Sergey Ivanov](https://www.linkedin.com/in/sergey-ivanov-451b72195/)
   - [Akshaya Jagannadharao](https://www.linkedin.com/in/akshaya-jagannadharao/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
