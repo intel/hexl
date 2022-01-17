@@ -85,7 +85,8 @@ class FFT {
 
   void ComputeForwardFFT(double_t* result_8C_intrlvd,
                          const double_t* operand_8C_intrlvd,
-                         const double_t* roots_1C_intrlvd);
+                         const double_t* roots_1C_intrlvd,
+                         const double_t* scalar);
 
   /// Compute inverse NTT. Results are bit-reversed.
   /// @param[out] result Stores the result

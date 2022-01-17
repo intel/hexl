@@ -71,7 +71,8 @@ void FFT::ComputeForwardFFTRI(double_t* result_real, double_t* result_imag,
 
 void FFT::ComputeForwardFFT(double_t* result_8C_intrlvd,
                             const double_t* operand_8C_intrlvd,
-                            const double_t* roots_1C_intrlvd) {
+                            const double_t* roots_1C_intrlvd,
+                            const double_t* in_scalar) {
   HEXL_CHECK(result_8C_intrlvd != nullptr, "result_8C_intrlvd == nullptr");
   HEXL_CHECK(operand_8C_intrlvd != nullptr, "operand_8C_intrlvd == nullptr");
   HEXL_CHECK(roots_1C_intrlvd != nullptr, "roots_1C_intrlvd == nullptr");
@@ -80,7 +81,7 @@ void FFT::ComputeForwardFFT(double_t* result_8C_intrlvd,
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
   FwdFFTToBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
-                           roots_1C_intrlvd, m_degree, scalar);
+                           roots_1C_intrlvd, m_degree, in_scalar);
   return;
 #endif
 }
