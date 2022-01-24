@@ -105,7 +105,7 @@ TEST_P(EltwiseReduceModTest, Random) {
   uint64_t upper_bound =
       m_modulus < (1ULL << 32) ? m_modulus * m_modulus : 1ULL << 63;
 
-  auto input = GenerateInsecureUniformRandomValues(m_N, 0, upper_bound);
+  auto input = GenerateInsecureUniformIntRandomValues(m_N, 0, upper_bound);
   std::vector<uint64_t> result_native(m_N, 0);
   std::vector<uint64_t> result_public_api(m_N, 0);
 

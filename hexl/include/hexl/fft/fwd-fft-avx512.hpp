@@ -34,18 +34,16 @@ namespace hexl {
 /// manner, such that an entire subtransform is completed before moving to the
 /// next subtransform. This reduces the number of cache misses, improving
 /// performance on larger transform sizes.
-void FwdFFTToBitReverseAVX512RI(double_t* result_real, double_t* result_imag,
-                                const double_t* operand_real,
-                                const double_t* operand_imag,
-                                const double_t* root_of_unity_powers_real,
-                                const double_t* root_of_unity_powers_imag,
-                                uint64_t n, const double_t* scalar = nullptr);
+void Forward_FFT_ToBitReverseAVX512RI(
+    double_t* result_real, double_t* result_imag, const double_t* operand_real,
+    const double_t* operand_imag, const double_t* root_of_unity_powers_real,
+    const double_t* root_of_unity_powers_imag, uint64_t n,
+    const double_t* scalar = nullptr);
 
-void FwdFFTToBitReverseAVX512(double_t* result_8C_intrlvd,
-                              const double_t* operand_8C_intrlvd,
-                              const double_t* root_of_unity_powers_1C_intrlvd,
-                              const uint64_t n,
-                              const double_t* scalar = nullptr);
+void Forward_FFT_ToBitReverseAVX512(
+    double_t* result_8C_intrlvd, const double_t* operand_8C_intrlvd,
+    const double_t* root_of_unity_powers_1C_intrlvd, const uint64_t n,
+    const double_t* scalar = nullptr);
 
 void BuildFloatingPointsAVX512(double_t* res_8C_intrlvd, const uint64_t* plain,
                                const uint64_t* threshold,

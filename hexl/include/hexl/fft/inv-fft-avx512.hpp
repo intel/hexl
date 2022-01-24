@@ -34,17 +34,10 @@ namespace hexl {
 /// manner, such that an entire subtransform is completed before moving to the
 /// next subtransform. This reduces the number of cache misses, improving
 /// performance on larger transform sizes.
-void InvFFTFromBitReverseAVX512(double_t* result_8C_intrlvd,
-                                const double_t* operand_8C_intrlvd,
-                                const double_t* root_of_unity_powers_1C_intrlvd,
-                                const uint64_t n,
-                                const double_t* scalar = nullptr);
-
-void BuildFloatingPointsAVX512(double_t* res, const uint64_t* plain,
-                               const uint64_t* threshold,
-                               const uint64_t* decryption_modulus,
-                               const double_t inv_scale, const size_t mod_size,
-                               const size_t coeff_count);
+void Inverse_FFT_FromBitReverseAVX512(
+    double_t* result_8C_intrlvd, const double_t* operand_8C_intrlvd,
+    const double_t* root_of_unity_powers_1C_intrlvd, const uint64_t n,
+    const double_t* scalar = nullptr);
 
 #endif  // HEXL_HAS_AVX512DQ
 

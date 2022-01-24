@@ -441,9 +441,6 @@ void ComplexFwdT8(double_t* result_real, double_t* result_imag,
 
 void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
                   uint64_t m, const double_t* scalar = nullptr) {
-  // const __m512d* v_W_pt_real = reinterpret_cast<const
-  // __m512d*>(W_1C_intrlvd); const __m512d* v_W_pt_imag =
-  // reinterpret_cast<const __m512d*>(W_1C_intrlvd + 8);
   size_t offset = 0;
   std::size_t xc = 0;
   std::size_t yc = 0;
@@ -482,10 +479,10 @@ void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
         W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[3], W_1C_intrlvd[1]);
     W_1C_intrlvd += 16;
 
-    // __m512d v_Xo_real = v_X_real;
-    // __m512d v_Xo_imag = v_X_imag;
-    // __m512d v_Yo_real = v_Y_real;
-    // __m512d v_Yo_imag = v_Y_imag;
+    __m512d v_Xo_real = v_X_real;
+    __m512d v_Xo_imag = v_X_imag;
+    __m512d v_Yo_real = v_Y_real;
+    __m512d v_Yo_imag = v_Y_imag;
 
     if (scalar != nullptr) {
       v_W_real = _mm512_mul_pd(v_W_real, v_scalar);
@@ -497,42 +494,64 @@ void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
     ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                         v_W_imag);
 
-/*
-      myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = (" << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
-      myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
-      myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
-      myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = (" << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
-      myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
-      myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = (" << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
-      myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = (" << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
-      myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
-      myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = (" << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
-      myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = (" << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
-      myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
-      myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = (" << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
-      myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = (" << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
-      myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      " ;
-      myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = (" << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
-      myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = (" << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
-      myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
-      myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = (" << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
-      myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = (" << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
-      myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
-      myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = (" << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
-      myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = (" << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
-      myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
-      myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
-*/
-    ComplexWriteFwdInterleavedT1(v_X_real, v_Y_real,
-                                 v_X_imag, v_Y_imag,
+    myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+            << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+    myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+    myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+            << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+    myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+            << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+    myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+    myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+            << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+    myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+            << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+    myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+    myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+            << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+    myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+            << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+    myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+    myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+            << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+    myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+            << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+    myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+    myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+            << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+    myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+            << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+    myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+    myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+            << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+    myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+            << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+    myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+    myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+            << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+    myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+            << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+    myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+    myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+            << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
+    ComplexWriteFwdInterleavedT1(v_X_real, v_Y_real, v_X_imag, v_Y_imag,
                                  v_X_pt_real);
 
     offset += 32;
@@ -583,40 +602,63 @@ void ComplexFwdT2(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
     ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                         v_W_imag);
 
-/*
-      myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = (" << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
-      myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
-      myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
-      myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = (" << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
-      myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
-      myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = (" << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
-      myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = (" << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
-      myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
-      myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = (" << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
-      myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = (" << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
-      myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
-      myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = (" << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
-      myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = (" << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
-      myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      " ;
-      myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = (" << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
-      myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = (" << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
-      myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
-      myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = (" << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
-      myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = (" << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
-      myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
-      myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = (" << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
-      myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = (" << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
-      myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
-      myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
-*/
+    myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+            << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+    myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+    myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+            << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+    myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+            << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+    myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+    myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+            << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+    myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+            << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+    myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+    myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+            << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+    myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+            << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+    myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+    myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+            << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+    myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+            << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+    myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+    myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+            << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+    myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+            << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+    myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+    myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+            << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+    myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+            << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+    myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+    myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+            << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+    myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+            << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+    myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+    myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+            << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
     _mm512_storeu_pd(v_X_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
     v_X_pt_real += 2;
@@ -644,8 +686,8 @@ void ComplexFwdT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
 
-// *out1 =  (11, 10,  9,  8, 3, 2, 1, 0)
-// *out2 =  (15, 14, 13, 12, 7, 6, 5, 4)
+    // *out1 =  (11, 10,  9,  8, 3, 2, 1, 0)
+    // *out2 =  (15, 14, 13, 12, 7, 6, 5, 4)
     __m512d v_X_real;
     __m512d v_X_imag;
     __m512d v_Y_real;
@@ -667,47 +709,71 @@ void ComplexFwdT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
 
     W_1C_intrlvd += 4;
 
-    // __m512d v_Xo_real = v_X_real;
-    // __m512d v_Xo_imag = v_X_imag;
-    // __m512d v_Yo_real = v_Y_real;
-    // __m512d v_Yo_imag = v_Y_imag;
+    __m512d v_Xo_real = v_X_real;
+    __m512d v_Xo_imag = v_X_imag;
+    __m512d v_Yo_real = v_Y_real;
+    __m512d v_Yo_imag = v_Y_imag;
 
     ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                         v_W_imag);
-/*
-   myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = (" << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
-   myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
-   myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
-   myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = (" << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
-   myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
-   myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = (" << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
-   myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = (" << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
-   myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
-   myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = (" << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
-   myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = (" << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
-   myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
-   myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = (" << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
-   myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = (" << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
-   myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      " ;
-   myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = (" << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
-   myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = (" << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
-   myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
-   myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = (" << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
-   myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = (" << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
-   myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
-   myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = (" << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
-   myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6 <<"    ";
-   myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = (" << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
-   myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
-   myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
-*/
+
+    myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+            << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+    myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+    myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+            << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+    myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+            << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+    myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+    myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+            << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+    myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+            << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+    myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+    myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+            << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+    myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+            << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+    myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+    myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+            << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+    myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+            << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+    myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+    myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+            << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+    myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+            << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+    myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+    myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+            << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+    myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+            << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+    myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+    myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+            << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+    myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6
+            << "    ";
+    myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+            << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+    myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+    myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+            << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
     _mm512_storeu_pd(v_X_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
     v_X_pt_real += 2;
@@ -778,40 +844,64 @@ void ComplexFwdT8(double_t* result_8C_intrlvd,
 
       ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                           v_W_imag);
-/*
-      myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = (" << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+
+      myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+              << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
       myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
-      myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
-      myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = (" << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+      myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+              << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+      myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+              << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
       myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
-      myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = (" << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
-      myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = (" << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+      myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+              << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+      myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+              << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
       myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
-      myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = (" << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
-      myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = (" << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+      myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+              << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+      myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+              << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
       myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
-      myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = (" << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
-      myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = (" << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
-      myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      " ;
-      myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = (" << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
-      myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = (" << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+      myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+              << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+      myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+              << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+      myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+      myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+              << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+      myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+              << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
       myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
-      myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = (" << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
-      myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = (" << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+      myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+              << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+      myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+              << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
       myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
-      myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = (" << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
-      myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = (" << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+      myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+              << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+      myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+              << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
       myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
-      myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
-*/
+      myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+              << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
       _mm512_storeu_pd(v_X_r_pt_real, v_X_real);
       _mm512_storeu_pd(v_X_r_pt_imag, v_X_imag);
 
@@ -829,21 +919,21 @@ void ComplexFwdT8(double_t* result_8C_intrlvd,
       v_Y_r_pt_real += 2;
       v_Y_r_pt_imag += 2;
 
-      xc+=16;
-      yc+=16;
+      xc += 16;
+      yc += 16;
     }
-    rc+=2;
+    rc += 2;
     offset += (gap << 1);
   }
 }
 
 void ComplexStartFwdT8(double_t* result_8C_intrlvd,
-                  const double_t* operand_1C_intrlvd,
-                  const double_t* W_1C_intrlvd, uint64_t gap, uint64_t m) {
+                       const double_t* operand_1C_intrlvd,
+                       const double_t* W_1C_intrlvd, uint64_t gap, uint64_t m) {
   size_t offset = 0;
-  // std::size_t xc = 0;
-  // std::size_t yc = 0;
-  // std::size_t rc = m;
+  std::size_t xc = 0;
+  std::size_t yc = 0;
+  std::size_t rc = m;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
@@ -867,8 +957,8 @@ void ComplexStartFwdT8(double_t* result_8C_intrlvd,
     __m512d* v_Y_r_pt_real = reinterpret_cast<__m512d*>(Y_r_real);
     __m512d* v_Y_r_pt_imag = reinterpret_cast<__m512d*>(Y_r_imag);
 
-    // xc = offset;
-    // yc = xc + gap;
+    xc = offset;
+    yc = xc + gap;
 
     // Weights
     __m512d v_W_real = _mm512_set1_pd(*W_1C_intrlvd++);
@@ -891,47 +981,71 @@ void ComplexStartFwdT8(double_t* result_8C_intrlvd,
       v_Y_real = _mm512_permutexvar_pd(v_perm_idx, v_Y_real);
       v_Y_imag = _mm512_permutexvar_pd(v_perm_idx, v_Y_imag);
 
-      // __m512d v_Xo_real = v_X_real;
-      // __m512d v_Xo_imag = v_X_imag;
-      // __m512d v_Yo_real = v_Y_real;
-      // __m512d v_Yo_imag = v_Y_imag;
+      __m512d v_Xo_real = v_X_real;
+      __m512d v_Xo_imag = v_X_imag;
+      __m512d v_Yo_real = v_Y_real;
+      __m512d v_Yo_imag = v_Y_imag;
 
       ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                           v_W_imag);
-/*
-      myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = (" << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+
+      myfile2 << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+              << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
       myfile2 << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
-      myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = (" << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
-      myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = (" << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+      myfile2 << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+              << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+      myfile2 << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 0
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+              << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
       myfile2 << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
-      myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = (" << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
-      myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = (" << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+      myfile2 << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+              << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+      myfile2 << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+              << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
       myfile2 << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
-      myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = (" << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
-      myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = (" << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+      myfile2 << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+              << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+      myfile2 << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 2
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+              << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
       myfile2 << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
-      myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = (" << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
-      myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = (" << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
-      myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      " ;
-      myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = (" << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
-      myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = (" << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+      myfile2 << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+              << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+      myfile2 << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+              << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+      myfile2 << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+      myfile2 << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+              << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+      myfile2 << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 4
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+              << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
       myfile2 << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
-      myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = (" << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
-      myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = (" << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+      myfile2 << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+              << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+      myfile2 << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+              << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
       myfile2 << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
-      myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = (" << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
-      myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6 <<"    ";
-      myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = (" << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+      myfile2 << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+              << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+      myfile2 << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 6
+              << "    ";
+      myfile2 << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+              << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
       myfile2 << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
-      myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = (" << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
-*/
+      myfile2 << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+              << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
       _mm512_storeu_pd(v_X_r_pt_real, v_X_real);
       _mm512_storeu_pd(v_X_r_pt_imag, v_X_imag);
 
@@ -944,20 +1058,21 @@ void ComplexStartFwdT8(double_t* result_8C_intrlvd,
       v_Y_r_pt_real += 2;
       v_Y_r_pt_imag += 2;
 
-      // xc+=16;
-      // yc+=16;
+      xc += 16;
+      yc += 16;
     }
-    // rc+=2;
+    rc += 2;
     offset += (gap << 1);
   }
 }
 
-void FwdFFTToBitReverseAVX512RI(double_t* result_real, double_t* result_imag,
-                                const double_t* operand_real,
-                                const double_t* operand_imag,
-                                const double_t* root_of_unity_powers_real,
-                                const double_t* root_of_unity_powers_imag,
-                                uint64_t n, const double_t* scalar) {
+void Forward_FFT_ToBitReverseAVX512RI(double_t* result_real,
+                                      double_t* result_imag,
+                                      const double_t* operand_real,
+                                      const double_t* operand_imag,
+                                      const double_t* root_of_unity_powers_real,
+                                      const double_t* root_of_unity_powers_imag,
+                                      uint64_t n, const double_t* scalar) {
   // myfile1.open ("2.txt");
 
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
@@ -1015,10 +1130,10 @@ void FwdFFTToBitReverseAVX512RI(double_t* result_real, double_t* result_imag,
   // myfile1.close();
 }
 
-void FwdFFTToBitReverseAVX512(double_t* result_8C_intrlvd,
-                              const double_t* operand_8C_intrlvd,
-                              const double_t* root_of_unity_powers_1C_intrlvd,
-                              const uint64_t n, const double_t* scalar) {
+void Forward_FFT_ToBitReverseAVX512(
+    double_t* result_8C_intrlvd, const double_t* operand_8C_intrlvd,
+    const double_t* root_of_unity_powers_1C_intrlvd, const uint64_t n,
+    const double_t* scalar) {
   myfile2.open("1.txt");
 
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
@@ -1033,8 +1148,8 @@ void FwdFFTToBitReverseAVX512(double_t* result_8C_intrlvd,
   // T8. First pass in case of out of place
   if (gap >= 16) {
     const double_t* W_1C_intrlvd = &root_of_unity_powers_1C_intrlvd[W_idx];
-    ComplexStartFwdT8(result_8C_intrlvd, operand_8C_intrlvd,
-                      W_1C_intrlvd, gap, m);
+    ComplexStartFwdT8(result_8C_intrlvd, operand_8C_intrlvd, W_1C_intrlvd, gap,
+                      m);
     m <<= 1;
     W_idx = m;
     gap >>= 1;
@@ -1140,8 +1255,8 @@ void BuildFloatingPointsAVX512(double_t* res, const uint64_t* plain,
 
       v_res_real = _mm512_mask_add_pd(v_res_real, cond_gt_dec_mod | cond_lt_thr,
                                       v_res_real, v_scaled_diff);
-      v_res_real = _mm512_mask_sub_pd(v_res_real, cond_le_dec_mod,
-                                      v_res_real, v_scaled_diff);
+      v_res_real = _mm512_mask_sub_pd(v_res_real, cond_le_dec_mod, v_res_real,
+                                      v_scaled_diff);
 
       /*myfile2 << "i = " << i + 0 << ", geth " << (((int32_t)cond_ge_thr&1) >>
       0) << ", ltth " << (((int32_t)cond_lt_thr&1) >> 0) << ", curr_coeff " <<

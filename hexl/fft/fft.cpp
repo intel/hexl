@@ -62,9 +62,9 @@ void FFT::ComputeForwardFFTRI(double_t* result_real, double_t* result_imag,
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
-  FwdFFTToBitReverseAVX512RI(result_real, result_imag, operand_real,
-                             operand_imag, roots_real, roots_imag, m_degree,
-                             scalar);
+  Forward_FFT_ToBitReverseAVX512RI(result_real, result_imag, operand_real,
+                                   operand_imag, roots_real, roots_imag,
+                                   m_degree, scalar);
   return;
 #endif
 }
@@ -80,8 +80,8 @@ void FFT::ComputeForwardFFT(double_t* result_8C_intrlvd,
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
-  FwdFFTToBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
-                           roots_1C_intrlvd, m_degree, in_scalar);
+  Forward_FFT_ToBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
+                                 roots_1C_intrlvd, m_degree, in_scalar);
   return;
 #endif
 }
@@ -97,8 +97,8 @@ void FFT::ComputeInverseFFT(double_t* result_8C_intrlvd,
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
-  InvFFTFromBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
-                             inv_roots_1C_intrlvd, m_degree, in_scalar);
+  Inverse_FFT_FromBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
+                                   inv_roots_1C_intrlvd, m_degree, in_scalar);
   return;
 #endif
 }

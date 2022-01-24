@@ -111,7 +111,7 @@ uint64_t GeneratePrimitiveRoot(uint64_t degree, uint64_t modulus) {
   uint64_t size_quotient_group = size_entire_group / degree;
 
   for (int trial = 0; trial < 200; ++trial) {
-    uint64_t root = GenerateInsecureUniformRandomValue(0, modulus);
+    uint64_t root = GenerateInsecureUniformIntRandomValue(0, modulus);
     root = PowMod(root, size_quotient_group, modulus);
 
     if (IsPrimitiveRoot(root, degree, modulus)) {

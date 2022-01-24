@@ -12,7 +12,7 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-reduce-mod.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
-    test-fft-avx512.cpp
+    test-fft-native.cpp
     test-util-internal.cpp
 )
 
