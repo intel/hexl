@@ -1,0 +1,14 @@
+{
+    "name": "hexl-example",
+    "version": "1.0.0",
+    "dependencies": [
+        {
+            "name": "hexl",
+            "version>=": "1.2.3"
+        }
+    ],
+    "builtin-baseline": "7baf7bc9f3390bab2f47e2bcbd35b065663bc80d",
+    "overrides": [
+        { "name": "hexl", "version": "1.2.1", "port-version": 0}
+    ]
+}
