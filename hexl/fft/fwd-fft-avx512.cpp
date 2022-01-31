@@ -401,11 +401,13 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
           *(base + (i + 3) * mod_size), *(base + (i + 2) * mod_size),
           *(base + (i + 1) * mod_size), *(base + (i + 0) * mod_size));
 
-      cond_lt_thr |= _mm512_mask_cmplt_epu64_mask(zeros, v_plain, v_thrld);
+      cond_lt_thr = static_cast<unsigned char>(cond_lt_thr) |
+                    static_cast<unsigned char>(
+                        _mm512_mask_cmplt_epu64_mask(zeros, v_plain, v_thrld));
       zeros = _mm512_mask_cmpeq_epu64_mask(zeros, v_plain, v_thrld);
     }
 
-    __mmask8 cond_ge_thr = ~cond_lt_thr;
+    __mmask8 cond_ge_thr = ~static_cast<unsigned char>(cond_lt_thr);
     double scaled_two_pow_64 = inv_scale;
     __m512d v_res_real = _mm512_setzero_pd();
     HEXL_LOOP_UNROLL_8
