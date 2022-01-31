@@ -99,8 +99,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        # TODO: add Linux/ice-lake tag to self-hosted runner
-        os: [self-hosted, macos-latest, ubuntu-20.04]
+        os: [ice-lake, [self-hosted, ubuntu-18.04], macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
         shared_lib: [ON, OFF]
         include:
@@ -224,8 +223,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        # TODO: add Linux/ice-lake tag to self-hosted runner
-        os: [self-hosted]
+        os: [ice-lake]
         build_type: [Release]
         shared_lib: [ON]
     steps:
