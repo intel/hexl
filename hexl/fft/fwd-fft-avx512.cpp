@@ -6,8 +6,6 @@
 #include "hexl/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 
-std::ofstream myfile1, myfile2;
-
 namespace intel {
 namespace hexl {
 
@@ -432,16 +430,13 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
 
       // __m512d v_scaled_diff = _mm512_castsi512_pd(v_diff); does not work
 
-      __m512d v_casted_diff = _mm512_set_pd(
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[7])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[6])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[5])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[4])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[3])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[2])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[1])),
-          static_cast<double_t>(static_cast<uint64_t>(v_diff[0])));
+      double_t tmp_v[8];
+      HEXL_LOOP_UNROLL_8
+      for (size_t t = 0; t < 8; t++) {
+        tmp_v[t] = static_cast<double_t>(static_cast<uint64_t>(v_diff[t]));
+      }
 
+      __m512d v_casted_diff = _mm512_loadu_pd(tmp_v);
       __m512d v_scaled_diff = _mm512_mul_pd(v_casted_diff, v_scaled_p64);
 
       v_res_real = _mm512_mask_add_pd(v_res_real, cond_gt_dec_mod | cond_lt_thr,

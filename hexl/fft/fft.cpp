@@ -3,6 +3,7 @@
 
 #include "hexl/fft/fft.hpp"
 
+#include "hexl/fft/fft-native.hpp"
 #include "hexl/logging/logging.hpp"
 
 namespace intel {
@@ -93,8 +94,8 @@ void FFT::ComputeForwardFFT(std::complex<double_t>* result,
   return;
 #else
   HEXL_VLOG(3, "Calling Native FwdFFT");
-  Forward_FFT_ToBitReverseRadix2(result, operand, m_complex_roots_of_unity,
-                                 m_degree, out_scale);
+  Forward_FFT_ToBitReverseRadix2(
+      result, operand, m_complex_roots_of_unity.data(), m_degree, out_scale);
   return;
 #endif
 }
@@ -125,8 +126,9 @@ void FFT::ComputeInverseFFT(std::complex<double_t>* result,
   return;
 #else
   HEXL_VLOG(3, "Calling Native InvFFT");
-  Inverse_FFT_FromBitReverseRadix2(
-      result, operand, m_inv_complex_roots_of_unity, m_degree, out_scale);
+  Inverse_FFT_FromBitReverseRadix2(result, operand,
+                                   m_inv_complex_roots_of_unity.data(),
+                                   m_degree, out_scale);
   return;
 #endif
 }
