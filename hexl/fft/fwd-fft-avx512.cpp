@@ -4,6 +4,7 @@
 #include "hexl/fft/fwd-fft-avx512.hpp"
 
 #include "hexl/fft/fft-avx512-util.hpp"
+#include "hexl/logging/logging.hpp"
 
 std::ofstream myfile1, myfile2;
 

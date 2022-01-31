@@ -3,6 +3,8 @@
 
 #include "hexl/fft/fft-native.hpp"
 
+#include <cstring>
+
 #include "util/util-internal.hpp"
 
 namespace intel {

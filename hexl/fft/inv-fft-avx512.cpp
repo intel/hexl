@@ -4,6 +4,7 @@
 #include "hexl/fft/inv-fft-avx512.hpp"
 
 #include "hexl/fft/fft-avx512-util.hpp"
+#include "hexl/logging/logging.hpp"
 
 namespace intel {
 namespace hexl {

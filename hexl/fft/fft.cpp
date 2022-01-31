@@ -3,6 +3,8 @@
 
 #include "hexl/fft/fft.hpp"
 
+#include "hexl/logging/logging.hpp"
+
 namespace intel {
 namespace hexl {
 
@@ -134,6 +136,14 @@ void FFT::BuildFloatingPoints(std::complex<double_t>* res,
                               const uint64_t* decryption_modulus,
                               const double_t in_inv_scale, size_t mod_size,
                               size_t coeff_count) {
+  HEXL_UNUSED(res);
+  HEXL_UNUSED(plain);
+  HEXL_UNUSED(threshold);
+  HEXL_UNUSED(decryption_modulus);
+  HEXL_UNUSED(in_inv_scale);
+  HEXL_UNUSED(mod_size);
+  HEXL_UNUSED(coeff_count);
+
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ BuildFloatingPoints");
 
