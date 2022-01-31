@@ -429,14 +429,15 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
                                      v_curr_coeff);
 
       // __m512d v_scaled_diff = _mm512_castsi512_pd(v_diff); does not work
-
-      double_t tmp_v[8];
+      uint64_t tmp_v_ui[8];
+      double_t tmp_v_pd[8];
+      _mm512_storeu_epi64(tmp_v_ui, v_diff);
       HEXL_LOOP_UNROLL_8
       for (size_t t = 0; t < 8; t++) {
-        tmp_v[t] = static_cast<double_t>(static_cast<uint64_t>(v_diff[t]));
+        tmp_v_pd[t] = static_cast<double_t>(tmp_v_ui[t]);
       }
 
-      __m512d v_casted_diff = _mm512_loadu_pd(tmp_v);
+      __m512d v_casted_diff = _mm512_loadu_pd(tmp_v_pd);
       __m512d v_scaled_diff = _mm512_mul_pd(v_casted_diff, v_scaled_p64);
 
       v_res_real = _mm512_mask_add_pd(v_res_real, cond_gt_dec_mod | cond_lt_thr,
