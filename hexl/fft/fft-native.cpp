@@ -3,11 +3,6 @@
 
 #include "hexl/fft/fft-native.hpp"
 
-#include <cstring>
-#include <iostream>
-
-#include "hexl/logging/logging.hpp"
-#include "hexl/util/check.hpp"
 #include "util/util-internal.hpp"
 
 namespace intel {

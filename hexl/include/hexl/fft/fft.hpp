@@ -3,10 +3,7 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <memory>
-#include <vector>
+#include <complex>
 
 #include "hexl/fft/fwd-fft-avx512.hpp"
 #include "hexl/fft/inv-fft-avx512.hpp"
@@ -17,7 +14,7 @@ namespace intel {
 namespace hexl {
 
 /// @brief Performs linear forward and inverse FTT-like transform
-/// for CKKS encodnig and decoding.
+/// for CKKS encoding and decoding.
 class FFT {
  public:
   /// @brief Helper class for custom memory allocation
@@ -41,13 +38,10 @@ class FFT {
   /// @brief Destructs the CKKS_FTT object
   ~FFT() = default;
 
-  /// @brief Initializes an NTT object with degree \p degree and modulus
-  /// \p q.
-  /// @param[in] degree also known as N. Size of the NTT transform. Must be a
-  /// power of
-  /// 2
-  /// @param[in] q Prime modulus. Must satisfy \f$ q == 1 \mod 2N \f$
-  /// @param[in] root_of_unity 2N'th root of unity in \f$ \mathbb{Z_q} \f$.
+  /// @brief Initializes an FFT object with degree \p degree and scalar
+  /// \p in_scalar.
+  /// @param[in] degree also known as N. Size of the FFT transform. Must be a
+  /// power of 2
   /// @param[in] alloc_ptr Custom memory allocator used for intermediate
   /// calculations
   /// @details  Performs pre-computation necessary for forward and inverse
@@ -63,83 +57,92 @@ class FFT {
                 std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
-  /// @brief Returns true if arguments satisfy constraints for FTT-like
-  /// transform
-  /// @param[in] degree N. Size of the transform, i.e. the polynomial degree.
-  /// Must be a power of two.
-  /// @param[in] modulus Prime modulus q. Must satisfy q mod 2N = 1
-  static bool CheckArguments(uint64_t degree, uint64_t modulus);
-
-  /// @brief Compute forward NTT. Results are bit-reversed.
+  /// @brief Compute forward FFT. Results are bit-reversed.
   /// @param[out] result Stores the result
-  /// @param[in] operand Data on which to compute the NTT
-  /// @param[in] input_mod_factor Assume input \p operand are in [0,
-  /// input_mod_factor * q). Must be 1, 2 or 4.
-  /// @param[in] output_mod_factor Returns output \p result in [0,
-  /// output_mod_factor * q). Must be 1 or 4.
-  void ComputeForwardFFTRI(double_t* result_real, double_t* result_imag,
-                           const double_t* operand_real,
-                           const double_t* operand_imag,
-                           const double_t* roots_real,
-                           const double_t* roots_imag);
+  /// @param[in] operand Data on which to compute the FFT
+  /// @param[in] in_scale Scale applied to output values
+  void ComputeForwardFFT(std::complex<double_t>* result,
+                         const std::complex<double_t>* operand,
+                         const double_t* in_scale = nullptr);
 
-  void ComputeForwardFFT(double_t* result_8C_intrlvd,
-                         const double_t* operand_8C_intrlvd,
-                         const double_t* roots_1C_intrlvd,
-                         const double_t* scalar);
-
-  /// Compute inverse NTT. Results are bit-reversed.
+  /// @brief Compute inverse FFT. Results are bit-reversed.
   /// @param[out] result Stores the result
-  /// @param[in] operand Data on which to compute the NTT
-  /// @param[in] input_mod_factor Assume input \p operand are in [0,
-  /// input_mod_factor * q). Must be 1 or 2.
-  /// @param[in] output_mod_factor Returns output \p result in [0,
-  /// output_mod_factor * q). Must be 1 or 2.
-  void ComputeInverseFFT(double_t* result_8C_intrlvd,
-                         const double_t* operand_8C_intrlvd,
-                         const double_t* inv_roots_1C_intrlvd,
-                         const double_t* scalar);
+  /// @param[in] operand Data on which to compute the FFT
+  /// @param[in] in_scale Scale applied to output values
+  void ComputeInverseFFT(std::complex<double_t>* result,
+                         const std::complex<double_t>* operand,
+                         const double_t* in_scale = nullptr);
 
-  void BuildFloatingPoints(double_t* res, const uint64_t* plain,
+  /// @brief Construct floating-point values from CRT-composed polynomial with
+  /// integer coefficients.
+  /// @param[out] res Stores the result
+  /// @param[in] plain Plaintext
+  /// @param[in] threshold Upper half threshold with respect to the total
+  /// coefficient modulus
+  /// @param[in] decryption_modulus Product of all primes in the coefficient
+  /// modulus
+  /// @param[in] inv_scale Scale applied to output values
+  /// @param[in] mod_size Size of coefficient modulus parameter
+  /// @param[in] coeff_count Degree of the polynomial modulus parameter
+  void BuildFloatingPoints(std::complex<double_t>* res, const uint64_t* plain,
                            const uint64_t* threshold,
                            const uint64_t* decryption_modulus,
                            const double_t inv_scale, size_t mod_size,
                            size_t coeff_count);
 
-  /// @brief Returns the root of unity powers in bit-reversed order
-  const AlignedVector64<double_t>& GetComplexRootOfUnityPowers_real() const {
-    return m_complex_root_of_unity_powers_real;
+  /// @brief Returns the root of unity power at bit-reversed index i.
+  /// @param[in] i Index
+  std::complex<double_t> GetComplexRootOfUnity(size_t i) {
+    return GetComplexRootsOfUnity()[i];
   }
 
-  /// @brief Returns the root of unity powers in bit-reversed order
-  const AlignedVector64<double_t>& GetComplexRootOfUnityPowers_imag() const {
-    return m_complex_root_of_unity_powers_imag;
+  /// @brief Returns the root of unity in bit-reversed order
+  const AlignedVector64<std::complex<double_t>>& GetComplexRootsOfUnity()
+      const {
+    return m_complex_roots_of_unity;
   }
+
+  /// @brief Returns the root of unity power at bit-reversed index i.
+  /// @param[in] i Index
+  std::complex<double_t> GetInvComplexRootOfUnity(size_t i) {
+    return GetInvComplexRootsOfUnity()[i];
+  }
+
+  /// @brief Returns the inverse root of unity in bit-reversed order
+  const AlignedVector64<std::complex<double_t>>& GetInvComplexRootsOfUnity()
+      const {
+    return m_inv_complex_roots_of_unity;
+  }
+
+  /// @brief Returns the degree N
+  uint64_t GetDegree() const { return m_degree; }
 
  private:
-  // Primitive 2n-th root, m = 2n
-  void ComputeComplexPrimitiveRootOfUnityPowers();
+  // Computes 1~(n-1)-th powers and inv powers of the primitive 2n-th root
+  void ComputeComplexRootsOfUnity();
 
-  // 1~(n-1)-th powers of the primitive 2n-th root
-  void ComputeComplexRootOfUnityPowers();
-
+  // PI value used to calculate the roots of unity
   static constexpr double PI_ = 3.1415926535897932384626433832795028842;
+
+  uint64_t m_degree;  // N: size of FFT transform, should be power of 2
+
+  double_t* scalar;  // Pointer to scalar used for scale/inv_scale calculation
+
+  double_t scale;  // Scale value use for encoding (inv fft)
+
+  double_t inv_scale;  // Scale value use in decoding (fwd fft)
 
   std::shared_ptr<AllocatorBase> m_alloc;
 
   AlignedAllocator<double_t, 64> m_aligned_alloc;
 
-  double_t* scalar;  //
-
-  uint64_t m_degree;  // N: size of FFT transform, should be power of 2
-
   uint64_t m_degree_bits;  // log_2(m_degree)
 
-  // Contains 0~(n/8-1)-th powers of the n-th primitive root.
-  // AlignedVector64<uint64_t> m_root_of_unity_powers_real;
-  AlignedVector64<double_t> m_complex_root_of_unity_powers_real;
-  AlignedVector64<double_t> m_complex_root_of_unity_powers_imag;
-  AlignedVector64<double_t> m_complex_root_of_unity_powers_interleaved;
+  // Contains 0~(n-1)-th powers of the 2n-th primitive root.
+  AlignedVector64<std::complex<double_t>> m_complex_roots_of_unity;
+
+  // Contains 0~(n-1)-th inv powers of the 2n-th primitive inv root.
+  AlignedVector64<std::complex<double_t>> m_inv_complex_roots_of_unity;
 };
 
 }  // namespace hexl

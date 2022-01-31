@@ -3,11 +3,6 @@
 
 #include "hexl/fft/fft.hpp"
 
-#include "hexl/logging/logging.hpp"
-#include "hexl/util/aligned-allocator.hpp"
-#include "hexl/util/check.hpp"
-#include "hexl/util/defines.hpp"
-
 namespace intel {
 namespace hexl {
 
@@ -20,99 +15,131 @@ FFT::FFT(uint64_t degree, double_t* in_scalar,
       scalar(in_scalar),
       m_alloc(alloc_ptr),
       m_aligned_alloc(AlignedAllocator<double_t, 64>(m_alloc)),
-      m_complex_root_of_unity_powers_real(m_aligned_alloc),
-      m_complex_root_of_unity_powers_imag(m_aligned_alloc) {
-  // HEXL_CHECK(CheckArguments(degree, q), "");
-  // HEXL_CHECK(IsPrimitiveRoot(m_w, 2 * degree, q),
-  //           m_w << " is not a primitive 2*" << degree << "'th root of
-  //           unity");
-
-  m_degree_bits = Log2(m_degree);
-}
-
-bool FFT::CheckArguments(uint64_t degree, uint64_t modulus) {
-  HEXL_UNUSED(degree);
-  HEXL_UNUSED(modulus);
+      m_complex_roots_of_unity(m_aligned_alloc) {
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
+  HEXL_CHECK(degree > 8, "degree should be bigger than 8");
 
-  HEXL_CHECK(modulus % (2 * degree) == 1,
-             "modulus mod 2n != 1");  // IS this needed?
-  HEXL_CHECK(IsPrime(modulus), "modulus is not prime");
+  m_degree_bits = Log2(m_degree);
+  ComputeComplexRootsOfUnity();
 
-  return true;
+  if (scalar != nullptr) {
+    scale = *scalar / static_cast<double_t>(degree);
+    inv_scale = static_cast<double_t>(1.0) / *scalar;
+  }
 }
 
-void FFT::ComputeComplexPrimitiveRootOfUnityPowers() {}
+inline std::complex<double_t> swap_real_imag(std::complex<double_t> c) {
+  return std::complex<double_t>(c.imag(), c.real());
+}
 
-void FFT::ComputeComplexRootOfUnityPowers() {}
+void FFT::ComputeComplexRootsOfUnity() {
+  AlignedVector64<std::complex<double_t>> roots_of_unity(m_degree, 0,
+                                                         m_aligned_alloc);
+  AlignedVector64<std::complex<double_t>> roots_in_bit_reverse(m_degree, 0,
+                                                               m_aligned_alloc);
+  AlignedVector64<std::complex<double_t>> inv_roots_in_bit_reverse(
+      m_degree, 0, m_aligned_alloc);
+  uint64_t roots_degree = static_cast<uint64_t>(m_degree) << 1;  // degree > 2
 
-void FFT::ComputeForwardFFTRI(double_t* result_real, double_t* result_imag,
-                              const double_t* operand_real,
-                              const double_t* operand_imag,
-                              const double_t* roots_real,
-                              const double_t* roots_imag) {
-  HEXL_CHECK(result_real != nullptr, "result_real == nullptr");
-  HEXL_CHECK(result_imag != nullptr, "result_imag == nullptr");
-  HEXL_CHECK(operand_real != nullptr, "operand_real == nullptr");
-  HEXL_CHECK(operand_imag != nullptr, "operand_imag == nullptr");
-  HEXL_CHECK(roots_real != nullptr, "W_real == nullptr");
-  HEXL_CHECK(roots_imag != nullptr, "W_imag == nullptr");
+  // Generate 1/8 of all roots first.
+  size_t i = 0;
+  for (; i <= roots_degree / 8; i++) {
+    roots_of_unity[i] =
+        std::polar<double>(1.0, 2 * PI_ * static_cast<double>(i) /
+                                    static_cast<double>(roots_degree));
+  }
+  // Complete first 4th
+  for (; i <= roots_degree / 4; i++) {
+    roots_of_unity[i] = swap_real_imag(roots_of_unity[roots_degree / 4 - i]);
+  }
+  // Get second 4th
+  for (; i < roots_degree / 2; i++) {
+    roots_of_unity[i] = -std::conj(roots_of_unity[roots_degree / 2 - i]);
+  }
+  // Put in bit reverse and get inv roots
+  for (i = 1; i < m_degree; i++) {
+    roots_in_bit_reverse[i] = roots_of_unity[ReverseBits(i, m_degree_bits)];
+    inv_roots_in_bit_reverse[i] =
+        std::conj(roots_of_unity[ReverseBits(i - 1, m_degree_bits) + 1]);
+  }
+  m_complex_roots_of_unity = roots_in_bit_reverse;
+  m_inv_complex_roots_of_unity = inv_roots_in_bit_reverse;
+}
+
+void FFT::ComputeForwardFFT(std::complex<double_t>* result,
+                            const std::complex<double_t>* operand,
+                            const double_t* in_scale) {
+  HEXL_CHECK(result != nullptr, "result == nullptr");
+  HEXL_CHECK(operand != nullptr, "operand == nullptr");
+
+  const double_t* out_scale = nullptr;
+  if (scalar != nullptr) {
+    out_scale = &inv_scale;
+  } else if (in_scale != nullptr) {
+    out_scale = in_scale;
+  }
 
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
-  Forward_FFT_ToBitReverseAVX512RI(result_real, result_imag, operand_real,
-                                   operand_imag, roots_real, roots_imag,
-                                   m_degree, scalar);
+  Forward_FFT_ToBitReverseAVX512(
+      &(reinterpret_cast<double_t(&)[2]>(result[0]))[0],
+      &(reinterpret_cast<const double_t(&)[2]>(operand[0]))[0],
+      &(reinterpret_cast<const double_t(&)[2]>(m_complex_roots_of_unity[0]))[0],
+      m_degree, out_scale);
+  return;
+#else
+  HEXL_VLOG(3, "Calling Native FwdFFT");
+  Forward_FFT_ToBitReverseRadix2(result, operand, m_complex_roots_of_unity,
+                                 m_degree, out_scale);
   return;
 #endif
 }
 
-void FFT::ComputeForwardFFT(double_t* result_8C_intrlvd,
-                            const double_t* operand_8C_intrlvd,
-                            const double_t* roots_1C_intrlvd,
-                            const double_t* in_scalar) {
-  HEXL_CHECK(result_8C_intrlvd != nullptr, "result_8C_intrlvd == nullptr");
-  HEXL_CHECK(operand_8C_intrlvd != nullptr, "operand_8C_intrlvd == nullptr");
-  HEXL_CHECK(roots_1C_intrlvd != nullptr, "roots_1C_intrlvd == nullptr");
+void FFT::ComputeInverseFFT(std::complex<double_t>* result,
+                            const std::complex<double_t>* operand,
+                            const double_t* in_scale) {
+  HEXL_CHECK(result != nullptr, "result==nullptr");
+  HEXL_CHECK(operand != nullptr, "operand==nullptr");
+
+  const double_t* out_scale = nullptr;
+  if (scalar != nullptr) {
+    out_scale = &scale;
+  } else if (in_scale != nullptr) {
+    out_scale = in_scale;
+  }
 
 #ifdef HEXL_HAS_AVX512DQ
-  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ InvFFT");
 
-  Forward_FFT_ToBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
-                                 roots_1C_intrlvd, m_degree, in_scalar);
+  Inverse_FFT_FromBitReverseAVX512(
+      &(reinterpret_cast<double_t(&)[2]>(result[0]))[0],
+      &(reinterpret_cast<const double_t(&)[2]>(operand[0]))[0],
+      &(reinterpret_cast<const double_t(&)[2]>(
+          m_inv_complex_roots_of_unity[0]))[0],
+      m_degree, out_scale);
+
+  return;
+#else
+  HEXL_VLOG(3, "Calling Native InvFFT");
+  Inverse_FFT_FromBitReverseRadix2(
+      result, operand, m_inv_complex_roots_of_unity, m_degree, out_scale);
   return;
 #endif
 }
 
-void FFT::ComputeInverseFFT(double_t* result_8C_intrlvd,
-                            const double_t* operand_8C_intrlvd,
-                            const double_t* inv_roots_1C_intrlvd,
-                            const double_t* in_scalar) {
-  HEXL_CHECK(result_8C_intrlvd != nullptr, "result_8C_intrlvd==nullptr");
-  HEXL_CHECK(operand_8C_intrlvd != nullptr, "operand_8C_intrlvd==nullptr");
-  HEXL_CHECK(inv_roots_1C_intrlvd != nullptr, "inv_roots_1C_intrlvd==nullptr");
-
-#ifdef HEXL_HAS_AVX512DQ
-  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
-
-  Inverse_FFT_FromBitReverseAVX512(result_8C_intrlvd, operand_8C_intrlvd,
-                                   inv_roots_1C_intrlvd, m_degree, in_scalar);
-  return;
-#endif
-}
-
-void FFT::BuildFloatingPoints(double_t* res, const uint64_t* plain,
-                              const uint64_t* threshold,
+void FFT::BuildFloatingPoints(std::complex<double_t>* res,
+                              const uint64_t* plain, const uint64_t* threshold,
                               const uint64_t* decryption_modulus,
-                              const double_t inv_scale, size_t mod_size,
+                              const double_t in_inv_scale, size_t mod_size,
                               size_t coeff_count) {
 #ifdef HEXL_HAS_AVX512DQ
-  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ BuildFloatingPoints");
 
-  BuildFloatingPointsAVX512(res, plain, threshold, decryption_modulus,
-                            inv_scale, mod_size, coeff_count);
+  BuildFloatingPointsAVX512(&(reinterpret_cast<double_t(&)[2]>(res[0]))[0],
+                            plain, threshold, decryption_modulus, in_inv_scale,
+                            mod_size, coeff_count);
   return;
 #endif
 }
