@@ -365,7 +365,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     Forward_FFT_ToBitReverseAVX512(
         &(reinterpret_cast<double_t(&)[2]>(result[0]))[0],
         &(reinterpret_cast<double_t(&)[2]>(operand[0]))[0],
-        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n);
+        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, 0, 0);
 
     for (size_t i = 0; i < n; ++i) {
       double tmp = abs(operand[0].real() - result[i].real());
@@ -392,7 +392,8 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     Forward_FFT_ToBitReverseAVX512(
         &reinterpret_cast<double(&)[2]>(result[0])[0],
         &reinterpret_cast<double(&)[2]>(operand[0])[0],
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, 0, 0,
+        &inv_scale);
 
     for (size_t i = 0; i < n; ++i) {
       double tmp = abs(value.real() - result[i].real());
@@ -420,7 +421,8 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     Forward_FFT_ToBitReverseAVX512(
         &reinterpret_cast<double(&)[2]>(result[0])[0],
         &reinterpret_cast<double(&)[2]>(transformed[0])[0],
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, 0, 0,
+        &inv_scale);
 
     for (size_t i = 0; i < n; ++i) {
       auto tmp = abs(operand[i].real() - result[i].real());
@@ -452,7 +454,8 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     Forward_FFT_ToBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, &inv_scale);
+        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, 0, 0,
+        &inv_scale);
 
     for (size_t i = 0; i < 2 * n; i++) {
       double tmp =
@@ -483,7 +486,8 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     Forward_FFT_ToBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, &inv_scale);
+        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, 0, 0,
+        &inv_scale);
 
     for (size_t i = 0; i < 2 * n; i++) {
       double tmp =
@@ -514,7 +518,8 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     Forward_FFT_ToBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, &inv_scale);
+        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, 0, 0,
+        &inv_scale);
 
     for (size_t i = 0; i < 2 * n; i++) {
       double tmp =
@@ -542,7 +547,8 @@ TEST(FFT, ForwardInverseFFTAVX512) {
 
     Forward_FFT_ToBitReverseAVX512(
         operand_complex_interleaved.data(), operand_complex_interleaved.data(),
-        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, &inv_scale);
+        &(reinterpret_cast<double_t(&)[2]>(root_powers[0]))[0], n, 0, 0,
+        &inv_scale);
 
     for (size_t i = 0; i < 2 * n; i++) {
       double tmp = abs(expected[i] - operand_complex_interleaved[i]);

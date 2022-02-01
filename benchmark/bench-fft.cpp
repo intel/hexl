@@ -373,7 +373,7 @@ static void BM_FwdFFTAVX512InPlaceUnscaled(
   for (auto _ : state) {
     Forward_FFT_ToBitReverseAVX512(
         input.data(), input.data(),
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, 0, 0);
   }
 }
 
@@ -401,7 +401,8 @@ static void BM_FwdFFTAVX512InPlaceScaled(benchmark::State& state) {  //  NOLINT
   for (auto _ : state) {
     Forward_FFT_ToBitReverseAVX512(
         input.data(), input.data(),
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, &scalar);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, 0, 0,
+        &scalar);
   }
 }
 
@@ -428,7 +429,7 @@ static void BM_FwdFFTAVX512CopyUnscaled(benchmark::State& state) {  //  NOLINT
   for (auto _ : state) {
     Forward_FFT_ToBitReverseAVX512(
         input.data(), input.data(),
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, 0, 0);
   }
 }
 
@@ -457,7 +458,8 @@ static void BM_FwdFFTAVX512CopyScaled(benchmark::State& state) {  //  NOLINT
   for (auto _ : state) {
     Forward_FFT_ToBitReverseAVX512(
         input.data(), input.data(),
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, &scalar);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, 0, 0,
+        &scalar);
   }
 }
 

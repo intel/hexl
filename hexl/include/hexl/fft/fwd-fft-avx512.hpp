@@ -23,6 +23,7 @@ namespace hexl {
 void Forward_FFT_ToBitReverseAVX512(
     double_t* result_cmplx_intrlvd, const double_t* operand_cmplx_intrlvd,
     const double_t* roots_of_unity_cmplx_intrlvd, const uint64_t n,
+    uint64_t recursion_depth, uint64_t recursion_half,
     const double_t* scale = nullptr);
 
 /// @brief Construct floating-point values from CRT-composed polynomial with

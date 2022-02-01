@@ -194,38 +194,23 @@ void ComplexFwdT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexFwdT8(double_t* result_8C_intrlvd,
-                  const double_t* operand_8C_intrlvd,
-                  const double_t* W_1C_intrlvd, uint64_t gap, uint64_t m) {
+void ComplexFwdT8(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+                  uint64_t gap, uint64_t m) {
   size_t offset = 0;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
     // Referencing operand
-    const double_t* X_op_real = operand_8C_intrlvd + offset;
-    const double_t* X_op_imag = operand_8C_intrlvd + 8 + offset;
+    double_t* X_real = operand_8C_intrlvd + offset;
+    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
 
-    const double_t* Y_op_real = X_op_real + gap;
-    const double_t* Y_op_imag = X_op_imag + gap;
+    double_t* Y_real = X_real + gap;
+    double_t* Y_imag = X_imag + gap;
 
-    const __m512d* v_X_op_pt_real = reinterpret_cast<const __m512d*>(X_op_real);
-    const __m512d* v_X_op_pt_imag = reinterpret_cast<const __m512d*>(X_op_imag);
-
-    const __m512d* v_Y_op_pt_real = reinterpret_cast<const __m512d*>(Y_op_real);
-    const __m512d* v_Y_op_pt_imag = reinterpret_cast<const __m512d*>(Y_op_imag);
-
-    // Referencing result
-    double_t* X_r_real = result_8C_intrlvd + offset;
-    double_t* X_r_imag = result_8C_intrlvd + 8 + offset;
-
-    double_t* Y_r_real = X_r_real + gap;
-    double_t* Y_r_imag = X_r_imag + gap;
-
-    __m512d* v_X_r_pt_real = reinterpret_cast<__m512d*>(X_r_real);
-    __m512d* v_X_r_pt_imag = reinterpret_cast<__m512d*>(X_r_imag);
-
-    __m512d* v_Y_r_pt_real = reinterpret_cast<__m512d*>(Y_r_real);
-    __m512d* v_Y_r_pt_imag = reinterpret_cast<__m512d*>(Y_r_imag);
+    __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
+    __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
+    __m512d* v_Y_pt_real = reinterpret_cast<__m512d*>(Y_real);
+    __m512d* v_Y_pt_imag = reinterpret_cast<__m512d*>(Y_imag);
 
     // Weights
     __m512d v_W_real = _mm512_set1_pd(*W_1C_intrlvd++);
@@ -233,31 +218,26 @@ void ComplexFwdT8(double_t* result_8C_intrlvd,
 
     // assume 8 | t
     for (size_t j = 0; j < gap; j += 16) {
-      __m512d v_X_real = _mm512_loadu_pd(v_X_op_pt_real);
-      __m512d v_X_imag = _mm512_loadu_pd(v_X_op_pt_imag);
+      __m512d v_X_real = _mm512_loadu_pd(v_X_pt_real);
+      __m512d v_X_imag = _mm512_loadu_pd(v_X_pt_imag);
 
-      __m512d v_Y_real = _mm512_loadu_pd(v_Y_op_pt_real);
-      __m512d v_Y_imag = _mm512_loadu_pd(v_Y_op_pt_imag);
+      __m512d v_Y_real = _mm512_loadu_pd(v_Y_pt_real);
+      __m512d v_Y_imag = _mm512_loadu_pd(v_Y_pt_imag);
 
       ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                           v_W_imag);
 
-      _mm512_storeu_pd(v_X_r_pt_real, v_X_real);
-      _mm512_storeu_pd(v_X_r_pt_imag, v_X_imag);
+      _mm512_storeu_pd(v_X_pt_real, v_X_real);
+      _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
 
-      _mm512_storeu_pd(v_Y_r_pt_real, v_Y_real);
-      _mm512_storeu_pd(v_Y_r_pt_imag, v_Y_imag);
+      _mm512_storeu_pd(v_Y_pt_real, v_Y_real);
+      _mm512_storeu_pd(v_Y_pt_imag, v_Y_imag);
 
-      // Increase operand & result pointers
-      v_X_op_pt_real += 2;
-      v_X_op_pt_imag += 2;
-      v_Y_op_pt_real += 2;
-      v_Y_op_pt_imag += 2;
-
-      v_X_r_pt_real += 2;
-      v_X_r_pt_imag += 2;
-      v_Y_r_pt_real += 2;
-      v_Y_r_pt_imag += 2;
+      // Increase operand pointers
+      v_X_pt_real += 2;
+      v_X_pt_imag += 2;
+      v_Y_pt_real += 2;
+      v_Y_pt_imag += 2;
     }
     offset += (gap << 1);
   }
@@ -324,53 +304,79 @@ void ComplexStartFwdT8(double_t* result_8C_intrlvd,
 void Forward_FFT_ToBitReverseAVX512(
     double_t* result_cmplx_intrlvd, const double_t* operand_cmplx_intrlvd,
     const double_t* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
-    const double_t* scale) {
+    uint64_t recursion_depth, uint64_t recursion_half, const double_t* scale) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
-  size_t gap = n;  // (2*n >> 1) Interleaved complex numbers
-  size_t m = 2;    // require twice the size
-  size_t W_idx = m;
+  static const size_t base_ntt_size = 1024;
 
-  // T8. First pass in case of out of place
-  if (gap >= 16) {
+  if (n <= base_ntt_size) {  // Perform breadth-first FFT
+    size_t gap = n;          // (2*n >> 1) Interleaved complex numbers
+    size_t m = 2;            // require twice the size
+    size_t W_idx = (m << recursion_depth) + (recursion_half * m);
+
+    // T8. First pass in case of out of place
+    if (gap >= 16) {
+      const double_t* W_cmplx_intrlvd =
+          &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
+                        W_cmplx_intrlvd, gap, m);
+      m <<= 1;
+      W_idx = m;
+      gap >>= 1;
+    }
+
+    for (; gap >= 16; gap >>= 1) {
+      const double_t* W_cmplx_intrlvd =
+          &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+      m <<= 1;
+      W_idx = m;
+    }
+
+    {
+      // T4
+      const double_t* W_cmplx_intrlvd =
+          &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+      m <<= 1;
+      W_idx = m;
+
+      // T2
+      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+      m <<= 1;
+      W_idx = m;
+
+      // T1
+      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT1(result_cmplx_intrlvd, W_cmplx_intrlvd, m, scale);
+      m <<= 1;
+      W_idx = m;
+    }
+  } else {
+    // Perform depth-first FFT via recursive call
+    size_t gap = n;
+    size_t W_idx = (2ULL << recursion_depth) + recursion_half;
     const double_t* W_cmplx_intrlvd =
         &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
-                      W_cmplx_intrlvd, gap, m);
-    m <<= 1;
-    W_idx = m;
-    gap >>= 1;
-  }
 
-  for (; gap >= 16; gap >>= 1) {
-    const double_t* W_cmplx_intrlvd =
-        &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT8(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd,
-                 gap, m);
-    m <<= 1;
-    W_idx = m;
-  }
+    if (recursion_depth == 0) {
+      ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
+                        W_cmplx_intrlvd, gap, 2);
+    } else {
+      ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, 2);
+    }
 
-  {
-    // T4
-    const double_t* W_cmplx_intrlvd =
-        &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-    m <<= 1;
-    W_idx = m;
+    Forward_FFT_ToBitReverseAVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
+                                   root_of_unity_powers_cmplx_intrlvd, n / 2,
+                                   recursion_depth + 1, recursion_half * 2,
+                                   scale);
 
-    // T2
-    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-    m <<= 1;
-    W_idx = m;
-
-    // T1
-    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT1(result_cmplx_intrlvd, W_cmplx_intrlvd, m, scale);
-    m <<= 1;
-    W_idx = m;
+    Forward_FFT_ToBitReverseAVX512(
+        &result_cmplx_intrlvd[n / 2], &result_cmplx_intrlvd[n / 2],
+        root_of_unity_powers_cmplx_intrlvd, n / 2, recursion_depth + 1,
+        recursion_half * 2 + 1, scale);
   }
 
   HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double_t>(
