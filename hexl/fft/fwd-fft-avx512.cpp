@@ -407,7 +407,7 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
       zeros = _mm512_mask_cmpeq_epu64_mask(zeros, v_plain, v_thrld);
     }
 
-    __mmask8 cond_ge_thr = ~static_cast<unsigned char>(cond_lt_thr);
+    __mmask8 cond_ge_thr = static_cast<unsigned char>(~cond_lt_thr);
     double scaled_two_pow_64 = inv_scale;
     __m512d v_res_real = _mm512_setzero_pd();
     HEXL_LOOP_UNROLL_8
@@ -432,8 +432,9 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
 
       // __m512d v_scaled_diff = _mm512_castsi512_pd(v_diff); does not work
       uint64_t tmp_v_ui[8];
+      __m512d* tmp_v_ui_pt = reinterpret_cast<__m512d*>(tmp_v_ui);
       double_t tmp_v_pd[8];
-      _mm512_storeu_epi64(tmp_v_ui, v_diff);
+      _mm512_storeu_epi64(tmp_v_ui_pt, v_diff);
       HEXL_LOOP_UNROLL_8
       for (size_t t = 0; t < 8; t++) {
         tmp_v_pd[t] = static_cast<double_t>(tmp_v_ui[t]);
