@@ -434,7 +434,7 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
       uint64_t tmp_v_ui[8];
       __m512i* tmp_v_ui_pt = reinterpret_cast<__m512i*>(tmp_v_ui);
       double_t tmp_v_pd[8];
-      _mm512_storeu_epi64(tmp_v_ui_pt, v_diff);
+      _mm512_storeu_si512(tmp_v_ui_pt, v_diff);
       HEXL_LOOP_UNROLL_8
       for (size_t t = 0; t < 8; t++) {
         tmp_v_pd[t] = static_cast<double_t>(tmp_v_ui[t]);
