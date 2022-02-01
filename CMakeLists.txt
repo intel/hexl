@@ -3,7 +3,7 @@
 
 # target_link_options and cmake -S . -B build require cmake 3.13
 cmake_minimum_required(VERSION 3.13)
-project(HEXL VERSION 1.2.2 LANGUAGES C CXX)
+project(HEXL VERSION 1.2.3 LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
