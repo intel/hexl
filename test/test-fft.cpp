@@ -3,9 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <tuple>
-#include <vector>
-
 #include "hexl/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"

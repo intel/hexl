@@ -4,9 +4,6 @@
 #include <gtest/gtest.h>
 
 #include <complex>
-#include <iostream>
-#include <tuple>
-#include <vector>
 
 #include "hexl/fft/fft-native.hpp"
 #include "hexl/fft/fft.hpp"
