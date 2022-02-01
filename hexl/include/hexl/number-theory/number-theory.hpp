@@ -338,5 +338,14 @@ inline uint64_t HenselLemma2adicRoot(uint32_t r, uint64_t q) {
   return a_prev;
 }
 
+/// @brief Calculates greater common divisor for a and b
+/// @param[in] a Input intiger
+/// @param[in] b Input intiger
+/// @return Unsigned long int in [0, 2^r − 1] such that q*x ≡ −1 mod 2^r
+inline uint64_t gcdHexl(uint64_t a, uint64_t b) {
+  if (b == 0) return a;
+  return gcdHexl(b, a % b);
+}
+
 }  // namespace hexl
 }  // namespace intel
