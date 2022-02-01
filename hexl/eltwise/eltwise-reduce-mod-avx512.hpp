@@ -4,8 +4,8 @@
 #pragma once
 
 #include <functional>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 #include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "eltwise/eltwise-reduce-mod-internal.hpp"
