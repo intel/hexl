@@ -42,6 +42,7 @@ class FFT {
   /// \p in_scalar.
   /// @param[in] degree also known as N. Size of the FFT transform. Must be a
   /// power of 2
+  /// @param[in] in_scalar Scalar value to calculate scale and inv scale
   /// @param[in] alloc_ptr Custom memory allocator used for intermediate
   /// calculations
   /// @details  Performs pre-computation necessary for forward and inverse
