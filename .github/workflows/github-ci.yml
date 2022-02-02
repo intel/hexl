@@ -247,11 +247,13 @@ jobs:
         run: |
           set -x
           if [ "$RUNNER_OS" == "Linux" ]; then
-            export CC=gcc-7.4
-            export CXX=g++-7.4
+            export CC=gcc
+            export CXX=g++
           fi
 
           # Print information useful for debugging
+          gcc --version
+          g++ --version
           whoami
           echo $HOME
           echo $GITHUB_WORKSPACE
