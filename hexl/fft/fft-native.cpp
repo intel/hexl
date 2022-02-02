@@ -10,45 +10,42 @@
 namespace intel {
 namespace hexl {
 
-inline void ComplexFwdButterflyRadix2(std::complex<double_t>* X_r,
-                                      std::complex<double_t>* Y_r,
-                                      const std::complex<double_t>* X_op,
-                                      const std::complex<double_t>* Y_op,
-                                      const std::complex<double_t> W) {
-  std::complex<double_t> U = *X_op;
-  std::complex<double_t> V = *Y_op * W;
+inline void ComplexFwdButterflyRadix2(std::complex<double>* X_r,
+                                      std::complex<double>* Y_r,
+                                      const std::complex<double>* X_op,
+                                      const std::complex<double>* Y_op,
+                                      const std::complex<double> W) {
+  std::complex<double> U = *X_op;
+  std::complex<double> V = *Y_op * W;
   *X_r = U + V;
   *Y_r = U - V;
 }
 
-inline void ComplexInvButterflyRadix2(std::complex<double_t>* X_r,
-                                      std::complex<double_t>* Y_r,
-                                      const std::complex<double_t>* X_op,
-                                      const std::complex<double_t>* Y_op,
-                                      const std::complex<double_t> W) {
-  std::complex<double_t> U = *X_op;
+inline void ComplexInvButterflyRadix2(std::complex<double>* X_r,
+                                      std::complex<double>* Y_r,
+                                      const std::complex<double>* X_op,
+                                      const std::complex<double>* Y_op,
+                                      const std::complex<double> W) {
+  std::complex<double> U = *X_op;
   *X_r = U + *Y_op;
-  *Y_r = U - *Y_op;
-  *Y_r *= W;
+  *Y_r = (U - *Y_op) * W;
 }
 
-inline void ScaledComplexInvButterflyRadix2(std::complex<double_t>* X_r,
-                                            std::complex<double_t>* Y_r,
-                                            const std::complex<double_t>* X_op,
-                                            const std::complex<double_t>* Y_op,
-                                            const std::complex<double_t> W,
-                                            const double_t* scalar) {
-  std::complex<double_t> U = *X_op;
-  *X_r = U + *Y_op;
-  *X_r *= *scalar;
-  *Y_r = U - *Y_op;
-  *Y_r *= W;
+inline void ScaledComplexInvButterflyRadix2(std::complex<double>* X_r,
+                                            std::complex<double>* Y_r,
+                                            const std::complex<double>* X_op,
+                                            const std::complex<double>* Y_op,
+                                            const std::complex<double> W,
+                                            const double* scalar) {
+  std::complex<double> U = *X_op;
+  *X_r = (U + *Y_op) * (*scalar);
+  *Y_r = (U - *Y_op) * W;
 }
 
 void Forward_FFT_ToBitReverseRadix2(
-    std::complex<double_t>* result, const std::complex<double_t>* operand,
-    const std::complex<double_t>* root_of_unity_powers, const uint64_t n,
-    const double_t* scalar) {
+    std::complex<double>* result, const std::complex<double>* operand,
+    const std::complex<double>* root_of_unity_powers, const uint64_t n,
+    const double* scalar) {
   HEXL_CHECK(root_of_unity_powers != nullptr,
              "root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
@@ -58,11 +55,11 @@ void Forward_FFT_ToBitReverseRadix2(
 
   // In case of out-of-place operation do first pass and convert to in-place
   {
-    const std::complex<double_t> W = root_of_unity_powers[1];
-    std::complex<double_t>* X_r = result;
-    std::complex<double_t>* Y_r = X_r + gap;
-    const std::complex<double_t>* X_op = operand;
-    const std::complex<double_t>* Y_op = X_op + gap;
+    const std::complex<double> W = root_of_unity_powers[1];
+    std::complex<double>* X_r = result;
+    std::complex<double>* Y_r = X_r + gap;
+    const std::complex<double>* X_op = operand;
+    const std::complex<double>* Y_op = X_op + gap;
 
     // First pass for out-of-order case
     switch (gap) {
@@ -90,7 +87,7 @@ void Forward_FFT_ToBitReverseRadix2(
         break;
       }
       case 1: {
-        std::complex<double_t> scaled_W = W;
+        std::complex<double> scaled_W = W;
         if (scalar != nullptr) scaled_W = W * *scalar;
         ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
         break;
@@ -121,11 +118,11 @@ void Forward_FFT_ToBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = root_of_unity_powers[m + i];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = root_of_unity_powers[m + i];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
@@ -142,11 +139,11 @@ void Forward_FFT_ToBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = root_of_unity_powers[m + i];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = root_of_unity_powers[m + i];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
@@ -159,11 +156,11 @@ void Forward_FFT_ToBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = root_of_unity_powers[m + i];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = root_of_unity_powers[m + i];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
         }
@@ -175,11 +172,11 @@ void Forward_FFT_ToBitReverseRadix2(
             if (i != 0) {
               j1 += (gap << 1);
             }
-            const std::complex<double_t> W = root_of_unity_powers[m + i];
-            std::complex<double_t>* X_r = result + j1;
-            std::complex<double_t>* Y_r = X_r + gap;
-            const std::complex<double_t>* X_op = X_r;
-            const std::complex<double_t>* Y_op = Y_r;
+            const std::complex<double> W = root_of_unity_powers[m + i];
+            std::complex<double>* X_r = result + j1;
+            std::complex<double>* Y_r = X_r + gap;
+            const std::complex<double>* X_op = X_r;
+            const std::complex<double>* Y_op = Y_r;
             ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
           }
         } else {
@@ -187,13 +184,13 @@ void Forward_FFT_ToBitReverseRadix2(
             if (i != 0) {
               j1 += (gap << 1);
             }
-            const std::complex<double_t> W =
+            const std::complex<double> W =
                 *scalar * root_of_unity_powers[m + i];
-            std::complex<double_t>* X_r = result + j1;
-            std::complex<double_t>* Y_r = X_r + gap;
+            std::complex<double>* X_r = result + j1;
+            std::complex<double>* Y_r = X_r + gap;
             *X_r = (*scalar) * (*X_r);
-            const std::complex<double_t>* X_op = X_r;
-            const std::complex<double_t>* Y_op = Y_r;
+            const std::complex<double>* X_op = X_r;
+            const std::complex<double>* Y_op = Y_r;
             ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
           }
         }
@@ -204,11 +201,11 @@ void Forward_FFT_ToBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = root_of_unity_powers[m + i];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = root_of_unity_powers[m + i];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < gap; j += 8) {
             ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
@@ -228,9 +225,9 @@ void Forward_FFT_ToBitReverseRadix2(
 }
 
 void Inverse_FFT_FromBitReverseRadix2(
-    std::complex<double_t>* result, const std::complex<double_t>* operand,
-    const std::complex<double_t>* inv_root_of_unity_powers, const uint64_t n,
-    const double_t* scalar) {
+    std::complex<double>* result, const std::complex<double>* operand,
+    const std::complex<double>* inv_root_of_unity_powers, const uint64_t n,
+    const double* scalar) {
   HEXL_CHECK(inv_root_of_unity_powers != nullptr,
              "inv_root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
@@ -240,8 +237,7 @@ void Inverse_FFT_FromBitReverseRadix2(
   size_t gap = 1;
   size_t root_index = 1;
 
-  size_t stop_loop;
-  (scalar == nullptr) ? stop_loop = 0 : stop_loop = 1;
+  size_t stop_loop = (scalar == nullptr) ? 0 : 1;
   size_t m = n_div_2;
   for (; m > stop_loop; m >>= 1) {
     size_t j1 = 0;
@@ -252,12 +248,12 @@ void Inverse_FFT_FromBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = inv_root_of_unity_powers[root_index];
+          const std::complex<double> W = inv_root_of_unity_powers[root_index];
 
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = operand + j1;
-          const std::complex<double_t>* Y_op = X_op + gap;
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = operand + j1;
+          const std::complex<double>* Y_op = X_op + gap;
           ComplexInvButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
         }
         break;
@@ -267,11 +263,11 @@ void Inverse_FFT_FromBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = inv_root_of_unity_powers[root_index];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = inv_root_of_unity_powers[root_index];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexInvButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
         }
@@ -282,11 +278,11 @@ void Inverse_FFT_FromBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = inv_root_of_unity_powers[root_index];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = inv_root_of_unity_powers[root_index];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
@@ -299,11 +295,11 @@ void Inverse_FFT_FromBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = inv_root_of_unity_powers[root_index];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = inv_root_of_unity_powers[root_index];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
           ComplexInvButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W);
@@ -320,11 +316,11 @@ void Inverse_FFT_FromBitReverseRadix2(
           if (i != 0) {
             j1 += (gap << 1);
           }
-          const std::complex<double_t> W = inv_root_of_unity_powers[root_index];
-          std::complex<double_t>* X_r = result + j1;
-          std::complex<double_t>* Y_r = X_r + gap;
-          const std::complex<double_t>* X_op = X_r;
-          const std::complex<double_t>* Y_op = Y_r;
+          const std::complex<double> W = inv_root_of_unity_powers[root_index];
+          std::complex<double>* X_r = result + j1;
+          std::complex<double>* Y_r = X_r + gap;
+          const std::complex<double>* X_op = X_r;
+          const std::complex<double>* Y_op = Y_r;
 
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < gap; j += 8) {
@@ -344,12 +340,12 @@ void Inverse_FFT_FromBitReverseRadix2(
   }
 
   if (m > 0) {
-    const std::complex<double_t> W =
+    const std::complex<double> W =
         *scalar * inv_root_of_unity_powers[root_index];
-    std::complex<double_t>* X_r = result;
-    std::complex<double_t>* Y_r = X_r + gap;
-    const std::complex<double_t>* X_o = X_r;
-    const std::complex<double_t>* Y_o = Y_r;
+    std::complex<double>* X_r = result;
+    std::complex<double>* Y_r = X_r + gap;
+    const std::complex<double>* X_o = X_r;
+    const std::complex<double>* Y_o = Y_r;
 
     switch (gap) {
       case 1: {
@@ -406,7 +402,7 @@ void Inverse_FFT_FromBitReverseRadix2(
   // When M is too short it only needs the final stage butterfly. Copying here
   // in the case of out-of-place.
   if (result != operand && n == 2) {
-    std::memcpy(result, operand, n * sizeof(std::complex<double_t>));
+    std::memcpy(result, operand, n * sizeof(std::complex<double>));
   }
 }
 

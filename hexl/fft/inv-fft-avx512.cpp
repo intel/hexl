@@ -26,7 +26,7 @@ namespace hexl {
 /// the Inverse Complex Roots of unity.
 void ComplexInvButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
                          __m512d* Y_imag, __m512d W_real, __m512d W_imag,
-                         const double_t* scalar = nullptr) {
+                         const double* scalar = nullptr) {
   // U = X,
   __m512d U_real = *X_real;
   __m512d U_imag = *X_imag;
@@ -56,9 +56,8 @@ void ComplexInvButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
   *Y_imag = _mm512_add_pd(*Y_imag, tmp);
 }
 
-void ComplexInvT1(double_t* result_8C_intrlvd,
-                  const double_t* operand_1C_intrlvd,
-                  const double_t* W_1C_intrlvd, uint64_t m) {
+void ComplexInvT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
+                  const double* W_1C_intrlvd, uint64_t m) {
   size_t offset = 0;
 
   // 8 | m guaranteed by n >= 16
@@ -66,11 +65,11 @@ void ComplexInvT1(double_t* result_8C_intrlvd,
 
   for (size_t i = 0; i < (m >> 1); i += 8) {
     // Referencing operand
-    const double_t* X_op_real = operand_1C_intrlvd + offset;
+    const double* X_op_real = operand_1C_intrlvd + offset;
 
     // Referencing result
-    double_t* X_r_real = result_8C_intrlvd + offset;
-    double_t* X_r_imag = result_8C_intrlvd + 8 + offset;
+    double* X_r_real = result_8C_intrlvd + offset;
+    double* X_r_imag = X_r_real + 8;
     __m512d* v_X_r_pt_real = reinterpret_cast<__m512d*>(X_r_real);
     __m512d* v_X_r_pt_imag = reinterpret_cast<__m512d*>(X_r_imag);
 
@@ -107,15 +106,15 @@ void ComplexInvT1(double_t* result_8C_intrlvd,
   }
 }
 
-void ComplexInvT2(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+void ComplexInvT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
                   uint64_t m) {
   size_t offset = 0;
 
   // 4 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i += 4) {
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -154,15 +153,15 @@ void ComplexInvT2(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexInvT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+void ComplexInvT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
                   uint64_t m) {
   size_t offset = 0;
 
   // 2 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i += 2) {
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -197,18 +196,18 @@ void ComplexInvT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexInvT8(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+void ComplexInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
                   uint64_t gap, uint64_t m) {
   size_t offset = 0;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
     // Referencing operand
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
-    double_t* Y_real = X_real + gap;
-    double_t* Y_imag = X_imag + gap;
+    double* Y_real = X_real + gap;
+    double* Y_imag = X_imag + gap;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -251,9 +250,9 @@ void ComplexInvT8(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
 // its 8 imaginary parts.
 // Returns operand as 1 complex interleaved: One real part followed by its
 // imaginary part.
-void ComplexFinalInvT8(double_t* operand_8C_intrlvd,
-                       const double_t* W_1C_intrlvd, uint64_t gap, uint64_t m,
-                       const double_t* scalar = nullptr) {
+void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+                       uint64_t gap, uint64_t m,
+                       const double* scalar = nullptr) {
   size_t offset = 0;
 
   __m512d v_scalar;
@@ -264,11 +263,11 @@ void ComplexFinalInvT8(double_t* operand_8C_intrlvd,
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
     // Referencing operand
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
-    double_t* Y_real = X_real + gap;
-    double_t* Y_imag = X_imag + gap;
+    double* Y_real = X_real + gap;
+    double* Y_imag = X_imag + gap;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -309,9 +308,9 @@ void ComplexFinalInvT8(double_t* operand_8C_intrlvd,
 }
 
 void Inverse_FFT_FromBitReverseAVX512(
-    double_t* result_cmplx_intrlvd, const double_t* operand_cmplx_intrlvd,
-    const double_t* inv_root_of_unity_cmplx_intrlvd, const uint64_t n,
-    const double_t* scale) {
+    double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
+    const double* inv_root_of_unity_cmplx_intrlvd, const uint64_t n,
+    const double* scale) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
@@ -321,7 +320,7 @@ void Inverse_FFT_FromBitReverseAVX512(
 
   {
     // T1
-    const double_t* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     ComplexInvT1(result_cmplx_intrlvd, operand_cmplx_intrlvd, W_cmplx_intrlvd,
                  m);
     W_idx += m;
@@ -342,7 +341,7 @@ void Inverse_FFT_FromBitReverseAVX512(
     gap <<= 1;
     m >>= 1;
 
-    for (; m > 2;) {
+    while (m > 2) {
       W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
       ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
       W_idx += m;
@@ -357,7 +356,7 @@ void Inverse_FFT_FromBitReverseAVX512(
     m >>= 1;
   }
 
-  HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double_t>(
+  HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double>(
                    result_cmplx_intrlvd, result_cmplx_intrlvd + n));
 }
 

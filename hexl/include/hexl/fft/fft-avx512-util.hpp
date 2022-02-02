@@ -20,7 +20,7 @@ namespace hexl {
 // *out2 =  (15, 13, 11, 9, 7, 5, 3, 1);
 //
 // Given output: 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0
-inline void ComplexLoadFwdInterleavedT1(const double_t* arg, __m512d* out1,
+inline void ComplexLoadFwdInterleavedT1(const double* arg, __m512d* out1,
                                         __m512d* out2) {
   const __m512i vperm_idx = _mm512_set_epi64(6, 7, 4, 5, 2, 3, 0, 1);
 
@@ -128,7 +128,7 @@ inline void ComplexWriteFwdInterleavedT1(__m512d arg_xr, __m512d arg_yr,
 // Given output:
 // 15i, 11i, 7i, 3i, 13i, 9i, 5i, 1i, 15r, 11r, 7r, 3r, 13r, 9r, 5r, 1r,
 // 14i, 10i, 6i, 2i, 12i, 8i, 4i, 0i, 14r, 10r, 6r, 2r, 12r, 8r, 4r, 0r
-inline void ComplexLoadInvInterleavedT1(const double_t* arg, __m512d* out1_r,
+inline void ComplexLoadInvInterleavedT1(const double* arg, __m512d* out1_r,
                                         __m512d* out1_i, __m512d* out2_r,
                                         __m512d* out2_i) {
   const __m512d* arg_512 = reinterpret_cast<const __m512d*>(arg);
@@ -183,7 +183,7 @@ inline void ComplexLoadInvInterleavedT1(const double_t* arg, __m512d* out1_r,
 // *out2 =  (15, 14, 11, 10, 7, 6, 3, 2)
 //
 // Given output: 15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0
-inline void ComplexLoadFwdInterleavedT2(const double_t* arg, __m512d* out1,
+inline void ComplexLoadFwdInterleavedT2(const double* arg, __m512d* out1,
                                         __m512d* out2) {
   const __m512d* arg_512 = reinterpret_cast<const __m512d*>(arg);
 
@@ -211,7 +211,7 @@ inline void ComplexLoadFwdInterleavedT2(const double_t* arg, __m512d* out1,
 // *out2 =  (15, 11, 7, 3, 14, 10, 6, 2)
 //
 // Given output: 15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0
-inline void ComplexLoadInvInterleavedT2(const double_t* arg, __m512d* out1,
+inline void ComplexLoadInvInterleavedT2(const double* arg, __m512d* out1,
                                         __m512d* out2) {
   const __m512d* arg_512 = reinterpret_cast<const __m512d*>(arg);
 
@@ -243,7 +243,7 @@ inline void ComplexLoadInvInterleavedT2(const double_t* arg, __m512d* out1,
 // *out2 =  (15, 14, 13, 12, 7, 6, 5, 4)
 //
 // Given output: 15, 14, 13, 12, 7, 6, 5, 4, 11, 10, 9, 8, 3, 2, 1, 0
-inline void ComplexLoadFwdInterleavedT4(const double_t* arg, __m512d* out1,
+inline void ComplexLoadFwdInterleavedT4(const double* arg, __m512d* out1,
                                         __m512d* out2) {
   const __m512d* arg_512 = reinterpret_cast<const __m512d*>(arg);
 
@@ -266,7 +266,7 @@ inline void ComplexLoadFwdInterleavedT4(const double_t* arg, __m512d* out1,
 //
 // Given output: 15, 13, 7, 5, 14, 12, 6, 4, 11, 9, 3, 1, 10, 8, 2, 0
 
-inline void ComplexLoadInvInterleavedT4(const double_t* arg, __m512d* out1,
+inline void ComplexLoadInvInterleavedT4(const double* arg, __m512d* out1,
                                         __m512d* out2) {
   const __m512d* arg_512 = reinterpret_cast<const __m512d*>(arg);
 

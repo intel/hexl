@@ -45,14 +45,14 @@ inline bool Compare(CMPINT cmp, uint64_t lhs, uint64_t rhs) {
 /// max_value)
 /// NOTE: this function is not a cryptographically secure random number
 /// generator and should be used for testing/benchmarking only
-inline double_t GenerateInsecureUniformRealRandomValue(double_t min_value,
-                                                       double_t max_value) {
+inline double GenerateInsecureUniformRealRandomValue(double min_value,
+                                                     double max_value) {
   HEXL_CHECK(min_value < max_value, "min_value must be > max_value");
 
   static std::random_device rd;
   static std::mt19937 mersenne_engine(rd());
-  std::uniform_real_distribution<double_t> distrib(min_value, max_value);
-  double_t res = distrib(mersenne_engine);
+  std::uniform_real_distribution<double> distrib(min_value, max_value);
+  double res = distrib(mersenne_engine);
   return (res == max_value) ? min_value : res;
 }
 
@@ -74,9 +74,9 @@ inline uint64_t GenerateInsecureUniformIntRandomValue(uint64_t min_value,
 /// max_value)
 /// NOTE: this function is not a cryptographically secure random
 /// number generator and should be used for testing/benchmarking only
-inline AlignedVector64<double_t> GenerateInsecureUniformRealRandomValues(
-    uint64_t size, double_t min_value, double_t max_value) {
-  AlignedVector64<double_t> values(size);
+inline AlignedVector64<double> GenerateInsecureUniformRealRandomValues(
+    uint64_t size, double min_value, double max_value) {
+  AlignedVector64<double> values(size);
   auto generator = [&]() {
     return GenerateInsecureUniformRealRandomValue(min_value, max_value);
   };

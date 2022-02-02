@@ -52,8 +52,8 @@ void ComplexFwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
 // its 8 imaginary parts.
 // Returns operand as 1 complex interleaved: One real part followed by its
 // imaginary part.
-void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
-                  uint64_t m, const double_t* scalar = nullptr) {
+void ComplexFwdT1(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+                  uint64_t m, const double* scalar = nullptr) {
   size_t offset = 0;
 
   __m512d v_scalar;
@@ -65,8 +65,8 @@ void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   HEXL_LOOP_UNROLL_4
 
   for (size_t i = 0; i < (m >> 1); i += 8) {
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
     __m512d* v_out_pt = reinterpret_cast<__m512d*>(X_real);
 
     __m512d v_X_real;
@@ -103,15 +103,15 @@ void ComplexFwdT1(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexFwdT2(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+void ComplexFwdT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
                   uint64_t m) {
   size_t offset = 0;
 
   // 4 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i += 4) {
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -147,15 +147,15 @@ void ComplexFwdT2(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexFwdT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+void ComplexFwdT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
                   uint64_t m) {
   size_t offset = 0;
 
   // 2 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i += 2) {
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -194,18 +194,18 @@ void ComplexFwdT4(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexFwdT8(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
+void ComplexFwdT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
                   uint64_t gap, uint64_t m) {
   size_t offset = 0;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
     // Referencing operand
-    double_t* X_real = operand_8C_intrlvd + offset;
-    double_t* X_imag = operand_8C_intrlvd + 8 + offset;
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
-    double_t* Y_real = X_real + gap;
-    double_t* Y_imag = X_imag + gap;
+    double* Y_real = X_real + gap;
+    double* Y_imag = X_imag + gap;
 
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
@@ -244,24 +244,24 @@ void ComplexFwdT8(double_t* operand_8C_intrlvd, const double_t* W_1C_intrlvd,
   }
 }
 
-void ComplexStartFwdT8(double_t* result_8C_intrlvd,
-                       const double_t* operand_1C_intrlvd,
-                       const double_t* W_1C_intrlvd, uint64_t gap, uint64_t m) {
+void ComplexStartFwdT8(double* result_8C_intrlvd,
+                       const double* operand_1C_intrlvd,
+                       const double* W_1C_intrlvd, uint64_t gap, uint64_t m) {
   size_t offset = 0;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
     // Referencing operand
-    const double_t* X_op = operand_1C_intrlvd + offset;
-    const double_t* Y_op = X_op + gap;
+    const double* X_op = operand_1C_intrlvd + offset;
+    const double* Y_op = X_op + gap;
     const __m512d* v_X_op_pt = reinterpret_cast<const __m512d*>(X_op);
     const __m512d* v_Y_op_pt = reinterpret_cast<const __m512d*>(Y_op);
 
     // Referencing result
-    double_t* X_r_real = result_8C_intrlvd + offset;
-    double_t* X_r_imag = result_8C_intrlvd + 8 + offset;
-    double_t* Y_r_real = X_r_real + gap;
-    double_t* Y_r_imag = X_r_imag + gap;
+    double* X_r_real = result_8C_intrlvd + offset;
+    double* X_r_imag = X_r_real + 8;
+    double* Y_r_real = X_r_real + gap;
+    double* Y_r_imag = X_r_imag + gap;
     __m512d* v_X_r_pt_real = reinterpret_cast<__m512d*>(X_r_real);
     __m512d* v_X_r_pt_imag = reinterpret_cast<__m512d*>(X_r_imag);
     __m512d* v_Y_r_pt_real = reinterpret_cast<__m512d*>(Y_r_real);
@@ -303,9 +303,9 @@ void ComplexStartFwdT8(double_t* result_8C_intrlvd,
 }
 
 void Forward_FFT_ToBitReverseAVX512(
-    double_t* result_cmplx_intrlvd, const double_t* operand_cmplx_intrlvd,
-    const double_t* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
-    const double_t* scale) {
+    double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
+    const double* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
+    const double* scale) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
@@ -313,10 +313,9 @@ void Forward_FFT_ToBitReverseAVX512(
   size_t m = 2;    // require twice the size
   size_t W_idx = m;
 
-  // T8. First pass in case of out of place
+  // First pass in case of out of place
   if (gap >= 16) {
-    const double_t* W_cmplx_intrlvd =
-        &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
     ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
                       W_cmplx_intrlvd, gap, m);
     m <<= 1;
@@ -325,8 +324,7 @@ void Forward_FFT_ToBitReverseAVX512(
   }
 
   for (; gap >= 16; gap >>= 1) {
-    const double_t* W_cmplx_intrlvd =
-        &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
     ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
     m <<= 1;
     W_idx = m;
@@ -334,8 +332,7 @@ void Forward_FFT_ToBitReverseAVX512(
 
   {
     // T4
-    const double_t* W_cmplx_intrlvd =
-        &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
     ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
     m <<= 1;
     W_idx = m;
@@ -353,19 +350,19 @@ void Forward_FFT_ToBitReverseAVX512(
     W_idx = m;
   }
 
-  HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double_t>(
+  HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double>(
                    result_cmplx_intrlvd, result_cmplx_intrlvd + n));
 }
 
-void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
-                               const uint64_t* plain, const uint64_t* threshold,
+void BuildFloatingPointsAVX512(double* res_cmplx_intrlvd, const uint64_t* plain,
+                               const uint64_t* threshold,
                                const uint64_t* decryption_modulus,
-                               const double_t inv_scale, const size_t mod_size,
+                               const double inv_scale, const size_t mod_size,
                                const size_t coeff_count) {
   const __m512i v_perm = _mm512_set_epi64(7, 3, 6, 2, 5, 1, 4, 0);
   __m512d v_res_imag = _mm512_setzero_pd();
   __m512d* v_res_pt = reinterpret_cast<__m512d*>(res_cmplx_intrlvd);
-  double_t two_pow_64 = std::pow(2.0, 64);
+  double two_pow_64 = std::pow(2.0, 64);
 
   for (size_t i = 0; i < coeff_count; i += 8) {
     __mmask8 zeros = 0xff;
@@ -413,11 +410,11 @@ void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
       // __m512d v_scaled_diff = _mm512_castsi512_pd(v_diff); does not work
       uint64_t tmp_v_ui[8];
       __m512i* tmp_v_ui_pt = reinterpret_cast<__m512i*>(tmp_v_ui);
-      double_t tmp_v_pd[8];
+      double tmp_v_pd[8];
       _mm512_storeu_si512(tmp_v_ui_pt, v_diff);
       HEXL_LOOP_UNROLL_8
       for (size_t t = 0; t < 8; t++) {
-        tmp_v_pd[t] = static_cast<double_t>(tmp_v_ui[t]);
+        tmp_v_pd[t] = static_cast<double>(tmp_v_ui[t]);
       }
 
       __m512d v_casted_diff = _mm512_loadu_pd(tmp_v_pd);

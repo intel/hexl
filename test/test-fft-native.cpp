@@ -18,16 +18,16 @@ namespace hexl {
 
 TEST(FFT, ForwardInverseFFTNative) {
   FFT fft(64, nullptr);
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   {  // Single Unscaled
     const uint64_t n = 64;
-    const double_t data_bound = (1 << 30);
-    AlignedVector64<std::complex<double_t>> operand(n);
-    AlignedVector64<std::complex<double_t>> result(n);
+    const double data_bound = (1 << 30);
+    AlignedVector64<std::complex<double>> operand(n);
+    AlignedVector64<std::complex<double>> result(n);
 
     operand[0] = std::complex<double>(
         GenerateInsecureUniformRealRandomValue(0, data_bound),
@@ -46,11 +46,11 @@ TEST(FFT, ForwardInverseFFTNative) {
 
   {  // Single Scaled
     const uint64_t n = 64;
-    const double_t scale = 1 << 16;
-    const double_t inv_scale = static_cast<double_t>(1.0) / scale;
-    const double_t data_bound = (1 << 30);
-    AlignedVector64<std::complex<double_t>> operand(n);
-    AlignedVector64<std::complex<double_t>> result(n);
+    const double scale = 1 << 16;
+    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double data_bound = (1 << 30);
+    AlignedVector64<std::complex<double>> operand(n);
+    AlignedVector64<std::complex<double>> result(n);
 
     std::complex<double> value(
         GenerateInsecureUniformRealRandomValue(0, data_bound),
@@ -71,13 +71,13 @@ TEST(FFT, ForwardInverseFFTNative) {
 
   {  // Zeros test
     const uint64_t n = 64;
-    const double_t scale = 1 << 16;
-    const double_t scalar = scale / static_cast<double_t>(n);
-    const double_t inv_scale = static_cast<double_t>(1.0) / scale;
+    const double scale = 1 << 16;
+    const double scalar = scale / static_cast<double>(n);
+    const double inv_scale = static_cast<double>(1.0) / scale;
 
-    AlignedVector64<std::complex<double_t>> operand(n, {0, 0});
-    AlignedVector64<std::complex<double_t>> transformed(n);
-    AlignedVector64<std::complex<double_t>> result(n);
+    AlignedVector64<std::complex<double>> operand(n, {0, 0});
+    AlignedVector64<std::complex<double>> transformed(n);
+    AlignedVector64<std::complex<double>> result(n);
 
     Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
                                      inv_root_powers.data(), n, &scalar);
@@ -95,14 +95,14 @@ TEST(FFT, ForwardInverseFFTNative) {
 
   {  // Large Scaled
     const uint64_t n = 64;
-    const double_t scale = 1099511627776;  // (1 << 40)
-    const double_t scalar = scale / static_cast<double_t>(n);
-    const double_t inv_scale = static_cast<double_t>(1.0) / scale;
-    const double_t data_bound = (1 << 30);
+    const double scale = 1099511627776;  // (1 << 40)
+    const double scalar = scale / static_cast<double>(n);
+    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double data_bound = (1 << 30);
 
-    AlignedVector64<std::complex<double_t>> operand(n);
-    AlignedVector64<std::complex<double_t>> transformed(n);
-    AlignedVector64<std::complex<double_t>> result(n);
+    AlignedVector64<std::complex<double>> operand(n);
+    AlignedVector64<std::complex<double>> transformed(n);
+    AlignedVector64<std::complex<double>> result(n);
 
     for (size_t i = 0; i < n; i++) {
       operand[i] = std::complex<double>(
@@ -126,14 +126,14 @@ TEST(FFT, ForwardInverseFFTNative) {
 
   {  // Very Large Scale
     const uint64_t n = 64;
-    const double_t scale = 1.2980742146337069e+33;  // (1 << 110)
-    const double_t scalar = scale / static_cast<double_t>(n);
-    const double_t inv_scale = static_cast<double_t>(1.0) / scale;
-    const double_t data_bound = (1 << 20);
+    const double scale = 1.2980742146337069e+33;  // (1 << 110)
+    const double scalar = scale / static_cast<double>(n);
+    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double data_bound = (1 << 20);
 
-    AlignedVector64<std::complex<double_t>> operand(n);
-    AlignedVector64<std::complex<double_t>> transformed(n);
-    AlignedVector64<std::complex<double_t>> result(n);
+    AlignedVector64<std::complex<double>> operand(n);
+    AlignedVector64<std::complex<double>> transformed(n);
+    AlignedVector64<std::complex<double>> result(n);
 
     for (size_t i = 0; i < n; i++) {
       operand[i] = std::complex<double>(
@@ -141,7 +141,7 @@ TEST(FFT, ForwardInverseFFTNative) {
           GenerateInsecureUniformRealRandomValue(0, data_bound));
     }
 
-    AlignedVector64<std::complex<double_t>> expected = operand;
+    AlignedVector64<std::complex<double>> expected = operand;
 
     Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
                                      inv_root_powers.data(), n, &scalar);
@@ -159,14 +159,14 @@ TEST(FFT, ForwardInverseFFTNative) {
 
   {  // Over 128 bits Scale
     const uint64_t n = 64;
-    const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-    const double_t scalar = scale / static_cast<double_t>(n);
-    const double_t inv_scale = static_cast<double_t>(1.0) / scale;
-    const double_t data_bound = (1 << 20);
+    const double scale = 1.3611294676837539e+39;  // (1 << 130)
+    const double scalar = scale / static_cast<double>(n);
+    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double data_bound = (1 << 20);
 
-    AlignedVector64<std::complex<double_t>> operand(n);
-    AlignedVector64<std::complex<double_t>> transformed(n);
-    AlignedVector64<std::complex<double_t>> result(n);
+    AlignedVector64<std::complex<double>> operand(n);
+    AlignedVector64<std::complex<double>> transformed(n);
+    AlignedVector64<std::complex<double>> result(n);
 
     for (size_t i = 0; i < n; i++) {
       operand[i] = std::complex<double>(
@@ -174,7 +174,7 @@ TEST(FFT, ForwardInverseFFTNative) {
           GenerateInsecureUniformRealRandomValue(0, data_bound));
     }
 
-    AlignedVector64<std::complex<double_t>> expected = operand;
+    AlignedVector64<std::complex<double>> expected = operand;
 
     Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
                                      inv_root_powers.data(), n, &scalar);
@@ -192,20 +192,20 @@ TEST(FFT, ForwardInverseFFTNative) {
 
   {  // Inplace
     const uint64_t n = 64;
-    const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-    const double_t scalar = scale / static_cast<double_t>(n);
-    const double_t inv_scale = static_cast<double_t>(1.0) / scale;
-    const double_t data_bound = (1 << 20);
+    const double scale = 1.3611294676837539e+39;  // (1 << 130)
+    const double scalar = scale / static_cast<double>(n);
+    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double data_bound = (1 << 20);
 
-    AlignedVector64<std::complex<double_t>> operand(n);
+    AlignedVector64<std::complex<double>> operand(n);
 
     for (size_t i = 0; i < n; i++) {
-      operand[i] = std::complex<double_t>(
+      operand[i] = std::complex<double>(
           GenerateInsecureUniformRealRandomValue(0, data_bound),
           GenerateInsecureUniformRealRandomValue(0, data_bound));
     }
 
-    AlignedVector64<std::complex<double_t>> expected = operand;
+    AlignedVector64<std::complex<double>> expected = operand;
 
     Inverse_FFT_FromBitReverseRadix2(operand.data(), operand.data(),
                                      inv_root_powers.data(), n, &scalar);

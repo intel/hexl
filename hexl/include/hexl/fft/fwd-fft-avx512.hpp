@@ -20,10 +20,11 @@ namespace hexl {
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] scale Scale applied to output values
-void Forward_FFT_ToBitReverseAVX512(
-    double_t* result_cmplx_intrlvd, const double_t* operand_cmplx_intrlvd,
-    const double_t* roots_of_unity_cmplx_intrlvd, const uint64_t n,
-    const double_t* scale = nullptr);
+void Forward_FFT_ToBitReverseAVX512(double* result_cmplx_intrlvd,
+                                    const double* operand_cmplx_intrlvd,
+                                    const double* roots_of_unity_cmplx_intrlvd,
+                                    const uint64_t n,
+                                    const double* scale = nullptr);
 
 /// @brief Construct floating-point values from CRT-composed polynomial with
 /// integer coefficients in AVX512.
@@ -36,10 +37,10 @@ void Forward_FFT_ToBitReverseAVX512(
 /// @param[in] inv_scale Scale applied to output values
 /// @param[in] mod_size Size of coefficient modulus parameter
 /// @param[in] coeff_count Degree of the polynomial modulus parameter
-void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,
-                               const uint64_t* plain, const uint64_t* threshold,
+void BuildFloatingPointsAVX512(double* res_cmplx_intrlvd, const uint64_t* plain,
+                               const uint64_t* threshold,
                                const uint64_t* decryption_modulus,
-                               const double_t inv_scale, const size_t mod_size,
+                               const double inv_scale, const size_t mod_size,
                                const size_t coeff_count);
 
 #endif  // HEXL_HAS_AVX512DQ
