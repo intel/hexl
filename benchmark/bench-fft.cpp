@@ -42,14 +42,14 @@ static void BM_FwdFFTNativeRadix2InPlaceUnscaled(
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -70,18 +70,18 @@ static void BM_FwdFFTNativeRadix2InPlaceSmallScaled(
     benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 10;
-  const double_t scalar = scale / static_cast<double_t>(fft_size);
+  const double scale = 10;
+  const double scalar = scale / static_cast<double>(fft_size);
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -102,18 +102,18 @@ static void BM_FwdFFTNativeRadix2InPlaceLargeScaled(
     benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t scalar = scale / static_cast<double_t>(fft_size);
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double scalar = scale / static_cast<double>(fft_size);
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -136,15 +136,15 @@ static void BM_FwdFFTNativeRadix2CopyUnscaled(
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> output(fft_size);
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> output(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -165,19 +165,19 @@ static void BM_FwdFFTNativeRadix2CopyLargeScaled(
     benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t scalar = scale / static_cast<double_t>(fft_size);
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double scalar = scale / static_cast<double>(fft_size);
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> output(fft_size);
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> output(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -201,14 +201,14 @@ static void BM_InvFFTNativeRadix2InPlaceUnscaled(
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -229,18 +229,18 @@ static void BM_InvFFTNativeRadix2InPlaceSmallScaled(
     benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 10;
-  const double_t inv_scale = static_cast<double_t>(1.0) / scale;
+  const double scale = 10;
+  const double inv_scale = static_cast<double>(1.0) / scale;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -262,18 +262,18 @@ static void BM_InvFFTNativeRadix2InPlaceLargeScaled(
     benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t inv_scale = static_cast<double_t>(1.0) / scale;
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double inv_scale = static_cast<double>(1.0) / scale;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -297,15 +297,15 @@ static void BM_InvFFTNativeRadix2CopyUnscaled(
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> output(fft_size);
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> output(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -326,19 +326,19 @@ static void BM_InvFFTNativeRadix2CopyScaled(
     benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t inv_scale = static_cast<double_t>(1.0) / scale;
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double inv_scale = static_cast<double>(1.0) / scale;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<std::complex<double_t>> output(fft_size);
-  AlignedVector64<std::complex<double_t>> input(fft_size);
+  AlignedVector64<std::complex<double>> output(fft_size);
+  AlignedVector64<std::complex<double>> input(fft_size);
   for (size_t i = 0; i < fft_size; i++) {
-    input[i] = std::complex<double_t>(
-        GenerateInsecureUniformRealRandomValue(0, bound),
-        GenerateInsecureUniformRealRandomValue(0, bound));
+    input[i] =
+        std::complex<double>(GenerateInsecureUniformRealRandomValue(0, bound),
+                             GenerateInsecureUniformRealRandomValue(0, bound));
   }
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -364,10 +364,10 @@ static void BM_FwdFFTAVX512InPlaceUnscaled(
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -388,14 +388,14 @@ BENCHMARK(BM_FwdFFTAVX512InPlaceUnscaled)
 static void BM_FwdFFTAVX512InPlaceScaled(benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t scalar = scale / static_cast<double_t>(fft_size);
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double scalar = scale / static_cast<double>(fft_size);
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -418,11 +418,11 @@ static void BM_FwdFFTAVX512CopyUnscaled(benchmark::State& state) {  //  NOLINT
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> output(2 * fft_size);
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> output(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -443,15 +443,15 @@ BENCHMARK(BM_FwdFFTAVX512CopyUnscaled)
 static void BM_FwdFFTAVX512CopyScaled(benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t scalar = scale / static_cast<double_t>(fft_size);
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double scalar = scale / static_cast<double>(fft_size);
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> output(2 * fft_size);
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> output(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> root_powers =
+  AlignedVector64<std::complex<double>> root_powers =
       fft.GetComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -475,10 +475,10 @@ static void BM_InvFFTAVX512InPlaceUnscaled(
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -499,14 +499,14 @@ BENCHMARK(BM_InvFFTAVX512InPlaceUnscaled)
 static void BM_InvFFTAVX512InPlaceScaled(benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t inv_scale = static_cast<double_t>(1.0) / scale;
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double inv_scale = static_cast<double>(1.0) / scale;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -530,11 +530,11 @@ static void BM_InvFFTAVX512CopyUnscaled(benchmark::State& state) {  //  NOLINT
   const size_t bound = 1 << 30;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> output(2 * fft_size);
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> output(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {
@@ -555,15 +555,15 @@ BENCHMARK(BM_InvFFTAVX512CopyUnscaled)
 static void BM_InvFFTAVX512CopyScaled(benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
-  const double_t scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double_t inv_scale = static_cast<double_t>(1.0) / scale;
+  const double scale = 1.3611294676837539e+39;  // (1 << 130)
+  const double inv_scale = static_cast<double>(1.0) / scale;
   FFT fft(fft_size, nullptr);
 
-  AlignedVector64<double_t> output(2 * fft_size);
-  AlignedVector64<double_t> input(2 * fft_size);
+  AlignedVector64<double> output(2 * fft_size);
+  AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double_t>> inv_root_powers =
+  AlignedVector64<std::complex<double>> inv_root_powers =
       fft.GetInvComplexRootsOfUnity();
 
   for (auto _ : state) {

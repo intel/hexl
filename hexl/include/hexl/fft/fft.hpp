@@ -13,7 +13,7 @@
 namespace intel {
 namespace hexl {
 
-/// @brief Performs linear forward and inverse FTT-like transform
+/// @brief Performs linear forward and inverse FFT-like transform
 /// for CKKS encoding and decoding.
 class FFT {
  public:
@@ -47,11 +47,11 @@ class FFT {
   /// calculations
   /// @details  Performs pre-computation necessary for forward and inverse
   /// transforms
-  FFT(uint64_t degree, double_t* in_scalar,
+  FFT(uint64_t degree, double* in_scalar,
       std::shared_ptr<AllocatorBase> alloc_ptr = {});
 
   template <class Allocator, class... AllocatorArgs>
-  FFT(uint64_t degree, double_t* in_scalar, Allocator&& a,
+  FFT(uint64_t degree, double* in_scalar, Allocator&& a,
       AllocatorArgs&&... args)
       : FFT(degree, in_scalar,
             std::static_pointer_cast<AllocatorBase>(
@@ -62,17 +62,17 @@ class FFT {
   /// @param[out] result Stores the result
   /// @param[in] operand Data on which to compute the FFT
   /// @param[in] in_scale Scale applied to output values
-  void ComputeForwardFFT(std::complex<double_t>* result,
-                         const std::complex<double_t>* operand,
-                         const double_t* in_scale = nullptr);
+  void ComputeForwardFFT(std::complex<double>* result,
+                         const std::complex<double>* operand,
+                         const double* in_scale = nullptr);
 
   /// @brief Compute inverse FFT. Results are bit-reversed.
   /// @param[out] result Stores the result
   /// @param[in] operand Data on which to compute the FFT
   /// @param[in] in_scale Scale applied to output values
-  void ComputeInverseFFT(std::complex<double_t>* result,
-                         const std::complex<double_t>* operand,
-                         const double_t* in_scale = nullptr);
+  void ComputeInverseFFT(std::complex<double>* result,
+                         const std::complex<double>* operand,
+                         const double* in_scale = nullptr);
 
   /// @brief Construct floating-point values from CRT-composed polynomial with
   /// integer coefficients.
@@ -85,32 +85,31 @@ class FFT {
   /// @param[in] inv_scale Scale applied to output values
   /// @param[in] mod_size Size of coefficient modulus parameter
   /// @param[in] coeff_count Degree of the polynomial modulus parameter
-  void BuildFloatingPoints(std::complex<double_t>* res, const uint64_t* plain,
+  void BuildFloatingPoints(std::complex<double>* res, const uint64_t* plain,
                            const uint64_t* threshold,
                            const uint64_t* decryption_modulus,
-                           const double_t inv_scale, size_t mod_size,
+                           const double inv_scale, size_t mod_size,
                            size_t coeff_count);
 
   /// @brief Returns the root of unity power at bit-reversed index i.
   /// @param[in] i Index
-  std::complex<double_t> GetComplexRootOfUnity(size_t i) {
+  std::complex<double> GetComplexRootOfUnity(size_t i) {
     return GetComplexRootsOfUnity()[i];
   }
 
   /// @brief Returns the root of unity in bit-reversed order
-  const AlignedVector64<std::complex<double_t>>& GetComplexRootsOfUnity()
-      const {
+  const AlignedVector64<std::complex<double>>& GetComplexRootsOfUnity() const {
     return m_complex_roots_of_unity;
   }
 
   /// @brief Returns the root of unity power at bit-reversed index i.
   /// @param[in] i Index
-  std::complex<double_t> GetInvComplexRootOfUnity(size_t i) {
+  std::complex<double> GetInvComplexRootOfUnity(size_t i) {
     return GetInvComplexRootsOfUnity()[i];
   }
 
   /// @brief Returns the inverse root of unity in bit-reversed order
-  const AlignedVector64<std::complex<double_t>>& GetInvComplexRootsOfUnity()
+  const AlignedVector64<std::complex<double>>& GetInvComplexRootsOfUnity()
       const {
     return m_inv_complex_roots_of_unity;
   }
@@ -122,28 +121,25 @@ class FFT {
   // Computes 1~(n-1)-th powers and inv powers of the primitive 2n-th root
   void ComputeComplexRootsOfUnity();
 
-  // PI value used to calculate the roots of unity
-  static constexpr double PI_ = 3.1415926535897932384626433832795028842;
-
   uint64_t m_degree;  // N: size of FFT transform, should be power of 2
 
-  double_t* scalar;  // Pointer to scalar used for scale/inv_scale calculation
+  double* scalar;  // Pointer to scalar used for scale/inv_scale calculation
 
-  double_t scale;  // Scale value use for encoding (inv fft)
+  double scale;  // Scale value use for encoding (inv fft)
 
-  double_t inv_scale;  // Scale value use in decoding (fwd fft)
+  double inv_scale;  // Scale value use in decoding (fwd fft)
 
   std::shared_ptr<AllocatorBase> m_alloc;
 
-  AlignedAllocator<double_t, 64> m_aligned_alloc;
+  AlignedAllocator<double, 64> m_aligned_alloc;
 
   uint64_t m_degree_bits;  // log_2(m_degree)
 
   // Contains 0~(n-1)-th powers of the 2n-th primitive root.
-  AlignedVector64<std::complex<double_t>> m_complex_roots_of_unity;
+  AlignedVector64<std::complex<double>> m_complex_roots_of_unity;
 
   // Contains 0~(n-1)-th inv powers of the 2n-th primitive inv root.
-  AlignedVector64<std::complex<double_t>> m_inv_complex_roots_of_unity;
+  AlignedVector64<std::complex<double>> m_inv_complex_roots_of_unity;
 };
 
 }  // namespace hexl

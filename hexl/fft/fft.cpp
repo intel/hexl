@@ -12,12 +12,12 @@ namespace hexl {
 // AllocatorStrategyPtr mallocStrategy = AllocatorStrategyPtr(new
 // MallocStrategy);
 
-FFT::FFT(uint64_t degree, double_t* in_scalar,
+FFT::FFT(uint64_t degree, double* in_scalar,
          std::shared_ptr<AllocatorBase> alloc_ptr)
     : m_degree(degree),
       scalar(in_scalar),
       m_alloc(alloc_ptr),
-      m_aligned_alloc(AlignedAllocator<double_t, 64>(m_alloc)),
+      m_aligned_alloc(AlignedAllocator<double, 64>(m_alloc)),
       m_complex_roots_of_unity(m_aligned_alloc) {
   HEXL_CHECK(IsPowerOfTwo(degree),
              "degree " << degree << " is not a power of 2");
@@ -27,23 +27,26 @@ FFT::FFT(uint64_t degree, double_t* in_scalar,
   ComputeComplexRootsOfUnity();
 
   if (scalar != nullptr) {
-    scale = *scalar / static_cast<double_t>(degree);
-    inv_scale = static_cast<double_t>(1.0) / *scalar;
+    scale = *scalar / static_cast<double>(degree);
+    inv_scale = static_cast<double>(1.0) / *scalar;
   }
 }
 
-inline std::complex<double_t> swap_real_imag(std::complex<double_t> c) {
-  return std::complex<double_t>(c.imag(), c.real());
+inline std::complex<double> swap_real_imag(std::complex<double> c) {
+  return std::complex<double>(c.imag(), c.real());
 }
 
 void FFT::ComputeComplexRootsOfUnity() {
-  AlignedVector64<std::complex<double_t>> roots_of_unity(m_degree, 0,
-                                                         m_aligned_alloc);
-  AlignedVector64<std::complex<double_t>> roots_in_bit_reverse(m_degree, 0,
-                                                               m_aligned_alloc);
-  AlignedVector64<std::complex<double_t>> inv_roots_in_bit_reverse(
+  AlignedVector64<std::complex<double>> roots_of_unity(m_degree, 0,
+                                                       m_aligned_alloc);
+  AlignedVector64<std::complex<double>> roots_in_bit_reverse(m_degree, 0,
+                                                             m_aligned_alloc);
+  AlignedVector64<std::complex<double>> inv_roots_in_bit_reverse(
       m_degree, 0, m_aligned_alloc);
   uint64_t roots_degree = static_cast<uint64_t>(m_degree) << 1;  // degree > 2
+
+  // PI value used to calculate the roots of unity
+  static constexpr double PI_ = 3.1415926535897932384626433832795028842;
 
   // Generate 1/8 of all roots first.
   size_t i = 0;
@@ -70,13 +73,13 @@ void FFT::ComputeComplexRootsOfUnity() {
   m_inv_complex_roots_of_unity = inv_roots_in_bit_reverse;
 }
 
-void FFT::ComputeForwardFFT(std::complex<double_t>* result,
-                            const std::complex<double_t>* operand,
-                            const double_t* in_scale) {
+void FFT::ComputeForwardFFT(std::complex<double>* result,
+                            const std::complex<double>* operand,
+                            const double* in_scale) {
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
 
-  const double_t* out_scale = nullptr;
+  const double* out_scale = nullptr;
   if (scalar != nullptr) {
     out_scale = &inv_scale;
   } else if (in_scale != nullptr) {
@@ -87,9 +90,9 @@ void FFT::ComputeForwardFFT(std::complex<double_t>* result,
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
 
   Forward_FFT_ToBitReverseAVX512(
-      &(reinterpret_cast<double_t(&)[2]>(result[0]))[0],
-      &(reinterpret_cast<const double_t(&)[2]>(operand[0]))[0],
-      &(reinterpret_cast<const double_t(&)[2]>(m_complex_roots_of_unity[0]))[0],
+      &(reinterpret_cast<double(&)[2]>(result[0]))[0],
+      &(reinterpret_cast<const double(&)[2]>(operand[0]))[0],
+      &(reinterpret_cast<const double(&)[2]>(m_complex_roots_of_unity[0]))[0],
       m_degree, out_scale);
   return;
 #else
@@ -100,13 +103,13 @@ void FFT::ComputeForwardFFT(std::complex<double_t>* result,
 #endif
 }
 
-void FFT::ComputeInverseFFT(std::complex<double_t>* result,
-                            const std::complex<double_t>* operand,
-                            const double_t* in_scale) {
+void FFT::ComputeInverseFFT(std::complex<double>* result,
+                            const std::complex<double>* operand,
+                            const double* in_scale) {
   HEXL_CHECK(result != nullptr, "result==nullptr");
   HEXL_CHECK(operand != nullptr, "operand==nullptr");
 
-  const double_t* out_scale = nullptr;
+  const double* out_scale = nullptr;
   if (scalar != nullptr) {
     out_scale = &scale;
   } else if (in_scale != nullptr) {
@@ -117,9 +120,9 @@ void FFT::ComputeInverseFFT(std::complex<double_t>* result,
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ InvFFT");
 
   Inverse_FFT_FromBitReverseAVX512(
-      &(reinterpret_cast<double_t(&)[2]>(result[0]))[0],
-      &(reinterpret_cast<const double_t(&)[2]>(operand[0]))[0],
-      &(reinterpret_cast<const double_t(&)[2]>(
+      &(reinterpret_cast<double(&)[2]>(result[0]))[0],
+      &(reinterpret_cast<const double(&)[2]>(operand[0]))[0],
+      &(reinterpret_cast<const double(&)[2]>(
           m_inv_complex_roots_of_unity[0]))[0],
       m_degree, out_scale);
 
@@ -133,10 +136,10 @@ void FFT::ComputeInverseFFT(std::complex<double_t>* result,
 #endif
 }
 
-void FFT::BuildFloatingPoints(std::complex<double_t>* res,
-                              const uint64_t* plain, const uint64_t* threshold,
+void FFT::BuildFloatingPoints(std::complex<double>* res, const uint64_t* plain,
+                              const uint64_t* threshold,
                               const uint64_t* decryption_modulus,
-                              const double_t in_inv_scale, size_t mod_size,
+                              const double in_inv_scale, size_t mod_size,
                               size_t coeff_count) {
   HEXL_UNUSED(res);
   HEXL_UNUSED(plain);
@@ -149,8 +152,8 @@ void FFT::BuildFloatingPoints(std::complex<double_t>* res,
 #ifdef HEXL_HAS_AVX512DQ
   HEXL_VLOG(3, "Calling 64-bit AVX512-DQ BuildFloatingPoints");
 
-  BuildFloatingPointsAVX512(&(reinterpret_cast<double_t(&)[2]>(res[0]))[0],
-                            plain, threshold, decryption_modulus, in_inv_scale,
+  BuildFloatingPointsAVX512(&(reinterpret_cast<double(&)[2]>(res[0]))[0], plain,
+                            threshold, decryption_modulus, in_inv_scale,
                             mod_size, coeff_count);
   return;
 #endif

@@ -16,8 +16,8 @@ namespace hexl {
 #ifdef HEXL_DEBUG
 TEST(FFT, bad_input) {
   uint64_t N = 16;
-  double_t scalar = 1.0;
-  AlignedVector64<std::complex<double_t>> input(N, {0, 0});
+  double scalar = 1.0;
+  AlignedVector64<std::complex<double>> input(N, {0, 0});
 
   EXPECT_ANY_THROW(FFT fft(2, nullptr));
   EXPECT_ANY_THROW(FFT fft(17, nullptr));
@@ -44,12 +44,11 @@ TEST(FFT, bad_input) {
 TEST(FFT, RootsOfUnityNative) {
   {
     FFT myfft(16, nullptr);
-    ASSERT_EQ(std::complex<double_t>(0, 0), myfft.GetComplexRootOfUnity(0));
-    ASSERT_EQ(std::complex<double_t>(-0.38268343236508978, 0.92387953251128674),
+    ASSERT_EQ(std::complex<double>(0, 0), myfft.GetComplexRootOfUnity(0));
+    ASSERT_EQ(std::complex<double>(-0.38268343236508978, 0.92387953251128674),
               myfft.GetComplexRootOfUnity(5));
-    ASSERT_EQ(std::complex<double_t>(0, -1),
-              myfft.GetInvComplexRootOfUnity(15));
-    ASSERT_EQ(std::complex<double_t>(0.83146961230254524, -0.55557023301960218),
+    ASSERT_EQ(std::complex<double>(0, -1), myfft.GetInvComplexRootOfUnity(15));
+    ASSERT_EQ(std::complex<double>(0.83146961230254524, -0.55557023301960218),
               myfft.GetInvComplexRootOfUnity(5));
   }
 }
@@ -118,23 +117,23 @@ struct FFT::AllocatorAdapter<std::allocator<T>>
 
 TEST(FFT, fft_with_allocator) {
   uint64_t N = 16;
-  const double_t data_bound = (1 << 30);
-  AlignedVector64<std::complex<double_t>> input1(N);
+  const double data_bound = (1 << 30);
+  AlignedVector64<std::complex<double>> input1(N);
   for (size_t i = 0; i < N; i++) {
     input1[i] = std::complex<double>(
         GenerateInsecureUniformRealRandomValue(0, data_bound),
         GenerateInsecureUniformRealRandomValue(0, data_bound));
   }
-  AlignedVector64<std::complex<double_t>> input2 = input1;
-  AlignedVector64<std::complex<double_t>> input3 = input1;
-  AlignedVector64<std::complex<double_t>> input4 = input1;
-  AlignedVector64<std::complex<double_t>> exp_out = input1;
+  AlignedVector64<std::complex<double>> input2 = input1;
+  AlignedVector64<std::complex<double>> input3 = input1;
+  AlignedVector64<std::complex<double>> input4 = input1;
+  AlignedVector64<std::complex<double>> exp_out = input1;
 
   {
     allocators::CustomAllocatorFFT a;
-    double_t scalar = 1 << 16;
-    double_t scale = scalar / static_cast<double_t>(N);
-    double_t inv_scale = static_cast<double_t>(1.0) / scalar;
+    double scalar = 1 << 16;
+    double scale = scalar / static_cast<double>(N);
+    double inv_scale = static_cast<double>(1.0) / scalar;
     FFT fft1(N, nullptr);
     FFT fft2(N, &scalar);
     FFT fft3(N, &scalar, std::move(a));

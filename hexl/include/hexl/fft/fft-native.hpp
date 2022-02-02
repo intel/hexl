@@ -17,9 +17,9 @@ namespace hexl {
 /// bit-reversed order
 /// @param[in] scale Scale applied to output data
 void Forward_FFT_ToBitReverseRadix2(
-    std::complex<double_t>* result, const std::complex<double_t>* operand,
-    const std::complex<double_t>* root_of_unity_powers, const uint64_t n,
-    const double_t* scale = nullptr);
+    std::complex<double>* result, const std::complex<double>* operand,
+    const std::complex<double>* root_of_unity_powers, const uint64_t n,
+    const double* scale = nullptr);
 
 /// @brief Radix-2 native C++ FFT implementation of the inverse FFT
 /// @param[out] result Output data. Overwritten with FFT output
@@ -30,9 +30,9 @@ void Forward_FFT_ToBitReverseRadix2(
 /// In bit-reversed order.
 /// @param[in] scale Scale applied to output data
 void Inverse_FFT_FromBitReverseRadix2(
-    std::complex<double_t>* result, const std::complex<double_t>* operand,
-    const std::complex<double_t>* inv_root_of_unity_powers, const uint64_t n,
-    const double_t* scale = nullptr);
+    std::complex<double>* result, const std::complex<double>* operand,
+    const std::complex<double>* inv_root_of_unity_powers, const uint64_t n,
+    const double* scale = nullptr);
 
 }  // namespace hexl
 }  // namespace intel
