@@ -1,7 +1,11 @@
 # Changes
 
-## Version 1.2.2
+## Version 1.2.3
+- Fix to EltwiseReduceMod on AVX512-DQ processors (https://github.com/intel/hexl/issues/86)
+- Update minimum CMake version to 3.13
+- Fixes 3rd-party dependency commits (https://github.com/intel/hexl/pull/85)
 
+## Version 1.2.2
 - Fixes Barrett reduce native benchmark (https://github.com/intel/hexl/pull/65)
 - Fixes 32 bit invntt (https://github.com/intel/hexl/pull/73)
 - Fixes CMake 3.13 compilation (https://github.com/intel/hexl/pull/67)
