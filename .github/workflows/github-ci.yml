@@ -217,7 +217,7 @@ jobs:
 
 
 
-  ubuntu-18.04-build:
+  ubuntu-1804-build:
     name: '${{ matrix.os }} ${{ matrix.build_type }} shared=${{ matrix.shared_lib }}'
     runs-on: '${{ matrix.os }}'
     defaults:
