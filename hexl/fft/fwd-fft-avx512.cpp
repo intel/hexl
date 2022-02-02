@@ -304,19 +304,19 @@ void ComplexStartFwdT8(double_t* result_8C_intrlvd,
 void Forward_FFT_ToBitReverseAVX512(
     double_t* result_cmplx_intrlvd, const double_t* operand_cmplx_intrlvd,
     const double_t* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
-    uint64_t recursion_depth, uint64_t recursion_half, const double_t* scale) {
+    const double_t* scale, uint64_t recursion_depth, uint64_t recursion_half) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
-  static const size_t base_ntt_size = 1024;
+  static const size_t base_fft_size = 1024;
 
-  if (n <= base_ntt_size) {  // Perform breadth-first FFT
+  if (n <= base_fft_size) {  // Perform breadth-first FFT
     size_t gap = n;          // (2*n >> 1) Interleaved complex numbers
     size_t m = 2;            // require twice the size
     size_t W_idx = (m << recursion_depth) + (recursion_half * m);
 
     // T8. First pass in case of out of place
-    if (gap >= 16) {
+    if (recursion_depth == 0 && gap >= 16) {
       const double_t* W_cmplx_intrlvd =
           &root_of_unity_powers_cmplx_intrlvd[W_idx];
       ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
@@ -370,17 +370,18 @@ void Forward_FFT_ToBitReverseAVX512(
 
     Forward_FFT_ToBitReverseAVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
                                    root_of_unity_powers_cmplx_intrlvd, n / 2,
-                                   recursion_depth + 1, recursion_half * 2,
-                                   scale);
+                                   scale, recursion_depth + 1,
+                                   recursion_half * 2);
 
     Forward_FFT_ToBitReverseAVX512(
         &result_cmplx_intrlvd[n / 2], &result_cmplx_intrlvd[n / 2],
-        root_of_unity_powers_cmplx_intrlvd, n / 2, recursion_depth + 1,
-        recursion_half * 2 + 1, scale);
+        root_of_unity_powers_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
+        recursion_half * 2 + 1);
   }
-
-  HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double_t>(
-                   result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+  if (recursion_depth == 0) {
+    HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double_t>(
+                     result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+  }
 }
 
 void BuildFloatingPointsAVX512(double_t* res_cmplx_intrlvd,

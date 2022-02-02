@@ -90,7 +90,7 @@ void FFT::ComputeForwardFFT(std::complex<double_t>* result,
       &(reinterpret_cast<double_t(&)[2]>(result[0]))[0],
       &(reinterpret_cast<const double_t(&)[2]>(operand[0]))[0],
       &(reinterpret_cast<const double_t(&)[2]>(m_complex_roots_of_unity[0]))[0],
-      m_degree, 0, 0, out_scale);
+      m_degree, out_scale);
   return;
 #else
   HEXL_VLOG(3, "Calling Native FwdFFT");
