@@ -5,7 +5,7 @@ To use Intel HE Acceleration Library in an external application, you can use one
 * Install Intel HE Acceleration Library. Then, in your external application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
-find_package(HEXL 1.2.2
+find_package(HEXL 1.2.3
     HINTS ${HEXL_HINT_DIR}
     REQUIRED)
 target_link_libraries(<your target> HEXL::hexl)
