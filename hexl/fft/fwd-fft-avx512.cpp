@@ -379,7 +379,7 @@ void Forward_FFT_ToBitReverseAVX512(
         recursion_half * 2 + 1);
   }
   if (recursion_depth == 0) {
-    HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double_t>(
+    HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double>(
                      result_cmplx_intrlvd, result_cmplx_intrlvd + n));
   }
 }

@@ -360,7 +360,7 @@ void Inverse_FFT_FromBitReverseAVX512(
     W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     if (recursion_depth == 0) {
       ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
-      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double_t>(
+      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double>(
                        result_cmplx_intrlvd, result_cmplx_intrlvd + n));
     } else {
       ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
@@ -384,10 +384,10 @@ void Inverse_FFT_FromBitReverseAVX512(
       W_delta >>= 1;
       W_idx += W_delta;
     }
-    const double_t* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     if (recursion_depth == 0) {
       ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
-      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double_t>(
+      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double>(
                        result_cmplx_intrlvd, result_cmplx_intrlvd + n));
     } else {
       ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
