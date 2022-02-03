@@ -24,7 +24,9 @@ void Forward_FFT_ToBitReverseAVX512(double* result_cmplx_intrlvd,
                                     const double* operand_cmplx_intrlvd,
                                     const double* roots_of_unity_cmplx_intrlvd,
                                     const uint64_t n,
-                                    const double* scale = nullptr);
+                                    const double* scale = nullptr,
+                                    uint64_t recursion_depth = 0,
+                                    uint64_t recursion_half = 0);
 
 /// @brief Construct floating-point values from CRT-composed polynomial with
 /// integer coefficients in AVX512.

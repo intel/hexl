@@ -561,6 +561,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
     AlignedVector64<double> transformed_complex_interleaved(2 * n);
+    AlignedVector64<double> transformed_complex_interleaved2(2 * n);
     AlignedVector64<double> result_complex_interleaved(2 * n);
 
     operand_complex_interleaved =
@@ -571,6 +572,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(big_root_powers[0]))[0], n,
         &inv_scale);
+
     Inverse_FFT_FromBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),

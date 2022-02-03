@@ -373,7 +373,7 @@ static void BM_FwdFFTAVX512InPlaceUnscaled(
   for (auto _ : state) {
     Forward_FFT_ToBitReverseAVX512(
         input.data(), input.data(),
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size);
+        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], fft_size, 0, 0);
   }
 }
 

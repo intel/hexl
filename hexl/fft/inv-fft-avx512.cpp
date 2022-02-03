@@ -1,7 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-
 #include "hexl/fft/inv-fft-avx512.hpp"
+
+#include <iostream>
 
 #include "hexl/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
@@ -310,54 +311,92 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
 void Inverse_FFT_FromBitReverseAVX512(
     double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
     const double* inv_root_of_unity_cmplx_intrlvd, const uint64_t n,
-    const double* scale) {
+    const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
-  size_t gap = 2;    // Interleaved complex values requires twice the size
-  size_t m = n;      // (2*n >> 1);
-  size_t W_idx = 2;  // 2*1
+  size_t gap = 2;  // Interleaved complex values requires twice the size
+  size_t m = n;    // (2*n >> 1);
+  size_t W_idx = 2 + m * recursion_half;  // 2*1
 
-  {
+  static const size_t base_fft_size = 1024;
+
+  if (n <= base_fft_size) {  // Perform breadth-first InvFFT
     // T1
     const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     ComplexInvT1(result_cmplx_intrlvd, operand_cmplx_intrlvd, W_cmplx_intrlvd,
                  m);
-    W_idx += m;
     gap <<= 1;
     m >>= 1;
+    uint64_t W_idx_delta =
+        m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
 
     // T2
     W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     ComplexInvT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-    W_idx += m;
     gap <<= 1;
     m >>= 1;
+    W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
 
     // T4
     W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     ComplexInvT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-    W_idx += m;
     gap <<= 1;
     m >>= 1;
+    W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
 
     while (m > 2) {
       W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
       ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
-      W_idx += m;
       gap <<= 1;
       m >>= 1;
+      W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+      W_idx += W_idx_delta;
     }
 
     W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
-    ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
-    W_idx += m;
+    if (recursion_depth == 0) {
+      ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
+      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double_t>(
+                       result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+    } else {
+      ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+    }
     gap <<= 1;
     m >>= 1;
+    W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
+  } else {
+    Inverse_FFT_FromBitReverseAVX512(
+        result_cmplx_intrlvd, operand_cmplx_intrlvd,
+        inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
+        2 * recursion_half);
+    Inverse_FFT_FromBitReverseAVX512(
+        &result_cmplx_intrlvd[n], &operand_cmplx_intrlvd[n],
+        inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
+        2 * recursion_half + 1);
+    uint64_t W_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    for (; m > 2; m >>= 1) {
+      gap <<= 1;
+      W_delta >>= 1;
+      W_idx += W_delta;
+    }
+    const double_t* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    if (recursion_depth == 0) {
+      ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
+      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double_t>(
+                       result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+    } else {
+      ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+    }
+    gap <<= 1;
+    m >>= 1;
+    W_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_delta;
   }
-
-  HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double>(
-                   result_cmplx_intrlvd, result_cmplx_intrlvd + n));
 }
 
 #endif  // HEXL_HAS_AVX512DQ

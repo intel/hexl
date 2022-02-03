@@ -234,7 +234,7 @@ void ComplexFwdT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
       _mm512_storeu_pd(v_Y_pt_real, v_Y_real);
       _mm512_storeu_pd(v_Y_pt_imag, v_Y_imag);
 
-      // Increase operand
+      // Increase pointers
       v_X_pt_real += 2;
       v_X_pt_imag += 2;
       v_Y_pt_real += 2;
@@ -305,53 +305,83 @@ void ComplexStartFwdT8(double* result_8C_intrlvd,
 void Forward_FFT_ToBitReverseAVX512(
     double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
     const double* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
-    const double* scale) {
+    const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
 
-  size_t gap = n;  // (2*n >> 1) Interleaved complex numbers
-  size_t m = 2;    // require twice the size
-  size_t W_idx = m;
+  static const size_t base_fft_size = 1024;
 
-  // First pass in case of out of place
-  if (gap >= 16) {
+  if (n <= base_fft_size) {  // Perform breadth-first FFT
+    size_t gap = n;          // (2*n >> 1) Interleaved complex numbers
+    size_t m = 2;            // require twice the size
+    size_t W_idx = (m << recursion_depth) + (recursion_half * m);
+
+    // First pass in case of out of place
+    if (recursion_depth == 0 && gap >= 16) {
+      const double* W_cmplx_intrlvd =
+          &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
+                        W_cmplx_intrlvd, gap, m);
+      m <<= 1;
+      W_idx <<= 1;
+      gap >>= 1;
+    }
+
+    for (; gap >= 16; gap >>= 1) {
+      const double* W_cmplx_intrlvd =
+          &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+      m <<= 1;
+      W_idx <<= 1;
+    }
+
+    {
+      // T4
+      const double* W_cmplx_intrlvd =
+          &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+      m <<= 1;
+      W_idx <<= 1;
+
+      // T2
+      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+      m <<= 1;
+      W_idx <<= 1;
+
+      // T1
+      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexFwdT1(result_cmplx_intrlvd, W_cmplx_intrlvd, m, scale);
+      m <<= 1;
+      W_idx <<= 1;
+    }
+  } else {
+    // Perform depth-first FFT via recursive call
+    size_t gap = n;
+    size_t W_idx = (2ULL << recursion_depth) + (recursion_half << 1);
     const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
-                      W_cmplx_intrlvd, gap, m);
-    m <<= 1;
-    W_idx = m;
-    gap >>= 1;
+
+    if (recursion_depth == 0) {
+      ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
+                        W_cmplx_intrlvd, gap, 2);
+    } else {
+      ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, 2);
+    }
+
+    Forward_FFT_ToBitReverseAVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
+                                   root_of_unity_powers_cmplx_intrlvd, n / 2,
+                                   scale, recursion_depth + 1,
+                                   recursion_half * 2);
+
+    Forward_FFT_ToBitReverseAVX512(
+        &result_cmplx_intrlvd[n], &result_cmplx_intrlvd[n],
+        root_of_unity_powers_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
+        recursion_half * 2 + 1);
   }
-
-  for (; gap >= 16; gap >>= 1) {
-    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
-    m <<= 1;
-    W_idx = m;
+  if (recursion_depth == 0) {
+    HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double_t>(
+                     result_cmplx_intrlvd, result_cmplx_intrlvd + n));
   }
-
-  {
-    // T4
-    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-    m <<= 1;
-    W_idx = m;
-
-    // T2
-    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-    m <<= 1;
-    W_idx = m;
-
-    // T1
-    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexFwdT1(result_cmplx_intrlvd, W_cmplx_intrlvd, m, scale);
-    m <<= 1;
-    W_idx = m;
-  }
-
-  HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double>(
-                   result_cmplx_intrlvd, result_cmplx_intrlvd + n));
 }
 
 void BuildFloatingPointsAVX512(double* res_cmplx_intrlvd, const uint64_t* plain,
