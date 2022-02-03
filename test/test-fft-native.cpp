@@ -37,10 +37,7 @@ TEST(FFT, ForwardInverseFFTNative) {
                                    root_powers.data(), n);
 
     for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(operand[0].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(operand[0].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
+      CheckClose(operand[0], result[i], 0.5);
     }
   }
 
@@ -62,10 +59,7 @@ TEST(FFT, ForwardInverseFFTNative) {
                                    root_powers.data(), n, &inv_scale);
 
     for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(value.real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(value.imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
+      CheckClose(value, result[i], 0.5);
     }
   }
 
@@ -85,12 +79,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
                                    root_powers.data(), n, &inv_scale);
 
-    for (size_t i = 0; i < n; ++i) {
-      auto tmp = abs(operand[i].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(operand[i].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand, result, 0.5);
   }
 
   {  // Large Scaled
@@ -116,12 +105,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
                                    root_powers.data(), n, &inv_scale);
 
-    for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(operand[i].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(operand[i].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand, result, 0.5);
   }
 
   {  // Very Large Scale
@@ -149,12 +133,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
                                    root_powers.data(), n, &inv_scale);
 
-    for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(expected[i].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(expected[i].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(expected, result, 0.5);
   }
 
   {  // Over 128 bits Scale
@@ -182,12 +161,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
                                    root_powers.data(), n, &inv_scale);
 
-    for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(expected[i].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(expected[i].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(expected, result, 0.5);
   }
 
   {  // Inplace
@@ -213,12 +187,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     Forward_FFT_ToBitReverseRadix2(operand.data(), operand.data(),
                                    root_powers.data(), n, &inv_scale);
 
-    for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(expected[i].real() - operand[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(expected[i].imag() - operand[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(expected, operand, 0.5);
   }
 }
 

@@ -111,15 +111,15 @@ void Forward_FFT_ToBitReverseRadix2(
 
   // Continue with in-place operation
   for (size_t m = 2; m < n; m <<= 1) {
-    size_t j1 = 0;
+    size_t offset = 0;
     switch (gap) {
       case 8: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = root_of_unity_powers[m + i];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -137,10 +137,10 @@ void Forward_FFT_ToBitReverseRadix2(
       case 4: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = root_of_unity_powers[m + i];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -154,10 +154,10 @@ void Forward_FFT_ToBitReverseRadix2(
       case 2: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = root_of_unity_powers[m + i];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -170,10 +170,10 @@ void Forward_FFT_ToBitReverseRadix2(
         if (scalar == nullptr) {
           for (size_t i = 0; i < m; i++) {
             if (i != 0) {
-              j1 += (gap << 1);
+              offset += (gap << 1);
             }
             const std::complex<double> W = root_of_unity_powers[m + i];
-            std::complex<double>* X_r = result + j1;
+            std::complex<double>* X_r = result + offset;
             std::complex<double>* Y_r = X_r + gap;
             const std::complex<double>* X_op = X_r;
             const std::complex<double>* Y_op = Y_r;
@@ -182,11 +182,11 @@ void Forward_FFT_ToBitReverseRadix2(
         } else {
           for (size_t i = 0; i < m; i++) {
             if (i != 0) {
-              j1 += (gap << 1);
+              offset += (gap << 1);
             }
             const std::complex<double> W =
                 *scalar * root_of_unity_powers[m + i];
-            std::complex<double>* X_r = result + j1;
+            std::complex<double>* X_r = result + offset;
             std::complex<double>* Y_r = X_r + gap;
             *X_r = (*scalar) * (*X_r);
             const std::complex<double>* X_op = X_r;
@@ -199,10 +199,10 @@ void Forward_FFT_ToBitReverseRadix2(
       default: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = root_of_unity_powers[m + i];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -240,19 +240,19 @@ void Inverse_FFT_FromBitReverseRadix2(
   size_t stop_loop = (scalar == nullptr) ? 0 : 1;
   size_t m = n_div_2;
   for (; m > stop_loop; m >>= 1) {
-    size_t j1 = 0;
+    size_t offset = 0;
 
     switch (gap) {
       case 1: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = inv_root_of_unity_powers[root_index];
 
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
-          const std::complex<double>* X_op = operand + j1;
+          const std::complex<double>* X_op = operand + offset;
           const std::complex<double>* Y_op = X_op + gap;
           ComplexInvButterflyRadix2(X_r, Y_r, X_op, Y_op, W);
         }
@@ -261,10 +261,10 @@ void Inverse_FFT_FromBitReverseRadix2(
       case 2: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = inv_root_of_unity_powers[root_index];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -276,10 +276,10 @@ void Inverse_FFT_FromBitReverseRadix2(
       case 4: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = inv_root_of_unity_powers[root_index];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -293,10 +293,10 @@ void Inverse_FFT_FromBitReverseRadix2(
       case 8: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = inv_root_of_unity_powers[root_index];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
@@ -314,10 +314,10 @@ void Inverse_FFT_FromBitReverseRadix2(
       default: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (gap << 1);
+            offset += (gap << 1);
           }
           const std::complex<double> W = inv_root_of_unity_powers[root_index];
-          std::complex<double>* X_r = result + j1;
+          std::complex<double>* X_r = result + offset;
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;

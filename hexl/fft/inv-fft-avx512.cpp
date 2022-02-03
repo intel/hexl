@@ -262,7 +262,7 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 
   HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < (m >> 1); i++) {
+  for (size_t i = 0; i < (m >> 1); i++, offset += (gap << 1)) {
     // Referencing operand
     double* X_real = operand_8C_intrlvd + offset;
     double* X_imag = X_real + 8;
@@ -304,7 +304,6 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
       v_Y_pt_real += 2;
       v_Y_pt_imag += 2;
     }
-    offset += (gap << 1);
   }
 }
 
