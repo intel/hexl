@@ -1,7 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-
 #include "hexl/fft/inv-fft-avx512.hpp"
+
+#include <iostream>
 
 #include "hexl/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
@@ -374,11 +375,11 @@ void Inverse_FFT_FromBitReverseAVX512(
         inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
         2 * recursion_half);
     Inverse_FFT_FromBitReverseAVX512(
-        &result_cmplx_intrlvd[n / 2], &operand_cmplx_intrlvd[n / 2],
+        &result_cmplx_intrlvd[n], &operand_cmplx_intrlvd[n],
         inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
         2 * recursion_half + 1);
     uint64_t W_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
-    for (; m > 1; m >>= 1) {
+    for (; m > 2; m >>= 1) {
       gap <<= 1;
       W_delta >>= 1;
       W_idx += W_delta;
@@ -397,6 +398,7 @@ void Inverse_FFT_FromBitReverseAVX512(
     W_idx += W_delta;
   }
 }
+
 #endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl

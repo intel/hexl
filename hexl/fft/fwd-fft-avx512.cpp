@@ -316,14 +316,14 @@ void Forward_FFT_ToBitReverseAVX512(
     size_t m = 2;            // require twice the size
     size_t W_idx = (m << recursion_depth) + (recursion_half * m);
 
-    // T8. First pass in case of out of place
+    // First pass in case of out of place
     if (recursion_depth == 0 && gap >= 16) {
-      const double_t* W_cmplx_intrlvd =
+      const double* W_cmplx_intrlvd =
           &root_of_unity_powers_cmplx_intrlvd[W_idx];
       ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
                         W_cmplx_intrlvd, gap, m);
       m <<= 1;
-      W_idx = m;
+      W_idx <<= 1;
       gap >>= 1;
     }
 
@@ -332,7 +332,7 @@ void Forward_FFT_ToBitReverseAVX512(
           &root_of_unity_powers_cmplx_intrlvd[W_idx];
       ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
       m <<= 1;
-      W_idx = m;
+      W_idx <<= 1;
     }
 
     {
@@ -341,24 +341,24 @@ void Forward_FFT_ToBitReverseAVX512(
           &root_of_unity_powers_cmplx_intrlvd[W_idx];
       ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
       m <<= 1;
-      W_idx = m;
+      W_idx <<= 1;
 
       // T2
       W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
       ComplexFwdT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
       m <<= 1;
-      W_idx = m;
+      W_idx <<= 1;
 
       // T1
       W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
       ComplexFwdT1(result_cmplx_intrlvd, W_cmplx_intrlvd, m, scale);
       m <<= 1;
-      W_idx = m;
+      W_idx <<= 1;
     }
   } else {
     // Perform depth-first FFT via recursive call
     size_t gap = n;
-    size_t W_idx = (2ULL << recursion_depth) + recursion_half;
+    size_t W_idx = (2ULL << recursion_depth) + (recursion_half << 1);
     const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
 
     if (recursion_depth == 0) {
@@ -374,7 +374,7 @@ void Forward_FFT_ToBitReverseAVX512(
                                    recursion_half * 2);
 
     Forward_FFT_ToBitReverseAVX512(
-        &result_cmplx_intrlvd[n / 2], &result_cmplx_intrlvd[n / 2],
+        &result_cmplx_intrlvd[n], &result_cmplx_intrlvd[n],
         root_of_unity_powers_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
         recursion_half * 2 + 1);
   }
