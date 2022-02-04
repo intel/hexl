@@ -121,14 +121,10 @@ if(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
-if(LINUX)
-  include(GNUInstallDirs)
-else()
-  set(CMAKE_INSTALL_BINDIR "bin")
-  set(CMAKE_INSTALL_INCLUDEDIR "include")
-  set(CMAKE_INSTALL_DOCDIR "doc")
-  set(CMAKE_INSTALL_LIBDIR "lib")
-endif()
+# Will set CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_INCLUDEDIR, etc
+# to usual unix directory names
+include(GNUInstallDirs)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_INSTALL_LIBDIR})
 
 message(STATUS "CMAKE_INSTALL_LIBDIR:     ${CMAKE_INSTALL_LIBDIR}")
