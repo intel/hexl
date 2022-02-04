@@ -44,7 +44,7 @@ TEST(FFT, ForwardInverseFFTNative) {
   {  // Single Scaled
     const uint64_t n = 64;
     const double scale = 1 << 16;
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
     AlignedVector64<std::complex<double>> operand(n);
     AlignedVector64<std::complex<double>> result(n);
@@ -67,7 +67,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     const uint64_t n = 64;
     const double scale = 1 << 16;
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
 
     AlignedVector64<std::complex<double>> operand(n, {0, 0});
     AlignedVector64<std::complex<double>> transformed(n);
@@ -86,7 +86,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     const uint64_t n = 64;
     const double scale = 1099511627776;  // (1 << 40)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
 
     AlignedVector64<std::complex<double>> operand(n);
@@ -112,7 +112,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     const uint64_t n = 64;
     const double scale = 1.2980742146337069e+33;  // (1 << 110)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<std::complex<double>> operand(n);
@@ -140,7 +140,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     const uint64_t n = 64;
     const double scale = 1.3611294676837539e+39;  // (1 << 130)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<std::complex<double>> operand(n);
@@ -168,7 +168,7 @@ TEST(FFT, ForwardInverseFFTNative) {
     const uint64_t n = 64;
     const double scale = 1.3611294676837539e+39;  // (1 << 130)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<std::complex<double>> operand(n);

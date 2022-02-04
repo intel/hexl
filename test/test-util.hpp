@@ -66,7 +66,7 @@ inline void CheckEqual(const std::vector<uint64_t>& x,
 template <typename A, typename B>
 inline void AssertClose(const A& x, const B& y, uint64_t tolerance) {
   ASSERT_EQ(x.size(), y.size());
-  uint64_t N = std::min(x.size(), y.size());
+  uint64_t N = x.size();
   for (size_t i = 0; i < N; ++i) {
     ASSERT_LE(std::max(x[i], y[i]) - std::min(x[i], y[i]), tolerance)
         << "Mismatch at index " << i;
