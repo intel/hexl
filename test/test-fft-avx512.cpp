@@ -26,7 +26,7 @@ TEST(FFT, BuildFloatingPointsAVX512) {
     const uint64_t poly_mod_degree = 16;
     const uint64_t coeff_mod_size = 4;
     const double scale = 1099511627776;  // (1 << 40)
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
 
     std::vector<std::complex<double>> result(poly_mod_degree);
 
@@ -368,17 +368,14 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
 
     for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(operand[0].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(operand[0].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
+      CheckClose(operand[0], result[i], 0.5);
     }
   }
 
   {  // Single Scaled
     const uint64_t n = 64;
     const double scale = 1 << 16;
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
     AlignedVector64<std::complex<double>> operand(n);
     AlignedVector64<std::complex<double>> result(n);
@@ -395,10 +392,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
 
     for (size_t i = 0; i < n; ++i) {
-      double tmp = abs(value.real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(value.imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
+      CheckClose(value, result[i], 0.5);
     }
   }
 
@@ -406,7 +400,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     const uint64_t n = 64;
     const double scale = 1 << 16;
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
 
     AlignedVector64<std::complex<double>> operand(n, {0, 0});
     AlignedVector64<std::complex<double>> transformed(n);
@@ -421,19 +415,14 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         &reinterpret_cast<double(&)[2]>(transformed[0])[0],
         &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0], n, &scalar);
 
-    for (size_t i = 0; i < n; ++i) {
-      auto tmp = abs(operand[i].real() - result[i].real());
-      ASSERT_TRUE(tmp < 0.5);
-      tmp = abs(operand[i].imag() - result[i].imag());
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand, result, 0.5);
   }
 
   {  // Large Scaled
     const uint64_t n = 64;
     const double scale = 1099511627776;  // (1 << 40)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
@@ -452,18 +441,14 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
 
-    for (size_t i = 0; i < 2 * n; i++) {
-      double tmp =
-          abs(operand_complex_interleaved[i] - result_complex_interleaved[i]);
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }
 
   {  // Very Large Scale
     const uint64_t n = 64;
     const double scale = 1.2980742146337069e+33;  // (1 << 110)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
@@ -482,18 +467,14 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
 
-    for (size_t i = 0; i < 2 * n; i++) {
-      double tmp =
-          abs(operand_complex_interleaved[i] - result_complex_interleaved[i]);
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }
 
   {  // Over 128 bits Scale
     const uint64_t n = 64;
     const double scale = 1.3611294676837539e+39;  // (1 << 130)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
@@ -512,18 +493,14 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
 
-    for (size_t i = 0; i < 2 * n; i++) {
-      double tmp =
-          abs(operand_complex_interleaved[i] - result_complex_interleaved[i]);
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }
 
   {  // Inplace
     const uint64_t n = 64;
     const double scale = 1.3611294676837539e+39;  // (1 << 130)
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
@@ -540,17 +517,14 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         operand_complex_interleaved.data(), operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
 
-    for (size_t i = 0; i < 2 * n; i++) {
-      double tmp = abs(expected[i] - operand_complex_interleaved[i]);
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(expected, operand_complex_interleaved, 0.5);
   }
 
   {  // Big message
     const uint64_t n = 4096;
     const double scale = 1 << 16;
     const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = static_cast<double>(1.0) / scale;
+    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
 
     FFT big_fft(n, nullptr);
@@ -579,11 +553,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         &(reinterpret_cast<double(&)[2]>(big_inv_root_powers[0]))[0], n,
         &scalar);
 
-    for (size_t i = 0; i < 2 * n; i++) {
-      double tmp =
-          abs(operand_complex_interleaved[i] - result_complex_interleaved[i]);
-      ASSERT_TRUE(tmp < 0.5);
-    }
+    CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }
 }
 

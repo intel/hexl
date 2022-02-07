@@ -133,7 +133,7 @@ TEST(FFT, fft_with_allocator) {
     allocators::CustomAllocatorFFT a;
     double scalar = 1 << 16;
     double scale = scalar / static_cast<double>(N);
-    double inv_scale = static_cast<double>(1.0) / scalar;
+    double inv_scale = 1.0 / scalar;
     FFT fft1(N, nullptr);
     FFT fft2(N, &scalar);
     FFT fft3(N, &scalar, std::move(a));
@@ -155,27 +155,10 @@ TEST(FFT, fft_with_allocator) {
   }
 
   ASSERT_NE(allocators::CustomAllocatorFFT::number_deallocations, 0);
-  for (size_t i = 0; i < N; ++i) {
-    double tmp = abs(exp_out[i].real() - input1[i].real());
-    ASSERT_TRUE(tmp < 0.5);
-    tmp = abs(exp_out[i].imag() - input1[i].imag());
-    ASSERT_TRUE(tmp < 0.5);
-
-    tmp = abs(exp_out[i].real() - input2[i].real());
-    ASSERT_TRUE(tmp < 0.5);
-    tmp = abs(exp_out[i].imag() - input2[i].imag());
-    ASSERT_TRUE(tmp < 0.5);
-
-    tmp = abs(exp_out[i].real() - input3[i].real());
-    ASSERT_TRUE(tmp < 0.5);
-    tmp = abs(exp_out[i].imag() - input3[i].imag());
-    ASSERT_TRUE(tmp < 0.5);
-
-    tmp = abs(exp_out[i].real() - input4[i].real());
-    ASSERT_TRUE(tmp < 0.5);
-    tmp = abs(exp_out[i].imag() - input4[i].imag());
-    ASSERT_TRUE(tmp < 0.5);
-  }
+  CheckClose(exp_out, input1, 0.5);
+  CheckClose(exp_out, input2, 0.5);
+  CheckClose(exp_out, input3, 0.5);
+  CheckClose(exp_out, input4, 0.5);
 }
 
 }  // namespace hexl

@@ -230,7 +230,7 @@ static void BM_InvFFTNativeRadix2InPlaceSmallScaled(
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
   const double scale = 10;
-  const double inv_scale = static_cast<double>(1.0) / scale;
+  const double inv_scale = 1.0 / scale;
   FFT fft(fft_size, nullptr);
 
   AlignedVector64<std::complex<double>> input(fft_size);
@@ -263,7 +263,7 @@ static void BM_InvFFTNativeRadix2InPlaceLargeScaled(
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
   const double scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double inv_scale = static_cast<double>(1.0) / scale;
+  const double inv_scale = 1.0 / scale;
   FFT fft(fft_size, nullptr);
 
   AlignedVector64<std::complex<double>> input(fft_size);
@@ -556,7 +556,7 @@ static void BM_InvFFTAVX512CopyScaled(benchmark::State& state) {  //  NOLINT
   const size_t fft_size = state.range(0);
   const size_t bound = 1 << 30;
   const double scale = 1.3611294676837539e+39;  // (1 << 130)
-  const double inv_scale = static_cast<double>(1.0) / scale;
+  const double inv_scale = 1.0 / scale;
   FFT fft(fft_size, nullptr);
 
   AlignedVector64<double> output(2 * fft_size);
