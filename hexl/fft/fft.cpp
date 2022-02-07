@@ -28,7 +28,7 @@ FFT::FFT(uint64_t degree, double* in_scalar,
 
   if (scalar != nullptr) {
     scale = *scalar / static_cast<double>(degree);
-    inv_scale = static_cast<double>(1.0) / *scalar;
+    inv_scale = 1.0 / *scalar;
   }
 }
 
