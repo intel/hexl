@@ -62,8 +62,7 @@ void ComplexInvT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
   size_t offset = 0;
 
   // 8 | m guaranteed by n >= 16
-  HEXL_LOOP_UNROLL_4
-
+  HEXL_LOOP_UNROLL_8
   for (size_t i = 0; i < (m >> 1); i += 8) {
     // Referencing operand
     const double* X_op_real = operand_1C_intrlvd + offset;
@@ -312,8 +311,14 @@ void Inverse_FFT_FromBitReverseAVX512(
     const double* inv_root_of_unity_cmplx_intrlvd, const uint64_t n,
     const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
-  HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
-
+  HEXL_CHECK(n >= 16,
+             "Don't support small transforms. Need n >= 16, got n = " << n);
+  HEXL_VLOG(5, "inv_root_of_unity_cmplx_intrlvd "
+                   << std::vector<std::complex<double>>(
+                          inv_root_of_unity_cmplx_intrlvd,
+                          inv_root_of_unity_cmplx_intrlvd + 2 * n));
+  HEXL_VLOG(5, "operand_cmplx_intrlvd " << std::vector<std::complex<double>>(
+                   operand_cmplx_intrlvd, operand_cmplx_intrlvd + 2 * n));
   size_t gap = 2;  // Interleaved complex values requires twice the size
   size_t m = n;    // (2*n >> 1);
   size_t W_idx = 2 + m * recursion_half;  // 2*1
@@ -359,8 +364,10 @@ void Inverse_FFT_FromBitReverseAVX512(
     W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     if (recursion_depth == 0) {
       ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
-      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double>(
-                       result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+      HEXL_VLOG(5,
+                "AVX512 returning INV FFT result "
+                    << std::vector<std::complex<double>>(
+                           result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
     } else {
       ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
     }
@@ -386,8 +393,10 @@ void Inverse_FFT_FromBitReverseAVX512(
     const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     if (recursion_depth == 0) {
       ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
-      HEXL_VLOG(5, "AVX512 returning INV FFT result " << std::vector<double>(
-                       result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+      HEXL_VLOG(5,
+                "AVX512 returning INV FFT result "
+                    << std::vector<std::complex<double>>(
+                           result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
     } else {
       ComplexInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
     }

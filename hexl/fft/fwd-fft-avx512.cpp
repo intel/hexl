@@ -62,8 +62,7 @@ void ComplexFwdT1(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 
   // 8 | m guaranteed by n >= 16
-  HEXL_LOOP_UNROLL_4
-
+  HEXL_LOOP_UNROLL_8
   for (size_t i = 0; i < (m >> 1); i += 8) {
     double* X_real = operand_8C_intrlvd + offset;
     double* X_imag = X_real + 8;
@@ -307,7 +306,14 @@ void Forward_FFT_ToBitReverseAVX512(
     const double* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
     const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
-  HEXL_CHECK(n > 2, "n " << n << " is not bigger than 2");
+  HEXL_CHECK(n >= 16,
+             "Don't support small transforms. Need n >= 16, got n = " << n);
+  HEXL_VLOG(5, "root_of_unity_powers_cmplx_intrlvd "
+                   << std::vector<std::complex<double>>(
+                          root_of_unity_powers_cmplx_intrlvd,
+                          root_of_unity_powers_cmplx_intrlvd + 2 * n));
+  HEXL_VLOG(5, "operand_cmplx_intrlvd " << std::vector<std::complex<double>>(
+                   operand_cmplx_intrlvd, operand_cmplx_intrlvd + 2 * n));
 
   static const size_t base_fft_size = 1024;
 
@@ -379,8 +385,10 @@ void Forward_FFT_ToBitReverseAVX512(
         recursion_half * 2 + 1);
   }
   if (recursion_depth == 0) {
-    HEXL_VLOG(5, "AVX512 returning FWD FFT result " << std::vector<double>(
-                     result_cmplx_intrlvd, result_cmplx_intrlvd + n));
+    HEXL_VLOG(
+        5,
+        "AVX512 returning FWD FFT result " << std::vector<std::complex<double>>(
+            result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
   }
 }
 

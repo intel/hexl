@@ -5,6 +5,7 @@
 
 #include <cstring>
 
+#include "hexl/logging/logging.hpp"
 #include "util/util-internal.hpp"
 
 namespace intel {
@@ -15,10 +16,13 @@ inline void ComplexFwdButterflyRadix2(std::complex<double>* X_r,
                                       const std::complex<double>* X_op,
                                       const std::complex<double>* Y_op,
                                       const std::complex<double> W) {
+  HEXL_VLOG(5, "ComplexFwdButterflyRadix2");
+  HEXL_VLOG(5, "Inputs: X_op " << *X_op << ", Y_op " << *Y_op << ", W " << W);
   std::complex<double> U = *X_op;
   std::complex<double> V = *Y_op * W;
   *X_r = U + V;
   *Y_r = U - V;
+  HEXL_VLOG(5, "Output X " << *X_r << ", Y " << *Y_r);
 }
 
 inline void ComplexInvButterflyRadix2(std::complex<double>* X_r,
@@ -26,9 +30,12 @@ inline void ComplexInvButterflyRadix2(std::complex<double>* X_r,
                                       const std::complex<double>* X_op,
                                       const std::complex<double>* Y_op,
                                       const std::complex<double> W) {
+  HEXL_VLOG(5, "ComplexInvButterflyRadix2");
+  HEXL_VLOG(5, "Inputs: X_op " << *X_op << ", Y_op " << *Y_op << ", W " << W);
   std::complex<double> U = *X_op;
   *X_r = U + *Y_op;
   *Y_r = (U - *Y_op) * W;
+  HEXL_VLOG(5, "Output X " << *X_r << ", Y " << *Y_r);
 }
 
 inline void ScaledComplexInvButterflyRadix2(std::complex<double>* X_r,
@@ -37,15 +44,20 @@ inline void ScaledComplexInvButterflyRadix2(std::complex<double>* X_r,
                                             const std::complex<double>* Y_op,
                                             const std::complex<double> W,
                                             const double* scalar) {
+  HEXL_VLOG(5, "ScaledComplexInvButterflyRadix2");
+  HEXL_VLOG(5, "Inputs: X_op " << *X_op << ", Y_op " << *Y_op << ", W " << W
+                               << ", scalar " << *scalar);
   std::complex<double> U = *X_op;
   *X_r = (U + *Y_op) * (*scalar);
   *Y_r = (U - *Y_op) * W;
+  HEXL_VLOG(5, "Output X " << *X_r << ", Y " << *Y_r);
 }
 
 void Forward_FFT_ToBitReverseRadix2(
     std::complex<double>* result, const std::complex<double>* operand,
     const std::complex<double>* root_of_unity_powers, const uint64_t n,
     const double* scalar) {
+  HEXL_CHECK(IsPowerOfTwo(n), "degree " << n << " is not a power of 2");
   HEXL_CHECK(root_of_unity_powers != nullptr,
              "root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
@@ -228,6 +240,7 @@ void Inverse_FFT_FromBitReverseRadix2(
     std::complex<double>* result, const std::complex<double>* operand,
     const std::complex<double>* inv_root_of_unity_powers, const uint64_t n,
     const double* scalar) {
+  HEXL_CHECK(IsPowerOfTwo(n), "degree " << n << " is not a power of 2");
   HEXL_CHECK(inv_root_of_unity_powers != nullptr,
              "inv_root_of_unity_powers == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");

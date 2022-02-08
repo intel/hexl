@@ -9,9 +9,6 @@
 namespace intel {
 namespace hexl {
 
-// AllocatorStrategyPtr mallocStrategy = AllocatorStrategyPtr(new
-// MallocStrategy);
-
 FFT::FFT(uint64_t degree, double* in_scalar,
          std::shared_ptr<AllocatorBase> alloc_ptr)
     : m_degree(degree),
