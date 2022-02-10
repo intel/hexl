@@ -424,6 +424,7 @@ void BuildFloatingPointsAVX512(double* res_cmplx_intrlvd, const uint64_t* plain,
 
     __mmask8 cond_ge_thr = static_cast<unsigned char>(~cond_lt_thr);
     double scaled_two_pow_64 = inv_scale;
+    __m512d v_zeros = _mm512_setzero_pd();
     __m512d v_res_real = _mm512_setzero_pd();
     HEXL_LOOP_UNROLL_8
     for (size_t j = 0; j < mod_size; j++, scaled_two_pow_64 *= two_pow_64) {
@@ -456,8 +457,10 @@ void BuildFloatingPointsAVX512(double* res_cmplx_intrlvd, const uint64_t* plain,
       }
 
       __m512d v_casted_diff = _mm512_loadu_pd(tmp_v_pd);
-      __m512d v_scaled_diff = _mm512_mul_pd(v_casted_diff, v_scaled_p64);
-
+      // This mask avoids multiplying by inf when diff is already zero
+      __mmask8 cond_no_zero = _mm512_cmpneq_pd_mask(v_casted_diff, v_zeros);
+      __m512d v_scaled_diff = _mm512_mask_mul_pd(v_casted_diff, cond_no_zero,
+                                                 v_casted_diff, v_scaled_p64);
       v_res_real = _mm512_mask_add_pd(v_res_real, cond_gt_dec_mod | cond_lt_thr,
                                       v_res_real, v_scaled_diff);
       v_res_real = _mm512_mask_sub_pd(v_res_real, cond_le_dec_mod, v_res_real,
