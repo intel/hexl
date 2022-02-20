@@ -110,7 +110,8 @@ Intel HE Acceleration Library requires the following dependencies:
 
 
 ### Compile-time options
-In addition to the standard CMake build options, Intel HE Acceleration Library supports several compile-time flags to configure the build.
+In addition to the standard CMake build options, Intel HE Acceleration Library
+supports several compile-time flags to configure the build.
 For convenience, they are listed below:
 
 | CMake option                  | Values   | Default |                                                             |
@@ -123,7 +124,9 @@ For convenience, they are listed below:
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF | OFF     | Set to ON to treat all warnings as error                    |
 
 ### Compiling Intel HE Acceleration Library
-To compile Intel HE Acceleration Library from source code, first clone the repository and change directories to the where the source has been cloned.
+To compile Intel HE Acceleration Library from source code, first clone the
+repository and change directories to the where the source has been cloned.
+
 #### Linux and Mac
 The instructions to build Intel HE Acceleration Library are common to Linux and MacOS.
 
@@ -131,7 +134,13 @@ Then, to configure the build, call
 ```bash
 cmake -S . -B build
 ```
-adding the desired compile-time options with a `-D` flag. For instance, to build Intel HE Acceleration Library as a shared library, call
+adding the desired compile-time options with a `-D` flag. For instance,
+to use a non-standard installation directory, configure the build with
+```bash
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
+```
+
+Or, to build Intel HE Acceleration Library as a shared library, call
 ```bash
 cmake -S . -B build -DHEXL_SHARED_LIB=ON
 ```
@@ -146,11 +155,6 @@ To install Intel HE Acceleration Library to the installation directory, run
 ```bash
 cmake --install build
 ```
-To use a non-standard installation directory, configure the build with
-```bash
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
-```
-before proceeding with the build and installation directions above.
 
 #### Windows
 To compile Intel HE Acceleration Library on Windows using Visual Studio in
