@@ -7,7 +7,10 @@ you can use to link Intel HE Acceleration Library to your external program.
 Before selecting a method, first install Intel HE Acceleration Library following
 the instructions provided in the (README.md)[../README.md].
 
-## Method 1
+## Method 1 (example program provided method)
+
+This method is provided in the `CMakeLists.txt` of the example program
+`example.cpp` provided in this directory.
 
 Once you have installed Intel HE Acceleration Library. Then, in your external
 application, add the following lines to your `CMakeLists.txt`:
