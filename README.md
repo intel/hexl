@@ -98,16 +98,19 @@ from source using CMake.
 ### Dependencies
 We have tested Intel HE Acceleration Library on the following operating systems:
 - Ubuntu 20.04
-- macOS 10.15
+- macOS 10.15 Catalina
 - Microsoft Windows 10
 
 Intel HE Acceleration Library requires the following dependencies:
 
 | Dependency  | Version                                      |
 |-------------|----------------------------------------------|
-| CMake       | >= 3.13                                      |
+| CMake       | >= 3.13 \*                                   |
 | Compiler    | gcc >= 7.0, clang++ >= 5.0, MSVC >= 2019     |
 
+ \* For Windows 10, you must check whether the version on CMake you have can
+ generate the necessary Visual Studio project files. For example, only form
+ CMake 3.14 onwards can MSVC project files be generated.
 
 ### Compile-time options
 In addition to the standard CMake build options, Intel HE Acceleration Library
