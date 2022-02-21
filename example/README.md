@@ -7,10 +7,12 @@ you can use to link Intel HE Acceleration Library to your external program.
 Before selecting a method, first install Intel HE Acceleration Library following
 the instructions provided in the (README.md)[../README.md].
 
-## Method 1 (example program provided method)
+For all methods an example `CMakeLists.txt` is provided in the corresponding
+directory for building the example program `example.cpp` provided in this
+directory. Specifically, methods 1, 2, and 3 are found in the `cmake`,
+`pkgconfig`, and `vcpkg` directories, respectively.
 
-This method is provided in the `CMakeLists.txt` of the example program
-`example.cpp` provided in this directory.
+## Method 1 (cmake)
 
 Once you have installed Intel HE Acceleration Library. Then, in your external
 application, add the following lines to your `CMakeLists.txt`:
@@ -25,7 +27,7 @@ If Intel HE Acceleration Library is installed globally, `HEXL_HINT_DIR` is not
 needed. Otherwise, `HEXL_HINT_DIR` should be the directory containing
 `HEXLConfig.cmake`, e.g. `${CMAKE_INSTALL_PREFIX}/lib/cmake/hexl-1.2.3/`
 
-## Method 2
+## Method 2 (pkgconfig)
 
 Once you have installed Intel HE Acceleration Library. Then, in your external
 application, add the following lines to your `CMakeLists.txt`:
