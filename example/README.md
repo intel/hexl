@@ -12,6 +12,17 @@ directory for building the example program `example.cpp` provided in this
 directory. Specifically, methods 1, 2, and 3 are found in the `cmake`,
 `pkgconfig`, and `vcpkg` directories, respectively.
 
+To run directly any of the provided methods use,
+```bash
+cmake -S <directory-for-method> -B build
+cmake --build build -j
+```
+The compiled example program , `example`, can be found in the `build` directory.
+
+Note that the Windows build of the example program may require some of the
+flags used un the Intel HE Acceleration Library build in
+[README.md](../README.md).
+
 ## Method 1 (cmake)
 
 Once you have installed Intel HE Acceleration Library. Then, in your external
