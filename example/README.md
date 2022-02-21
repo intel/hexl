@@ -1,10 +1,16 @@
 # Example using Intel HE Acceleration Library in an external application
 
-To use Intel HE Acceleration Library in an external application, you can use
-one of the three provided ways.
+This directory provides an example program as an example of using Intel HE
+Acceleration Library in an external application. There are three methods that
+you can use to link Intel HE Acceleration Library to your external program.
 
-* Install Intel HE Acceleration Library. Then, in your external application,
-* add the following lines to your `CMakeLists.txt`:
+Before selecting a method, first install Intel HE Acceleration Library following
+the instructions provided in the (README.md)[../README.md].
+
+## Method 1
+
+Once you have installed Intel HE Acceleration Library. Then, in your external
+application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
 find_package(HEXL 1.2.3
@@ -16,8 +22,10 @@ If Intel HE Acceleration Library is installed globally, `HEXL_HINT_DIR` is not
 needed. Otherwise, `HEXL_HINT_DIR` should be the directory containing
 `HEXLConfig.cmake`, e.g. `${CMAKE_INSTALL_PREFIX}/lib/cmake/hexl-1.2.3/`
 
-* Install Intel HE Acceleration Library. Then, in your external application,
-* add the following lines to your `CMakeLists.txt`:
+## Method 2
+
+Once you have installed Intel HE Acceleration Library. Then, in your external
+application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
 include(FindPkgConfig)
@@ -25,8 +33,10 @@ pkg_check_modules(HEXL REQUIRED IMPORTED_TARGET hexl)
 target_link_libraries(<your target> PkgConfig::HEXL)
 ```
 
-* Install Intel HE Acceleration Library from vcpkg. Then, in your external
-* application, add the following lines to your `CMakeLists.txt`:
+## Method 3 (vcpkg)
+
+If you installed Intel HE Acceleration Library from vcpkg. Then, in your external
+application, add the following lines to your `CMakeLists.txt`:
 
 ```bash
 find_package(HEXL CONFIG REQUIRED)
