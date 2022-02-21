@@ -5,7 +5,7 @@ Acceleration Library in an external application. There are three methods that
 you can use to link Intel HE Acceleration Library to your external program.
 
 Before selecting a method, first install Intel HE Acceleration Library following
-the instructions provided in the (README.md)[../README.md].
+the instructions provided in the [README.md](../README.md).
 
 For all methods an example `CMakeLists.txt` is provided in the corresponding
 directory for building the example program `example.cpp` provided in this
