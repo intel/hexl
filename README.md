@@ -133,7 +133,8 @@ To compile Intel HE Acceleration Library from source code, first clone the
 repository and change directories to the where the source has been cloned.
 
 #### Linux and Mac
-The instructions to build Intel HE Acceleration Library are common to Linux and MacOS.
+The instructions to build Intel HE Acceleration Library are common to Linux and
+MacOS.
 
 Then, to configure the build, call
 ```bash
@@ -154,7 +155,8 @@ Then, to build Intel HE Acceleration Library, call
 ```bash
 cmake --build build
 ```
-This will build the Intel HE Acceleration Library library in the `build/hexl/lib/` directory.
+This will build the Intel HE Acceleration Library library in the
+`build/hexl/lib/` directory.
 
 To install Intel HE Acceleration Library to the installation directory, run
 ```bash
@@ -167,7 +169,12 @@ Release mode, configure the build via
 ```bash
 cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
 ```
-adding the desired compile-time options with a `-D` flag (see [Compile-time options](#compile-time-options)).
+adding the desired compile-time options with a `-D` flag (see [Compile-time
+options](#compile-time-options)). For instance, to use a non-standard
+installation directory, configure the build with
+```bash
+cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install
+```
 
 To specify the desired build configuration, pass either `--config Debug` or
 `--config Release` to the build step and install steps. For instance, to build
@@ -182,11 +189,6 @@ To install Intel HE Acceleration Library to the installation directory, run
 ```bash
 cmake --build build --target install --config Release
 ```
-To use a non-standard installation directory, configure the build with
-```bash
-cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install
-```
-before proceeding with the build and installation directions above.
 
 ## Performance
 For best performance, we recommend using Intel HE Acceleration Library on a
@@ -236,7 +238,8 @@ Linux and Mac, and at `build\benchmark\Debug\bench_hexl.exe` or
 `build\benchmark\Release\bench_hexl.exe` on Windows.
 
 ## Using Intel HE Acceleration Library
-The `example` folder has an example of using Intel HE Acceleration Library in a third-party project.
+The `example` folder has an example of using Intel HE Acceleration Library in a
+third-party project.
 
 ## Debugging
 For optimal performance, Intel HE Acceleration Library does not perform input
@@ -265,9 +268,9 @@ Intel HE Acceleration Library is single-threaded and thread-safe.
 
 Intel HE Acceleration Library has been integrated to the following homomorphic
 encryption libraries:
-- [HElib](https://github.com/homenc/HElib)
-- [Microsoft SEAL](https://github.com/microsoft/SEAL)
 - [PALISADE](https://gitlab.com/palisade/palisade-release)
+- [Microsoft SEAL](https://github.com/microsoft/SEAL)
+- [HElib](https://github.com/homenc/HElib)
 
 See also the [Intel Homomorphic Encryption
 Toolkit](https://github.com/intel/he-toolkit) for example uses cases using
@@ -285,8 +288,10 @@ To build documentation, first install `doxygen` and `graphviz`, e.g.
 ```bash
 sudo apt-get install doxygen graphviz
 ```
-Then, configure Intel HE Acceleration Library with `-DHEXL_DOCS=ON` (see [Compile-time options](#compile-time-options)).
- To build Doxygen documentation, after configuring Intel HE Acceleration Library with `-DHEXL_DOCS=ON`, run
+Then, configure Intel HE Acceleration Library with `-DHEXL_DOCS=ON` (see
+[Compile-time options](#compile-time-options)).
+ To build Doxygen documentation, after configuring Intel HE Acceleration
+ Library with `-DHEXL_DOCS=ON`, run
 ```
 cmake --build build --target docs
 ```
@@ -294,8 +299,9 @@ To view the generated Doxygen documentation, open the generated
 `docs/doxygen/html/index.html` file in a web browser.
 
 # Contributing
-This project welcomes external contributions. To contribute to Intel HE
-Acceleration Library, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Intel HE Acceleration Library welcomes external contributions.
+To know more about contributing please go to [CONTRIBUTING.md](CONTRIBUTING.md).
+
 We encourage feedback and suggestions via [Github
 Issues](https://github.com/intel/hexl/issues) as well as discussion via [Github
 Discussions](https://github.com/intel/hexl/discussions).
