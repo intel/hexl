@@ -59,7 +59,7 @@ find_package(HEXL CONFIG REQUIRED)
 target_link_libraries(<your target> HEXL::hexl)
 ```
 
-To install a specific version of Intel HE Acceleration Library using vcpkg, use
+To install a specific version of Intel HE Acceleration Library using vcpkg, use the
 package versioning feature provided by vcpkg. An example manifest file is
 provided at `/path/to/hexl/example/vcpkg/vcpkg.json` with baseline pointing to
 a specific vcpkg commit. While building, overrides  will  force vcpkg to

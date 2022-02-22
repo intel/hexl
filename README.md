@@ -130,7 +130,7 @@ For convenience, they are listed below:
 
 ### Compiling Intel HE Acceleration Library
 To compile Intel HE Acceleration Library from source code, first clone the
-repository and change directories to the where the source has been cloned.
+repository and change directories to where the source has been cloned.
 
 #### Linux and Mac
 The instructions to build Intel HE Acceleration Library are common to Linux and
