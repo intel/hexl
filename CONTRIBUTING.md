@@ -1,6 +1,7 @@
 # Pull Requests
 
-Intel HEXL welcomes pull requests from external contributors to the `development` branch.
+Intel HE Acceleration Library (HEXL) welcomes pull requests from external
+contributors to the `development` branch.
 
 Before contributing, please run
 ```bash
@@ -8,7 +9,9 @@ cmake --build build --target check unittest
 ```
 to make sure the formatting checks and all unit tests pass.
 
-Please sign your commits before making a pull request. See instructions [here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits) for how to sign commits.
+Please sign your commits before making a pull request. See instructions
+[here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)
+for how to sign commits.
 
 ### Known Issues ###
 
@@ -25,4 +28,5 @@ Please sign your commits before making a pull request. See instructions [here](h
      error: gpg failed to sign the data
      fatal: failed to write commit object
   ```
-  Try adding ```export GPG_TTY=$(tty)``` to `~/.bashrc`.
+  Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
+  as `~/.bashrc`.
