@@ -1,9 +1,7 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "hexl/experimental/seal/ckks-multiply.hpp"
-
-#include <cstring>
+#include "hexl/experimental/seal/dyadic-multiply-internal.hpp"
 
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
@@ -14,10 +12,11 @@
 
 namespace intel {
 namespace hexl {
+namespace internal {
 
-void CkksMultiply(uint64_t* result, const uint64_t* operand1,
-                  const uint64_t* operand2, uint64_t n, const uint64_t* moduli,
-                  uint64_t num_moduli) {
+void DyadicMultiply(uint64_t* result, const uint64_t* operand1,
+                    const uint64_t* operand2, uint64_t n,
+                    const uint64_t* moduli, uint64_t num_moduli) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(operand2 != nullptr, "Require operand2 != nullptr");
@@ -74,5 +73,6 @@ void CkksMultiply(uint64_t* result, const uint64_t* operand1,
   }
 }
 
+}  // namespace internal
 }  // namespace hexl
 }  // namespace intel

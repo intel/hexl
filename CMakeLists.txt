@@ -61,6 +61,7 @@ option(HEXL_EXPERIMENTAL "Enable experimental features" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
+option(HEXL_FPGA_COMPAT "Disable some features so that they don't conflict with the HEXL-FPGA implementation" OFF)
 
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE_C_COMPILER:              ${CMAKE_C_COMPILER}")
@@ -73,9 +74,14 @@ message(STATUS "HEXL_EXPERIMENTAL:             ${HEXL_EXPERIMENTAL}")
 message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
+message(STATUS "HEXL_FPGA_COMPAT:              ${HEXL_FPGA_COMPAT}")
 
 hexl_check_compiler_version()
 hexl_add_compiler_definition()
+
+if (HEXL_FPGA_COMPAT)
+  add_definitions(-DHEXL_FPGA_COMPAT)
+endif()
 
 if (HEXL_COVERAGE)
   if (NOT HEXL_USE_GNU)
