@@ -3,8 +3,6 @@
 
 #include "hexl/fft/fwd-fft-avx512.hpp"
 
-#include <iostream>
-
 #include "hexl/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 

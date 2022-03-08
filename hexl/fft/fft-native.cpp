@@ -4,7 +4,6 @@
 #include "hexl/fft/fft-native.hpp"
 
 #include <cstring>
-#include <iostream>
 
 #include "hexl/logging/logging.hpp"
 #include "util/util-internal.hpp"
