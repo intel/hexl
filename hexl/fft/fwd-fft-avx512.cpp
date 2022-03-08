@@ -302,7 +302,7 @@ void FFT_AVX512(double* result_cmplx_intrlvd,
 
   size_t W_idx;
 
-  static const size_t base_fft_size = 16;
+  static const size_t base_fft_size = 1024;
 
   if (n <= base_fft_size) {  // Perform breadth-first InvFFT
     size_t m = n;            // (2*n >> 1);
