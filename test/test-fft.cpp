@@ -6,9 +6,9 @@
 #include "hexl/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
-#include "ntt/ntt-internal.hpp"
 #include "test-util.hpp"
 #include "util/cpu-features.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
@@ -16,34 +16,31 @@ namespace hexl {
 #ifdef HEXL_DEBUG
 TEST(FFT, bad_input) {
   uint64_t N = 16;
-  double scalar = 1.0;
   AlignedVector64<std::complex<double>> input(N, {0, 0});
 
-  EXPECT_ANY_THROW(FFT fft(2, nullptr));
-  EXPECT_ANY_THROW(FFT fft(17, nullptr));
-  EXPECT_NO_THROW(FFT fft(16, nullptr));
+  EXPECT_ANY_THROW(FFT fft(2));
+  EXPECT_ANY_THROW(FFT fft(17));
+  EXPECT_NO_THROW(FFT fft(16));
 
-  FFT fft(N, nullptr);
+  FFT fft(N);
 
   // Forward transform
   // Bad input
-  EXPECT_ANY_THROW(fft.ComputeForwardFFT(input.data(), nullptr, &scalar));
-  EXPECT_ANY_THROW(fft.ComputeForwardFFT(nullptr, input.data(), &scalar));
-  EXPECT_NO_THROW(fft.ComputeForwardFFT(input.data(), input.data(), &scalar));
-  EXPECT_NO_THROW(fft.ComputeForwardFFT(input.data(), input.data(), nullptr));
+  EXPECT_ANY_THROW(fft.ComputeForwardFFT(input.data(), nullptr));
+  EXPECT_ANY_THROW(fft.ComputeForwardFFT(nullptr, input.data()));
+  EXPECT_NO_THROW(fft.ComputeForwardFFT(input.data(), input.data()));
 
   // Inverse transform
   // Bad input
-  EXPECT_ANY_THROW(fft.ComputeInverseFFT(input.data(), nullptr, &scalar));
-  EXPECT_ANY_THROW(fft.ComputeInverseFFT(nullptr, input.data(), &scalar));
-  EXPECT_NO_THROW(fft.ComputeInverseFFT(input.data(), input.data(), &scalar));
-  EXPECT_NO_THROW(fft.ComputeInverseFFT(input.data(), input.data(), nullptr));
+  EXPECT_ANY_THROW(fft.ComputeInverseFFT(input.data(), nullptr));
+  EXPECT_ANY_THROW(fft.ComputeInverseFFT(nullptr, input.data()));
+  EXPECT_NO_THROW(fft.ComputeInverseFFT(input.data(), input.data()));
 }
 #endif
 
 TEST(FFT, RootsOfUnityNative) {
   {
-    FFT myfft(16, nullptr);
+    FFT myfft(16);
     ASSERT_EQ(std::complex<double>(0, 0), myfft.GetComplexRootOfUnity(0));
     ASSERT_EQ(std::complex<double>(-0.38268343236508978, 0.92387953251128674),
               myfft.GetComplexRootOfUnity(5));
@@ -56,7 +53,7 @@ TEST(FFT, RootsOfUnityNative) {
 TEST(FFT, RootsOfUnityNative2) {
   uint64_t N = 16;
 
-  FFT fft(N, nullptr);
+  FFT fft(N);
 
   EXPECT_EQ(fft.GetDegree(), N);
   EXPECT_EQ(fft.GetInvComplexRootOfUnity(0),
@@ -126,39 +123,31 @@ TEST(FFT, fft_with_allocator) {
   }
   AlignedVector64<std::complex<double>> input2 = input1;
   AlignedVector64<std::complex<double>> input3 = input1;
-  AlignedVector64<std::complex<double>> input4 = input1;
   AlignedVector64<std::complex<double>> exp_out = input1;
 
   {
     allocators::CustomAllocatorFFT a;
-    double scalar = 1 << 16;
-    double scale = scalar / static_cast<double>(N);
-    double inv_scale = 1.0 / scalar;
-    FFT fft1(N, nullptr);
-    FFT fft2(N, &scalar);
-    FFT fft3(N, &scalar, std::move(a));
+    FFT fft1(N);
+    FFT fft2(N, std::move(a));
 
     std::allocator<int> s;
-    FFT fft4(N, &scalar, std::move(s));
+    FFT fft3(N, std::move(s));
 
-    fft1.ComputeForwardFFT(input1.data(), input1.data(), &inv_scale);
-    fft1.ComputeInverseFFT(input1.data(), input1.data(), &scale);
-    fft2.ComputeForwardFFT(input2.data(), input2.data());
-    fft2.ComputeInverseFFT(input2.data(), input2.data());
+    fft1.ComputeForwardFFT(input1.data(), input1.data());
+    fft1.ComputeInverseFFT(input1.data(), input1.data());
 
     ASSERT_NE(allocators::CustomAllocatorFFT::number_allocations, 0);
 
+    fft2.ComputeForwardFFT(input2.data(), input2.data());
+    fft2.ComputeInverseFFT(input2.data(), input2.data());
     fft3.ComputeForwardFFT(input3.data(), input3.data());
     fft3.ComputeInverseFFT(input3.data(), input3.data());
-    fft4.ComputeForwardFFT(input4.data(), input4.data(), &inv_scale);
-    fft4.ComputeInverseFFT(input4.data(), input4.data(), &scale);
   }
 
   ASSERT_NE(allocators::CustomAllocatorFFT::number_deallocations, 0);
   CheckClose(exp_out, input1, 0.5);
   CheckClose(exp_out, input2, 0.5);
   CheckClose(exp_out, input3, 0.5);
-  CheckClose(exp_out, input4, 0.5);
 }
 
 }  // namespace hexl

@@ -18,113 +18,6 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-TEST(FFT, BuildFloatingPointsAVX512) {
-  if (!has_avx512dq) {
-    GTEST_SKIP();
-  }
-  {
-    const uint64_t poly_mod_degree = 16;
-    const uint64_t coeff_mod_size = 4;
-    const double scale = 1099511627776;  // (1 << 40)
-    const double inv_scale = 1.0 / scale;
-
-    std::vector<std::complex<double>> result(poly_mod_degree);
-
-    std::vector<std::complex<double>> expected{{469095144.125, 0},
-                                               {32109980.057216156, 0},
-                                               {133969900.94656014, 0},
-                                               {1327830.7073135898, 0},
-                                               {-72732310.45981437, 0},
-                                               {-55123198.89089907, 0},
-                                               {-130250344.32255825, 0},
-                                               {66152794.724299073, 0},
-                                               {0, 0},
-                                               {-66152794.724299081, 0},
-                                               {130250344.32255828, 0},
-                                               {55123198.89089907, 0},
-                                               {72732310.459814355, 0},
-                                               {-1327830.7073136102, 0},
-                                               {-133969900.94656017, 0},
-                                               {-32109980.05721616, 0}};
-
-    const uint64_t operand[] = {17713475508538179584ULL,
-                                27,
-                                0,
-                                0,
-                                16858552366855081984ULL,
-                                1,
-                                0,
-                                0,
-                                18174255346774966272ULL,
-                                7,
-                                0,
-                                0,
-                                1459965302409322496ULL,
-                                0,
-                                0,
-                                0,
-                                10852157353743343297ULL,
-                                72057091796482622ULL,
-                                0,
-                                0,
-                                11766836204861046465ULL,
-                                72057091796482623ULL,
-                                0,
-                                0,
-                                2950642535971380929ULL,
-                                72057091796482619ULL,
-                                0,
-                                0,
-                                17395534788117004288ULL,
-                                3,
-                                0,
-                                0,
-                                0,
-                                0,
-                                0,
-                                0,
-                                18086411410077564609ULL,
-                                72057091796482622ULL,
-                                0,
-                                0,
-                                14084559588513677312ULL,
-                                7,
-                                0,
-                                0,
-                                5268365919623979008ULL,
-                                3,
-                                0,
-                                0,
-                                6183044770741665792ULL,
-                                4,
-                                0,
-                                0,
-                                15575236822075680449ULL,
-                                72057091796482626ULL,
-                                0,
-                                0,
-                                17307690851419578049ULL,
-                                72057091796482618ULL,
-                                0,
-                                0,
-                                176649757629939393ULL,
-                                72057091796482625ULL,
-                                0,
-                                0};
-
-    const uint64_t upper_half_threshold[] = {8517601062242512737ULL,
-                                             36028545898241313ULL, 0, 0};
-    const uint64_t decryption_modulus[] = {17035202124485025473ULL,
-                                           72057091796482626ULL, 0, 0};
-
-    BuildFloatingPointsAVX512(&reinterpret_cast<double(&)[2]>(result[0])[0],
-                              operand, upper_half_threshold, decryption_modulus,
-                              inv_scale, coeff_mod_size, poly_mod_degree);
-
-    ASSERT_EQ(expected, result);
-  }
-}
-
 TEST(FFT, ComplexLoadFwdInterleavedT1AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
@@ -341,19 +234,12 @@ TEST(FFT, ComplexWriteInvInterleavedT8AVX512) {
   AssertEqual(exp_x, out_x);
 }
 
-TEST(FFT, ForwardInverseFFTAVX512) {
-  if (!has_avx512dq) {
-    GTEST_SKIP();
-  }
-
-  FFT fft(64, nullptr);
-  AlignedVector64<std::complex<double>> root_powers =
-      fft.GetComplexRootsOfUnity();
-  AlignedVector64<std::complex<double>> inv_root_powers =
-      fft.GetInvComplexRootsOfUnity();
-
-  {  // Single Unscaled
+TEST(FFT, OneWayFFT_AVX512) {
+  {  // Single
     const uint64_t n = 64;
+    FFT fft(n);
+    AlignedVector64<double> root_powers =
+        fft.GetComplexInterleavedRootsOfUnity();
     const double data_bound = (1 << 30);
     AlignedVector64<std::complex<double>> operand(n);
     AlignedVector64<std::complex<double>> result(n);
@@ -362,67 +248,87 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         GenerateInsecureUniformRealRandomValue(0, data_bound),
         GenerateInsecureUniformRealRandomValue(0, data_bound));
 
-    Forward_FFT_ToBitReverseAVX512(
-        &(reinterpret_cast<double(&)[2]>(result[0]))[0],
-        &(reinterpret_cast<double(&)[2]>(operand[0]))[0],
-        &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
+    Forward_FFT_AVX512(&(reinterpret_cast<double(&)[2]>(result[0]))[0],
+                       &(reinterpret_cast<double(&)[2]>(operand[0]))[0],
+                       &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
 
     for (size_t i = 0; i < n; ++i) {
       CheckClose(operand[0], result[i], 0.5);
     }
   }
 
-  {  // Single Scaled
-    const uint64_t n = 64;
-    const double scale = 1 << 16;
-    const double inv_scale = 1.0 / scale;
-    const double data_bound = (1 << 30);
-    AlignedVector64<std::complex<double>> operand(n);
+  {
+    const uint64_t n = 16;
+    FFT fft(n);
+    AlignedVector64<std::complex<double>> inv_root_powers =
+        fft.GetInvComplexRootsOfUnity();
+
+    std::vector<std::complex<double>> operand = {
+        {1, 8}, {5, 4}, {3, 6}, {7, 2}, {4, -5}, {8, -1}, {6, -3}, {2, -7},
+        {2, 7}, {6, 3}, {8, 1}, {4, 5}, {7, -2}, {3, -6}, {5, -4}, {1, -8}};
+    std::vector<std::complex<double>> expected = {
+        {4.5, 0},
+        {-0.73197082710900485, 0.14559805007309851},
+        {-3.3195436482630059, 1.3750000000000004},
+        {-0.25000000000000006, 0.16704465947982483},
+        {-1, 1},
+        {0.52003106085336159, -0.77828148243818829},
+        {-0.86243686707645817, 2.0821067811865475},
+        {-0.24999999999999997, 1.256834873031462},
+        {0, 1},
+        {-0.078689344670816563, -0.3955980500730984},
+        {0.56954364826300585, 1.375},
+        {-0.25000000000000017, -0.37415144066637229},
+        {0, 5.5511151231257827e-17},
+        {0.79062911092645982, 0.52828148243818829},
+        {1.6124368670764582, 0.66789321881345221},
+        {-0.24999999999999986, -0.049728091844914557}};
+
     AlignedVector64<std::complex<double>> result(n);
 
-    std::complex<double> value(
-        GenerateInsecureUniformRealRandomValue(0, data_bound),
-        GenerateInsecureUniformRealRandomValue(0, data_bound));
-    operand[0] = value;
-    value *= inv_scale;
-
-    Forward_FFT_ToBitReverseAVX512(
-        &reinterpret_cast<double(&)[2]>(result[0])[0],
-        &reinterpret_cast<double(&)[2]>(operand[0])[0],
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
+    Inverse_FFT_AVX512(&reinterpret_cast<double(&)[2]>(result[0])[0],
+                       &reinterpret_cast<double(&)[2]>(operand[0])[0],
+                       &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0],
+                       n);
 
     for (size_t i = 0; i < n; ++i) {
-      CheckClose(value, result[i], 0.5);
+      ASSERT_TRUE(expected[i].real() == result[i].real());
+      ASSERT_TRUE(result[i].imag() == expected[i].imag());
     }
   }
+}
+
+TEST(FFT, ForwardInverseFFT_AVX512) {
+  if (!has_avx512dq) {
+    GTEST_SKIP();
+  }
+
+  FFT fft(64);
+  AlignedVector64<std::complex<double>> root_powers =
+      fft.GetComplexRootsOfUnity();
+  AlignedVector64<std::complex<double>> inv_root_powers =
+      fft.GetInvComplexRootsOfUnity();
 
   {  // Zeros test
     const uint64_t n = 64;
-    const double scale = 1 << 16;
-    const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = 1.0 / scale;
 
     AlignedVector64<std::complex<double>> operand(n, {0, 0});
     AlignedVector64<std::complex<double>> transformed(n);
     AlignedVector64<std::complex<double>> result(n);
 
-    Forward_FFT_ToBitReverseAVX512(
-        &reinterpret_cast<double(&)[2]>(transformed[0])[0],
-        &reinterpret_cast<double(&)[2]>(operand[0])[0],
-        &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
-        &reinterpret_cast<double(&)[2]>(result[0])[0],
-        &reinterpret_cast<double(&)[2]>(transformed[0])[0],
-        &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0], n, &scalar);
+    Forward_FFT_AVX512(&reinterpret_cast<double(&)[2]>(transformed[0])[0],
+                       &reinterpret_cast<double(&)[2]>(operand[0])[0],
+                       &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n);
+    Inverse_FFT_AVX512(&reinterpret_cast<double(&)[2]>(result[0])[0],
+                       &reinterpret_cast<double(&)[2]>(transformed[0])[0],
+                       &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0],
+                       n);
 
     CheckClose(operand, result, 0.5);
   }
 
-  {  // Large Scaled
+  {  // Out of place
     const uint64_t n = 64;
-    const double scale = 1099511627776;  // (1 << 40)
-    const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
@@ -432,75 +338,20 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand_complex_interleaved =
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
-    Forward_FFT_ToBitReverseAVX512(
-        transformed_complex_interleaved.data(),
-        operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
-        result_complex_interleaved.data(),
-        transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
+    Forward_FFT_AVX512(transformed_complex_interleaved.data(),
+                       operand_complex_interleaved.data(),
+                       &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
+
+    Inverse_FFT_AVX512(result_complex_interleaved.data(),
+                       transformed_complex_interleaved.data(),
+                       &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0],
+                       n);
 
     CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }
 
-  {  // Very Large Scale
+  {  // In place
     const uint64_t n = 64;
-    const double scale = 1.2980742146337069e+33;  // (1 << 110)
-    const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = 1.0 / scale;
-    const double data_bound = (1 << 20);
-
-    AlignedVector64<double> operand_complex_interleaved(2 * n);
-    AlignedVector64<double> transformed_complex_interleaved(2 * n);
-    AlignedVector64<double> result_complex_interleaved(2 * n);
-
-    operand_complex_interleaved =
-        GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
-
-    Forward_FFT_ToBitReverseAVX512(
-        transformed_complex_interleaved.data(),
-        operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
-        result_complex_interleaved.data(),
-        transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
-
-    CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
-  }
-
-  {  // Over 128 bits Scale
-    const uint64_t n = 64;
-    const double scale = 1.3611294676837539e+39;  // (1 << 130)
-    const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = 1.0 / scale;
-    const double data_bound = (1 << 20);
-
-    AlignedVector64<double> operand_complex_interleaved(2 * n);
-    AlignedVector64<double> transformed_complex_interleaved(2 * n);
-    AlignedVector64<double> result_complex_interleaved(2 * n);
-
-    operand_complex_interleaved =
-        GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
-
-    Forward_FFT_ToBitReverseAVX512(
-        transformed_complex_interleaved.data(),
-        operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
-        result_complex_interleaved.data(),
-        transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
-
-    CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
-  }
-
-  {  // Inplace
-    const uint64_t n = 64;
-    const double scale = 1.3611294676837539e+39;  // (1 << 130)
-    const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 20);
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
@@ -509,25 +360,22 @@ TEST(FFT, ForwardInverseFFTAVX512) {
 
     AlignedVector64<double> expected = operand_complex_interleaved;
 
-    Forward_FFT_ToBitReverseAVX512(
-        operand_complex_interleaved.data(), operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
+    Forward_FFT_AVX512(operand_complex_interleaved.data(),
+                       operand_complex_interleaved.data(),
+                       &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
 
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFT_AVX512(
         operand_complex_interleaved.data(), operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
+        &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n);
 
     CheckClose(expected, operand_complex_interleaved, 0.5);
   }
 
   {  // Big message
     const uint64_t n = 4096;
-    const double scale = 1 << 16;
-    const double scalar = scale / static_cast<double>(n);
-    const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
 
-    FFT big_fft(n, nullptr);
+    FFT big_fft(n);
     AlignedVector64<std::complex<double>> big_root_powers =
         big_fft.GetComplexRootsOfUnity();
     AlignedVector64<std::complex<double>> big_inv_root_powers =
@@ -541,17 +389,15 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand_complex_interleaved =
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
-    Forward_FFT_ToBitReverseAVX512(
-        transformed_complex_interleaved.data(),
-        operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(big_root_powers[0]))[0], n,
-        &inv_scale);
+    Forward_FFT_AVX512(transformed_complex_interleaved.data(),
+                       operand_complex_interleaved.data(),
+                       &(reinterpret_cast<double(&)[2]>(big_root_powers[0]))[0],
+                       n);
 
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFT_AVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(big_inv_root_powers[0]))[0], n,
-        &scalar);
+        &(reinterpret_cast<double(&)[2]>(big_inv_root_powers[0]))[0], n);
 
     CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }

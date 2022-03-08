@@ -15,6 +15,8 @@ set(NATIVE_SRC
     number-theory/number-theory.cpp
     fft/fft.cpp
     fft/fft-native.cpp
+    dwt/dwt.cpp
+    dwt/dwt-native.cpp
 )
 
 if (HEXL_EXPERIMENTAL)
@@ -39,6 +41,8 @@ if (HEXL_HAS_AVX512DQ)
         ntt/inv-ntt-avx512.cpp
         fft/fwd-fft-avx512.cpp
         fft/inv-fft-avx512.cpp
+        dwt/fwd-dwt-avx512.cpp
+        dwt/inv-dwt-avx512.cpp
     )
 endif()
 

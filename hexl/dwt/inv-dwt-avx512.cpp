@@ -1,8 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-#include "hexl/fft/inv-fft-avx512.hpp"
+#include "hexl/dwt/inv-dwt-avx512.hpp"
 
-#include "hexl/fft/fft-avx512-util.hpp"
+#include "hexl/dwt/dwt-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 
 namespace intel {
@@ -10,7 +10,7 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-/// @brief Final butterfly step for the Inverse FFT.
+/// @brief Final butterfly step for the Inverse DWT.
 /// @param[in,out] X_real Double precision (DP) values in SIMD form representing
 /// the real part of 8 complex numbers.
 /// @param[in,out] X_imag DP values in SIMD form representing the
@@ -23,9 +23,9 @@ namespace hexl {
 /// Inverse Complex Roots of unity.
 /// @param[in] W_imag DP values in SIMD form representing the imaginary part of
 /// the Inverse Complex Roots of unity.
-void ComplexInvButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
-                         __m512d* Y_imag, __m512d W_real, __m512d W_imag,
-                         const double* scalar = nullptr) {
+void ComplexInvDWT_Butterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
+                             __m512d* Y_imag, __m512d W_real, __m512d W_imag,
+                             const double* scalar = nullptr) {
   // U = X,
   __m512d U_real = *X_real;
   __m512d U_imag = *X_imag;
@@ -55,8 +55,9 @@ void ComplexInvButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
   *Y_imag = _mm512_add_pd(*Y_imag, tmp);
 }
 
-void ComplexInvT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
-                  const double* W_1C_intrlvd, uint64_t m) {
+void ComplexInvDWT_T1(double* result_8C_intrlvd,
+                      const double* operand_1C_intrlvd,
+                      const double* W_1C_intrlvd, uint64_t m) {
   size_t offset = 0;
 
   // 8 | m guaranteed by n >= 16
@@ -90,8 +91,8 @@ void ComplexInvT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
         W_1C_intrlvd[13], W_1C_intrlvd[9], W_1C_intrlvd[5], W_1C_intrlvd[1]);
     W_1C_intrlvd += 16;
 
-    ComplexInvButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                        v_W_imag);
+    ComplexInvDWT_Butterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
+                            v_W_real, v_W_imag);
 
     _mm512_storeu_pd(v_X_r_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_r_pt_imag, v_X_imag);
@@ -104,8 +105,8 @@ void ComplexInvT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
   }
 }
 
-void ComplexInvT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t m) {
+void ComplexInvDWT_T2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+                      uint64_t m) {
   size_t offset = 0;
 
   // 4 | m guaranteed by n >= 16
@@ -137,8 +138,8 @@ void ComplexInvT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
         W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[3], W_1C_intrlvd[1]);
     W_1C_intrlvd += 8;
 
-    ComplexInvButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                        v_W_imag);
+    ComplexInvDWT_Butterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
+                            v_W_real, v_W_imag);
 
     _mm512_storeu_pd(v_X_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
@@ -151,8 +152,8 @@ void ComplexInvT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 }
 
-void ComplexInvT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t m) {
+void ComplexInvDWT_T4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+                      uint64_t m) {
   size_t offset = 0;
 
   // 2 | m guaranteed by n >= 16
@@ -184,8 +185,8 @@ void ComplexInvT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
 
     W_1C_intrlvd += 4;
 
-    ComplexInvButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                        v_W_imag);
+    ComplexInvDWT_Butterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
+                            v_W_real, v_W_imag);
 
     ComplexWriteInvInterleavedT4(v_X_real, v_Y_real, v_X_pt_real);
     ComplexWriteInvInterleavedT4(v_X_imag, v_Y_imag, v_X_pt_imag);
@@ -194,8 +195,8 @@ void ComplexInvT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 }
 
-void ComplexInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t gap, uint64_t m) {
+void ComplexInvDWT_T8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+                      uint64_t gap, uint64_t m) {
   size_t offset = 0;
 
   HEXL_LOOP_UNROLL_4
@@ -225,8 +226,8 @@ void ComplexInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
       __m512d v_Y_real = _mm512_loadu_pd(v_Y_pt_real);
       __m512d v_Y_imag = _mm512_loadu_pd(v_Y_pt_imag);
 
-      ComplexInvButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                          v_W_imag);
+      ComplexInvDWT_Butterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
+                              v_W_real, v_W_imag);
 
       _mm512_storeu_pd(v_X_pt_real, v_X_real);
       _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
@@ -248,9 +249,9 @@ void ComplexInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
 // its 8 imaginary parts.
 // Returns operand as 1 complex interleaved: One real part followed by its
 // imaginary part.
-void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                       uint64_t gap, uint64_t m,
-                       const double* scalar = nullptr) {
+void ComplexFinalInvDWT_T8(double* operand_8C_intrlvd,
+                           const double* W_1C_intrlvd, uint64_t gap, uint64_t m,
+                           const double* scalar = nullptr) {
   size_t offset = 0;
 
   __m512d v_scalar;
@@ -289,8 +290,8 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
       __m512d v_Y_real = _mm512_loadu_pd(v_Y_pt_real);
       __m512d v_Y_imag = _mm512_loadu_pd(v_Y_pt_imag);
 
-      ComplexInvButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
-                          v_W_imag, scalar);
+      ComplexInvDWT_Butterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
+                              v_W_real, v_W_imag, scalar);
 
       ComplexWriteInvInterleavedT8(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
                                    v_X_pt_real, v_Y_pt_real);
@@ -304,10 +305,10 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 }
 
-void Inverse_FFT_AVX512(double* result_cmplx_intrlvd,
-                        const double* operand_cmplx_intrlvd,
-                        const double* inv_root_of_unity_cmplx_intrlvd,
-                        const uint64_t n) {
+void Inverse_DWT_FromBitReverseAVX512(
+    double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
+    const double* inv_root_of_unity_cmplx_intrlvd, const uint64_t n,
+    const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n >= 16,
              "Don't support small transforms. Need n >= 16, got n = " << n);
@@ -317,9 +318,87 @@ void Inverse_FFT_AVX512(double* result_cmplx_intrlvd,
                           inv_root_of_unity_cmplx_intrlvd + 2 * n));
   HEXL_VLOG(5, "operand_cmplx_intrlvd " << std::vector<std::complex<double>>(
                    operand_cmplx_intrlvd, operand_cmplx_intrlvd + 2 * n));
+  size_t gap = 2;  // Interleaved complex values requires twice the size
+  size_t m = n;    // (2*n >> 1);
+  size_t W_idx = 2 + m * recursion_half;  // 2*1
 
-  Forward_FFT_AVX512(result_cmplx_intrlvd, operand_cmplx_intrlvd,
-                     inv_root_of_unity_cmplx_intrlvd, n, true);
+  static const size_t base_dwt_size = 1024;
+
+  if (n <= base_dwt_size) {  // Perform breadth-first InvDWT
+    // T1
+    const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    ComplexInvDWT_T1(result_cmplx_intrlvd, operand_cmplx_intrlvd,
+                     W_cmplx_intrlvd, m);
+    gap <<= 1;
+    m >>= 1;
+    uint64_t W_idx_delta =
+        m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
+
+    // T2
+    W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    ComplexInvDWT_T2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    gap <<= 1;
+    m >>= 1;
+    W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
+
+    // T4
+    W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    ComplexInvDWT_T4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    gap <<= 1;
+    m >>= 1;
+    W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    W_idx += W_idx_delta;
+
+    while (m > 2) {
+      W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+      ComplexInvDWT_T8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+      gap <<= 1;
+      m >>= 1;
+      W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+      W_idx += W_idx_delta;
+    }
+
+    W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    if (recursion_depth == 0) {
+      ComplexFinalInvDWT_T8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m,
+                            scale);
+      HEXL_VLOG(5,
+                "AVX512 returning INV DWT result "
+                    << std::vector<std::complex<double>>(
+                           result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
+    } else {
+      ComplexInvDWT_T8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+    }
+
+  } else {
+    Inverse_DWT_FromBitReverseAVX512(
+        result_cmplx_intrlvd, operand_cmplx_intrlvd,
+        inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
+        2 * recursion_half);
+    Inverse_DWT_FromBitReverseAVX512(
+        &result_cmplx_intrlvd[n], &operand_cmplx_intrlvd[n],
+        inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
+        2 * recursion_half + 1);
+    uint64_t W_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
+    for (; m > 2; m >>= 1) {
+      gap <<= 1;
+      W_delta >>= 1;
+      W_idx += W_delta;
+    }
+    const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
+    if (recursion_depth == 0) {
+      ComplexFinalInvDWT_T8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m,
+                            scale);
+      HEXL_VLOG(5,
+                "AVX512 returning INV DWT result "
+                    << std::vector<std::complex<double>>(
+                           result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
+    } else {
+      ComplexInvDWT_T8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+    }
+  }
 }
 
 #endif  // HEXL_HAS_AVX512DQ

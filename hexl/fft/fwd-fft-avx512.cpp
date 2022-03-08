@@ -3,6 +3,8 @@
 
 #include "hexl/fft/fwd-fft-avx512.hpp"
 
+#include <iostream>
+
 #include "hexl/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 
@@ -48,63 +50,129 @@ void ComplexFwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
   *Y_imag = _mm512_sub_pd(U_imag, V_imag);
 }
 
-// Takes operand as 8 complex interleaved: This is 8 real parts followed by
-// its 8 imaginary parts.
-// Returns operand as 1 complex interleaved: One real part followed by its
-// imaginary part.
-void ComplexFwdT1(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t m, const double* scalar = nullptr) {
+void ComplexT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
+               const double* W_1C_intrlvd, uint64_t m) {
   size_t offset = 0;
 
-  __m512d v_scalar;
-  if (scalar != nullptr) {
-    v_scalar = _mm512_set1_pd(*scalar);
-  }
+  // ***
+  std::size_t xc = 0;
+  std::size_t yc = 0;
+  std::size_t rc = 0;
+  // ***
 
   // 8 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_8
   for (size_t i = 0; i < (m >> 1); i += 8) {
-    double* X_real = operand_8C_intrlvd + offset;
-    double* X_imag = X_real + 8;
-    __m512d* v_out_pt = reinterpret_cast<__m512d*>(X_real);
+    // Referencing operand
+    const double* X_op_real = operand_1C_intrlvd + offset;
+
+    // Referencing result
+    double* X_r_real = result_8C_intrlvd + offset;
+    double* X_r_imag = X_r_real + 8;
+    __m512d* v_X_r_pt_real = reinterpret_cast<__m512d*>(X_r_real);
+    __m512d* v_X_r_pt_imag = reinterpret_cast<__m512d*>(X_r_imag);
 
     __m512d v_X_real;
     __m512d v_X_imag;
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    ComplexLoadFwdInterleavedT1(X_real, &v_X_real, &v_Y_real);
-    ComplexLoadFwdInterleavedT1(X_imag, &v_X_imag, &v_Y_imag);
+    ComplexLoadInvInterleavedT1(X_op_real, &v_X_real, &v_X_imag, &v_Y_real,
+                                &v_Y_imag);
+    // ***
+    xc = offset;
+    yc = xc + 1;
+
+    __m512d v_Xo_real = v_X_real;
+    __m512d v_Xo_imag = v_X_imag;
+    __m512d v_Yo_real = v_Y_real;
+    __m512d v_Yo_imag = v_Y_imag;
+    // ***
 
     // Weights
-    __m512d v_W_real = _mm512_set_pd(
-        W_1C_intrlvd[14], W_1C_intrlvd[12], W_1C_intrlvd[10], W_1C_intrlvd[8],
-        W_1C_intrlvd[6], W_1C_intrlvd[4], W_1C_intrlvd[2], W_1C_intrlvd[0]);
-    __m512d v_W_imag = _mm512_set_pd(
-        W_1C_intrlvd[15], W_1C_intrlvd[13], W_1C_intrlvd[11], W_1C_intrlvd[9],
-        W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[3], W_1C_intrlvd[1]);
-    W_1C_intrlvd += 16;
-
-    if (scalar != nullptr) {
-      v_W_real = _mm512_mul_pd(v_W_real, v_scalar);
-      v_W_imag = _mm512_mul_pd(v_W_imag, v_scalar);
-      v_X_real = _mm512_mul_pd(v_X_real, v_scalar);
-      v_X_imag = _mm512_mul_pd(v_X_imag, v_scalar);
-    }
+    __m512d v_W_real = _mm512_set1_pd(W_1C_intrlvd[0]);
+    __m512d v_W_imag = _mm512_set1_pd(W_1C_intrlvd[8]);
 
     ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                         v_W_imag);
 
-    ComplexWriteFwdInterleavedT1(v_X_real, v_Y_real, v_X_imag, v_Y_imag,
-                                 v_out_pt);
+    std::cout << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+              << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+    std::cout << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+    std::cout << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+              << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+    std::cout << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+              << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+    std::cout << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+    std::cout << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+              << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+    std::cout << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+              << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+    std::cout << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+    std::cout << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+              << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+    std::cout << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+              << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+    std::cout << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+    std::cout << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+              << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+    std::cout << " x = " << xc + 8 << " y = " << yc + 8 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+              << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+    std::cout << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+    std::cout << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+              << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+    std::cout << " x = " << xc + 10 << " y = " << yc + 10 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+              << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+    std::cout << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+    std::cout << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+              << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+    std::cout << " x = " << xc + 12 << " y = " << yc + 12 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+              << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+    std::cout << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+    std::cout << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+              << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+    std::cout << " x = " << xc + 14 << " y = " << yc + 14 << " w = " << rc
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+              << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+    std::cout << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+    std::cout << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+              << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
+    _mm512_storeu_pd(v_X_r_pt_real, v_X_real);
+    _mm512_storeu_pd(v_X_r_pt_imag, v_X_imag);
+    v_X_r_pt_real += 2;
+    v_X_r_pt_imag += 2;
+    _mm512_storeu_pd(v_X_r_pt_real, v_Y_real);
+    _mm512_storeu_pd(v_X_r_pt_imag, v_Y_imag);
 
     offset += 32;
   }
 }
 
-void ComplexFwdT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t m) {
+void ComplexT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+               uint64_t m) {
   size_t offset = 0;
+
+  // ***
+  std::size_t xc = 0;
+  std::size_t yc = 0;
+  std::size_t rc = 1;
+  // ***
 
   // 4 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
@@ -117,23 +185,92 @@ void ComplexFwdT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
 
     __m512d v_X_real;
     __m512d v_X_imag;
+
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    ComplexLoadFwdInterleavedT2(X_real, &v_X_real, &v_Y_real);
-    ComplexLoadFwdInterleavedT2(X_imag, &v_X_imag, &v_Y_imag);
+    ComplexLoadInvInterleavedT2(X_real, &v_X_real, &v_Y_real);
+    ComplexLoadInvInterleavedT2(X_imag, &v_X_imag, &v_Y_imag);
+
+    // ***
+    xc = offset;
+    yc = xc + 2;
+
+    __m512d v_Xo_real = v_X_real;
+    __m512d v_Xo_imag = v_X_imag;
+    __m512d v_Yo_real = v_Y_real;
+    __m512d v_Yo_imag = v_Y_imag;
+    // ***
 
     // Weights
+    // x =  (13,  9, 5, 1, 12,  8, 4, 0)
+    // y =  (15, 11, 7, 3, 14, 10, 6, 2)
     __m512d v_W_real = _mm512_set_pd(
-        W_1C_intrlvd[6], W_1C_intrlvd[6], W_1C_intrlvd[4], W_1C_intrlvd[4],
-        W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[0], W_1C_intrlvd[0]);
+        W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[2],
+        W_1C_intrlvd[0], W_1C_intrlvd[0], W_1C_intrlvd[0], W_1C_intrlvd[0]);
     __m512d v_W_imag = _mm512_set_pd(
-        W_1C_intrlvd[7], W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[5],
-        W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[1], W_1C_intrlvd[1]);
-    W_1C_intrlvd += 8;
+        W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[3],
+        W_1C_intrlvd[1], W_1C_intrlvd[1], W_1C_intrlvd[1], W_1C_intrlvd[1]);
 
     ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                         v_W_imag);
+
+    std::cout << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+              << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+    std::cout << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+    std::cout << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+              << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+    std::cout << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 1
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+              << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+    std::cout << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+    std::cout << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+              << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+    std::cout << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 0
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+              << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+    std::cout << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+    std::cout << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+              << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+    std::cout << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 1
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+              << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+    std::cout << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+    std::cout << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+              << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+    std::cout << " x = " << xc + 8 << " y = " << yc + 8 << " w = " << rc + 0
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+              << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+    std::cout << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+    std::cout << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+              << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+    std::cout << " x = " << xc + 9 << " y = " << yc + 9 << " w = " << rc + 1
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+              << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+    std::cout << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+    std::cout << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+              << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+    std::cout << " x = " << xc + 12 << " y = " << yc + 12 << " w = " << rc + 0
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+              << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+    std::cout << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+    std::cout << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+              << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+    std::cout << " x = " << xc + 13 << " y = " << yc + 13 << " w = " << rc + 1
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+              << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+    std::cout << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+    std::cout << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+              << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
 
     _mm512_storeu_pd(v_X_pt_real, v_X_real);
     _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
@@ -146,9 +283,15 @@ void ComplexFwdT2(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 }
 
-void ComplexFwdT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t m) {
+void ComplexT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+               uint64_t m) {
   size_t offset = 0;
+
+  // ***
+  std::size_t xc = 0;
+  std::size_t yc = 0;
+  std::size_t rc = 3;
+  // ***
 
   // 2 | m guaranteed by n >= 16
   HEXL_LOOP_UNROLL_4
@@ -164,38 +307,106 @@ void ComplexFwdT4(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    ComplexLoadFwdInterleavedT4(X_real, &v_X_real, &v_Y_real);
-    ComplexLoadFwdInterleavedT4(X_imag, &v_X_imag, &v_Y_imag);
+    ComplexLoadInvInterleavedT4(X_real, &v_X_real, &v_Y_real);
+    ComplexLoadInvInterleavedT4(X_imag, &v_X_imag, &v_Y_imag);
+
+    // ***
+    xc = offset;
+    yc = xc + 4;
+
+    __m512d v_Xo_real = v_X_real;
+    __m512d v_Xo_imag = v_X_imag;
+    __m512d v_Yo_real = v_Y_real;
+    __m512d v_Yo_imag = v_Y_imag;
+    // ***
 
     // Weights
-    // x =  (11, 10,  9,  8, 3, 2, 1, 0)
-    // y =  (15, 14, 13, 12, 7, 6, 5, 4)
+    // x =  (11,  9, 3, 1, 10,  8, 2, 0)
+    // y =  (15, 13, 7, 5, 14, 12, 6, 4)
     __m512d v_W_real = _mm512_set_pd(
-        W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[2], W_1C_intrlvd[2],
-        W_1C_intrlvd[0], W_1C_intrlvd[0], W_1C_intrlvd[0], W_1C_intrlvd[0]);
+        W_1C_intrlvd[6], W_1C_intrlvd[2], W_1C_intrlvd[6], W_1C_intrlvd[2],
+        W_1C_intrlvd[4], W_1C_intrlvd[0], W_1C_intrlvd[4], W_1C_intrlvd[0]);
     __m512d v_W_imag = _mm512_set_pd(
-        W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[3], W_1C_intrlvd[3],
-        W_1C_intrlvd[1], W_1C_intrlvd[1], W_1C_intrlvd[1], W_1C_intrlvd[1]);
-
-    W_1C_intrlvd += 4;
+        W_1C_intrlvd[7], W_1C_intrlvd[3], W_1C_intrlvd[7], W_1C_intrlvd[3],
+        W_1C_intrlvd[5], W_1C_intrlvd[1], W_1C_intrlvd[5], W_1C_intrlvd[1]);
 
     ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                         v_W_imag);
 
-    _mm512_storeu_pd(v_X_pt_real, v_X_real);
-    _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
-    v_X_pt_real += 2;
-    v_X_pt_imag += 2;
-    _mm512_storeu_pd(v_X_pt_real, v_Y_real);
-    _mm512_storeu_pd(v_X_pt_imag, v_Y_imag);
+    std::cout << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+              << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+    std::cout << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+    std::cout << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+              << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+    std::cout << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 1
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+              << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+    std::cout << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+    std::cout << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+              << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+    std::cout << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+              << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+    std::cout << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+    std::cout << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+              << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+    std::cout << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 3
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+              << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+    std::cout << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+    std::cout << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+              << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+    std::cout << " x = " << xc + 8 << " y = " << yc + 8 << " w = " << rc + 0
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+              << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+    std::cout << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+    std::cout << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+              << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+    std::cout << " x = " << xc + 9 << " y = " << yc + 9 << " w = " << rc + 1
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+              << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+    std::cout << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+    std::cout << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+              << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+    std::cout << " x = " << xc + 10 << " y = " << yc + 10 << " w = " << rc + 2
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+              << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+    std::cout << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+    std::cout << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+              << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+    std::cout << " x = " << xc + 11 << " y = " << yc + 11 << " w = " << rc + 3
+              << "    ";
+    std::cout << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+              << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+    std::cout << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+    std::cout << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+              << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
+
+    ComplexWriteInvInterleavedT4(v_X_real, v_Y_real, v_X_pt_real);
+    ComplexWriteInvInterleavedT4(v_X_imag, v_Y_imag, v_X_pt_imag);
 
     offset += 32;
   }
 }
 
-void ComplexFwdT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
-                  uint64_t gap, uint64_t m) {
+void ComplexT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+               uint64_t gap, uint64_t m) {
   size_t offset = 0;
+  const double* W_start = W_1C_intrlvd;
+
+  // ***
+  std::size_t xc = 0;
+  std::size_t yc = 0;
+  std::size_t rc = 7;
+  // ***
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < (m >> 1); i++) {
@@ -206,26 +417,104 @@ void ComplexFwdT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
     double* Y_real = X_real + gap;
     double* Y_imag = X_imag + gap;
 
+    // ***
+    xc = offset;
+    yc = xc + (gap >> 1);
+    // ***
+
     __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
     __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
 
     __m512d* v_Y_pt_real = reinterpret_cast<__m512d*>(Y_real);
     __m512d* v_Y_pt_imag = reinterpret_cast<__m512d*>(Y_imag);
 
-    // Weights
-    __m512d v_W_real = _mm512_set1_pd(*W_1C_intrlvd++);
-    __m512d v_W_imag = _mm512_set1_pd(*W_1C_intrlvd++);
+    W_1C_intrlvd = W_start;
+
+    std::cout << "i = " << i << std::endl;
 
     // assume 8 | t
     for (size_t j = 0; j < gap; j += 16) {
+      // Weights
+      __m512d v_W_real = _mm512_set_pd(
+          W_1C_intrlvd[14], W_1C_intrlvd[12], W_1C_intrlvd[10], W_1C_intrlvd[8],
+          W_1C_intrlvd[6], W_1C_intrlvd[4], W_1C_intrlvd[2], W_1C_intrlvd[0]);
+      __m512d v_W_imag = _mm512_set_pd(
+          W_1C_intrlvd[15], W_1C_intrlvd[13], W_1C_intrlvd[11], W_1C_intrlvd[9],
+          W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[3], W_1C_intrlvd[1]);
+      W_1C_intrlvd += 16;
+
       __m512d v_X_real = _mm512_loadu_pd(v_X_pt_real);
       __m512d v_X_imag = _mm512_loadu_pd(v_X_pt_imag);
 
       __m512d v_Y_real = _mm512_loadu_pd(v_Y_pt_real);
       __m512d v_Y_imag = _mm512_loadu_pd(v_Y_pt_imag);
 
+      // ***
+      __m512d v_Xo_real = v_X_real;
+      __m512d v_Xo_imag = v_X_imag;
+      __m512d v_Yo_real = v_Y_real;
+      __m512d v_Yo_imag = v_Y_imag;
+      // ***
+
       ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                           v_W_imag);
+
+      std::cout << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+                << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+      std::cout << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+      std::cout << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+                << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+      std::cout << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 1
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+                << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+      std::cout << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+      std::cout << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+                << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+      std::cout << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+                << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+      std::cout << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+      std::cout << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+                << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+      std::cout << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 3
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+                << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+      std::cout << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+      std::cout << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+                << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+      std::cout << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+                << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+      std::cout << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+      std::cout << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+                << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+      std::cout << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 5
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+                << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+      std::cout << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+      std::cout << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+                << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+      std::cout << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+                << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+      std::cout << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+      std::cout << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+                << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+      std::cout << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 7
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+                << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+      std::cout << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+      std::cout << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+                << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
 
       _mm512_storeu_pd(v_X_pt_real, v_X_real);
       _mm512_storeu_pd(v_X_pt_imag, v_X_imag);
@@ -233,7 +522,7 @@ void ComplexFwdT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
       _mm512_storeu_pd(v_Y_pt_real, v_Y_real);
       _mm512_storeu_pd(v_Y_pt_imag, v_Y_imag);
 
-      // Increase pointers
+      // Increase operand & result pointers
       v_X_pt_real += 2;
       v_X_pt_imag += 2;
       v_Y_pt_real += 2;
@@ -243,68 +532,258 @@ void ComplexFwdT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 }
 
-void ComplexStartFwdT8(double* result_8C_intrlvd,
-                       const double* operand_1C_intrlvd,
-                       const double* W_1C_intrlvd, uint64_t gap, uint64_t m) {
+// Takes operand as 8 complex interleaved: This is 8 real parts followed by
+// its 8 imaginary parts.
+// Returns operand as 1 complex interleaved: One real part followed by its
+// imaginary part.
+void ComplexFinalT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
+                    uint64_t gap, uint64_t m,
+                    const __m512d* scale_down = nullptr) {
   size_t offset = 0;
+  const double* W_start = W_1C_intrlvd;
+  // ***
+  std::size_t xc = 0;
+  std::size_t yc = 0;
+  std::size_t rc = 7;
+  // ***
 
   HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < (m >> 1); i++) {
+  for (size_t i = 0; i < (m >> 1); i++, offset += (gap << 1)) {
     // Referencing operand
-    const double* X_op = operand_1C_intrlvd + offset;
-    const double* Y_op = X_op + gap;
-    const __m512d* v_X_op_pt = reinterpret_cast<const __m512d*>(X_op);
-    const __m512d* v_Y_op_pt = reinterpret_cast<const __m512d*>(Y_op);
+    double* X_real = operand_8C_intrlvd + offset;
+    double* X_imag = X_real + 8;
 
-    // Referencing result
-    double* X_r_real = result_8C_intrlvd + offset;
-    double* X_r_imag = X_r_real + 8;
-    double* Y_r_real = X_r_real + gap;
-    double* Y_r_imag = X_r_imag + gap;
-    __m512d* v_X_r_pt_real = reinterpret_cast<__m512d*>(X_r_real);
-    __m512d* v_X_r_pt_imag = reinterpret_cast<__m512d*>(X_r_imag);
-    __m512d* v_Y_r_pt_real = reinterpret_cast<__m512d*>(Y_r_real);
-    __m512d* v_Y_r_pt_imag = reinterpret_cast<__m512d*>(Y_r_imag);
+    double* Y_real = X_real + gap;
+    double* Y_imag = X_imag + gap;
 
-    // Weights
-    __m512d v_W_real = _mm512_set1_pd(*W_1C_intrlvd++);
-    __m512d v_W_imag = _mm512_set1_pd(*W_1C_intrlvd++);
+    // ***
+    xc = offset;
+    yc = xc + (gap >> 1);
+    // ***
+
+    __m512d* v_X_pt_real = reinterpret_cast<__m512d*>(X_real);
+    __m512d* v_X_pt_imag = reinterpret_cast<__m512d*>(X_imag);
+
+    __m512d* v_Y_pt_real = reinterpret_cast<__m512d*>(Y_real);
+    __m512d* v_Y_pt_imag = reinterpret_cast<__m512d*>(Y_imag);
+
+    W_1C_intrlvd = W_start;
+
+    std::cout << "i = " << i << std::endl;
 
     // assume 8 | t
     for (size_t j = 0; j < gap; j += 16) {
-      __m512d v_X_real;
-      __m512d v_X_imag;
-      __m512d v_Y_real;
-      __m512d v_Y_imag;
+      // Weights
+      __m512d v_W_real = _mm512_set_pd(
+          W_1C_intrlvd[14], W_1C_intrlvd[12], W_1C_intrlvd[10], W_1C_intrlvd[8],
+          W_1C_intrlvd[6], W_1C_intrlvd[4], W_1C_intrlvd[2], W_1C_intrlvd[0]);
+      __m512d v_W_imag = _mm512_set_pd(
+          W_1C_intrlvd[15], W_1C_intrlvd[13], W_1C_intrlvd[11], W_1C_intrlvd[9],
+          W_1C_intrlvd[7], W_1C_intrlvd[5], W_1C_intrlvd[3], W_1C_intrlvd[1]);
+      W_1C_intrlvd += 16;
 
-      ComplexLoadFwdInterleavedT8(v_X_op_pt, v_Y_op_pt, &v_X_real, &v_X_imag,
-                                  &v_Y_real, &v_Y_imag);
+      __m512d v_X_real = _mm512_loadu_pd(v_X_pt_real);
+      __m512d v_X_imag = _mm512_loadu_pd(v_X_pt_imag);
+      __m512d v_Y_real = _mm512_loadu_pd(v_Y_pt_real);
+      __m512d v_Y_imag = _mm512_loadu_pd(v_Y_pt_imag);
+
+      // ***
+      __m512d v_Xo_real = v_X_real;
+      __m512d v_Xo_imag = v_X_imag;
+      __m512d v_Yo_real = v_Y_real;
+      __m512d v_Yo_imag = v_Y_imag;
+      // ***
 
       ComplexFwdButterfly(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag, v_W_real,
                           v_W_imag);
+      if (scale_down != nullptr) {
+        v_X_real = _mm512_mul_pd(v_X_real, *scale_down);
+        v_X_imag = _mm512_mul_pd(v_X_imag, *scale_down);
+        v_Y_real = _mm512_mul_pd(v_Y_real, *scale_down);
+        v_Y_imag = _mm512_mul_pd(v_Y_imag, *scale_down);
+      }
 
-      _mm512_storeu_pd(v_X_r_pt_real, v_X_real);
-      _mm512_storeu_pd(v_X_r_pt_imag, v_X_imag);
+      std::cout << " x = " << xc + 0 << " y = " << yc + 0 << " w = " << rc + 0
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[0] << "," << v_Xo_imag[0] << ") y = ("
+                << v_Yo_real[0] << "," << v_Yo_imag[0] << ")";
+      std::cout << " w = (" << v_W_real[0] << "," << v_W_imag[0] << ")      ";
+      std::cout << " x = (" << v_X_real[0] << "," << v_X_imag[0] << ") y = ("
+                << v_Y_real[0] << "," << v_Y_imag[0] << ")" << std::endl;
+      std::cout << " x = " << xc + 1 << " y = " << yc + 1 << " w = " << rc + 1
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[1] << "," << v_Xo_imag[1] << ") y = ("
+                << v_Yo_real[1] << "," << v_Yo_imag[1] << ")";
+      std::cout << " w = (" << v_W_real[1] << "," << v_W_imag[1] << ")      ";
+      std::cout << " x = (" << v_X_real[1] << "," << v_X_imag[1] << ") y = ("
+                << v_Y_real[1] << "," << v_Y_imag[1] << ")" << std::endl;
+      std::cout << " x = " << xc + 2 << " y = " << yc + 2 << " w = " << rc + 2
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[2] << "," << v_Xo_imag[2] << ") y = ("
+                << v_Yo_real[2] << "," << v_Yo_imag[2] << ")";
+      std::cout << " w = (" << v_W_real[2] << "," << v_W_imag[2] << ")      ";
+      std::cout << " x = (" << v_X_real[2] << "," << v_X_imag[2] << ") y = ("
+                << v_Y_real[2] << "," << v_Y_imag[2] << ")" << std::endl;
+      std::cout << " x = " << xc + 3 << " y = " << yc + 3 << " w = " << rc + 3
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[3] << "," << v_Xo_imag[3] << ") y = ("
+                << v_Yo_real[3] << "," << v_Yo_imag[3] << ")";
+      std::cout << " w = (" << v_W_real[3] << "," << v_W_imag[3] << ")      ";
+      std::cout << " x = (" << v_X_real[3] << "," << v_X_imag[3] << ") y = ("
+                << v_Y_real[3] << "," << v_Y_imag[3] << ")" << std::endl;
+      std::cout << " x = " << xc + 4 << " y = " << yc + 4 << " w = " << rc + 4
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[4] << "," << v_Xo_imag[4] << ") y = ("
+                << v_Yo_real[4] << "," << v_Yo_imag[4] << ")";
+      std::cout << " w = (" << v_W_real[4] << "," << v_W_imag[4] << ")      ";
+      std::cout << " x = (" << v_X_real[4] << "," << v_X_imag[4] << ") y = ("
+                << v_Y_real[4] << "," << v_Y_imag[4] << ")" << std::endl;
+      std::cout << " x = " << xc + 5 << " y = " << yc + 5 << " w = " << rc + 5
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[5] << "," << v_Xo_imag[5] << ") y = ("
+                << v_Yo_real[5] << "," << v_Yo_imag[5] << ")";
+      std::cout << " w = (" << v_W_real[5] << "," << v_W_imag[5] << ")      ";
+      std::cout << " x = (" << v_X_real[5] << "," << v_X_imag[5] << ") y = ("
+                << v_Y_real[5] << "," << v_Y_imag[5] << ")" << std::endl;
+      std::cout << " x = " << xc + 6 << " y = " << yc + 6 << " w = " << rc + 6
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[6] << "," << v_Xo_imag[6] << ") y = ("
+                << v_Yo_real[6] << "," << v_Yo_imag[6] << ")";
+      std::cout << " w = (" << v_W_real[6] << "," << v_W_imag[6] << ")      ";
+      std::cout << " x = (" << v_X_real[6] << "," << v_X_imag[6] << ") y = ("
+                << v_Y_real[6] << "," << v_Y_imag[6] << ")" << std::endl;
+      std::cout << " x = " << xc + 7 << " y = " << yc + 7 << " w = " << rc + 7
+                << "    ";
+      std::cout << " x = (" << v_Xo_real[7] << "," << v_Xo_imag[7] << ") y = ("
+                << v_Yo_real[7] << "," << v_Yo_imag[7] << ")";
+      std::cout << " w = (" << v_W_real[7] << "," << v_W_imag[7] << ")      ";
+      std::cout << " x = (" << v_X_real[7] << "," << v_X_imag[7] << ") y = ("
+                << v_Y_real[7] << "," << v_Y_imag[7] << ")" << std::endl;
 
-      _mm512_storeu_pd(v_Y_r_pt_real, v_Y_real);
-      _mm512_storeu_pd(v_Y_r_pt_imag, v_Y_imag);
+      ComplexWriteInvInterleavedT8(&v_X_real, &v_X_imag, &v_Y_real, &v_Y_imag,
+                                   v_X_pt_real, v_Y_pt_real);
 
       // Increase operand & result pointers
-      v_X_op_pt += 2;
-      v_Y_op_pt += 2;
-      v_X_r_pt_real += 2;
-      v_X_r_pt_imag += 2;
-      v_Y_r_pt_real += 2;
-      v_Y_r_pt_imag += 2;
+      v_X_pt_real += 2;
+      v_X_pt_imag += 2;
+      v_Y_pt_real += 2;
+      v_Y_pt_imag += 2;
     }
-    offset += (gap << 1);
   }
 }
 
-void Forward_FFT_ToBitReverseAVX512(
-    double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
-    const double* root_of_unity_powers_cmplx_intrlvd, const uint64_t n,
-    const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
+void FFT_AVX512(double* result_cmplx_intrlvd,
+                const double* operand_cmplx_intrlvd,
+                const double* root_of_unity_powers_cmplx_intrlvd,
+                const uint64_t n, uint64_t recursion_depth,
+                bool inverse = false) {
+  size_t gap;  // Interleaved complex values requires a gap twice the size
+
+  size_t W_idx;
+
+  static const size_t base_fft_size = 16;
+
+  if (n <= base_fft_size) {  // Perform breadth-first InvFFT
+    size_t m = n;            // (2*n >> 1);
+    gap = 2;
+    W_idx = 2;
+
+    // T1
+    std::cout << "Gap " << (gap >> 1) << " r " << W_idx << " m " << m
+              << std::endl;
+    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    ComplexT1(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    gap <<= 1;
+    m >>= 1;
+    W_idx += 2;
+
+    // T2
+    std::cout << "Gap " << (gap >> 1) << " r " << W_idx << " m " << m
+              << std::endl;
+    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    ComplexT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    gap <<= 1;
+    m >>= 1;
+    W_idx += 4;
+
+    // T4
+    std::cout << "Gap " << (gap >> 1) << " r " << W_idx << " m " << m
+              << std::endl;
+    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    ComplexT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    gap <<= 1;
+    m >>= 1;
+    W_idx += 8;
+
+    while (m > 2) {
+      std::cout << "Gap " << (gap >> 1) << " r " << W_idx << " m " << m
+                << std::endl;
+      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+      ComplexT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+      gap <<= 1;
+      m >>= 1;
+      W_idx += (gap >> 1);
+    }
+
+    W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    if (recursion_depth == 0) {
+      __m512d scale_down;
+      std::cout << "Final Gap " << (gap >> 1) << " r " << W_idx << " m " << m
+                << std::endl;
+      if (inverse) {
+        scale_down = _mm512_set1_pd(1.0 / static_cast<double>(n));
+        ComplexFinalT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m,
+                       &scale_down);
+      } else {
+        ComplexFinalT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+      }
+
+      HEXL_VLOG(5,
+                "AVX512 returning INV FFT result "
+                    << std::vector<std::complex<double>>(
+                           result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
+    } else {
+      std::cout << "Branch final Gap " << (gap >> 1) << " r " << W_idx << " m "
+                << m << std::endl;
+      ComplexT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
+    }
+  } else {
+    FFT_AVX512(result_cmplx_intrlvd, operand_cmplx_intrlvd,
+               root_of_unity_powers_cmplx_intrlvd, n / 2, recursion_depth + 1);
+    FFT_AVX512(&result_cmplx_intrlvd[n], &operand_cmplx_intrlvd[n],
+               root_of_unity_powers_cmplx_intrlvd, n / 2, recursion_depth + 1);
+
+    gap = n;
+    W_idx = gap;
+    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
+    if (recursion_depth == 0) {
+      __m512d scale_down;
+      if (inverse) {
+        scale_down = _mm512_set1_pd(1.0 / static_cast<double>(n));
+        ComplexFinalT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, 2,
+                       &scale_down);
+      } else {
+        ComplexFinalT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, 2);
+      }
+
+      std::cout << "Recursive Final Gap " << (gap >> 1) << " r " << W_idx
+                << std::endl;
+      HEXL_VLOG(5,
+                "AVX512 returning INV FFT result "
+                    << std::vector<std::complex<double>>(
+                           result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
+    } else {
+      std::cout << "Recursive Gap " << (gap >> 1) << " r " << W_idx
+                << std::endl;
+      ComplexT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, 2);
+    }
+  }
+}
+
+void Forward_FFT_AVX512(double* result_cmplx_intrlvd,
+                        const double* operand_cmplx_intrlvd,
+                        const double* root_of_unity_powers_cmplx_intrlvd,
+                        const uint64_t n, bool inverse) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n >= 16,
              "Don't support small transforms. Need n >= 16, got n = " << n);
@@ -315,165 +794,28 @@ void Forward_FFT_ToBitReverseAVX512(
   HEXL_VLOG(5, "operand_cmplx_intrlvd " << std::vector<std::complex<double>>(
                    operand_cmplx_intrlvd, operand_cmplx_intrlvd + 2 * n));
 
-  static const size_t base_fft_size = 1024;
-
-  if (n <= base_fft_size) {  // Perform breadth-first FFT
-    size_t gap = n;          // (2*n >> 1) Interleaved complex numbers
-    size_t m = 2;            // require twice the size
-    size_t W_idx = (m << recursion_depth) + (recursion_half * m);
-
-    // First pass in case of out of place
-    if (recursion_depth == 0 && gap >= 16) {
-      const double* W_cmplx_intrlvd =
-          &root_of_unity_powers_cmplx_intrlvd[W_idx];
-      ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
-                        W_cmplx_intrlvd, gap, m);
-      m <<= 1;
-      W_idx <<= 1;
-      gap >>= 1;
-    }
-
-    for (; gap >= 16; gap >>= 1) {
-      const double* W_cmplx_intrlvd =
-          &root_of_unity_powers_cmplx_intrlvd[W_idx];
-      ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m);
-      m <<= 1;
-      W_idx <<= 1;
-    }
-
-    {
-      // T4
-      const double* W_cmplx_intrlvd =
-          &root_of_unity_powers_cmplx_intrlvd[W_idx];
-      ComplexFwdT4(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-      m <<= 1;
-      W_idx <<= 1;
-
-      // T2
-      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-      ComplexFwdT2(result_cmplx_intrlvd, W_cmplx_intrlvd, m);
-      m <<= 1;
-      W_idx <<= 1;
-
-      // T1
-      W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-      ComplexFwdT1(result_cmplx_intrlvd, W_cmplx_intrlvd, m, scale);
-      m <<= 1;
-      W_idx <<= 1;
-    }
-  } else {
-    // Perform depth-first FFT via recursive call
-    size_t gap = n;
-    size_t W_idx = (2ULL << recursion_depth) + (recursion_half << 1);
-    const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-
-    if (recursion_depth == 0) {
-      ComplexStartFwdT8(result_cmplx_intrlvd, operand_cmplx_intrlvd,
-                        W_cmplx_intrlvd, gap, 2);
-    } else {
-      ComplexFwdT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, 2);
-    }
-
-    Forward_FFT_ToBitReverseAVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
-                                   root_of_unity_powers_cmplx_intrlvd, n / 2,
-                                   scale, recursion_depth + 1,
-                                   recursion_half * 2);
-
-    Forward_FFT_ToBitReverseAVX512(
-        &result_cmplx_intrlvd[n], &result_cmplx_intrlvd[n],
-        root_of_unity_powers_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
-        recursion_half * 2 + 1);
-  }
-  if (recursion_depth == 0) {
-    HEXL_VLOG(
-        5,
-        "AVX512 returning FWD FFT result " << std::vector<std::complex<double>>(
-            result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
-  }
-}
-
-void BuildFloatingPointsAVX512(double* res_cmplx_intrlvd, const uint64_t* plain,
-                               const uint64_t* threshold,
-                               const uint64_t* decryption_modulus,
-                               const double inv_scale, const size_t mod_size,
-                               const size_t coeff_count) {
-  const __m512i v_perm = _mm512_set_epi64(7, 3, 6, 2, 5, 1, 4, 0);
-  __m512d v_res_imag = _mm512_setzero_pd();
-  __m512d* v_res_pt = reinterpret_cast<__m512d*>(res_cmplx_intrlvd);
-  double two_pow_64 = std::pow(2.0, 64);
-
-  for (size_t i = 0; i < coeff_count; i += 8) {
-    __mmask8 zeros = 0xff;
-    __mmask8 cond_lt_thr = 0;
-
-    for (int32_t j = static_cast<int32_t>(mod_size) - 1; zeros && (j >= 0);
-         j--) {
-      const uint64_t* base = plain + j;
-      __m512i v_thrld = _mm512_set1_epi64(*(threshold + j));
-      __m512i v_plain = _mm512_set_epi64(
-          *(base + (i + 7) * mod_size), *(base + (i + 6) * mod_size),
-          *(base + (i + 5) * mod_size), *(base + (i + 4) * mod_size),
-          *(base + (i + 3) * mod_size), *(base + (i + 2) * mod_size),
-          *(base + (i + 1) * mod_size), *(base + (i + 0) * mod_size));
-
-      cond_lt_thr = static_cast<unsigned char>(cond_lt_thr) |
-                    static_cast<unsigned char>(
-                        _mm512_mask_cmplt_epu64_mask(zeros, v_plain, v_thrld));
-      zeros = _mm512_mask_cmpeq_epu64_mask(zeros, v_plain, v_thrld);
-    }
-
-    __mmask8 cond_ge_thr = static_cast<unsigned char>(~cond_lt_thr);
-    double scaled_two_pow_64 = inv_scale;
-    __m512d v_zeros = _mm512_setzero_pd();
-    __m512d v_res_real = _mm512_setzero_pd();
-    HEXL_LOOP_UNROLL_8
-    for (size_t j = 0; j < mod_size; j++, scaled_two_pow_64 *= two_pow_64) {
-      const uint64_t* base = plain + j;
-      __m512d v_scaled_p64 = _mm512_set1_pd(scaled_two_pow_64);
-      __m512i v_dec_moduli = _mm512_set1_epi64(*(decryption_modulus + j));
-      __m512i v_curr_coeff = _mm512_set_epi64(
-          *(base + (i + 7) * mod_size), *(base + (i + 6) * mod_size),
-          *(base + (i + 5) * mod_size), *(base + (i + 4) * mod_size),
-          *(base + (i + 3) * mod_size), *(base + (i + 2) * mod_size),
-          *(base + (i + 1) * mod_size), *(base + (i + 0) * mod_size));
-
-      __mmask8 cond_gt_dec_mod =
-          _mm512_mask_cmpgt_epu64_mask(cond_ge_thr, v_curr_coeff, v_dec_moduli);
-      __mmask8 cond_le_dec_mod = cond_gt_dec_mod ^ cond_ge_thr;
-
-      __m512i v_diff = _mm512_mask_sub_epi64(v_curr_coeff, cond_gt_dec_mod,
-                                             v_curr_coeff, v_dec_moduli);
-      v_diff = _mm512_mask_sub_epi64(v_diff, cond_le_dec_mod, v_dec_moduli,
-                                     v_curr_coeff);
-
-      // __m512d v_scaled_diff = _mm512_castsi512_pd(v_diff); does not work
-      uint64_t tmp_v_ui[8];
-      __m512i* tmp_v_ui_pt = reinterpret_cast<__m512i*>(tmp_v_ui);
-      double tmp_v_pd[8];
-      _mm512_storeu_si512(tmp_v_ui_pt, v_diff);
-      HEXL_LOOP_UNROLL_8
-      for (size_t t = 0; t < 8; t++) {
-        tmp_v_pd[t] = static_cast<double>(tmp_v_ui[t]);
+  uint64_t bits = static_cast<uint64_t>(log2(static_cast<double>(n)));
+  for (size_t i = 0; i < n; i++) {
+    size_t j = ReverseBits(i, bits);
+    size_t ix = 2 * i;
+    size_t jx = 2 * j;
+    if (result_cmplx_intrlvd == operand_cmplx_intrlvd) {
+      if (j > i) {
+        double tmp = operand_cmplx_intrlvd[ix];
+        result_cmplx_intrlvd[ix] = operand_cmplx_intrlvd[jx];
+        result_cmplx_intrlvd[jx] = tmp;
+        tmp = operand_cmplx_intrlvd[ix + 1];
+        result_cmplx_intrlvd[ix + 1] = operand_cmplx_intrlvd[jx + 1];
+        result_cmplx_intrlvd[jx + 1] = tmp;
       }
-
-      __m512d v_casted_diff = _mm512_loadu_pd(tmp_v_pd);
-      // This mask avoids multiplying by inf when diff is already zero
-      __mmask8 cond_no_zero = _mm512_cmpneq_pd_mask(v_casted_diff, v_zeros);
-      __m512d v_scaled_diff = _mm512_mask_mul_pd(v_casted_diff, cond_no_zero,
-                                                 v_casted_diff, v_scaled_p64);
-      v_res_real = _mm512_mask_add_pd(v_res_real, cond_gt_dec_mod | cond_lt_thr,
-                                      v_res_real, v_scaled_diff);
-      v_res_real = _mm512_mask_sub_pd(v_res_real, cond_le_dec_mod, v_res_real,
-                                      v_scaled_diff);
+    } else {
+      result_cmplx_intrlvd[ix] = operand_cmplx_intrlvd[jx];
+      result_cmplx_intrlvd[ix + 1] = operand_cmplx_intrlvd[jx + 1];
     }
-
-    // Make res 1 complex interleaved
-    v_res_real = _mm512_permutexvar_pd(v_perm, v_res_real);
-    __m512d v_res1 = _mm512_shuffle_pd(v_res_real, v_res_imag, 0x00);
-    __m512d v_res2 = _mm512_shuffle_pd(v_res_real, v_res_imag, 0xff);
-    _mm512_storeu_pd(v_res_pt++, v_res1);
-    _mm512_storeu_pd(v_res_pt++, v_res2);
   }
+
+  FFT_AVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
+             root_of_unity_powers_cmplx_intrlvd, n, 0, inverse);
 }
 
 #endif  // HEXL_HAS_AVX512DQ
