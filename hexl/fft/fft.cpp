@@ -29,15 +29,15 @@ inline std::complex<double> swap_real_imag(std::complex<double> c) {
 void FFT::ComputeComplexRootsOfUnity() {
   AlignedVector64<std::complex<double>> roots(m_degree, 0, m_aligned_alloc);
   AlignedVector64<std::complex<double>> inv_roots(m_degree, 0, m_aligned_alloc);
-  AlignedVector64<double> roots_d(2 * m_degree, 0, m_aligned_alloc);
-
+  AlignedVector64<double> roots_interleaved(2 * m_degree, 0, m_aligned_alloc);
+  AlignedVector64<double> inv_roots_interleaved(2 * m_degree, 0,
+                                                m_aligned_alloc);
   // PI value used to calculate the roots of unity
   static constexpr double PI_ = 3.1415926535897932384626433832795028842;
 
   const std::complex<double> J(0, 1);
   size_t gap = 1;
   size_t root_index = 1;
-  std::cout << "m_degree " << m_degree << std::endl;
   for (size_t m = m_degree >> 1; m > 0; m >>= 1) {
     std::complex<double> w(1, 0);
     std::complex<double> wm =
@@ -45,14 +45,14 @@ void FFT::ComputeComplexRootsOfUnity() {
     for (size_t j = 0; j < gap; ++j, root_index++) {
       size_t idx_r = (root_index & 7) + (root_index >> 3) * 16;
       size_t idx_i = idx_r + 8;
-      roots_d[idx_r] = w.real();
-      roots_d[idx_i] = w.imag();
+      roots_interleaved[idx_r] = w.real();
+      roots_interleaved[idx_i] = w.imag();
 
       roots[root_index] = w;
       inv_roots[root_index] = std::conj(w);
-      std::cout << "i " << root_index << " W " << roots[root_index] << " => "
-                << idx_r << " = " << roots_d[idx_r] << " , " << idx_i << " = "
-                << roots_d[idx_i] << std::endl;
+      inv_roots_interleaved[idx_r] = std::conj(w).real();
+      inv_roots_interleaved[idx_i] = std::conj(w).imag();
+
       w *= wm;
     }
     gap <<= 1;
@@ -86,7 +86,8 @@ void FFT::ComputeComplexRootsOfUnity() {
   */
 
   m_complex_roots_of_unity = roots;
-  m_complex_roots_of_unity_d = roots_d;
+  m_interleaved_complex_roots_of_unity = roots_interleaved;
+  m_interleaved_inv_complex_roots_of_unity = inv_roots_interleaved;
   m_inv_complex_roots_of_unity = inv_roots;
 }
 

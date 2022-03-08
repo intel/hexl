@@ -239,7 +239,7 @@ TEST(FFT, OneWayFFT_AVX512) {
     const uint64_t n = 64;
     FFT fft(n);
     AlignedVector64<double> root_powers =
-        fft.GetComplexInterleavedRootsOfUnity();
+        fft.GetInterleavedComplexRootsOfUnity();
     const double data_bound = (1 << 30);
     AlignedVector64<std::complex<double>> operand(n);
     AlignedVector64<std::complex<double>> result(n);
@@ -250,7 +250,7 @@ TEST(FFT, OneWayFFT_AVX512) {
 
     Forward_FFT_AVX512(&(reinterpret_cast<double(&)[2]>(result[0]))[0],
                        &(reinterpret_cast<double(&)[2]>(operand[0]))[0],
-                       &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
+                       root_powers.data(), n);
 
     for (size_t i = 0; i < n; ++i) {
       CheckClose(operand[0], result[i], 0.5);
@@ -260,8 +260,8 @@ TEST(FFT, OneWayFFT_AVX512) {
   {
     const uint64_t n = 16;
     FFT fft(n);
-    AlignedVector64<std::complex<double>> inv_root_powers =
-        fft.GetInvComplexRootsOfUnity();
+    AlignedVector64<double> inv_root_powers =
+        fft.GetInterleavedInvComplexRootsOfUnity();
 
     std::vector<std::complex<double>> operand = {
         {1, 8}, {5, 4}, {3, 6}, {7, 2}, {4, -5}, {8, -1}, {6, -3}, {2, -7},
@@ -288,8 +288,7 @@ TEST(FFT, OneWayFFT_AVX512) {
 
     Inverse_FFT_AVX512(&reinterpret_cast<double(&)[2]>(result[0])[0],
                        &reinterpret_cast<double(&)[2]>(operand[0])[0],
-                       &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0],
-                       n);
+                       inv_root_powers.data(), n);
 
     for (size_t i = 0; i < n; ++i) {
       ASSERT_TRUE(expected[i].real() == result[i].real());
@@ -304,10 +303,9 @@ TEST(FFT, ForwardInverseFFT_AVX512) {
   }
 
   FFT fft(64);
-  AlignedVector64<std::complex<double>> root_powers =
-      fft.GetComplexRootsOfUnity();
-  AlignedVector64<std::complex<double>> inv_root_powers =
-      fft.GetInvComplexRootsOfUnity();
+  AlignedVector64<double> root_powers = fft.GetInterleavedComplexRootsOfUnity();
+  AlignedVector64<double> inv_root_powers =
+      fft.GetInterleavedInvComplexRootsOfUnity();
 
   {  // Zeros test
     const uint64_t n = 64;
@@ -318,11 +316,10 @@ TEST(FFT, ForwardInverseFFT_AVX512) {
 
     Forward_FFT_AVX512(&reinterpret_cast<double(&)[2]>(transformed[0])[0],
                        &reinterpret_cast<double(&)[2]>(operand[0])[0],
-                       &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n);
+                       root_powers.data(), n);
     Inverse_FFT_AVX512(&reinterpret_cast<double(&)[2]>(result[0])[0],
                        &reinterpret_cast<double(&)[2]>(transformed[0])[0],
-                       &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0],
-                       n);
+                       inv_root_powers.data(), n);
 
     CheckClose(operand, result, 0.5);
   }
@@ -339,13 +336,12 @@ TEST(FFT, ForwardInverseFFT_AVX512) {
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
     Forward_FFT_AVX512(transformed_complex_interleaved.data(),
-                       operand_complex_interleaved.data(),
-                       &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
+                       operand_complex_interleaved.data(), root_powers.data(),
+                       n);
 
     Inverse_FFT_AVX512(result_complex_interleaved.data(),
                        transformed_complex_interleaved.data(),
-                       &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0],
-                       n);
+                       inv_root_powers.data(), n);
 
     CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }
@@ -361,12 +357,12 @@ TEST(FFT, ForwardInverseFFT_AVX512) {
     AlignedVector64<double> expected = operand_complex_interleaved;
 
     Forward_FFT_AVX512(operand_complex_interleaved.data(),
-                       operand_complex_interleaved.data(),
-                       &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
+                       operand_complex_interleaved.data(), root_powers.data(),
+                       n);
 
-    Inverse_FFT_AVX512(
-        operand_complex_interleaved.data(), operand_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n);
+    Inverse_FFT_AVX512(operand_complex_interleaved.data(),
+                       operand_complex_interleaved.data(),
+                       inv_root_powers.data(), n);
 
     CheckClose(expected, operand_complex_interleaved, 0.5);
   }
@@ -376,10 +372,10 @@ TEST(FFT, ForwardInverseFFT_AVX512) {
     const double data_bound = (1 << 30);
 
     FFT big_fft(n);
-    AlignedVector64<std::complex<double>> big_root_powers =
-        big_fft.GetComplexRootsOfUnity();
-    AlignedVector64<std::complex<double>> big_inv_root_powers =
-        big_fft.GetInvComplexRootsOfUnity();
+    AlignedVector64<double> big_root_powers =
+        big_fft.GetInterleavedComplexRootsOfUnity();
+    AlignedVector64<double> big_inv_root_powers =
+        big_fft.GetInterleavedInvComplexRootsOfUnity();
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
     AlignedVector64<double> transformed_complex_interleaved(2 * n);
@@ -391,13 +387,11 @@ TEST(FFT, ForwardInverseFFT_AVX512) {
 
     Forward_FFT_AVX512(transformed_complex_interleaved.data(),
                        operand_complex_interleaved.data(),
-                       &(reinterpret_cast<double(&)[2]>(big_root_powers[0]))[0],
-                       n);
+                       big_root_powers.data(), n);
 
-    Inverse_FFT_AVX512(
-        result_complex_interleaved.data(),
-        transformed_complex_interleaved.data(),
-        &(reinterpret_cast<double(&)[2]>(big_inv_root_powers[0]))[0], n);
+    Inverse_FFT_AVX512(result_complex_interleaved.data(),
+                       transformed_complex_interleaved.data(),
+                       big_inv_root_powers.data(), n);
 
     CheckClose(operand_complex_interleaved, result_complex_interleaved, 0.5);
   }

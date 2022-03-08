@@ -165,12 +165,10 @@ static void BM_FwdFFTAVX512InPlace(benchmark::State& state) {  //  NOLINT
   AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double>> root_powers =
-      fft.GetComplexRootsOfUnity();
+  AlignedVector64<double> root_powers = fft.GetInterleavedComplexRootsOfUnity();
 
   for (auto _ : state) {
-    Forward_FFT_AVX512(input.data(), input.data(),
-                       &reinterpret_cast<double(&)[2]>(root_powers[0])[0],
+    Forward_FFT_AVX512(input.data(), input.data(), root_powers.data(),
                        fft_size);
   }
 }
@@ -192,12 +190,10 @@ static void BM_FwdFFTAVX512Copy(benchmark::State& state) {  //  NOLINT
   AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double>> root_powers =
-      fft.GetComplexRootsOfUnity();
+  AlignedVector64<double> root_powers = fft.GetInterleavedComplexRootsOfUnity();
 
   for (auto _ : state) {
-    Forward_FFT_AVX512(input.data(), input.data(),
-                       &reinterpret_cast<double(&)[2]>(root_powers[0])[0],
+    Forward_FFT_AVX512(input.data(), input.data(), root_powers.data(),
                        fft_size);
   }
 }
@@ -218,12 +214,11 @@ static void BM_InvFFTAVX512InPlace(benchmark::State& state) {  //  NOLINT
   AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double>> inv_root_powers =
-      fft.GetInvComplexRootsOfUnity();
+  AlignedVector64<double> inv_root_powers =
+      fft.GetInterleavedInvComplexRootsOfUnity();
 
   for (auto _ : state) {
-    Inverse_FFT_AVX512(input.data(), input.data(),
-                       &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0],
+    Inverse_FFT_AVX512(input.data(), input.data(), inv_root_powers.data(),
                        fft_size);
   }
 }
@@ -245,12 +240,11 @@ static void BM_InvFFTAVX512Copy(benchmark::State& state) {  //  NOLINT
   AlignedVector64<double> input(2 * fft_size);
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
-  AlignedVector64<std::complex<double>> inv_root_powers =
-      fft.GetInvComplexRootsOfUnity();
+  AlignedVector64<double> inv_root_powers =
+      fft.GetInterleavedInvComplexRootsOfUnity();
 
   for (auto _ : state) {
-    Inverse_FFT_AVX512(input.data(), input.data(),
-                       &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0],
+    Inverse_FFT_AVX512(input.data(), input.data(), inv_root_powers.data(),
                        fft_size);
   }
 }

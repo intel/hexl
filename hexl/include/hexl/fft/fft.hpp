@@ -79,8 +79,8 @@ class FFT {
   }
 
   /// @brief Returns the interleaved roots of unity
-  const AlignedVector64<double>& GetComplexInterleavedRootsOfUnity() const {
-    return m_complex_roots_of_unity_d;
+  const AlignedVector64<double>& GetInterleavedComplexRootsOfUnity() const {
+    return m_interleaved_complex_roots_of_unity;
   }
 
   /// @brief Returns the root of unity power at index i
@@ -93,6 +93,11 @@ class FFT {
   const AlignedVector64<std::complex<double>>& GetInvComplexRootsOfUnity()
       const {
     return m_inv_complex_roots_of_unity;
+  }
+
+  /// @brief Returns the interleaved inverse roots of unity
+  const AlignedVector64<double>& GetInterleavedInvComplexRootsOfUnity() const {
+    return m_interleaved_inv_complex_roots_of_unity;
   }
 
   /// @brief Returns the degree N
@@ -112,10 +117,11 @@ class FFT {
 
   // Contains 0~(n-1)-th powers of the 2n-th primitive root.
   AlignedVector64<std::complex<double>> m_complex_roots_of_unity;
-  AlignedVector64<double> m_complex_roots_of_unity_d;
+  AlignedVector64<double> m_interleaved_complex_roots_of_unity;
 
   // Contains 0~(n-1)-th inv powers of the 2n-th primitive inv root.
   AlignedVector64<std::complex<double>> m_inv_complex_roots_of_unity;
+  AlignedVector64<double> m_interleaved_inv_complex_roots_of_unity;
 };
 
 }  // namespace hexl

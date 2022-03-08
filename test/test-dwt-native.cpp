@@ -95,8 +95,8 @@ TEST(DWT, OneWayDWT_Native) {
                                      inv_root_powers.data(), n);
 
     for (size_t i = 0; i < n; ++i) {
-      ASSERT_EQ(expected[i] == result[i].real());
-      ASSERT_EQ(result[i].imag() == 0);
+      ASSERT_EQ(expected[i], result[i].real());
+      ASSERT_EQ(result[i].imag(), 0);
     }
   }
 }

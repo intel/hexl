@@ -49,7 +49,7 @@ void Forward_FFT_Radix2(std::complex<double>* result,
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
   HEXL_CHECK(result != nullptr, "result == nullptr");
 
-  size_t bits = log2(n);
+  size_t bits = static_cast<size_t>(log2(static_cast<double>(n)));
   for (size_t i = 0; i < n; ++i) {
     size_t j = ReverseBits(i, bits);
     if (result == operand) {
@@ -69,13 +69,10 @@ void Forward_FFT_Radix2(std::complex<double>* result,
   size_t m = n_div_2;
 
   for (; m > 0; m >>= 1) {
-    std::cout << "Fwd S = " << gap << " m = " << m << std::endl;
     size_t j1 = 0;
 
     switch (gap) {
       case 1: {
-        std::cout << "Fwd Loop J1 = " << j1 << " gap = " << gap << " step = 1 "
-                  << std::endl;
         const std::complex<double>* W = &root_of_unity_powers[root_index++];
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
@@ -86,22 +83,11 @@ void Forward_FFT_Radix2(std::complex<double>* result,
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = result + j1;
           const std::complex<double>* Y_op = X_op + gap;
-
-          int xc = j1;
-          int yc = xc + gap;
-
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_op << " y[" << yc
-                    << "] = " << *Y_op << " Wg[" << root_index << "] = " << *W
-                    << std::endl;
           ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *W);
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
         }
         break;
       }
       case 2: {
-        std::cout << "Fwd Loop J1 = " << j1 << " gap = " << gap << " step = 2 "
-                  << std::endl;
         const std::complex<double>* W = &root_of_unity_powers[root_index];
         root_index += 2;
         for (size_t i = 0; i < m; i++) {
@@ -113,33 +99,12 @@ void Forward_FFT_Radix2(std::complex<double>* result,
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
-          int xc = j1;
-          int yc = xc + gap;
-
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index << "] = " << *W
-                    << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *W);
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 1) << std::endl;
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *W);
           ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 1));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
         }
         break;
       }
       case 4: {
-        std::cout << "Fwd Loop J1 = " << j1 << " gap = " << gap << " step = 4 "
-                  << std::endl;
         const std::complex<double>* W = &root_of_unity_powers[root_index];
         root_index += 4;
         for (size_t i = 0; i < m; i++) {
@@ -151,56 +116,14 @@ void Forward_FFT_Radix2(std::complex<double>* result,
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
-          int xc = j1;
-          int yc = xc + gap;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index << "] = " << *W
-                    << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *W);
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 1) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 1));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 2) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 2));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 3) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 3));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *W);
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 1));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 2));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 3));
         }
         break;
       }
       case 8: {
-        std::cout << "Fwd Loop J1 = " << j1 << " gap = " << gap
-                  << " step = " << gap << std::endl;
         const std::complex<double>* W = &root_of_unity_powers[root_index];
         root_index += 8;
         for (size_t i = 0; i < m; i++) {
@@ -212,105 +135,18 @@ void Forward_FFT_Radix2(std::complex<double>* result,
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
-          int xc = j1;
-          int yc = xc + gap;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index << "] = " << *W
-                    << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *W);
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 1) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 1));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 2) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 2));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 3) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 3));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 4) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 4));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 5) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 5));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 6) << std::endl;
-          ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 6));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
-          X_r++;
-          Y_r++;
-          X_op++;
-          Y_op++;
-          xc++;
-          yc++;
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << " Wg[" << root_index
-                    << "] = " << *(W + 7) << std::endl;
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *W);
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 1));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 2));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 3));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 4));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 5));
+          ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 6));
           ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 7));
-          std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                    << "] = " << *Y_r << std::endl;
         }
         break;
       }
       default: {
-        std::cout << "Fwd Default Loop J1 = " << j1 << " gap = " << gap
-                  << " step = " << gap << std::endl;
-
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
             j1 += (gap << 1);
@@ -320,107 +156,17 @@ void Forward_FFT_Radix2(std::complex<double>* result,
           std::complex<double>* Y_r = X_r + gap;
           const std::complex<double>* X_op = X_r;
           const std::complex<double>* Y_op = Y_r;
-          int xc = j1;
-          int yc = xc + gap;
+
           HEXL_LOOP_UNROLL_8
           for (size_t j = 0; j < gap; j += 8) {
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index << "] = " << *W
-                      << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *W);
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 1) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 1));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 2) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 2));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 3) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 3));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 4) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 4));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 5) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 5));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 6) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 6));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << " Wg[" << root_index
-                      << "] = " << *(W + 7) << std::endl;
-            ComplexFwdButterflyRadix2(X_r, Y_r, X_op, Y_op, *(W + 7));
-            std::cout << "Fwd \t x[" << xc << "] = " << *X_r << " y[" << yc
-                      << "] = " << *Y_r << std::endl;
-            X_r++;
-            Y_r++;
-            X_op++;
-            Y_op++;
-            xc++;
-            yc++;
-
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *W);
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 1));
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 2));
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 3));
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 4));
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 5));
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 6));
+            ComplexFwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, *(W + 7));
             W += 8;
           }
         }

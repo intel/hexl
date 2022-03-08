@@ -426,8 +426,8 @@ TEST(DWT, OneWayDWT_AVX512) {
         &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0], n);
 
     for (size_t i = 0; i < n; ++i) {
-      ASSERT_EQ(expected[i] == result[i].real());
-      ASSERT_EQ(result[i].imag() == 0);
+      ASSERT_EQ(expected[i], result[i].real());
+      ASSERT_EQ(result[i].imag(), 0);
     }
   }
 }
