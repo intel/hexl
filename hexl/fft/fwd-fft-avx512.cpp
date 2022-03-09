@@ -350,9 +350,10 @@ void FFT_AVX512(double* result_cmplx_intrlvd,
     // T1
     const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
     if (idx_rev == nullptr) {
-      ComplexT1(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+      ComplexT1(result_cmplx_intrlvd, operand_cmplx_intrlvd, W_cmplx_intrlvd,
+                m);
     } else {
-      ComplexT1(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd, m,
+      ComplexT1(result_cmplx_intrlvd, operand_cmplx_intrlvd, W_cmplx_intrlvd, m,
                 idx_rev);
     }
     gap <<= 1;
@@ -462,7 +463,7 @@ void Forward_FFT_AVX512(double* result_cmplx_intrlvd,
                root_of_unity_powers_cmplx_intrlvd, n, 0, inverse);
 
   } else {
-    FFT_AVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
+    FFT_AVX512(result_cmplx_intrlvd, operand_cmplx_intrlvd,
                root_of_unity_powers_cmplx_intrlvd, n, 0, inverse, idx_rev);
   }
 }
