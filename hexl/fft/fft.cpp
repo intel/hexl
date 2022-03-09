@@ -27,6 +27,8 @@ inline std::complex<double> swap_real_imag(std::complex<double> c) {
 }
 
 void FFT::ComputeComplexRootsOfUnity() {
+  AlignedVector64<size_t> bit_reverse1(m_degree, 0, m_aligned_alloc);
+  AlignedVector64<size_t> bit_reverse2(m_degree, 0, m_aligned_alloc);
   AlignedVector64<std::complex<double>> roots(m_degree, 0, m_aligned_alloc);
   AlignedVector64<std::complex<double>> inv_roots(m_degree, 0, m_aligned_alloc);
   AlignedVector64<double> roots_interleaved(2 * m_degree, 0, m_aligned_alloc);
@@ -56,6 +58,12 @@ void FFT::ComputeComplexRootsOfUnity() {
       w *= wm;
     }
     gap <<= 1;
+  }
+
+  for (size_t i = 0; i < m_degree; i++) {
+    size_t idx = ReverseBits(i, m_degree_bits);
+    bit_reverse1[i] = idx;
+    bit_reverse2[idx] = i;
   }
 
   /*
@@ -89,6 +97,8 @@ void FFT::ComputeComplexRootsOfUnity() {
   m_interleaved_complex_roots_of_unity = roots_interleaved;
   m_interleaved_inv_complex_roots_of_unity = inv_roots_interleaved;
   m_inv_complex_roots_of_unity = inv_roots;
+  rev_idx = bit_reverse1;
+  idx_rev = bit_reverse2;
 }
 
 void FFT::ComputeForwardFFT(std::complex<double>* result,
@@ -103,7 +113,7 @@ void FFT::ComputeForwardFFT(std::complex<double>* result,
       &(reinterpret_cast<double(&)[2]>(result[0]))[0],
       &(reinterpret_cast<const double(&)[2]>(operand[0]))[0],
       &(reinterpret_cast<const double(&)[2]>(m_complex_roots_of_unity[0]))[0],
-      m_degree);
+      rev_idx.data(), idx_rev.data(), m_degree);
   return;
 #else
   HEXL_VLOG(3, "Calling Native FwdFFT");
@@ -125,7 +135,7 @@ void FFT::ComputeInverseFFT(std::complex<double>* result,
                      &(reinterpret_cast<const double(&)[2]>(operand[0]))[0],
                      &(reinterpret_cast<const double(&)[2]>(
                          m_inv_complex_roots_of_unity[0]))[0],
-                     m_degree);
+                     rev_idx.data(), idx_rev.data(), m_degree);
 
   return;
 #else

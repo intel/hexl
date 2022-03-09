@@ -100,6 +100,12 @@ class FFT {
     return m_interleaved_inv_complex_roots_of_unity;
   }
 
+  /// @brief Returns the inverse roots of unity
+  const AlignedVector64<size_t>& GetRevIdx() const { return rev_idx; }
+
+  /// @brief Returns the inverse roots of unity
+  const AlignedVector64<size_t>& GetIdxRev() const { return idx_rev; }
+
   /// @brief Returns the degree N
   uint64_t GetDegree() const { return m_degree; }
 
@@ -118,6 +124,8 @@ class FFT {
   // Contains 0~(n-1)-th powers of the 2n-th primitive root.
   AlignedVector64<std::complex<double>> m_complex_roots_of_unity;
   AlignedVector64<double> m_interleaved_complex_roots_of_unity;
+  AlignedVector64<size_t> rev_idx;
+  AlignedVector64<size_t> idx_rev;
 
   // Contains 0~(n-1)-th inv powers of the 2n-th primitive inv root.
   AlignedVector64<std::complex<double>> m_inv_complex_roots_of_unity;

@@ -3,6 +3,8 @@
 
 #include "hexl/fft/fwd-fft-avx512.hpp"
 
+#include <iostream>
+
 #include "hexl/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 
@@ -49,7 +51,8 @@ void ComplexFwdButterfly(__m512d* X_real, __m512d* X_imag, __m512d* Y_real,
 }
 
 void ComplexT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
-               const double* W_1C_intrlvd, uint64_t m) {
+               const double* W_1C_intrlvd, uint64_t m,
+               const size_t* idx_rev = nullptr) {
   size_t offset = 0;
 
   // 8 | m guaranteed by n >= 16
@@ -69,8 +72,43 @@ void ComplexT1(double* result_8C_intrlvd, const double* operand_1C_intrlvd,
     __m512d v_Y_real;
     __m512d v_Y_imag;
 
-    ComplexLoadInvInterleavedT1(X_op_real, &v_X_real, &v_X_imag, &v_Y_real,
-                                &v_Y_imag);
+    if (idx_rev == nullptr) {
+      ComplexLoadInvInterleavedT1(X_op_real, &v_X_real, &v_X_imag, &v_Y_real,
+                                  &v_Y_imag);
+    } else {
+      v_X_real = _mm512_set_pd(operand_1C_intrlvd[idx_rev[offset + 30]],
+                               operand_1C_intrlvd[idx_rev[offset + 22]],
+                               operand_1C_intrlvd[idx_rev[offset + 14]],
+                               operand_1C_intrlvd[idx_rev[offset + 6]],
+                               operand_1C_intrlvd[idx_rev[offset + 26]],
+                               operand_1C_intrlvd[idx_rev[offset + 18]],
+                               operand_1C_intrlvd[idx_rev[offset + 10]],
+                               operand_1C_intrlvd[idx_rev[offset + 2]]);
+      v_X_imag = _mm512_set_pd(operand_1C_intrlvd[idx_rev[offset + 31]],
+                               operand_1C_intrlvd[idx_rev[offset + 23]],
+                               operand_1C_intrlvd[idx_rev[offset + 15]],
+                               operand_1C_intrlvd[idx_rev[offset + 7]],
+                               operand_1C_intrlvd[idx_rev[offset + 27]],
+                               operand_1C_intrlvd[idx_rev[offset + 19]],
+                               operand_1C_intrlvd[idx_rev[offset + 11]],
+                               operand_1C_intrlvd[idx_rev[offset + 3]]);
+      v_Y_real = _mm512_set_pd(operand_1C_intrlvd[idx_rev[offset + 28]],
+                               operand_1C_intrlvd[idx_rev[offset + 20]],
+                               operand_1C_intrlvd[idx_rev[offset + 12]],
+                               operand_1C_intrlvd[idx_rev[offset + 4]],
+                               operand_1C_intrlvd[idx_rev[offset + 24]],
+                               operand_1C_intrlvd[idx_rev[offset + 16]],
+                               operand_1C_intrlvd[idx_rev[offset + 8]],
+                               operand_1C_intrlvd[idx_rev[offset + 0]]);
+      v_Y_imag = _mm512_set_pd(operand_1C_intrlvd[idx_rev[offset + 29]],
+                               operand_1C_intrlvd[idx_rev[offset + 21]],
+                               operand_1C_intrlvd[idx_rev[offset + 13]],
+                               operand_1C_intrlvd[idx_rev[offset + 5]],
+                               operand_1C_intrlvd[idx_rev[offset + 25]],
+                               operand_1C_intrlvd[idx_rev[offset + 17]],
+                               operand_1C_intrlvd[idx_rev[offset + 9]],
+                               operand_1C_intrlvd[idx_rev[offset + 1]]);
+    }
 
     // Weights
     __m512d v_W_real = _mm512_set1_pd(W_1C_intrlvd[0]);
@@ -297,7 +335,7 @@ void FFT_AVX512(double* result_cmplx_intrlvd,
                 const double* operand_cmplx_intrlvd,
                 const double* root_of_unity_powers_cmplx_intrlvd,
                 const uint64_t n, uint64_t recursion_depth,
-                bool inverse = false) {
+                bool inverse = false, const size_t* idx_rev = nullptr) {
   size_t gap;  // Interleaved complex values requires a gap twice the size
 
   size_t W_idx;
@@ -311,7 +349,12 @@ void FFT_AVX512(double* result_cmplx_intrlvd,
 
     // T1
     const double* W_cmplx_intrlvd = &root_of_unity_powers_cmplx_intrlvd[W_idx];
-    ComplexT1(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    if (idx_rev == nullptr) {
+      ComplexT1(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd, m);
+    } else {
+      ComplexT1(result_cmplx_intrlvd, result_cmplx_intrlvd, W_cmplx_intrlvd, m,
+                idx_rev);
+    }
     gap <<= 1;
     m >>= 1;
     W_idx += 1;
@@ -387,6 +430,7 @@ void FFT_AVX512(double* result_cmplx_intrlvd,
 void Forward_FFT_AVX512(double* result_cmplx_intrlvd,
                         const double* operand_cmplx_intrlvd,
                         const double* root_of_unity_powers_cmplx_intrlvd,
+                        const size_t* rev_idx, const size_t* idx_rev,
                         const uint64_t n, bool inverse) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n >= 16,
@@ -398,13 +442,13 @@ void Forward_FFT_AVX512(double* result_cmplx_intrlvd,
   HEXL_VLOG(5, "operand_cmplx_intrlvd " << std::vector<std::complex<double>>(
                    operand_cmplx_intrlvd, operand_cmplx_intrlvd + 2 * n));
 
-  uint64_t bits = static_cast<uint64_t>(log2(static_cast<double>(n)));
-  for (size_t i = 0; i < n; i++) {
-    size_t j = ReverseBits(i, bits);
-    size_t ix = 2 * i;
-    size_t jx = 2 * j;
-    if (result_cmplx_intrlvd == operand_cmplx_intrlvd) {
-      if (j > i) {
+  // uint64_t bits = static_cast<uint64_t>(log2(static_cast<double>(n)));
+
+  if (result_cmplx_intrlvd == operand_cmplx_intrlvd) {
+    for (size_t i = 0; i < n; i++) {
+      size_t ix = 2 * i;
+      size_t jx = 2 * rev_idx[i];
+      if (jx > ix) {
         double tmp = operand_cmplx_intrlvd[ix];
         result_cmplx_intrlvd[ix] = operand_cmplx_intrlvd[jx];
         result_cmplx_intrlvd[jx] = tmp;
@@ -412,14 +456,15 @@ void Forward_FFT_AVX512(double* result_cmplx_intrlvd,
         result_cmplx_intrlvd[ix + 1] = operand_cmplx_intrlvd[jx + 1];
         result_cmplx_intrlvd[jx + 1] = tmp;
       }
-    } else {
-      result_cmplx_intrlvd[ix] = operand_cmplx_intrlvd[jx];
-      result_cmplx_intrlvd[ix + 1] = operand_cmplx_intrlvd[jx + 1];
     }
-  }
 
-  FFT_AVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
-             root_of_unity_powers_cmplx_intrlvd, n, 0, inverse);
+    FFT_AVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
+               root_of_unity_powers_cmplx_intrlvd, n, 0, inverse);
+
+  } else {
+    FFT_AVX512(result_cmplx_intrlvd, result_cmplx_intrlvd,
+               root_of_unity_powers_cmplx_intrlvd, n, 0, inverse, idx_rev);
+  }
 }
 
 #endif  // HEXL_HAS_AVX512DQ

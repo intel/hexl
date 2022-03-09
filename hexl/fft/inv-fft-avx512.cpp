@@ -307,6 +307,7 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
 void Inverse_FFT_AVX512(double* result_cmplx_intrlvd,
                         const double* operand_cmplx_intrlvd,
                         const double* inv_root_of_unity_cmplx_intrlvd,
+                        const size_t* rev_idx, const size_t* idx_rev,
                         const uint64_t n) {
   HEXL_CHECK(IsPowerOfTwo(n), "n " << n << " is not a power of 2");
   HEXL_CHECK(n >= 16,
@@ -319,7 +320,8 @@ void Inverse_FFT_AVX512(double* result_cmplx_intrlvd,
                    operand_cmplx_intrlvd, operand_cmplx_intrlvd + 2 * n));
 
   Forward_FFT_AVX512(result_cmplx_intrlvd, operand_cmplx_intrlvd,
-                     inv_root_of_unity_cmplx_intrlvd, n, true);
+                     inv_root_of_unity_cmplx_intrlvd, rev_idx, idx_rev, n,
+                     true);
 }
 
 #endif  // HEXL_HAS_AVX512DQ

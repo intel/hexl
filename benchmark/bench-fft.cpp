@@ -163,13 +163,15 @@ static void BM_FwdFFTAVX512InPlace(benchmark::State& state) {  //  NOLINT
   FFT fft(fft_size);
 
   AlignedVector64<double> input(2 * fft_size);
+  AlignedVector64<size_t> rev_idx = fft.GetRevIdx();
+  AlignedVector64<size_t> idx_rev = fft.GetIdxRev();
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
   AlignedVector64<double> root_powers = fft.GetInterleavedComplexRootsOfUnity();
 
   for (auto _ : state) {
     Forward_FFT_AVX512(input.data(), input.data(), root_powers.data(),
-                       fft_size);
+                       rev_idx.data(), idx_rev.data(), fft_size);
   }
 }
 
@@ -188,13 +190,15 @@ static void BM_FwdFFTAVX512Copy(benchmark::State& state) {  //  NOLINT
 
   AlignedVector64<double> output(2 * fft_size);
   AlignedVector64<double> input(2 * fft_size);
+  AlignedVector64<size_t> rev_idx = fft.GetRevIdx();
+  AlignedVector64<size_t> idx_rev = fft.GetIdxRev();
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
   AlignedVector64<double> root_powers = fft.GetInterleavedComplexRootsOfUnity();
 
   for (auto _ : state) {
     Forward_FFT_AVX512(input.data(), input.data(), root_powers.data(),
-                       fft_size);
+                       rev_idx.data(), idx_rev.data(), fft_size);
   }
 }
 
@@ -212,6 +216,8 @@ static void BM_InvFFTAVX512InPlace(benchmark::State& state) {  //  NOLINT
   FFT fft(fft_size);
 
   AlignedVector64<double> input(2 * fft_size);
+  AlignedVector64<size_t> rev_idx = fft.GetRevIdx();
+  AlignedVector64<size_t> idx_rev = fft.GetIdxRev();
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
   AlignedVector64<double> inv_root_powers =
@@ -219,7 +225,7 @@ static void BM_InvFFTAVX512InPlace(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     Inverse_FFT_AVX512(input.data(), input.data(), inv_root_powers.data(),
-                       fft_size);
+                       rev_idx.data(), idx_rev.data(), fft_size);
   }
 }
 
@@ -238,6 +244,8 @@ static void BM_InvFFTAVX512Copy(benchmark::State& state) {  //  NOLINT
 
   AlignedVector64<double> output(2 * fft_size);
   AlignedVector64<double> input(2 * fft_size);
+  AlignedVector64<size_t> rev_idx = fft.GetRevIdx();
+  AlignedVector64<size_t> idx_rev = fft.GetIdxRev();
   input = GenerateInsecureUniformRealRandomValues(2 * fft_size, 0, bound);
 
   AlignedVector64<double> inv_root_powers =
@@ -245,7 +253,7 @@ static void BM_InvFFTAVX512Copy(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     Inverse_FFT_AVX512(input.data(), input.data(), inv_root_powers.data(),
-                       fft_size);
+                       rev_idx.data(), idx_rev.data(), fft_size);
   }
 }
 

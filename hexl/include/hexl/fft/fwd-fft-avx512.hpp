@@ -22,6 +22,7 @@ namespace hexl {
 void Forward_FFT_AVX512(double* result_cmplx_intrlvd,
                         const double* operand_cmplx_intrlvd,
                         const double* roots_of_unity_cmplx_intrlvd,
+                        const size_t* rev_idx, const size_t* idx_rev,
                         const uint64_t n, bool inverse = false);
 
 #endif  // HEXL_HAS_AVX512DQ
