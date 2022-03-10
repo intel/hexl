@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "hexl/experimental/seal/ckks-switch-key.hpp"
+#include "hexl/experimental/seal/key-switch.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util.hpp"
@@ -13,7 +13,7 @@
 namespace intel {
 namespace hexl {
 
-TEST(CkksSwitchKey, small) {
+TEST(KeySwitch, small) {
   std::vector<std::vector<uint64_t>> key_vector{
       {31369078234928549,   167410544543601533,  30295063465117864,
        1029113708974659001, 350455048150478228,  1069609725127969255,
@@ -143,10 +143,10 @@ TEST(CkksSwitchKey, small) {
       409326672106986276,  871859211375214104,  683969770428749805,
       1007557589887202473, 1058613598685494981};
 
-  CkksSwitchKey(input.data(), t_target_iter_ptr.data(), coeff_count,
-                decomp_modulus_size, key_modulus_size, rns_modulus_size,
-                key_component_count, moduli.data(), hexl_key_vectors.data(),
-                modswitch_factors.data());
+  KeySwitch(input.data(), t_target_iter_ptr.data(), coeff_count,
+            decomp_modulus_size, key_modulus_size, rns_modulus_size,
+            key_component_count, moduli.data(), hexl_key_vectors.data(),
+            modswitch_factors.data());
 
   std::vector<uint64_t> expected_output{
       89296029533050855,   567993976793839274,  697003759686378746,
