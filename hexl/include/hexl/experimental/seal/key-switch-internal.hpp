@@ -12,7 +12,8 @@ namespace internal {
 /// @brief Computes key switching in-place
 /// @param[in,out] result Ciphertext data. Will be over-written with result. Has
 /// (n * decomp_modulus_size * key_component_count) elements
-/// @param[in] t_target_iter_ptr
+/// @param[in] t_target_iter_ptr Pointer to the last component of the input
+/// ciphertext
 /// @param[in] n Number of coefficients in each polynomial
 /// @param[in] decomp_modulus_size  Number of moduli in the ciphertext at its
 /// current level, excluding one auxiliary prime.
@@ -21,7 +22,8 @@ namespace internal {
 /// @param[in] rns_modulus_size Number of moduli in the ciphertext at its
 /// current level, including one auxiliary prime. rns_modulus_size ==
 /// decomp_modulus_size + 1
-/// @param[in] key_component_count
+/// @param[in] key_component_count Number of components in the resulting
+/// ciphertext, e.g. key_component_count == 2.
 /// @param[in] moduli Array of word-sized coefficient moduli. There must be
 /// key_modulus_size moduli in the array
 /// @param[in] k_switch_keys Array of evaluation key data. Has
