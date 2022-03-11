@@ -17,8 +17,10 @@ set(NATIVE_SRC
 
 if (HEXL_EXPERIMENTAL)
     list(APPEND NATIVE_SRC
-        experimental/seal/ckks-multiply.cpp
-        experimental/seal/ckks-switch-key.cpp
+        experimental/seal/dyadic-multiply.cpp
+        experimental/seal/key-switch.cpp
+        experimental/seal/dyadic-multiply-internal.cpp
+        experimental/seal/key-switch-internal.cpp
         experimental/misc/lr-mat-vec-mult.cpp
     )
 endif()
@@ -72,6 +74,17 @@ target_include_directories(hexl
 )
 if(CpuFeatures_FOUND)
     target_include_directories(hexl PUBLIC ${CpuFeatures_INCLUDE_DIR}) # Public headers
+endif()
+
+if (HEXL_FPGA_COMPATIBILITY STREQUAL "1")
+    target_compile_options(hexl PRIVATE -DHEXL_FPGA_COMPATIBLE_DYADIC_MULTIPLY)
+elseif (HEXL_FPGA_COMPATIBILITY STREQUAL "2")
+    target_compile_options(hexl PRIVATE -DHEXL_FPGA_COMPATIBLE_KEYSWITCH)
+elseif (HEXL_FPGA_COMPATIBILITY STREQUAL "3")
+    target_compile_options(hexl PRIVATE
+        -DHEXL_FPGA_COMPATIBLE_DYADIC_MULTIPLY
+        -DHEXL_FPGA_COMPATIBLE_KEYSWITCH
+    )
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
