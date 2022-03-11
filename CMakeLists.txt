@@ -63,7 +63,7 @@ option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
 
 if (NOT HEXL_FPGA_COMPATIBILITY)
-    set(HEXL_FPGA_COMPATIBILITY "0" CACHE STRING "Set FPGA compatibility mask" FORCE)
+    set(HEXL_FPGA_COMPATIBILITY "0" CACHE INTERNAL "Set FPGA compatibility mask" FORCE)
 endif()
 
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
