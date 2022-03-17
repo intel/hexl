@@ -1,5 +1,8 @@
 # Changes
 
+## Version 1.2.4
+-
+
 ## Version 1.2.3
 - Fix to EltwiseReduceMod on AVX512-DQ processors (https://github.com/intel/hexl/issues/86)
 - Update minimum CMake version to 3.13

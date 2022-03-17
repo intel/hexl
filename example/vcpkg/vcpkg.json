@@ -4,7 +4,7 @@
     "dependencies": [
         {
             "name": "hexl",
-            "version>=": "1.2.3"
+            "version>=": "1.2.4"
         }
     ],
     "builtin-baseline": "7baf7bc9f3390bab2f47e2bcbd35b065663bc80d",
