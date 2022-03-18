@@ -9,29 +9,29 @@ word-sized primes, typically 30-60 bits. Intel HE Acceleration Library provides
 an API for 64-bit unsigned integers and targets Intel CPUs. For more details on
 Intel HE Acceleration Library, see our
 [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best
-performance, see [Performance](#performance)
+performance, see [Performance](#performance).
 
 ## Contents
-- [Intel Homomorphic Encryption (HE) Acceleration Library](#intel-homomorphic-encryption-acceleration-library-hexl)
+- [Intel Homomorphic Encryption (HE) Acceleration Library](#intel-homomorphic-encryption-he-acceleration-library)
   - [Contents](#contents)
   - [Introduction](#introduction)
-  - [Building Intel HE Acceleration Library](#building-intel-hexl)
+  - [Building Intel HE Acceleration Library](#building-intel-he-acceleration-library)
     - [Dependencies](#dependencies)
     - [Compile-time options](#compile-time-options)
-    - [Compiling Intel HE Acceleration Library](#compiling-intel-hexl)
+    - [Compiling Intel HE Acceleration Library](#compiling-intel-he-acceleration-library)
       - [Linux and Mac](#linux-and-mac)
       - [Windows](#windows)
   - [Performance](#performance)
-  - [Testing Intel HE Acceleration Library](#testing-intel-hexl)
-  - [Benchmarking Intel HE Acceleration Library](#benchmarking-intel-hexl)
-  - [Using Intel HE Acceleration Library](#using-intel-hexl)
+  - [Testing Intel HE Acceleration Library](#testing-intel-he-acceleration-library)
+  - [Benchmarking Intel HE Acceleration Library](#benchmarking-intel-he-acceleration-library)
+  - [Using Intel HE Acceleration Library](#using-intel-he-acceleration-library)
   - [Debugging](#debugging)
   - [Threading](#threading)
 - [Community Adoption](#community-adoption)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
   - [Repository layout](#repository-layout)
-- [Citing Intel HE Acceleration Library](#citing-intel-hexl)
+- [Citing Intel HE Acceleration Library](#citing-intel-he-acceleration-library)
     - [Version 1.2](#version-12)
     - [Version 1.1](#version-11)
     - [Version 1.0](#version-10)
