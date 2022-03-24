@@ -55,7 +55,8 @@ inline std::vector<int64_t> ExtractIntValues(__m512i x) {
 // Returns the 64-bit floating-point values in x as a vector
 inline std::vector<double> ExtractValues(__m512d x) {
   std::vector<double> ret(8, 0);
-  double* x_data = reinterpret_cast<double*>(&x);
+  double* x_ptr = reinterpret_cast<double*>(&x);
+  std::vector<double> x_data(x_ptr, x_ptr + 8);
   for (size_t i = 0; i < 8; ++i) {
     ret[i] = x_data[i];
   }
