@@ -99,12 +99,11 @@ class EltwiseReduceModTest
   bool m_prefer_small_primes;
   uint64_t m_modulus;
 
-  EltwiseReduceModTest() {
-    m_N = 1024 + 7;  // m_N % 8 = 7 to test AVX512 boundary case
-    m_modulus_bits = 0;
-    m_prefer_small_primes = 0;
-    m_modulus = 0;
-  }
+  EltwiseReduceModTest()
+      : m_N(1024 + 7),  // m_N % 8 = 7 to test AVX512 boundary case
+        m_modulus_bits(0),
+        m_prefer_small_primes(0),
+        m_modulus(0) {}
 };
 
 // Test public API matches Native implementation on random values
