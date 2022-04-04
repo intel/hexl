@@ -121,7 +121,7 @@ if (HEXL_SHARED_LIB)
         target_link_libraries(hexl PUBLIC easyloggingpp)
         # Manually add logging include directory
         target_include_directories(hexl
-            PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
+            PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>>
         )
     endif()
 else ()
@@ -132,7 +132,7 @@ else ()
     if (HEXL_DEBUG)
         # Manually add logging include directory
         target_include_directories(hexl
-            PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INCLUDE_DIRECTORIES>>
+            PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:easyloggingpp,INTERFACE_INCLUDE_DIRECTORIES>>
         )
         if (EASYLOGGINGPP_FOUND)
             target_link_libraries(hexl PRIVATE easyloggingpp)
