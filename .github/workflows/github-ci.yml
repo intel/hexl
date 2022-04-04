@@ -24,7 +24,7 @@ on:
 # Define env vars #
 ###################
 env:
-  HEXL_VER: 1.2.3
+  HEXL_VER: 1.2.4
   HEXL_DIR: ${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
   HEXL_HINT_DIR: >
       -DHEXL_HINT_DIR=${GITHUB_WORKSPACE}/lib/cmake/hexl-${HEXL_VER}
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
-      - run: pip3 install cpplint
+      - run: pip3 install cpplint==1.5.5
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:
@@ -99,7 +99,8 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        os: [ice-lake, [self-hosted, ubuntu-18.04], macos-latest, ubuntu-20.04]
+        # os: [ice-lake, [self-hosted, ubuntu-18.04], macos-latest, ubuntu-20.04]
+        os: [ice-lake, macos-latest, ubuntu-20.04]
         build_type: [Release, Debug]
         shared_lib: [ON, OFF]
         include:

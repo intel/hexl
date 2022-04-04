@@ -3,7 +3,7 @@
 
 # target_link_options and cmake -S . -B build require cmake 3.13
 cmake_minimum_required(VERSION 3.13)
-project(HEXL VERSION 1.2.3 LANGUAGES C CXX)
+project(HEXL VERSION 1.2.4 LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
@@ -62,6 +62,10 @@ option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
 
+if (NOT HEXL_FPGA_COMPATIBILITY)
+    set(HEXL_FPGA_COMPATIBILITY "0" CACHE INTERNAL "Set FPGA compatibility mask" FORCE)
+endif()
+
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE_C_COMPILER:              ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_CXX_COMPILER:            ${CMAKE_CXX_COMPILER}")
@@ -73,6 +77,7 @@ message(STATUS "HEXL_EXPERIMENTAL:             ${HEXL_EXPERIMENTAL}")
 message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
+message(STATUS "HEXL_FPGA_COMPATIBILITY:       ${HEXL_FPGA_COMPATIBILITY}")
 
 hexl_check_compiler_version()
 hexl_add_compiler_definition()
@@ -121,14 +126,10 @@ if(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
-if(LINUX)
-  include(GNUInstallDirs)
-else()
-  set(CMAKE_INSTALL_BINDIR "bin")
-  set(CMAKE_INSTALL_INCLUDEDIR "include")
-  set(CMAKE_INSTALL_DOCDIR "doc")
-  set(CMAKE_INSTALL_LIBDIR "lib")
-endif()
+# Will set CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_INCLUDEDIR, etc
+# to usual unix directory names
+include(GNUInstallDirs)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_INSTALL_LIBDIR})
 
 message(STATUS "CMAKE_INSTALL_LIBDIR:     ${CMAKE_INSTALL_LIBDIR}")
