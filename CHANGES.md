@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.2.4
+- Adds experimental HEXL-FPGA compatibility for dyadic multiply and key switch (https://github.com/intel/hexl/pull/109)
+- Adds vcpkg example of how to use previous hexl versions (https://github.com/intel/hexl/pull/103)
+- Adds benchmarking montgomery multiplication (https://github.com/intel/hexl/pull/94)
+- Moves to compiling with minimum C++ 17
+- Updates to documentation
+
 ## Version 1.2.3
 - Fix to EltwiseReduceMod on AVX512-DQ processors (https://github.com/intel/hexl/issues/86)
 - Update minimum CMake version to 3.13

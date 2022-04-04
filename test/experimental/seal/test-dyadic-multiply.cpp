@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "hexl/experimental/seal/ckks-multiply.hpp"
+#include "hexl/experimental/seal/dyadic-multiply.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "test-util.hpp"
@@ -13,7 +13,7 @@
 namespace intel {
 namespace hexl {
 
-TEST(CkksMultiply, small_one_mod) {
+TEST(DyadicMultiply, small_one_mod) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10};
 
@@ -29,13 +29,13 @@ TEST(CkksMultiply, small_one_mod) {
       (4 * 8 % 10),         (5 * 1 % 10),         (6 * 3 % 10)           //
   };
 
-  CkksMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
-               moduli.size());
+  DyadicMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
+                 moduli.size());
 
   CheckEqual(out, exp_out);
 }
 
-TEST(CkksMultiply, small_one_mod_inplace) {
+TEST(DyadicMultiply, small_one_mod_inplace) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10};
 
@@ -53,13 +53,13 @@ TEST(CkksMultiply, small_one_mod_inplace) {
       (4 * 8 % 10),         (5 * 1 % 10),         (6 * 3 % 10)           //
   };
 
-  CkksMultiply(op1.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
-               moduli.size());
+  DyadicMultiply(op1.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
+                 moduli.size());
 
   CheckEqual(op1, exp_out);
 }
 
-TEST(CkksMultiply, small_one_mod_square_same_op) {
+TEST(DyadicMultiply, small_one_mod_square_same_op) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10};
 
@@ -79,13 +79,13 @@ TEST(CkksMultiply, small_one_mod_square_same_op) {
       (op1[5] * op1[5] % 10)  //
   };
 
-  CkksMultiply(out.data(), op1.data(), op1.data(), coeff_count, moduli.data(),
-               moduli.size());
+  DyadicMultiply(out.data(), op1.data(), op1.data(), coeff_count, moduli.data(),
+                 moduli.size());
 
   CheckEqual(out, exp_out);
 }
 
-TEST(CkksMultiply, small_one_mod_square_same_op_inline) {
+TEST(DyadicMultiply, small_one_mod_square_same_op_inline) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10};
 
@@ -105,13 +105,13 @@ TEST(CkksMultiply, small_one_mod_square_same_op_inline) {
       (op1[5] * op1[5] % 10)  //
   };
 
-  CkksMultiply(op1.data(), op1.data(), op1.data(), coeff_count, moduli.data(),
-               moduli.size());
+  DyadicMultiply(op1.data(), op1.data(), op1.data(), coeff_count, moduli.data(),
+                 moduli.size());
 
   CheckEqual(op1, exp_out);
 }
 
-TEST(CkksMultiply, small_two_mod) {
+TEST(DyadicMultiply, small_two_mod) {
   size_t coeff_count = 3;
   std::vector<uint64_t> moduli{10, 20};
 
@@ -148,8 +148,8 @@ TEST(CkksMultiply, small_two_mod) {
                                 (15 * 11 % 20),
                                 (16 * 13 % 20)};
 
-  CkksMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
-               moduli.size());
+  DyadicMultiply(out.data(), op1.data(), op2.data(), coeff_count, moduli.data(),
+                 moduli.size());
 
   CheckEqual(out, exp_out);
 }
