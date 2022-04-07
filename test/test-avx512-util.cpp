@@ -330,7 +330,8 @@ TEST(AVX512, _mm512_hexl_barrett_reduce64) {
     __m512i v_neg_mod = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
 
     for (size_t trial = 0; trial < 200; ++trial) {
-      auto arg1 = GenerateInsecureUniformRandomValues(8, 0, modulus * modulus);
+      auto arg1 =
+          GenerateInsecureUniformIntRandomValues(8, 0, modulus * modulus);
       auto exp = arg1;
       for (auto& elem : exp) {
         elem %= modulus;

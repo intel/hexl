@@ -12,6 +12,8 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-reduce-mod.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
+    test-fft.cpp
+    test-fft-native.cpp
     test-util-internal.cpp
 )
 
@@ -33,6 +35,7 @@ set(AVX512_TEST_SRC
     test-eltwise-reduce-mod-avx512.cpp
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
+    test-fft-avx512.cpp
 )
 
 set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")

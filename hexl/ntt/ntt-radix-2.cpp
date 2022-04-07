@@ -118,17 +118,17 @@ void ForwardTransformToBitReverseRadix2(
 
   // Continue with in-place operation
   for (size_t m = 2; m < n; m <<= 1) {
-    size_t j1 = 0;
+    size_t offset = 0;
     switch (t) {
       case 8: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -155,12 +155,12 @@ void ForwardTransformToBitReverseRadix2(
       case 4: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -179,12 +179,12 @@ void ForwardTransformToBitReverseRadix2(
       case 2: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -199,12 +199,12 @@ void ForwardTransformToBitReverseRadix2(
       case 1: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -217,12 +217,12 @@ void ForwardTransformToBitReverseRadix2(
       default: {
         for (size_t i = 0; i < m; i++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = root_of_unity_powers[m + i];
           const uint64_t W_precon = precon_root_of_unity_powers[m + i];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -270,21 +270,21 @@ void ReferenceForwardTransformToBitReverse(
 
   size_t t = (n >> 1);
   for (size_t m = 1; m < n; m <<= 1) {
-    size_t j1 = 0;
+    size_t offset = 0;
     for (size_t i = 0; i < m; i++) {
-      size_t j2 = j1 + t;
+      size_t offset2 = offset + t;
       const uint64_t W = root_of_unity_powers[m + i];
 
-      uint64_t* X = operand + j1;
+      uint64_t* X = operand + offset;
       uint64_t* Y = X + t;
-      for (size_t j = j1; j < j2; j++) {
+      for (size_t j = offset; j < offset2; j++) {
         // X', Y' = X + WY, X - WY (mod q).
         uint64_t tx = *X;
         uint64_t W_x_Y = MultiplyMod(*Y, W, modulus);
         *X++ = AddUIntMod(tx, W_x_Y, modulus);
         *Y++ = SubUIntMod(tx, W_x_Y, modulus);
       }
-      j1 += (t << 1);
+      offset += (t << 1);
     }
     t >>= 1;
   }
@@ -301,10 +301,10 @@ void ReferenceInverseTransformFromBitReverse(
   size_t t = 1;
   size_t root_index = 1;
   for (size_t m = (n >> 1); m >= 1; m >>= 1) {
-    size_t j1 = 0;
+    size_t offset = 0;
     for (size_t i = 0; i < m; i++, root_index++) {
       const uint64_t W = inv_root_of_unity_powers[root_index];
-      uint64_t* X_r = operand + j1;
+      uint64_t* X_r = operand + offset;
       uint64_t* Y_r = X_r + t;
       for (size_t j = 0; j < t; j++) {
         uint64_t X_op = *X_r;
@@ -315,7 +315,7 @@ void ReferenceInverseTransformFromBitReverse(
         X_r++;
         Y_r++;
       }
-      j1 += (t << 1);
+      offset += (t << 1);
     }
     t <<= 1;
   }
@@ -350,20 +350,20 @@ void InverseTransformFromBitReverseRadix2(
   size_t root_index = 1;
 
   for (size_t m = n_div_2; m > 1; m >>= 1) {
-    size_t j1 = 0;
+    size_t offset = 0;
 
     switch (t) {
       case 1: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
-          const uint64_t* X_op = operand + j1;
+          const uint64_t* X_op = operand + offset;
           const uint64_t* Y_op = X_op + t;
           InvButterflyRadix2(X_r, Y_r, X_op, Y_op, W, W_precon, modulus,
                              twice_modulus);
@@ -373,12 +373,12 @@ void InverseTransformFromBitReverseRadix2(
       case 2: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -392,12 +392,12 @@ void InverseTransformFromBitReverseRadix2(
       case 4: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -415,12 +415,12 @@ void InverseTransformFromBitReverseRadix2(
       case 8: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;
@@ -446,12 +446,12 @@ void InverseTransformFromBitReverseRadix2(
       default: {
         for (size_t i = 0; i < m; i++, root_index++) {
           if (i != 0) {
-            j1 += (t << 1);
+            offset += (t << 1);
           }
           const uint64_t W = inv_root_of_unity_powers[root_index];
           const uint64_t W_precon = precon_inv_root_of_unity_powers[root_index];
 
-          uint64_t* X_r = result + j1;
+          uint64_t* X_r = result + offset;
           uint64_t* Y_r = X_r + t;
           const uint64_t* X_op = X_r;
           const uint64_t* Y_op = Y_r;

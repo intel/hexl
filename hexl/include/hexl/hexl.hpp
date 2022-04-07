@@ -15,6 +15,7 @@
 #include "hexl/experimental/seal/dyadic-multiply.hpp"
 #include "hexl/experimental/seal/key-switch-internal.hpp"
 #include "hexl/experimental/seal/key-switch.hpp"
+#include "hexl/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
