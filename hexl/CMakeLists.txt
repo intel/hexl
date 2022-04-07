@@ -13,6 +13,10 @@ set(NATIVE_SRC
     ntt/ntt-radix-2.cpp
     ntt/ntt-radix-4.cpp
     number-theory/number-theory.cpp
+    fft/fft.cpp
+    fft/fft-native.cpp
+    dwt/dwt.cpp
+    dwt/dwt-native.cpp
 )
 
 if (HEXL_EXPERIMENTAL)
@@ -37,6 +41,10 @@ if (HEXL_HAS_AVX512DQ)
         eltwise/eltwise-fma-mod-avx512.cpp
         ntt/fwd-ntt-avx512.cpp
         ntt/inv-ntt-avx512.cpp
+        fft/fwd-fft-avx512.cpp
+        fft/inv-fft-avx512.cpp
+        dwt/fwd-dwt-avx512.cpp
+        dwt/inv-dwt-avx512.cpp
     )
 endif()
 

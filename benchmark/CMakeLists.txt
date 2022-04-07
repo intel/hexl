@@ -3,6 +3,8 @@
 
 set(SRC main.cpp
     bench-ntt.cpp
+    bench-fft.cpp
+    bench-dwt.cpp
     bench-eltwise-add-mod.cpp
     bench-eltwise-cmp-add.cpp
     bench-eltwise-cmp-sub-mod.cpp

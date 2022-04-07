@@ -420,7 +420,7 @@ TEST_P(NttNativeTest, InverseZeros) {
 }
 
 TEST_P(NttNativeTest, ForwardRadix4Random) {
-  auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
   auto input_radix4 = input;
 
   ForwardTransformToBitReverseRadix4(
@@ -435,7 +435,7 @@ TEST_P(NttNativeTest, ForwardRadix4Random) {
 }
 
 TEST_P(NttNativeTest, InverseRadix4Random) {
-  auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
   auto input_radix4 = input;
 
   InverseTransformFromBitReverseRadix2(
@@ -452,7 +452,7 @@ TEST_P(NttNativeTest, InverseRadix4Random) {
 }
 
 TEST_P(NttNativeTest, InverseRadix2Random) {
-  auto input = GenerateInsecureUniformRandomValues(m_N, 1, 2);
+  auto input = GenerateInsecureUniformIntRandomValues(m_N, 1, 2);
   auto input_reference = input;
 
   InverseTransformFromBitReverseRadix2(

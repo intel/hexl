@@ -6,6 +6,7 @@
 #include <tuple>
 #include <vector>
 
+#include "hexl/fft/fft.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
@@ -176,7 +177,7 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
 
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
-        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+        GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
     AlignedVector64<uint64_t> exp_output(m_N, 0);
@@ -212,7 +213,7 @@ TEST_P(NttAVX512Test, InvNTT_AVX512IFMA) {
 
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input64 =
-        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+        GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_ifma = input64;
     AlignedVector64<uint64_t> input_ifma_lazy = input64;
     AlignedVector64<uint64_t> exp_output(m_N, 0);
@@ -251,7 +252,7 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512_32) {
 
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input =
-        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+        GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_avx = input;
     AlignedVector64<uint64_t> input_avx_lazy = input;
 
@@ -287,7 +288,7 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512_64) {
 
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input =
-        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+        GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_avx = input;
     AlignedVector64<uint64_t> input_avx_lazy = input;
 
@@ -323,7 +324,7 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_32) {
 
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input =
-        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+        GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
 
     AlignedVector64<uint64_t> input_avx = input;
     AlignedVector64<uint64_t> input_avx_lazy = input;
@@ -360,7 +361,7 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
 
   for (size_t trial = 0; trial < m_num_trials; ++trial) {
     AlignedVector64<uint64_t> input =
-        GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+        GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
     AlignedVector64<uint64_t> input_avx = input;
     AlignedVector64<uint64_t> input_avx_lazy = input;
 

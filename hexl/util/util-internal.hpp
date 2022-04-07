@@ -45,14 +45,28 @@ inline bool Compare(CMPINT cmp, uint64_t lhs, uint64_t rhs) {
 /// max_value)
 /// NOTE: this function is not a cryptographically secure random number
 /// generator and should be used for testing/benchmarking only
-inline uint64_t GenerateInsecureUniformRandomValue(uint64_t min_value,
-                                                   uint64_t max_value) {
+inline double GenerateInsecureUniformRealRandomValue(double min_value,
+                                                     double max_value) {
+  HEXL_CHECK(min_value < max_value, "min_value must be > max_value");
+
+  static std::random_device rd;
+  static std::mt19937 mersenne_engine(rd());
+  std::uniform_real_distribution<double> distrib(min_value, max_value);
+  double res = distrib(mersenne_engine);
+  return (res == max_value) ? min_value : res;
+}
+
+/// Generates a vector of size random values drawn uniformly from [min_value,
+/// max_value)
+/// NOTE: this function is not a cryptographically secure random number
+/// generator and should be used for testing/benchmarking only
+inline uint64_t GenerateInsecureUniformIntRandomValue(uint64_t min_value,
+                                                      uint64_t max_value) {
   HEXL_CHECK(min_value < max_value, "min_value must be > max_value");
 
   static std::random_device rd;
   static std::mt19937 mersenne_engine(rd());
   std::uniform_int_distribution<uint64_t> distrib(min_value, max_value - 1);
-
   return distrib(mersenne_engine);
 }
 
@@ -60,11 +74,25 @@ inline uint64_t GenerateInsecureUniformRandomValue(uint64_t min_value,
 /// max_value)
 /// NOTE: this function is not a cryptographically secure random
 /// number generator and should be used for testing/benchmarking only
-inline AlignedVector64<uint64_t> GenerateInsecureUniformRandomValues(
+inline AlignedVector64<double> GenerateInsecureUniformRealRandomValues(
+    uint64_t size, double min_value, double max_value) {
+  AlignedVector64<double> values(size);
+  auto generator = [&]() {
+    return GenerateInsecureUniformRealRandomValue(min_value, max_value);
+  };
+  std::generate(values.begin(), values.end(), generator);
+  return values;
+}
+
+/// Generates a vector of size random values drawn uniformly from [min_value,
+/// max_value)
+/// NOTE: this function is not a cryptographically secure random
+/// number generator and should be used for testing/benchmarking only
+inline AlignedVector64<uint64_t> GenerateInsecureUniformIntRandomValues(
     uint64_t size, uint64_t min_value, uint64_t max_value) {
   AlignedVector64<uint64_t> values(size);
   auto generator = [&]() {
-    return GenerateInsecureUniformRandomValue(min_value, max_value);
+    return GenerateInsecureUniformIntRandomValue(min_value, max_value);
   };
   std::generate(values.begin(), values.end(), generator);
   return values;
