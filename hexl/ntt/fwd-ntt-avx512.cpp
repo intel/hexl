@@ -6,6 +6,8 @@
 #include <cstring>
 #include <functional>
 #include <vector>
+#include <thread>
+#include <iostream>
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
@@ -16,6 +18,8 @@
 
 namespace intel {
 namespace hexl {
+
+const auto HEXL_THREAD_COUNT = std::thread::hardware_concurrency();
 
 #ifdef HEXL_HAS_AVX512IFMA
 template void ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
@@ -44,6 +48,9 @@ template void ForwardTransformToBitReverseAVX512<NTT::s_default_shift_bits>(
 
 #ifdef HEXL_HAS_AVX512DQ
 
+void bar(__m512i* x) {
+  std::cout << "ROCHA: Bar " << (*x)[0] << " Address " << x << std::endl;
+}
 /// @brief The Harvey butterfly: assume \p X, \p Y in [0, 4q), and return X', Y'
 /// in [0, 4q) such that X', Y' = X + WY, X - WY (mod q).
 /// @param[in,out] X Input representing 8 64-bit signed integers in SIMD form
@@ -115,6 +122,7 @@ void FwdT1(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
     FwdButterfly<BitShift, false>(&v_X, &v_Y, v_W, v_W_precon, v_neg_modulus,
                                   v_twice_mod);
+
     WriteFwdInterleavedT1(v_X, v_Y, v_X_pt);
 
     j1 += 16;
@@ -184,6 +192,30 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
   }
 }
 
+template <int BitShift, bool InputLessThanMod>
+void FwdT8Thread(const __m512i* v_X_op_pt, const __m512i* v_Y_op_pt,
+                 __m512i* v_X_r_pt,__m512i* v_Y_r_pt, 
+                size_t t, size_t step,
+                 __m512i v_W, __m512i v_W_precon,
+                __m512i  v_neg_modulus, __m512i v_twice_mod) {
+
+  for (size_t j = t / 8; j > 0; --j) {
+    __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+    __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+
+    FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                              v_neg_modulus, v_twice_mod);
+
+    _mm512_storeu_si512(v_X_r_pt, v_X);
+    _mm512_storeu_si512(v_Y_r_pt, v_Y);
+    
+    v_X_r_pt +=step;
+    v_Y_r_pt +=step;
+    v_X_op_pt +=step;
+    v_Y_op_pt +=step;
+  }
+}
+
 // Out-of-place implementation
 template <int BitShift, bool InputLessThanMod>
 void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
@@ -191,6 +223,7 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
+  //std::cout << "t = " << t << " m = " << m << std::endl; 
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < m; i++) {
     // Referencing operand
@@ -212,20 +245,49 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
     __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
     // assume 8 | t
-    for (size_t j = t / 8; j > 0; --j) {
-      __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
-      __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+    //std::cout << "t/8 = " << t/8 << std::endl;
+    
+    /*
+    if (m == 1) {
+      std::cout << "t/8 = " << t/8 << " m " << m << std::endl;
+      std::thread th_a (FwdT8Thread<BitShift, InputLessThanMod>,
+                        v_X_op_pt, v_Y_op_pt, v_X_r_pt, v_Y_r_pt, t/4, 4,
+                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
+      std::thread th_b (FwdT8Thread<BitShift, InputLessThanMod>,
+                        v_X_op_pt + 1 , v_Y_op_pt + 1,
+                        v_X_r_pt + 1, v_Y_r_pt + 1, t/4, 4,
+                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
+      std::thread th_c (FwdT8Thread<BitShift, InputLessThanMod>,
+                        v_X_op_pt + 2, v_Y_op_pt + 2,
+                        v_X_r_pt + 2, v_Y_r_pt + 2, t/4, 4,
+                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
+      std::thread th_d (FwdT8Thread<BitShift, InputLessThanMod>,
+                        v_X_op_pt + 3, v_Y_op_pt + 3,
+                        v_X_r_pt + 3, v_Y_r_pt + 3, t/4, 4,
+                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
+      th_a.join();
+      th_b.join();
+      th_c.join();
+      th_d.join();                // pauses until first finishes
+    
+    } else {
+    */
+      for (size_t j = t / 8; j > 0; --j) {
+        __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+        __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
 
-      FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
-                                               v_neg_modulus, v_twice_mod);
+        FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                  v_neg_modulus, v_twice_mod);
 
-      _mm512_storeu_si512(v_X_r_pt++, v_X);
-      _mm512_storeu_si512(v_Y_r_pt++, v_Y);
-
-      // Increase operand pointers as well
-      v_X_op_pt++;
-      v_Y_op_pt++;
-    }
+        _mm512_storeu_si512(v_X_r_pt++, v_X);
+        _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+        
+        // Increase operand pointers as well
+        v_X_op_pt++;
+        v_Y_op_pt++;
+      }
+    //}      
+    
     j1 += (t << 1);
   }
 }
@@ -271,7 +333,7 @@ void ForwardTransformToBitReverseAVX512(
                 precon_root_of_unity_powers, precon_root_of_unity_powers + n));
   HEXL_VLOG(5, "operand " << std::vector<uint64_t>(operand, operand + n));
 
-  static const size_t base_ntt_size = 1024;
+  static const size_t base_ntt_size = 8192;
 
   if (n <= base_ntt_size) {  // Perform breadth-first NTT
     size_t t = (n >> 1);
@@ -390,16 +452,31 @@ void ForwardTransformToBitReverseAVX512(
 
     FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
                            W_precon);
+    /*
+    if (recursion_depth == 3) {
+      std::thread th_a (ForwardTransformToBitReverseAVX512<BitShift>,
+          result, result, n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2);
+      std::thread th_b (ForwardTransformToBitReverseAVX512<BitShift>,
+          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2 + 1);
 
-    ForwardTransformToBitReverseAVX512<BitShift>(
-        result, result, n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2);
+      th_a.join();
+      th_b.join();
+    }else {
+    */
+      ForwardTransformToBitReverseAVX512<BitShift>(
+          result, result, n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2);
 
-    ForwardTransformToBitReverseAVX512<BitShift>(
-        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2 + 1);
+      ForwardTransformToBitReverseAVX512<BitShift>(
+          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2 + 1);
+    //}
   }
 }
 
