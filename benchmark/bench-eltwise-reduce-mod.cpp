@@ -109,9 +109,40 @@ static void BM_EltwiseReduceModAVX512(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseReduceModAVX512)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+// state[0] is the degree
+static void BM_EltwiseReduceModAVX512_MT(benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 0xffffffffffc0001ULL;
+
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512_mt<64>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 //=================================================================
@@ -137,9 +168,41 @@ static void BM_EltwiseReduceModAVX512BitShift64(
 
 BENCHMARK(BM_EltwiseReduceModAVX512BitShift64)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+// state[0] is the degree
+static void BM_EltwiseReduceModAVX512BitShift64_MT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 0xffffffffffc0001ULL;
+
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 2;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512_mt<64>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512BitShift64_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 ////=================================================================
@@ -165,9 +228,41 @@ static void BM_EltwiseReduceModAVX512BitShift52(
 
 BENCHMARK(BM_EltwiseReduceModAVX512BitShift52)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+    // state[0] is the degree
+static void BM_EltwiseReduceModAVX512BitShift52_MT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 0xffffffffffc0001ULL;
+
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 2;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512_mt<52>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512BitShift52_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 ////=================================================================
@@ -193,9 +288,41 @@ static void BM_EltwiseReduceModAVX512BitShift52GT(
 
 BENCHMARK(BM_EltwiseReduceModAVX512BitShift52GT)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+// state[0] is the degree
+static void BM_EltwiseReduceModAVX512BitShift52GT_MT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 0xffffffffffc0001ULL;
+
+  auto input1 = GenerateInsecureUniformRandomValues(
+      input_size, 4503599627370496, 100 * modulus);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512_mt<52>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512BitShift52GT_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 static void BM_EltwiseReduceModAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
@@ -216,9 +343,40 @@ static void BM_EltwiseReduceModAVX512BitShift52LT(
 
 BENCHMARK(BM_EltwiseReduceModAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+static void BM_EltwiseReduceModAVX512BitShift52LT_MT(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 0xffffffffffc0001ULL;
+
+  auto input1 =
+      GenerateInsecureUniformRandomValues(input_size, 0, 2251799813685248);
+  const uint64_t input_mod_factor = modulus;
+  const uint64_t output_mod_factor = 1;
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseReduceModAVX512_mt<52>(output.data(), input1.data(), input_size,
+                               modulus, input_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_EltwiseReduceModAVX512BitShift52LT_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 ////=================================================================

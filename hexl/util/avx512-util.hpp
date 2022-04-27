@@ -390,7 +390,7 @@ inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
 #ifdef HEXL_HAS_AVX512IFMA
   if (BitShift == 52) {
     // Operation:
-    // m ← ((T mod R)N′) mod R | m ← ((T & mod_R_mask)*v_inv_mod) & mod_R_mask
+    // m ← ((T mod R)N′) mod R 
     __m512i m = _mm512_hexl_mullo_epi<BitShift>(T_lo, v_inv_mod);
     m = ClearTopBits64<r>(m);
 
@@ -402,9 +402,6 @@ inline __m512i _mm512_hexl_montgomery_reduce(__m512i T_hi, __m512i T_lo,
     t = _mm512_srli_epi64(t, r);
     // Join parts
     t = _mm512_madd52lo_epu64(t, t_hi, v_rs_or_msk);
-
-    // If this function exists for 52 bits we could save 1 cycle
-    // t = _mm512_shrdi_epi64 (t_hi, t, r)
 
     // Operation: t ≥ q? return (t - q) : return t
     return _mm512_hexl_small_mod_epu64<2>(t, q);
