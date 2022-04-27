@@ -26,18 +26,18 @@ template void EltwiseReduceModAVX512<52>(uint64_t* result,
 #ifdef HEXL_HAS_AVX512DQ
 
 template void EltwiseReduceModAVX512_mt<64>(uint64_t* result,
-                                         const uint64_t* operand, uint64_t n,
-                                         uint64_t modulus,
-                                         uint64_t input_mod_factor,
-                                         uint64_t output_mod_factor);
+                                            const uint64_t* operand, uint64_t n,
+                                            uint64_t modulus,
+                                            uint64_t input_mod_factor,
+                                            uint64_t output_mod_factor);
 #endif
 
 #ifdef HEXL_HAS_AVX512IFMA
 template void EltwiseReduceModAVX512_mt<52>(uint64_t* result,
-                                         const uint64_t* operand, uint64_t n,
-                                         uint64_t modulus,
-                                         uint64_t input_mod_factor,
-                                         uint64_t output_mod_factor);
+                                            const uint64_t* operand, uint64_t n,
+                                            uint64_t modulus,
+                                            uint64_t input_mod_factor,
+                                            uint64_t output_mod_factor);
 #endif
 
 }  // namespace hexl

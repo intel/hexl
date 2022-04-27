@@ -5,9 +5,9 @@
 
 #include <cstring>
 #include <functional>
-#include <vector>
-#include <thread>
 #include <iostream>
+#include <thread>
+#include <vector>
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
@@ -194,25 +194,23 @@ void FwdT4(uint64_t* operand, __m512i v_neg_modulus, __m512i v_twice_mod,
 
 template <int BitShift, bool InputLessThanMod>
 void FwdT8Thread(const __m512i* v_X_op_pt, const __m512i* v_Y_op_pt,
-                 __m512i* v_X_r_pt,__m512i* v_Y_r_pt, 
-                size_t t, size_t step,
-                 __m512i v_W, __m512i v_W_precon,
-                __m512i  v_neg_modulus, __m512i v_twice_mod) {
-
+                 __m512i* v_X_r_pt, __m512i* v_Y_r_pt, size_t t, size_t step,
+                 __m512i v_W, __m512i v_W_precon, __m512i v_neg_modulus,
+                 __m512i v_twice_mod) {
   for (size_t j = t / 8; j > 0; --j) {
     __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
     __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
 
     FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
-                                              v_neg_modulus, v_twice_mod);
+                                             v_neg_modulus, v_twice_mod);
 
     _mm512_storeu_si512(v_X_r_pt, v_X);
     _mm512_storeu_si512(v_Y_r_pt, v_Y);
-    
-    v_X_r_pt +=step;
-    v_Y_r_pt +=step;
-    v_X_op_pt +=step;
-    v_Y_op_pt +=step;
+
+    v_X_r_pt += step;
+    v_Y_r_pt += step;
+    v_X_op_pt += step;
+    v_Y_op_pt += step;
   }
 }
 
@@ -223,7 +221,7 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
-  //std::cout << "t = " << t << " m = " << m << std::endl; 
+  // std::cout << "t = " << t << " m = " << m << std::endl;
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < m; i++) {
     // Referencing operand
@@ -245,8 +243,8 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
     __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
     // assume 8 | t
-    //std::cout << "t/8 = " << t/8 << std::endl;
-    
+    // std::cout << "t/8 = " << t/8 << std::endl;
+
     /*
     if (m == 1) {
       std::cout << "t/8 = " << t/8 << " m " << m << std::endl;
@@ -269,25 +267,25 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
       th_b.join();
       th_c.join();
       th_d.join();                // pauses until first finishes
-    
+
     } else {
     */
-      for (size_t j = t / 8; j > 0; --j) {
-        __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
-        __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+    for (size_t j = t / 8; j > 0; --j) {
+      __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+      __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
 
-        FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
-                                                  v_neg_modulus, v_twice_mod);
+      FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                               v_neg_modulus, v_twice_mod);
 
-        _mm512_storeu_si512(v_X_r_pt++, v_X);
-        _mm512_storeu_si512(v_Y_r_pt++, v_Y);
-        
-        // Increase operand pointers as well
-        v_X_op_pt++;
-        v_Y_op_pt++;
-      }
-    //}      
-    
+      _mm512_storeu_si512(v_X_r_pt++, v_X);
+      _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+      // Increase operand pointers as well
+      v_X_op_pt++;
+      v_Y_op_pt++;
+    }
+    //}
+
     j1 += (t << 1);
   }
 }
@@ -467,15 +465,15 @@ void ForwardTransformToBitReverseAVX512(
       th_b.join();
     }else {
     */
-      ForwardTransformToBitReverseAVX512<BitShift>(
-          result, result, n / 2, modulus, root_of_unity_powers,
-          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-          recursion_depth + 1, recursion_half * 2);
+    ForwardTransformToBitReverseAVX512<BitShift>(
+        result, result, n / 2, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, recursion_half * 2);
 
-      ForwardTransformToBitReverseAVX512<BitShift>(
-          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-          recursion_depth + 1, recursion_half * 2 + 1);
+    ForwardTransformToBitReverseAVX512<BitShift>(
+        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, recursion_half * 2 + 1);
     //}
   }
 }

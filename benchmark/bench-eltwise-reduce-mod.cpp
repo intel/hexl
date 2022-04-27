@@ -130,7 +130,7 @@ static void BM_EltwiseReduceModAVX512_MT(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     EltwiseReduceModAVX512_mt<64>(output.data(), input1.data(), input_size,
-                               modulus, input_mod_factor, output_mod_factor);
+                                  modulus, input_mod_factor, output_mod_factor);
   }
 }
 
@@ -190,7 +190,7 @@ static void BM_EltwiseReduceModAVX512BitShift64_MT(
 
   for (auto _ : state) {
     EltwiseReduceModAVX512_mt<64>(output.data(), input1.data(), input_size,
-                               modulus, input_mod_factor, output_mod_factor);
+                                  modulus, input_mod_factor, output_mod_factor);
   }
 }
 
@@ -236,7 +236,7 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52)
     ->Args({131072})
     ->Args({262144});
 
-    // state[0] is the degree
+// state[0] is the degree
 static void BM_EltwiseReduceModAVX512BitShift52_MT(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
@@ -250,7 +250,7 @@ static void BM_EltwiseReduceModAVX512BitShift52_MT(
 
   for (auto _ : state) {
     EltwiseReduceModAVX512_mt<52>(output.data(), input1.data(), input_size,
-                               modulus, input_mod_factor, output_mod_factor);
+                                  modulus, input_mod_factor, output_mod_factor);
   }
 }
 
@@ -310,7 +310,7 @@ static void BM_EltwiseReduceModAVX512BitShift52GT_MT(
 
   for (auto _ : state) {
     EltwiseReduceModAVX512_mt<52>(output.data(), input1.data(), input_size,
-                               modulus, input_mod_factor, output_mod_factor);
+                                  modulus, input_mod_factor, output_mod_factor);
   }
 }
 
@@ -364,7 +364,7 @@ static void BM_EltwiseReduceModAVX512BitShift52LT_MT(
 
   for (auto _ : state) {
     EltwiseReduceModAVX512_mt<52>(output.data(), input1.data(), input_size,
-                               modulus, input_mod_factor, output_mod_factor);
+                                  modulus, input_mod_factor, output_mod_factor);
   }
 }
 
