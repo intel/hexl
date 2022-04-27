@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include <functional>
-#include <numeric>
-#include <vector>
-#include <thread>
 #include <omp.h>
+
+#include <functional>
 #include <iostream>
+#include <numeric>
+#include <thread>
+#include <vector>
 
 #include "eltwise/eltwise-reduce-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
@@ -25,10 +26,8 @@ namespace hexl {
 template <int BitShift, int OutFactor>
 void EltwiseReduceModAVX512_thread(__m512i* v_result, const __m512i* v_operand,
                                    uint64_t n, __m512i v_neg_mod,
-                                   __m512i v_modulus, 
-                                   __m512i v_bf, __m512i v_bf_52,
-                                   uint64_t prod_right_shift) {
-
+                                   __m512i v_modulus, __m512i v_bf,
+                                   __m512i v_bf_52, uint64_t prod_right_shift) {
   for (size_t i = 0; i < n; i += 8) {
     __m512i v_op = _mm512_loadu_si512(v_operand);
     v_op = _mm512_hexl_barrett_reduce64<BitShift, OutFactor>(
@@ -41,9 +40,9 @@ void EltwiseReduceModAVX512_thread(__m512i* v_result, const __m512i* v_operand,
 
 template <int BitShift = 64>
 void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
-                            uint64_t n, uint64_t modulus,
-                            uint64_t input_mod_factor,
-                            uint64_t output_mod_factor) {
+                               uint64_t n, uint64_t modulus,
+                               uint64_t input_mod_factor,
+                               uint64_t output_mod_factor) {
   HEXL_CHECK(operand != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(n != 0, "Require n != 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
@@ -96,46 +95,46 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   omp_set_num_threads(16);
-  
+
   if (input_mod_factor == modulus) {
     if (output_mod_factor == 2) {
-      //double start = omp_get_wtime();
-      #pragma omp parallel firstprivate(v_operand, v_result)
+// double start = omp_get_wtime();
+#pragma omp parallel firstprivate(v_operand, v_result)
       {
-        //double end = omp_get_wtime();
-        //std::cout << "ROCHA Time1 " << end - start << std::endl;
-        //#pragma omp for 
+        // double end = omp_get_wtime();
+        // std::cout << "ROCHA Time1 " << end - start << std::endl;
+        // #pragma omp for
         int threads = omp_get_num_threads();
         int id = omp_get_thread_num();
-        v_operand += id*n_tmp/threads/8;
-        v_result += id*n_tmp/threads/8;
-        for (size_t i = 0; i < n_tmp/threads; i+=8) {
+        v_operand += id * n_tmp / threads / 8;
+        v_result += id * n_tmp / threads / 8;
+        for (size_t i = 0; i < n_tmp / threads; i += 8) {
           __m512i v_op = _mm512_loadu_si512(v_operand);
           v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
               v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
           _mm512_storeu_si512(v_result, v_op);
-          v_operand ++;
-          v_result ++;
+          v_operand++;
+          v_result++;
         }
       }
     } else {
-      //double start = omp_get_wtime();
-      #pragma omp parallel firstprivate(v_operand, v_result)
+// double start = omp_get_wtime();
+#pragma omp parallel firstprivate(v_operand, v_result)
       {
-        //double end = omp_get_wtime();
-        //std::cout << "ROCHA Time2 " << end - start << std::endl;
-        //#pragma omp for 
+        // double end = omp_get_wtime();
+        // std::cout << "ROCHA Time2 " << end - start << std::endl;
+        // #pragma omp for
         int threads = omp_get_num_threads();
         int id = omp_get_thread_num();
-        v_operand += id*n_tmp/threads/8;
-        v_result += id*n_tmp/threads/8;
-        for (size_t i = 0; i < n_tmp/threads; i+=8) {
+        v_operand += id * n_tmp / threads / 8;
+        v_result += id * n_tmp / threads / 8;
+        for (size_t i = 0; i < n_tmp / threads; i += 8) {
           __m512i v_op = _mm512_loadu_si512(v_operand);
           v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
               v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
           _mm512_storeu_si512(v_result, v_op);
-          v_operand ++;
-          v_result ++;
+          v_operand++;
+          v_result++;
         }
       }
     }
