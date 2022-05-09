@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
+#include <omp.h>
 
+#include <iostream>
 #include <vector>
 
 #include "hexl/logging/logging.hpp"
@@ -136,10 +138,44 @@ static void BM_FwdNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
+// state[0] is the degree
+static void BM_FwdNTT_AVX512IFMA_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus_bits = 49;
+  size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetAVX512Precon52RootOfUnityPowers();
+
+  for (auto _ : state) {
+    ForwardTransformToBitReverseAVX512_MT<NTT::s_ifma_shift_bits>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512IFMA_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 // state[0] is the degree
@@ -165,10 +201,44 @@ static void BM_FwdNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512IFMALazy)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
+// state[0] is the degree
+static void BM_FwdNTT_AVX512IFMALazy_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus_bits = 49;
+  size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetAVX512Precon52RootOfUnityPowers();
+
+  for (auto _ : state) {
+    ForwardTransformToBitReverseAVX512_MT<NTT::s_ifma_shift_bits>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 4, 4);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512IFMALazy_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 #endif
@@ -200,12 +270,45 @@ static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512DQ_32)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 4})
     ->Args({4096, 1})
-    ->Args({4096, 4})
+    ->Args({8192, 1})
     ->Args({16384, 1})
-    ->Args({16384, 4});
+    ->Args({32768, 1})
+    ->Args({65536, 1})
+    ->Args({131072, 1})
+    ->Args({262144, 1});
+
+// state[0] is the degree
+// state[1] is the output modulus factor
+static void BM_FwdNTT_AVX512DQ_32_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  uint64_t output_mod_factor = state.range(1);
+  size_t modulus_bits = 29;
+  size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetAVX512Precon32RootOfUnityPowers();
+  for (auto _ : state) {
+    ForwardTransformToBitReverseAVX512_MT<32>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 4, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512DQ_32_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096, 1})
+    ->Args({8192, 1})
+    ->Args({16384, 1})
+    ->Args({32768, 4})
+    ->Args({65536, 4})
+    ->Args({131072, 4})
+    ->Args({262144, 4});
 
 // state[0] is the degree
 // state[1] is the output modulus factor
@@ -231,12 +334,45 @@ static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_FwdNTT_AVX512DQ_64)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 4})
     ->Args({4096, 1})
+    ->Args({8192, 4})
+    ->Args({16384, 4})
+    ->Args({32768, 4})
+    ->Args({65536, 4})
+    ->Args({131072, 4})
+    ->Args({262144, 4});
+
+// state[0] is the degree
+// state[1] is the output modulus factor
+static void BM_FwdNTT_AVX512DQ_64_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  uint64_t output_mod_factor = state.range(1);
+  size_t modulus_bits = 55;
+  size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetAVX512Precon64RootOfUnityPowers();
+  for (auto _ : state) {
+    ForwardTransformToBitReverseAVX512_MT<64>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 4, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512DQ_64_MT)
+    ->Unit(benchmark::kMicrosecond)
     ->Args({4096, 4})
+    ->Args({8192, 1})
     ->Args({16384, 1})
-    ->Args({16384, 4});
+    ->Args({32768, 1})
+    ->Args({65536, 1})
+    ->Args({131072, 1})
+    ->Args({262144, 1});
 
 #endif
 
@@ -452,10 +588,41 @@ static void BM_InvNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
+// state[0] is the degree
+static void BM_InvNTT_AVX512IFMA_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 49, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon52InvRootOfUnityPowers();
+  for (auto _ : state) {
+    InverseTransformFromBitReverseAVX512_MT<NTT::s_ifma_shift_bits>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 1, 1);
+  }
+}
+
+BENCHMARK(BM_InvNTT_AVX512IFMA_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 // state[0] is the degree
@@ -478,9 +645,41 @@ static void BM_InvNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512IFMALazy)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+// state[0] is the degree
+static void BM_InvNTT_AVX512IFMALazy_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus = GeneratePrimes(1, 49, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon52InvRootOfUnityPowers();
+  for (auto _ : state) {
+    InverseTransformFromBitReverseAVX512_MT<NTT::s_ifma_shift_bits>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 2, 2);
+  }
+}
+
+BENCHMARK(BM_InvNTT_AVX512IFMALazy_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 #endif
 
@@ -509,12 +708,43 @@ static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512DQ_32)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
     ->Args({4096, 1})
-    ->Args({4096, 2})
+    ->Args({8192, 1})
     ->Args({16384, 1})
-    ->Args({16384, 2});
+    ->Args({32768, 1})
+    ->Args({65536, 1})
+    ->Args({131072, 1})
+    ->Args({262144, 1});
+
+// state[0] is the degree
+static void BM_InvNTT_AVX512DQ_32_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  uint64_t output_mod_factor = state.range(1);
+  size_t modulus = GeneratePrimes(1, 29, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon32InvRootOfUnityPowers();
+
+  for (auto _ : state) {
+    InverseTransformFromBitReverseAVX512_MT<32>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), output_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_InvNTT_AVX512DQ_32_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096, 1})
+    ->Args({8192, 1})
+    ->Args({16384, 1})
+    ->Args({32768, 1})
+    ->Args({65536, 1})
+    ->Args({131072, 1})
+    ->Args({262144, 1});
 
 static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
@@ -537,12 +767,43 @@ static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_InvNTT_AVX512DQ_64)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1024, 1})
-    ->Args({1024, 2})
     ->Args({4096, 1})
-    ->Args({4096, 2})
+    ->Args({8192, 1})
     ->Args({16384, 1})
-    ->Args({16384, 2});
+    ->Args({32768, 1})
+    ->Args({65536, 1})
+    ->Args({131072, 1})
+    ->Args({262144, 1});
+
+static void BM_InvNTT_AVX512DQ_64_MT(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  uint64_t output_mod_factor = state.range(1);
+  size_t modulus = GeneratePrimes(1, 61, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetPrecon64InvRootOfUnityPowers();
+
+  for (auto _ : state) {
+    InverseTransformFromBitReverseAVX512_MT<NTT::s_default_shift_bits>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), output_mod_factor, output_mod_factor);
+  }
+}
+
+BENCHMARK(BM_InvNTT_AVX512DQ_64_MT)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096, 1})
+    ->Args({8192, 1})
+    ->Args({16384, 1})
+    ->Args({32768, 1})
+    ->Args({65536, 1})
+    ->Args({131072, 1})
+    ->Args({262144, 1});
+
 #endif
 
 //=================================================================

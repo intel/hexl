@@ -40,6 +40,14 @@ void InverseTransformFromBitReverseAVX512(
     uint64_t output_mod_factor, uint64_t recursion_depth = 0,
     uint64_t recursion_half = 0);
 
+template <int BitShift>
+void InverseTransformFromBitReverseAVX512_MT(
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* inv_root_of_unity_powers,
+    const uint64_t* precon_inv_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth = 0,
+    uint64_t recursion_half = 0);
+
 #endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl

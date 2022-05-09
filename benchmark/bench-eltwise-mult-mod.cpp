@@ -97,7 +97,7 @@ static void BM_EltwiseMultModAVX512Float(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512Float)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{4096, 8192, 16384, 32768, 65536, 131072, 262144}, {1}});
 #endif
 
 //=================================================================
@@ -134,7 +134,7 @@ static void BM_EltwiseMultModAVX512DQInt(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512DQInt)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{4096, 8192, 16384, 32768, 65536, 131072, 262144}, {1}});
 #endif
 
 #ifdef HEXL_HAS_AVX512IFMA
@@ -172,7 +172,7 @@ static void BM_EltwiseMultModAVX512IFMAInt(
 
 BENCHMARK(BM_EltwiseMultModAVX512IFMAInt)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{4096, 8192, 16384, 32768, 65536, 131072, 262144}, {1}});
 #endif
 
 //=================================================================
