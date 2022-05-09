@@ -42,7 +42,7 @@ add_executable(unit-test ${TEST_SRC})
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
     message(STATUS "OpenMP: pre-installed OpenMP found")
-    target_link_libraries(bench_hexl PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(unit-test PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

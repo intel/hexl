@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <omp.h>
 #include <stdint.h>
 
 #include <utility>
