@@ -5,7 +5,6 @@
 
 #include <cstring>
 #include <utility>
-#include <iostream>
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
@@ -199,7 +198,7 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
   HEXL_CHECK_BOUNDS(
       operand, m_degree, m_q * input_mod_factor,
       "value in operand exceeds bound " << m_q * input_mod_factor);
-  std::cout << "This is running my version of the HEXL" << std::endl;
+
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma && (m_q < s_max_fwd_ifma_modulus && (m_degree >= 16))) {
     const uint64_t* root_of_unity_powers = GetAVX512RootOfUnityPowers().data();
