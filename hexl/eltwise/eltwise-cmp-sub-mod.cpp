@@ -23,7 +23,7 @@ void EltwiseCmpSubMod(uint64_t* result, const uint64_t* operand1, uint64_t n,
   HEXL_CHECK(n != 0, "Require n != 0");
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(diff != 0, "Require diff != 0");
-  
+
 #ifdef HEXL_HAS_AVX512IFMA
   if (has_avx512ifma) {
     if (modulus < (1ULL << 52)) {
@@ -36,8 +36,7 @@ void EltwiseCmpSubMod(uint64_t* result, const uint64_t* operand1, uint64_t n,
 
 #ifdef HEXL_HAS_AVX512DQ
   if (has_avx512dq) {
-    EltwiseCmpSubModAVX512<64>(result, operand1, n, modulus, cmp, bound,
-                                 diff);
+    EltwiseCmpSubModAVX512<64>(result, operand1, n, modulus, cmp, bound, diff);
     return;
   }
 #endif
