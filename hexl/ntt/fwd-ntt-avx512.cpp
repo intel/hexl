@@ -660,7 +660,7 @@ void ForwardTransformToBitReverseAVX512_MT(
                            W_precon);
 
     if (recursion_depth == 0) {
-      omp_set_num_threads(30);
+      omp_set_num_threads(2);
 
 #pragma omp parallel
       {
@@ -684,9 +684,11 @@ void ForwardTransformToBitReverseAVX512_MT(
 #pragma omp taskwait
         }
       }
-    } else if (recursion_depth < 4) {
+    } else if (recursion_depth < 1) {
 #pragma omp task
       {
+        int id = omp_get_thread_num();
+        // std::cout << "FWD NTT ID = " << id << std::endl;
         ForwardTransformToBitReverseAVX512_MT<BitShift>(
             result, result, n / 2, modulus, root_of_unity_powers,
             precon_root_of_unity_powers, input_mod_factor, output_mod_factor,

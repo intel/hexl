@@ -69,7 +69,7 @@ void EltwiseMultModAVX512DQIntLoopUnroll(__m512i* vp_result,
                 "avx512_64bit_count");
 
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(128);
+  omp_set_num_threads(4);
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
@@ -326,7 +326,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           __m512i v_barr_lo, __m512i v_modulus,
                                           __m512i v_twice_mod, uint64_t n) {
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(128);
+  omp_set_num_threads(4);
 
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
@@ -381,7 +381,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           __m512i v_twice_mod, uint64_t n,
                                           uint64_t prod_right_shift) {
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(2);
+  omp_set_num_threads(4);
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
@@ -610,7 +610,7 @@ inline void EltwiseMultModAVX512FloatLoopDefault(
   HEXL_UNUSED(v_twice_mod);
   // std::cout << " Float Default" << std::endl;
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
-  omp_set_num_threads(64);
+  omp_set_num_threads(4);
 
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
@@ -669,7 +669,7 @@ inline void EltwiseMultModAVX512FloatLoopUnroll(
 
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
   // std::cout << "Float loop unroll" << std::endl;
-  omp_set_num_threads(64);
+  omp_set_num_threads(4);
 
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {

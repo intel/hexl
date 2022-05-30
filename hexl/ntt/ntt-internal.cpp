@@ -208,7 +208,7 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
         GetAVX512Precon52RootOfUnityPowers().data();
 
     HEXL_VLOG(3, "Calling 52-bit AVX512-IFMA FwdNTT");
-    ForwardTransformToBitReverseAVX512<s_ifma_shift_bits>(
+    ForwardTransformToBitReverseAVX512_MT<s_ifma_shift_bits>(
         result, operand, m_degree, m_q, root_of_unity_powers,
         precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
     return;
@@ -223,7 +223,7 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
           GetAVX512RootOfUnityPowers().data();
       const uint64_t* precon_root_of_unity_powers =
           GetAVX512Precon32RootOfUnityPowers().data();
-      ForwardTransformToBitReverseAVX512<32>(
+      ForwardTransformToBitReverseAVX512_MT<32>(
           result, operand, m_degree, m_q, root_of_unity_powers,
           precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
     } else {
@@ -233,7 +233,7 @@ void NTT::ComputeForward(uint64_t* result, const uint64_t* operand,
       const uint64_t* precon_root_of_unity_powers =
           GetAVX512Precon64RootOfUnityPowers().data();
 
-      ForwardTransformToBitReverseAVX512<s_default_shift_bits>(
+      ForwardTransformToBitReverseAVX512_MT<s_default_shift_bits>(
           result, operand, m_degree, m_q, root_of_unity_powers,
           precon_root_of_unity_powers, input_mod_factor, output_mod_factor);
     }
@@ -269,7 +269,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
     const uint64_t* inv_root_of_unity_powers = GetInvRootOfUnityPowers().data();
     const uint64_t* precon_inv_root_of_unity_powers =
         GetPrecon52InvRootOfUnityPowers().data();
-    InverseTransformFromBitReverseAVX512<s_ifma_shift_bits>(
+    InverseTransformFromBitReverseAVX512_MT<s_ifma_shift_bits>(
         result, operand, m_degree, m_q, inv_root_of_unity_powers,
         precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
     return;
@@ -284,7 +284,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
           GetInvRootOfUnityPowers().data();
       const uint64_t* precon_inv_root_of_unity_powers =
           GetPrecon32InvRootOfUnityPowers().data();
-      InverseTransformFromBitReverseAVX512<32>(
+      InverseTransformFromBitReverseAVX512_MT<32>(
           result, operand, m_degree, m_q, inv_root_of_unity_powers,
           precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
     } else {
@@ -294,7 +294,7 @@ void NTT::ComputeInverse(uint64_t* result, const uint64_t* operand,
       const uint64_t* precon_inv_root_of_unity_powers =
           GetPrecon64InvRootOfUnityPowers().data();
 
-      InverseTransformFromBitReverseAVX512<s_default_shift_bits>(
+      InverseTransformFromBitReverseAVX512_MT<s_default_shift_bits>(
           result, operand, m_degree, m_q, inv_root_of_unity_powers,
           precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor);
     }

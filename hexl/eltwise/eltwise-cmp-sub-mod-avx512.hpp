@@ -4,6 +4,7 @@
 #pragma once
 
 #include <immintrin.h>
+#include <omp.h>
 #include <stdint.h>
 
 #include "eltwise/eltwise-cmp-sub-mod-internal.hpp"
@@ -64,21 +65,30 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
 
   __m512i v_mu_64 = _mm512_set1_epi64(static_cast<int64_t>(mu_64));
 
-  for (size_t i = n / 8; i > 0; --i) {
-    __m512i v_op = _mm512_loadu_si512(v_op_ptr);
-    __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
+  omp_set_num_threads(4);
+#pragma omp parallel firstprivate(v_op_ptr, v_result_ptr)
+  {
+    int id = omp_get_thread_num();
+    int threads = omp_get_num_threads();
+    v_result_ptr += id * n / 8 / threads;
+    v_op_ptr += id * n / 8 / threads;
+    for (size_t i = n / 8 / threads; i > 0; --i) {
+      __m512i v_op = _mm512_loadu_si512(v_op_ptr);
+      __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
 
-    v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
-        v_op, v_modulus, v_mu_64, v_mu, prod_right_shift, v_neg_mod);
+      v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
+          v_op, v_modulus, v_mu_64, v_mu, prod_right_shift, v_neg_mod);
 
-    __m512i v_to_add = _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
-    v_to_add = _mm512_sub_epi64(v_to_add, v_diff);
-    v_to_add = _mm512_mask_set1_epi64(v_to_add, op_le_cmp, 0);
+      __m512i v_to_add =
+          _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
+      v_to_add = _mm512_sub_epi64(v_to_add, v_diff);
+      v_to_add = _mm512_mask_set1_epi64(v_to_add, op_le_cmp, 0);
 
-    v_op = _mm512_add_epi64(v_op, v_to_add);
-    _mm512_storeu_si512(v_result_ptr, v_op);
-    ++v_op_ptr;
-    ++v_result_ptr;
+      v_op = _mm512_add_epi64(v_op, v_to_add);
+      _mm512_storeu_si512(v_result_ptr, v_op);
+      ++v_op_ptr;
+      ++v_result_ptr;
+    }
   }
 }
 #endif

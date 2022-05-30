@@ -15,6 +15,8 @@ set(SRC main.cpp
     ../hexl/eltwise/eltwise-mult-mod-avx512ifma.cpp
     ../hexl/eltwise/eltwise-mult-mod-avx512dq.cpp
     ../hexl/eltwise/eltwise-add-mod-avx512.cpp
+    ../hexl/eltwise/eltwise-cmp-add-avx512.cpp
+    ../hexl/eltwise/eltwise-fma-mod-avx512.cpp
     )
 
 if (HEXL_EXPERIMENTAL)
@@ -48,13 +50,4 @@ endif()
 target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads)
 if (HEXL_DEBUG)
     target_link_libraries(bench_hexl PRIVATE easyloggingpp)
-endif()
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(bench_hexl PRIVATE -Wall -Wextra -march=native -O3 -fopenmp)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(bench_hexl PRIVATE /Wall /W4
-        /wd4127 # warning C4127: conditional expression is constant; C++11 doesn't support if constexpr
-        /wd5105 # warning C5105: macro expansion producing 'defined' has undefined behavior
-    )
 endif()

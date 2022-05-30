@@ -94,7 +94,7 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
-  omp_set_num_threads(16);
+  omp_set_num_threads(8);
 
   if (input_mod_factor == modulus) {
     if (output_mod_factor == 2) {
@@ -108,7 +108,8 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
         int id = omp_get_thread_num();
         v_operand += id * n_tmp / threads / 8;
         v_result += id * n_tmp / threads / 8;
-        for (size_t i = 0; i < n_tmp / threads; i += 8) {
+        // std::cout << "n_tmp " << n_tmp << " id " << id << std::endl;
+        for (size_t i = 0; i < n_tmp / threads / 8; i++) {
           __m512i v_op = _mm512_loadu_si512(v_operand);
           v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
               v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
@@ -119,6 +120,7 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
       }
     } else {
 // double start = omp_get_wtime();
+// std::cout << "n_tmp " << n_tmp << std::endl;
 #pragma omp parallel firstprivate(v_operand, v_result)
       {
         // double end = omp_get_wtime();
@@ -128,6 +130,7 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
         int id = omp_get_thread_num();
         v_operand += id * n_tmp / threads / 8;
         v_result += id * n_tmp / threads / 8;
+        std::cout << "n_tmp " << n_tmp << " id " << id << std::endl;
         for (size_t i = 0; i < n_tmp / threads; i += 8) {
           __m512i v_op = _mm512_loadu_si512(v_operand);
           v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(

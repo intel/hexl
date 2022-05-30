@@ -47,7 +47,8 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
 
   // std::cout << "ROCHA " << std::endl;
-  omp_set_num_threads(64);
+  // std::cout << "n " << n << std::endl;
+  omp_set_num_threads(2);
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
@@ -99,7 +100,8 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i v_operand2 = _mm512_set1_epi64(static_cast<int64_t>(operand2));
 
-  omp_set_num_threads(64);
+  // std::cout << "n " << n << std::endl;
+  omp_set_num_threads(2);
 #pragma omp parallel firstprivate(vp_operand1, vp_result)
   {
     int id = omp_get_thread_num();
