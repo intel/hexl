@@ -5,12 +5,12 @@
 
 #include <vector>
 
-#include "../test/test-util-avx512.hpp"
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
+#include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"
 

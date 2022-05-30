@@ -6,14 +6,14 @@
 #include <tuple>
 #include <vector>
 
-#include "../test/test-ntt-util.hpp"
-#include "../test/test-util.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
+#include "test-ntt-util.hpp"
+#include "test-util.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
