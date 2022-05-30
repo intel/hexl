@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 #include "hexl/logging/logging.hpp"
@@ -550,7 +551,7 @@ void InverseTransformFromBitReverseAVX512_MT(
     }
   } else {
     if (recursion_depth == 0) {
-      omp_set_num_threads(3);
+      omp_set_num_threads(2);
 
 #pragma omp parallel
       {
@@ -576,6 +577,8 @@ void InverseTransformFromBitReverseAVX512_MT(
     } else if (recursion_depth < 1) {
 #pragma omp task
       {
+        // int id = omp_get_thread_num();
+        // std::cout << "INV NTT ID = " << id << std::endl;
         InverseTransformFromBitReverseAVX512_MT<BitShift>(
             result, operand, n / 2, modulus, inv_root_of_unity_powers,
             precon_inv_root_of_unity_powers, input_mod_factor,
@@ -589,6 +592,7 @@ void InverseTransformFromBitReverseAVX512_MT(
             input_mod_factor, output_mod_factor, recursion_depth + 1,
             2 * recursion_half + 1);
       }
+#pragma omp taskwait
     } else {
       InverseTransformFromBitReverseAVX512_MT<BitShift>(
           result, operand, n / 2, modulus, inv_root_of_unity_powers,

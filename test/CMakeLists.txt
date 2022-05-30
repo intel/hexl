@@ -33,6 +33,11 @@ set(AVX512_TEST_SRC
     test-eltwise-reduce-mod-avx512.cpp
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
+    ../hexl/ntt/fwd-ntt-avx512.cpp
+    ../hexl/ntt/inv-ntt-avx512.cpp
+    ../hexl/eltwise/eltwise-mult-mod-avx512ifma.cpp
+    ../hexl/eltwise/eltwise-mult-mod-avx512dq.cpp
+    ../hexl/eltwise/eltwise-add-mod-avx512.cpp
 )
 
 set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")

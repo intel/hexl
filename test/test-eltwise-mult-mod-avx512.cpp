@@ -5,13 +5,13 @@
 
 #include <vector>
 
+#include "../test/test-util-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-avx512.hpp"
 #include "eltwise/eltwise-mult-mod-internal.hpp"
 #include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
-#include "test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"
 
@@ -23,10 +23,14 @@ TEST(EltwiseMultMod, avx512_small) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  std::vector<uint64_t> op1{1, 2, 3, 1, 1, 1, 0, 1, 0};
-  std::vector<uint64_t> op2{1, 1, 1, 1, 2, 3, 1, 0, 0};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
-  std::vector<uint64_t> exp_out{1, 2, 3, 1, 2, 3, 0, 0, 0};
+  std::vector<uint64_t> op1{1, 2, 3, 1, 1, 1, 0, 1, 0,
+                            1, 2, 3, 1, 1, 1, 0, 1, 0};
+  std::vector<uint64_t> op2{1, 1, 1, 1, 2, 3, 1, 0, 0,
+                            1, 1, 1, 1, 2, 3, 1, 0, 0};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> exp_out{1, 2, 3, 1, 2, 3, 0, 0, 0,
+                                1, 2, 3, 1, 2, 3, 0, 0, 0};
 
   uint64_t modulus = 769;
   EltwiseMultModAVX512Float<1>(result.data(), op1.data(), op2.data(),
@@ -41,10 +45,13 @@ TEST(EltwiseMultMod, avx512_int2) {
   }
   uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
-  std::vector<uint64_t> op1{modulus - 3, 1, 1, 1, 1, 1, 1, 1};
-  std::vector<uint64_t> op2{modulus - 4, 1, 1, 1, 1, 1, 1, 1};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
-  std::vector<uint64_t> exp_out{12, 1, 1, 1, 1, 1, 1, 1};
+  std::vector<uint64_t> op1{modulus - 3, 1, 1, 1, 1, 1, 1, 1,
+                            modulus - 3, 1, 1, 1, 1, 1, 1, 1};
+  std::vector<uint64_t> op2{modulus - 4, 1, 1, 1, 1, 1, 1, 1,
+                            modulus - 4, 1, 1, 1, 1, 1, 1, 1};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> exp_out{12, 1, 1, 1, 1, 1, 1, 1,
+                                12, 1, 1, 1, 1, 1, 1, 1};
 
   EltwiseMultModAVX512DQInt<2>(result.data(), op1.data(), op2.data(),
                                op1.size(), modulus);
@@ -62,12 +69,22 @@ TEST(EltwiseMultMod, Big) {
 
   std::vector<uint64_t> op1{706712574074152, 943467560561867, 1115920708919443,
                             515713505356094, 525633777116309, 910766532971356,
+                            757086506562426, 799841520990167, 1,
+                            706712574074152, 943467560561867, 1115920708919443,
+                            515713505356094, 525633777116309, 910766532971356,
                             757086506562426, 799841520990167, 1};
   std::vector<uint64_t> op2{515910833966633, 96924929169117,   537587376997453,
                             41829060600750,  205864998008014,  463185427411646,
+                            965818279134294, 1075778049568657, 1,
+                            515910833966633, 96924929169117,   537587376997453,
+                            41829060600750,  205864998008014,  463185427411646,
                             965818279134294, 1075778049568657, 1};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<uint64_t> exp_out{
+      231838787758587, 618753612121218, 1116345967490421,
+      409735411065439, 25680427818594,  950138933882289,
+      554128714280822, 1465109636753,   1,
       231838787758587, 618753612121218, 1116345967490421,
       409735411065439, 25680427818594,  950138933882289,
       554128714280822, 1465109636753,   1};
@@ -267,7 +284,7 @@ TEST(EltwiseMultMod, avx512ifma_big) {
     GTEST_SKIP();
   }
 
-  for (size_t length = 8; length <= 8; length *= 2) {
+  for (size_t length = 16; length <= 16; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> result_native(length, 0);

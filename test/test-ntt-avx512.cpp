@@ -6,14 +6,14 @@
 #include <tuple>
 #include <vector>
 
+#include "../test/test-ntt-util.hpp"
+#include "../test/test-util.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"
 #include "ntt/inv-ntt-avx512.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "test-ntt-util.hpp"
-#include "test-util.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {
@@ -186,13 +186,13 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512IFMA) {
     ReferenceForwardTransformToBitReverse(input64.data(), m_N, m_modulus,
                                           m_ntt.GetRootOfUnityPowers().data());
 
-    ForwardTransformToBitReverseAVX512<52>(
+    ForwardTransformToBitReverseAVX512_MT<52>(
         input_ifma.data(), input_ifma.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
-    ForwardTransformToBitReverseAVX512<52>(
+    ForwardTransformToBitReverseAVX512_MT<52>(
         input_ifma_lazy.data(), input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon52RootOfUnityPowers().data(), 2, 4);
@@ -223,13 +223,13 @@ TEST_P(NttAVX512Test, InvNTT_AVX512IFMA) {
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
-    InverseTransformFromBitReverseAVX512<52>(
+    InverseTransformFromBitReverseAVX512_MT<52>(
         input_ifma.data(), input_ifma.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
-    InverseTransformFromBitReverseAVX512<52>(
+    InverseTransformFromBitReverseAVX512_MT<52>(
         input_ifma_lazy.data(), input_ifma_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon52InvRootOfUnityPowers().data(), 1, 2);
@@ -260,13 +260,13 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512_32) {
         m_ntt.GetRootOfUnityPowers().data(),
         m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
-    ForwardTransformToBitReverseAVX512<32>(
+    ForwardTransformToBitReverseAVX512_MT<32>(
         input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 1);
 
     // Compute lazy
-    ForwardTransformToBitReverseAVX512<32>(
+    ForwardTransformToBitReverseAVX512_MT<32>(
         input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon32RootOfUnityPowers().data(), 2, 4);
@@ -296,13 +296,13 @@ TEST_P(NttAVX512Test, FwdNTT_AVX512_64) {
         m_ntt.GetRootOfUnityPowers().data(),
         m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
 
-    ForwardTransformToBitReverseAVX512<64>(
+    ForwardTransformToBitReverseAVX512_MT<64>(
         input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 1);
 
     // Compute lazy
-    ForwardTransformToBitReverseAVX512<64>(
+    ForwardTransformToBitReverseAVX512_MT<64>(
         input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetAVX512RootOfUnityPowers().data(),
         m_ntt.GetAVX512Precon64RootOfUnityPowers().data(), 2, 4);
@@ -333,13 +333,13 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_32) {
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
-    InverseTransformFromBitReverseAVX512<32>(
+    InverseTransformFromBitReverseAVX512_MT<32>(
         input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
-    InverseTransformFromBitReverseAVX512<32>(
+    InverseTransformFromBitReverseAVX512_MT<32>(
         input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon32InvRootOfUnityPowers().data(), 1, 2);
@@ -369,13 +369,13 @@ TEST_P(NttAVX512Test, InvNTT_AVX512_64) {
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
-    InverseTransformFromBitReverseAVX512<64>(
+    InverseTransformFromBitReverseAVX512_MT<64>(
         input_avx.data(), input_avx.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 1);
 
     // Compute lazy
-    InverseTransformFromBitReverseAVX512<64>(
+    InverseTransformFromBitReverseAVX512_MT<64>(
         input_avx_lazy.data(), input_avx_lazy.data(), m_N, m_ntt.GetModulus(),
         m_ntt.GetInvRootOfUnityPowers().data(),
         m_ntt.GetPrecon64InvRootOfUnityPowers().data(), 1, 2);
