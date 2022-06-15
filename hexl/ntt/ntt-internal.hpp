@@ -36,7 +36,15 @@ void ForwardTransformToBitReverseRadix2(
     uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
-    uint64_t output_mod_factor = 1);
+    uint64_t output_mod_factor = 1, uint64_t recursion_depth = 0,
+    uint64_t recursion_half = 0);
+
+void ForwardTransformToBitReverseRadix2Orig(
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor = 1,
+    uint64_t output_mod_factor = 1, uint64_t recursion_depth = 0,
+    uint64_t recursion_half = 0);
 
 /// @brief Radix-4 native C++ NTT implementation of the forward NTT
 /// @param[out] result Output data. Overwritten with NTT output

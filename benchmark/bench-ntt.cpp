@@ -42,7 +42,11 @@ BENCHMARK(BM_FwdNTTNativeRadix2InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 static void BM_FwdNTTNativeRadix2Copy(benchmark::State& state) {  //  NOLINT
@@ -65,7 +69,11 @@ BENCHMARK(BM_FwdNTTNativeRadix2Copy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 static void BM_FwdNTTNativeRadix4InPlace(benchmark::State& state) {  //  NOLINT

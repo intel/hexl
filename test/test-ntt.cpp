@@ -434,6 +434,21 @@ TEST_P(NttNativeTest, ForwardRadix4Random) {
   AssertEqual(input, input_radix4);
 }
 
+TEST_P(NttNativeTest, ForwardRadix2Random) {
+  auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+  auto input_radix2 = input;
+
+  ForwardTransformToBitReverseRadix2(
+      input_radix2.data(), input_radix2.data(), m_N, m_modulus,
+      m_ntt.GetRootOfUnityPowers().data(),
+      m_ntt.GetPrecon64RootOfUnityPowers().data(), 2, 1);
+
+  ReferenceForwardTransformToBitReverse(input.data(), m_N, m_modulus,
+                                        m_ntt.GetRootOfUnityPowers().data());
+
+  AssertEqual(input, input_radix2);
+}
+
 TEST_P(NttNativeTest, InverseRadix4Random) {
   auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
   auto input_radix4 = input;

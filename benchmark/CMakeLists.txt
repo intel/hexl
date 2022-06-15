@@ -17,6 +17,7 @@ set(SRC main.cpp
     ../hexl/eltwise/eltwise-add-mod-avx512.cpp
     ../hexl/eltwise/eltwise-cmp-add-avx512.cpp
     ../hexl/eltwise/eltwise-fma-mod-avx512.cpp
+    ../hexl/ntt/ntt-radix-2.cpp
     )
 
 add_executable(bench_hexl ${SRC})
@@ -28,7 +29,7 @@ target_include_directories(bench_hexl PRIVATE
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-    message(STATUS "OpenMP: pre-installed OpenMP found")
+#    message(STATUS "OpenMP: pre-installed OpenMP found")
     target_link_libraries(bench_hexl PUBLIC OpenMP::OpenMP_CXX)
 endif()
 

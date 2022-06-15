@@ -33,6 +33,13 @@ set(AVX512_TEST_SRC
     test-eltwise-reduce-mod-avx512.cpp
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
+    ../hexl/ntt/fwd-ntt-avx512.cpp
+    ../hexl/ntt/inv-ntt-avx512.cpp
+    ../hexl/eltwise/eltwise-mult-mod-avx512ifma.cpp
+    ../hexl/eltwise/eltwise-mult-mod-avx512dq.cpp
+    ../hexl/eltwise/eltwise-add-mod-avx512.cpp
+    ../hexl/eltwise/eltwise-cmp-add-avx512.cpp
+    ../hexl/eltwise/eltwise-fma-mod-avx512.cpp
 )
 
 set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")
@@ -41,7 +48,7 @@ add_executable(unit-test ${TEST_SRC})
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-    message(STATUS "OpenMP: pre-installed OpenMP found")
+#    message(STATUS "OpenMP: pre-installed OpenMP found")
     target_link_libraries(unit-test PUBLIC OpenMP::OpenMP_CXX)
 endif()
 

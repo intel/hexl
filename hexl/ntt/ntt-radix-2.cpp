@@ -1,7 +1,10 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include <omp.h>
+
 #include <cstring>
+#include <iostream>
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
@@ -9,16 +12,16 @@
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
 #include "ntt/ntt-default.hpp"
-#include "util/cpu-features.hpp"
 
 namespace intel {
 namespace hexl {
 
-void ForwardTransformToBitReverseRadix2(
+void ForwardTransformToBitReverseRadix2Orig(
     uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
-    uint64_t output_mod_factor) {
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half) {
   HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
   HEXL_CHECK_BOUNDS(operand, n, modulus * input_mod_factor,
                     "operand exceeds bound " << modulus * input_mod_factor);
@@ -34,12 +37,14 @@ void ForwardTransformToBitReverseRadix2(
              "output_mod_factor must be 1 or 4; got " << output_mod_factor);
 
   uint64_t twice_modulus = modulus << 1;
+
   size_t t = (n >> 1);
+  size_t W_idx = (1 << recursion_depth) + (recursion_half);
 
   // In case of out-of-place operation do first pass and convert to in-place
   {
-    const uint64_t W = root_of_unity_powers[1];
-    const uint64_t W_precon = precon_root_of_unity_powers[1];
+    const uint64_t W = root_of_unity_powers[W_idx];
+    const uint64_t W_precon = precon_root_of_unity_powers[W_idx];
 
     uint64_t* X_r = result;
     uint64_t* Y_r = X_r + t;
@@ -114,6 +119,7 @@ void ForwardTransformToBitReverseRadix2(
       }
     }
     t >>= 1;
+    W_idx <<= 1;
   }
 
   // Continue with in-place operation
@@ -125,8 +131,8 @@ void ForwardTransformToBitReverseRadix2(
           if (i != 0) {
             j1 += (t << 1);
           }
-          const uint64_t W = root_of_unity_powers[m + i];
-          const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          const uint64_t W = root_of_unity_powers[W_idx + i];
+          const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
 
           uint64_t* X_r = result + j1;
           uint64_t* Y_r = X_r + t;
@@ -157,8 +163,8 @@ void ForwardTransformToBitReverseRadix2(
           if (i != 0) {
             j1 += (t << 1);
           }
-          const uint64_t W = root_of_unity_powers[m + i];
-          const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          const uint64_t W = root_of_unity_powers[W_idx + i];
+          const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
 
           uint64_t* X_r = result + j1;
           uint64_t* Y_r = X_r + t;
@@ -181,8 +187,8 @@ void ForwardTransformToBitReverseRadix2(
           if (i != 0) {
             j1 += (t << 1);
           }
-          const uint64_t W = root_of_unity_powers[m + i];
-          const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          const uint64_t W = root_of_unity_powers[W_idx + i];
+          const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
 
           uint64_t* X_r = result + j1;
           uint64_t* Y_r = X_r + t;
@@ -201,8 +207,8 @@ void ForwardTransformToBitReverseRadix2(
           if (i != 0) {
             j1 += (t << 1);
           }
-          const uint64_t W = root_of_unity_powers[m + i];
-          const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          const uint64_t W = root_of_unity_powers[W_idx + i];
+          const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
 
           uint64_t* X_r = result + j1;
           uint64_t* Y_r = X_r + t;
@@ -219,8 +225,8 @@ void ForwardTransformToBitReverseRadix2(
           if (i != 0) {
             j1 += (t << 1);
           }
-          const uint64_t W = root_of_unity_powers[m + i];
-          const uint64_t W_precon = precon_root_of_unity_powers[m + i];
+          const uint64_t W = root_of_unity_powers[W_idx + i];
+          const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
 
           uint64_t* X_r = result + j1;
           uint64_t* Y_r = X_r + t;
@@ -250,12 +256,351 @@ void ForwardTransformToBitReverseRadix2(
       }
     }
     t >>= 1;
+    W_idx <<= 1;
   }
   if (output_mod_factor == 1) {
     for (size_t i = 0; i < n; ++i) {
       result[i] = ReduceMod<4>(result[i], modulus, &twice_modulus);
       HEXL_CHECK(result[i] < modulus, "Incorrect modulus reduction in NTT "
                                           << result[i] << " >= " << modulus);
+    }
+  }
+}
+
+void ForwardTransformToBitReverseRadix2(
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half) {
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
+  HEXL_CHECK_BOUNDS(operand, n, modulus * input_mod_factor,
+                    "operand exceeds bound " << modulus * input_mod_factor);
+  HEXL_CHECK(root_of_unity_powers != nullptr,
+             "root_of_unity_powers == nullptr");
+  HEXL_CHECK(precon_root_of_unity_powers != nullptr,
+             "precon_root_of_unity_powers == nullptr");
+  HEXL_CHECK(
+      input_mod_factor == 1 || input_mod_factor == 2 || input_mod_factor == 4,
+      "input_mod_factor must be 1, 2, or 4; got " << input_mod_factor);
+  HEXL_UNUSED(input_mod_factor);
+  HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
+             "output_mod_factor must be 1 or 4; got " << output_mod_factor);
+
+  uint64_t twice_modulus = modulus << 1;
+  static const size_t base_ntt_size = 1024;
+  if (n <= base_ntt_size) {  // Perform breadth-first NTT
+
+    size_t t = (n >> 1);
+    size_t W_idx = (1 << recursion_depth) + (recursion_half);
+
+    // In case of out-of-place operation do first pass and convert to in-place
+    {
+      const uint64_t W = root_of_unity_powers[W_idx];
+      const uint64_t W_precon = precon_root_of_unity_powers[W_idx];
+
+      uint64_t* X_r = result;
+      uint64_t* Y_r = X_r + t;
+
+      const uint64_t* X_op = operand;
+      const uint64_t* Y_op = X_op + t;
+
+      // First pass for out-of-order case
+      switch (t) {
+        case 8: {
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          break;
+        }
+        case 4: {
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          break;
+        }
+        case 2: {
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                             twice_modulus);
+          break;
+        }
+        case 1: {
+          FwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W, W_precon, modulus,
+                             twice_modulus);
+          break;
+        }
+        default: {
+          HEXL_LOOP_UNROLL_8
+          for (size_t j = 0; j < t; j += 8) {
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+          }
+        }
+      }
+      t >>= 1;
+      W_idx <<= 1;
+    }
+
+    // Continue with in-place operation
+    for (size_t m = 2; m < n; m <<= 1) {
+      size_t j1 = 0;
+      switch (t) {
+        case 8: {
+          for (size_t i = 0; i < m; i++) {
+            if (i != 0) {
+              j1 += (t << 1);
+            }
+            const uint64_t W = root_of_unity_powers[W_idx + i];
+            const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
+
+            uint64_t* X_r = result + j1;
+            uint64_t* Y_r = X_r + t;
+            const uint64_t* X_op = X_r;
+            const uint64_t* Y_op = Y_r;
+
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+          }
+          break;
+        }
+        case 4: {
+          for (size_t i = 0; i < m; i++) {
+            if (i != 0) {
+              j1 += (t << 1);
+            }
+            const uint64_t W = root_of_unity_powers[W_idx + i];
+            const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
+
+            uint64_t* X_r = result + j1;
+            uint64_t* Y_r = X_r + t;
+            const uint64_t* X_op = X_r;
+            const uint64_t* Y_op = Y_r;
+
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+          }
+          break;
+        }
+        case 2: {
+          for (size_t i = 0; i < m; i++) {
+            if (i != 0) {
+              j1 += (t << 1);
+            }
+            const uint64_t W = root_of_unity_powers[W_idx + i];
+            const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
+
+            uint64_t* X_r = result + j1;
+            uint64_t* Y_r = X_r + t;
+            const uint64_t* X_op = X_r;
+            const uint64_t* Y_op = Y_r;
+
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+            FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                               modulus, twice_modulus);
+          }
+          break;
+        }
+        case 1: {
+          for (size_t i = 0; i < m; i++) {
+            if (i != 0) {
+              j1 += (t << 1);
+            }
+            const uint64_t W = root_of_unity_powers[W_idx + i];
+            const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
+
+            uint64_t* X_r = result + j1;
+            uint64_t* Y_r = X_r + t;
+            const uint64_t* X_op = X_r;
+            const uint64_t* Y_op = Y_r;
+
+            FwdButterflyRadix2(X_r, Y_r, X_op, Y_op, W, W_precon, modulus,
+                               twice_modulus);
+          }
+          break;
+        }
+        default: {
+          for (size_t i = 0; i < m; i++) {
+            if (i != 0) {
+              j1 += (t << 1);
+            }
+            const uint64_t W = root_of_unity_powers[W_idx + i];
+            const uint64_t W_precon = precon_root_of_unity_powers[W_idx + i];
+
+            uint64_t* X_r = result + j1;
+            uint64_t* Y_r = X_r + t;
+            const uint64_t* X_op = X_r;
+            const uint64_t* Y_op = Y_r;
+
+            HEXL_LOOP_UNROLL_8
+            for (size_t j = 0; j < t; j += 8) {
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+              FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon,
+                                 modulus, twice_modulus);
+            }
+          }
+        }
+      }
+      t >>= 1;
+      W_idx <<= 1;
+    }
+    if (output_mod_factor == 1) {
+      for (size_t i = 0; i < n; ++i) {
+        result[i] = ReduceMod<4>(result[i], modulus, &twice_modulus);
+        HEXL_CHECK(result[i] < modulus, "Incorrect modulus reduction in NTT "
+                                            << result[i] << " >= " << modulus);
+      }
+    }
+
+  } else {  // Perform depth-first NTT via recursive call
+
+    size_t t = (n >> 1);
+    size_t W_idx = (1ULL << recursion_depth) + recursion_half;
+    const uint64_t W = root_of_unity_powers[W_idx];
+    const uint64_t W_precon = precon_root_of_unity_powers[W_idx];
+
+    uint64_t* X_r = result;
+    uint64_t* Y_r = X_r + t;
+    const uint64_t* X_op = operand;
+    const uint64_t* Y_op = X_op + t;
+
+    HEXL_LOOP_UNROLL_8
+    for (size_t j = 0; j < t; j += 8) {
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+      FwdButterflyRadix2(X_r++, Y_r++, X_op++, Y_op++, W, W_precon, modulus,
+                         twice_modulus);
+    }
+
+    if (recursion_depth == 0) {
+      omp_set_num_threads(62);
+
+#pragma omp parallel
+      {
+#pragma omp single nowait
+        {
+#pragma omp task
+          {
+            ForwardTransformToBitReverseRadix2(
+                result, result, n / 2, modulus, root_of_unity_powers,
+                precon_root_of_unity_powers, input_mod_factor,
+                output_mod_factor, recursion_depth + 1, recursion_half * 2);
+          }
+#pragma omp task
+          {
+            ForwardTransformToBitReverseRadix2(
+                &result[n / 2], &result[n / 2], n / 2, modulus,
+                root_of_unity_powers, precon_root_of_unity_powers,
+                input_mod_factor, output_mod_factor, recursion_depth + 1,
+                recursion_half * 2 + 1);
+          }
+#pragma omp taskwait
+        }
+      }
+    } else if (recursion_depth < 5) {
+#pragma omp task
+      {
+        ForwardTransformToBitReverseRadix2(
+            result, result, n / 2, modulus, root_of_unity_powers,
+            precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+            recursion_depth + 1, recursion_half * 2);
+      }
+#pragma omp task
+      {
+        ForwardTransformToBitReverseRadix2(
+            &result[n / 2], &result[n / 2], n / 2, modulus,
+            root_of_unity_powers, precon_root_of_unity_powers, input_mod_factor,
+            output_mod_factor, recursion_depth + 1, recursion_half * 2 + 1);
+      }
+#pragma omp taskwait
+    } else {
+      ForwardTransformToBitReverseRadix2(
+          result, result, n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2);
+      ForwardTransformToBitReverseRadix2(
+          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2 + 1);
     }
   }
 }

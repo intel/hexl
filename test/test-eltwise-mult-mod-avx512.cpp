@@ -98,7 +98,7 @@ TEST(EltwiseMultMod, Big) {
 TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
   uint64_t modulus = 281474976546817;
 
-  std::vector<uint64_t> data_native(8, 998771110802331);
+  std::vector<uint64_t> data_native(16, 998771110802331);
   auto data_avx = data_native;
 
   EltwiseMultModAVX512Float<4>(data_avx.data(), data_avx.data(),
@@ -107,8 +107,8 @@ TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
   EltwiseMultModNative<4>(data_native.data(), data_native.data(),
                           data_native.data(), data_avx.size(), modulus);
 
-  CheckEqual(data_native, std::vector<uint64_t>(8, 273497826869315));
-  CheckEqual(data_avx, std::vector<uint64_t>(8, 273497826869315));
+  CheckEqual(data_native, std::vector<uint64_t>(16, 273497826869315));
+  CheckEqual(data_avx, std::vector<uint64_t>(16, 273497826869315));
   CheckEqual(data_avx, data_native);
 }
 

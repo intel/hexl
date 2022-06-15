@@ -57,7 +57,7 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
   std::cout << "Loop" << std::endl;
 
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(4);
+  omp_set_num_threads(2);
 #pragma omp parallel
   {
     int id = omp_get_thread_num();
@@ -392,7 +392,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   // std::cout << "Default 1" << std::endl;
   HEXL_UNUSED(v_twice_mod);
 
-  omp_set_num_threads(4);
+  omp_set_num_threads(2);
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
