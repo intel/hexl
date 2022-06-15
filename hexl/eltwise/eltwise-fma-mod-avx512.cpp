@@ -100,7 +100,7 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
 
   if (arg3) {
     const __m512i* vp_arg3 = reinterpret_cast<const __m512i*>(arg3);
-    omp_set_num_threads(4);
+    omp_set_num_threads(2);
 #pragma omp parallel firstprivate(vp_arg1, vp_result, vp_arg3)
     {
       int id = omp_get_thread_num();
@@ -139,7 +139,7 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
       }
     }
   } else {  // arg3 == nullptr
-    omp_set_num_threads(4);
+    omp_set_num_threads(2);
 #pragma omp parallel firstprivate(vp_arg1, vp_result)
     {
       int id = omp_get_thread_num();

@@ -94,7 +94,7 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
-  omp_set_num_threads(8);
+  omp_set_num_threads(2);
 
   if (input_mod_factor == modulus) {
     if (output_mod_factor == 2) {
