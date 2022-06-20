@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "hexl/fft/fft.hpp"
+#include "hexl/experimental/fft/fft.hpp"
 
 namespace intel {
 namespace hexl {

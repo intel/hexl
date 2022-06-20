@@ -1,8 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-#include "hexl/fft/inv-fft-avx512.hpp"
+#include "hexl/experimental/fft/inv-fft-avx512.hpp"
 
-#include "hexl/fft/fft-avx512-util.hpp"
+#include "hexl/experimental/fft/fft-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 
 namespace intel {

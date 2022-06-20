@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "hexl/fft/fft.hpp"
+#include "hexl/experimental/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
 #include "ntt/ntt-internal.hpp"

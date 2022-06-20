@@ -5,8 +5,8 @@
 
 #include <complex>
 
-#include "hexl/fft/fft-native.hpp"
-#include "hexl/fft/fft.hpp"
+#include "hexl/experimental/fft/fft-native.hpp"
+#include "hexl/experimental/fft/fft.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
 #include "test-util.hpp"

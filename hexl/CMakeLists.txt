@@ -13,8 +13,6 @@ set(NATIVE_SRC
     ntt/ntt-radix-2.cpp
     ntt/ntt-radix-4.cpp
     number-theory/number-theory.cpp
-    fft/fft.cpp
-    fft/fft-native.cpp
 )
 
 if (HEXL_EXPERIMENTAL)
@@ -24,6 +22,10 @@ if (HEXL_EXPERIMENTAL)
         experimental/seal/dyadic-multiply-internal.cpp
         experimental/seal/key-switch-internal.cpp
         experimental/misc/lr-mat-vec-mult.cpp
+        experimental/fft/fft.cpp
+        experimental/fft/fft-native.cpp
+        experimental/fft/fwd-fft-avx512.cpp
+        experimental/fft/inv-fft-avx512.cpp
     )
 endif()
 
@@ -39,8 +41,6 @@ if (HEXL_HAS_AVX512DQ)
         eltwise/eltwise-fma-mod-avx512.cpp
         ntt/fwd-ntt-avx512.cpp
         ntt/inv-ntt-avx512.cpp
-        fft/fwd-fft-avx512.cpp
-        fft/inv-fft-avx512.cpp
     )
 endif()
 

@@ -5,10 +5,10 @@
 
 #include <vector>
 
-#include "hexl/fft/fft-native.hpp"
-#include "hexl/fft/fft.hpp"
-#include "hexl/fft/fwd-fft-avx512.hpp"
-#include "hexl/fft/inv-fft-avx512.hpp"
+#include "hexl/experimental/fft/fft-native.hpp"
+#include "hexl/experimental/fft/fft.hpp"
+#include "hexl/experimental/fft/fwd-fft-avx512.hpp"
+#include "hexl/experimental/fft/inv-fft-avx512.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
