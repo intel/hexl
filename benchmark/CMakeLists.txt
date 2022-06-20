@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set(SRC main.cpp
+    bench-ntt.cpp
     bench-eltwise-add-mod.cpp
     bench-eltwise-cmp-add.cpp
     bench-eltwise-cmp-sub-mod.cpp
@@ -13,7 +14,7 @@ set(SRC main.cpp
 
 if (HEXL_EXPERIMENTAL)
     list(APPEND SRC
-        bench-ntt.cpp
+      bench-fft.cpp
     )
 endif()
 
