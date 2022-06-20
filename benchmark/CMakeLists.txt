@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set(SRC main.cpp
-    bench-fft.cpp
     bench-eltwise-add-mod.cpp
     bench-eltwise-cmp-add.cpp
     bench-eltwise-cmp-sub-mod.cpp
