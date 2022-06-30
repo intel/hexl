@@ -6,7 +6,6 @@
 #include <tuple>
 #include <vector>
 
-#include "hexl/experimental/fft/fft.hpp"
 #include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/fwd-ntt-avx512.hpp"

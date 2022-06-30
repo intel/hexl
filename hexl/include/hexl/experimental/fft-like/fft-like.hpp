@@ -5,17 +5,17 @@
 
 #include <complex>
 
-#include "hexl/experimental/fft/fwd-fft-avx512.hpp"
-#include "hexl/experimental/fft/inv-fft-avx512.hpp"
+#include "hexl/experimental/fft-like/fwd-fft-like-avx512.hpp"
+#include "hexl/experimental/fft-like/inv-fft-like-avx512.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/allocator.hpp"
 
 namespace intel {
 namespace hexl {
 
-/// @brief Performs linear forward and inverse FFT-like transform
+/// @brief Performs linear forward and inverse FFT like transform
 /// for CKKS encoding and decoding.
-class FFT {
+class FFTLike {
  public:
   /// @brief Helper class for custom memory allocation
   template <class Adaptee, class... Args>
@@ -33,46 +33,47 @@ class FFT {
   };
 
   /// @brief Initializes an empty CKKS_FTT object
-  FFT() = default;
+  FFTLike() = default;
 
   /// @brief Destructs the CKKS_FTT object
-  ~FFT() = default;
+  ~FFTLike() = default;
 
-  /// @brief Initializes an FFT object with degree \p degree and scalar
+  /// @brief Initializes an FFTLike object with degree \p degree and scalar
   /// \p in_scalar.
-  /// @param[in] degree also known as N. Size of the FFT transform. Must be a
-  /// power of 2
+  /// @param[in] degree also known as N. Size of the FFT like transform. Must be
+  /// a power of 2
   /// @param[in] in_scalar Scalar value to calculate scale and inv scale
   /// @param[in] alloc_ptr Custom memory allocator used for intermediate
   /// calculations
   /// @details  Performs pre-computation necessary for forward and inverse
   /// transforms
-  FFT(uint64_t degree, double* in_scalar,
-      std::shared_ptr<AllocatorBase> alloc_ptr = {});
+  FFTLike(uint64_t degree, double* in_scalar,
+          std::shared_ptr<AllocatorBase> alloc_ptr = {});
 
   template <class Allocator, class... AllocatorArgs>
-  FFT(uint64_t degree, double* in_scalar, Allocator&& a,
-      AllocatorArgs&&... args)
-      : FFT(degree, in_scalar,
+  FFTLike(uint64_t degree, double* in_scalar, Allocator&& a,
+          AllocatorArgs&&... args)
+      : FFTLike(
+            degree, in_scalar,
             std::static_pointer_cast<AllocatorBase>(
                 std::make_shared<AllocatorAdapter<Allocator, AllocatorArgs...>>(
                     std::move(a), std::forward<AllocatorArgs>(args)...))) {}
 
-  /// @brief Compute forward FFT. Results are bit-reversed.
+  /// @brief Compute forward FFT like. Results are bit-reversed.
   /// @param[out] result Stores the result
-  /// @param[in] operand Data on which to compute the FFT
+  /// @param[in] operand Data on which to compute the FFT like
   /// @param[in] in_scale Scale applied to output values
-  void ComputeForwardFFT(std::complex<double>* result,
-                         const std::complex<double>* operand,
-                         const double* in_scale = nullptr);
+  void ComputeForwardFFTLike(std::complex<double>* result,
+                             const std::complex<double>* operand,
+                             const double* in_scale = nullptr);
 
-  /// @brief Compute inverse FFT. Results are bit-reversed.
+  /// @brief Compute inverse FFT like. Results are bit-reversed.
   /// @param[out] result Stores the result
-  /// @param[in] operand Data on which to compute the FFT
+  /// @param[in] operand Data on which to compute the FFT like
   /// @param[in] in_scale Scale applied to output values
-  void ComputeInverseFFT(std::complex<double>* result,
-                         const std::complex<double>* operand,
-                         const double* in_scale = nullptr);
+  void ComputeInverseFFTLike(std::complex<double>* result,
+                             const std::complex<double>* operand,
+                             const double* in_scale = nullptr);
 
   /// @brief Construct floating-point values from CRT-composed polynomial with
   /// integer coefficients.
@@ -121,13 +122,13 @@ class FFT {
   // Computes 1~(n-1)-th powers and inv powers of the primitive 2n-th root
   void ComputeComplexRootsOfUnity();
 
-  uint64_t m_degree;  // N: size of FFT transform, should be power of 2
+  uint64_t m_degree;  // N: size of FFT like transform, should be power of 2
 
   double* scalar;  // Pointer to scalar used for scale/inv_scale calculation
 
-  double scale;  // Scale value use for encoding (inv fft)
+  double scale;  // Scale value use for encoding (inv fft-like)
 
-  double inv_scale;  // Scale value use in decoding (fwd fft)
+  double inv_scale;  // Scale value use in decoding (fwd fft-like)
 
   std::shared_ptr<AllocatorBase> m_alloc;
 

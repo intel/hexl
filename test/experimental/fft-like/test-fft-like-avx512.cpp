@@ -5,8 +5,8 @@
 
 #include <complex>
 
-#include "hexl/experimental/fft/fft-avx512-util.hpp"
-#include "hexl/experimental/fft/fft.hpp"
+#include "hexl/experimental/fft-like/fft-like-avx512-util.hpp"
+#include "hexl/experimental/fft-like/fft-like.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
 #include "test-util.hpp"
@@ -18,7 +18,7 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-TEST(FFT, BuildFloatingPointsAVX512) {
+TEST(FFTLike, BuildFloatingPointsAVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -125,7 +125,7 @@ TEST(FFT, BuildFloatingPointsAVX512) {
   }
 }
 
-TEST(FFT, ComplexLoadFwdInterleavedT1AVX512) {
+TEST(FFTLike, ComplexLoadFwdInterleavedT1AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -143,7 +143,7 @@ TEST(FFT, ComplexLoadFwdInterleavedT1AVX512) {
 
 // ComplexWriteFwdInterleavedT1:
 // Re-arrange back 8 complex interleaved into 1 complex interleaved
-TEST(FFT, ComplexWriteFwdInterleavedT1AVX512) {
+TEST(FFTLike, ComplexWriteFwdInterleavedT1AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -167,7 +167,7 @@ TEST(FFT, ComplexWriteFwdInterleavedT1AVX512) {
 
 // ComplexLoadInvInterleavedT1:
 // Re-arrange 1 complex interleaved into 8 complex interleaved
-TEST(FFT, ComplexLoadInvInterleavedT1AVX512) {
+TEST(FFTLike, ComplexLoadInvInterleavedT1AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -193,7 +193,7 @@ TEST(FFT, ComplexLoadInvInterleavedT1AVX512) {
   AssertEqual(ExtractValues(exp_xi), ExtractValues(out_xi));
 }
 
-TEST(FFT, ComplexLoadFwdInterleavedT2AVX512) {
+TEST(FFTLike, ComplexLoadFwdInterleavedT2AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -211,7 +211,7 @@ TEST(FFT, ComplexLoadFwdInterleavedT2AVX512) {
   AssertEqual(ExtractValues(out2), ExtractValues(exp2));
 }
 
-TEST(FFT, ComplexLoadInvInterleavedT2AVX512) {
+TEST(FFTLike, ComplexLoadInvInterleavedT2AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -229,7 +229,7 @@ TEST(FFT, ComplexLoadInvInterleavedT2AVX512) {
   AssertEqual(ExtractValues(out2), ExtractValues(exp2));
 }
 
-TEST(FFT, ComplexLoadFwdInterleavedT4AVX512) {
+TEST(FFTLike, ComplexLoadFwdInterleavedT4AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -247,7 +247,7 @@ TEST(FFT, ComplexLoadFwdInterleavedT4AVX512) {
   AssertEqual(ExtractValues(out2), ExtractValues(exp2));
 }
 
-TEST(FFT, ComplexLoadInvInterleavedT4AVX512) {
+TEST(FFTLike, ComplexLoadInvInterleavedT4AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -265,7 +265,7 @@ TEST(FFT, ComplexLoadInvInterleavedT4AVX512) {
   AssertEqual(ExtractValues(out2), ExtractValues(exp2));
 }
 
-TEST(FFT, ComplexWriteInvInterleavedT4AVX512) {
+TEST(FFTLike, ComplexWriteInvInterleavedT4AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -283,7 +283,7 @@ TEST(FFT, ComplexWriteInvInterleavedT4AVX512) {
 
 // ComplexLoadFwdInterleavedT8:
 // Re-arrange 1 complex interleaved into 8 complex interleaved
-TEST(FFT, ComplexLoadFwdInterleavedT8AVX512) {
+TEST(FFTLike, ComplexLoadFwdInterleavedT8AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -316,7 +316,7 @@ TEST(FFT, ComplexLoadFwdInterleavedT8AVX512) {
 // Assuming ComplexLoadInvInterleavedT4 was used before.
 // Given inputs: 7i, 6i, 5i, 4i, 3i, 2i, 1i, 0i, 7r, 6r, 5r, 4r, 3r, 2r, 1r, 0r
 // Given output: 7i, 7r, 6i, 6r, 5i, 5r, 4i, 4r, 3i, 3r, 2i, 2r, 1i, 1r, 0i, 0r
-TEST(FFT, ComplexWriteInvInterleavedT8AVX512) {
+TEST(FFTLike, ComplexWriteInvInterleavedT8AVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -341,16 +341,16 @@ TEST(FFT, ComplexWriteInvInterleavedT8AVX512) {
   AssertEqual(exp_x, out_x);
 }
 
-TEST(FFT, ForwardInverseFFTAVX512) {
+TEST(FFTLike, ForwardInverseFFTLikeAVX512) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
 
-  FFT fft(64, nullptr);
+  FFTLike fft_like(64, nullptr);
   AlignedVector64<std::complex<double>> root_powers =
-      fft.GetComplexRootsOfUnity();
+      fft_like.GetComplexRootsOfUnity();
   AlignedVector64<std::complex<double>> inv_root_powers =
-      fft.GetInvComplexRootsOfUnity();
+      fft_like.GetInvComplexRootsOfUnity();
 
   {  // Single Unscaled
     const uint64_t n = 64;
@@ -362,7 +362,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
         GenerateInsecureUniformRealRandomValue(0, data_bound),
         GenerateInsecureUniformRealRandomValue(0, data_bound));
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         &(reinterpret_cast<double(&)[2]>(result[0]))[0],
         &(reinterpret_cast<double(&)[2]>(operand[0]))[0],
         &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n);
@@ -386,7 +386,7 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand[0] = value;
     value *= inv_scale;
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         &reinterpret_cast<double(&)[2]>(result[0])[0],
         &reinterpret_cast<double(&)[2]>(operand[0])[0],
         &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
@@ -406,11 +406,11 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     AlignedVector64<std::complex<double>> transformed(n);
     AlignedVector64<std::complex<double>> result(n);
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         &reinterpret_cast<double(&)[2]>(transformed[0])[0],
         &reinterpret_cast<double(&)[2]>(operand[0])[0],
         &reinterpret_cast<double(&)[2]>(root_powers[0])[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         &reinterpret_cast<double(&)[2]>(result[0])[0],
         &reinterpret_cast<double(&)[2]>(transformed[0])[0],
         &reinterpret_cast<double(&)[2]>(inv_root_powers[0])[0], n, &scalar);
@@ -432,11 +432,11 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand_complex_interleaved =
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         transformed_complex_interleaved.data(),
         operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
@@ -458,11 +458,11 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand_complex_interleaved =
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         transformed_complex_interleaved.data(),
         operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
@@ -484,11 +484,11 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand_complex_interleaved =
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         transformed_complex_interleaved.data(),
         operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
@@ -509,11 +509,11 @@ TEST(FFT, ForwardInverseFFTAVX512) {
 
     AlignedVector64<double> expected = operand_complex_interleaved;
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         operand_complex_interleaved.data(), operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(root_powers[0]))[0], n, &inv_scale);
 
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         operand_complex_interleaved.data(), operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(inv_root_powers[0]))[0], n, &scalar);
 
@@ -527,11 +527,11 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     const double inv_scale = 1.0 / scale;
     const double data_bound = (1 << 30);
 
-    FFT big_fft(n, nullptr);
+    FFTLike big_fft_like(n, nullptr);
     AlignedVector64<std::complex<double>> big_root_powers =
-        big_fft.GetComplexRootsOfUnity();
+        big_fft_like.GetComplexRootsOfUnity();
     AlignedVector64<std::complex<double>> big_inv_root_powers =
-        big_fft.GetInvComplexRootsOfUnity();
+        big_fft_like.GetInvComplexRootsOfUnity();
 
     AlignedVector64<double> operand_complex_interleaved(2 * n);
     AlignedVector64<double> transformed_complex_interleaved(2 * n);
@@ -541,13 +541,13 @@ TEST(FFT, ForwardInverseFFTAVX512) {
     operand_complex_interleaved =
         GenerateInsecureUniformRealRandomValues(2 * n, 0, data_bound);
 
-    Forward_FFT_ToBitReverseAVX512(
+    Forward_FFTLike_ToBitReverseAVX512(
         transformed_complex_interleaved.data(),
         operand_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(big_root_powers[0]))[0], n,
         &inv_scale);
 
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         result_complex_interleaved.data(),
         transformed_complex_interleaved.data(),
         &(reinterpret_cast<double(&)[2]>(big_inv_root_powers[0]))[0], n,

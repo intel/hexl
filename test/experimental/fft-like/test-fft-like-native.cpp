@@ -5,8 +5,8 @@
 
 #include <complex>
 
-#include "hexl/experimental/fft/fft-native.hpp"
-#include "hexl/experimental/fft/fft.hpp"
+#include "hexl/experimental/fft-like/fft-like-native.hpp"
+#include "hexl/experimental/fft-like/fft-like.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
 #include "test-util.hpp"
@@ -16,12 +16,12 @@
 namespace intel {
 namespace hexl {
 
-TEST(FFT, ForwardInverseFFTNative) {
-  FFT fft(64, nullptr);
+TEST(FFTLike, ForwardInverseFFTLikeNative) {
+  FFTLike fft_like(64, nullptr);
   AlignedVector64<std::complex<double>> root_powers =
-      fft.GetComplexRootsOfUnity();
+      fft_like.GetComplexRootsOfUnity();
   AlignedVector64<std::complex<double>> inv_root_powers =
-      fft.GetInvComplexRootsOfUnity();
+      fft_like.GetInvComplexRootsOfUnity();
 
   {  // Single Unscaled
     const uint64_t n = 64;
@@ -33,8 +33,8 @@ TEST(FFT, ForwardInverseFFTNative) {
         GenerateInsecureUniformRealRandomValue(0, data_bound),
         GenerateInsecureUniformRealRandomValue(0, data_bound));
 
-    Forward_FFT_ToBitReverseRadix2(result.data(), operand.data(),
-                                   root_powers.data(), n);
+    Forward_FFTLike_ToBitReverseRadix2(result.data(), operand.data(),
+                                       root_powers.data(), n);
 
     for (size_t i = 0; i < n; ++i) {
       CheckClose(operand[0], result[i], 0.5);
@@ -55,8 +55,8 @@ TEST(FFT, ForwardInverseFFTNative) {
     operand[0] = value;
     value *= inv_scale;
 
-    Forward_FFT_ToBitReverseRadix2(result.data(), operand.data(),
-                                   root_powers.data(), n, &inv_scale);
+    Forward_FFTLike_ToBitReverseRadix2(result.data(), operand.data(),
+                                       root_powers.data(), n, &inv_scale);
 
     for (size_t i = 0; i < n; ++i) {
       CheckClose(value, result[i], 0.5);
@@ -73,11 +73,11 @@ TEST(FFT, ForwardInverseFFTNative) {
     AlignedVector64<std::complex<double>> transformed(n);
     AlignedVector64<std::complex<double>> result(n);
 
-    Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
-                                     inv_root_powers.data(), n, &scalar);
+    Inverse_FFTLike_FromBitReverseRadix2(transformed.data(), operand.data(),
+                                         inv_root_powers.data(), n, &scalar);
 
-    Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
-                                   root_powers.data(), n, &inv_scale);
+    Forward_FFTLike_ToBitReverseRadix2(result.data(), transformed.data(),
+                                       root_powers.data(), n, &inv_scale);
 
     CheckClose(operand, result, 0.5);
   }
@@ -99,11 +99,11 @@ TEST(FFT, ForwardInverseFFTNative) {
           GenerateInsecureUniformRealRandomValue(0, data_bound));
     }
 
-    Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
-                                     inv_root_powers.data(), n, &scalar);
+    Inverse_FFTLike_FromBitReverseRadix2(transformed.data(), operand.data(),
+                                         inv_root_powers.data(), n, &scalar);
 
-    Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
-                                   root_powers.data(), n, &inv_scale);
+    Forward_FFTLike_ToBitReverseRadix2(result.data(), transformed.data(),
+                                       root_powers.data(), n, &inv_scale);
 
     CheckClose(operand, result, 0.5);
   }
@@ -127,11 +127,11 @@ TEST(FFT, ForwardInverseFFTNative) {
 
     AlignedVector64<std::complex<double>> expected = operand;
 
-    Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
-                                     inv_root_powers.data(), n, &scalar);
+    Inverse_FFTLike_FromBitReverseRadix2(transformed.data(), operand.data(),
+                                         inv_root_powers.data(), n, &scalar);
 
-    Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
-                                   root_powers.data(), n, &inv_scale);
+    Forward_FFTLike_ToBitReverseRadix2(result.data(), transformed.data(),
+                                       root_powers.data(), n, &inv_scale);
 
     CheckClose(expected, result, 0.5);
   }
@@ -155,11 +155,11 @@ TEST(FFT, ForwardInverseFFTNative) {
 
     AlignedVector64<std::complex<double>> expected = operand;
 
-    Inverse_FFT_FromBitReverseRadix2(transformed.data(), operand.data(),
-                                     inv_root_powers.data(), n, &scalar);
+    Inverse_FFTLike_FromBitReverseRadix2(transformed.data(), operand.data(),
+                                         inv_root_powers.data(), n, &scalar);
 
-    Forward_FFT_ToBitReverseRadix2(result.data(), transformed.data(),
-                                   root_powers.data(), n, &inv_scale);
+    Forward_FFTLike_ToBitReverseRadix2(result.data(), transformed.data(),
+                                       root_powers.data(), n, &inv_scale);
 
     CheckClose(expected, result, 0.5);
   }
@@ -181,11 +181,11 @@ TEST(FFT, ForwardInverseFFTNative) {
 
     AlignedVector64<std::complex<double>> expected = operand;
 
-    Inverse_FFT_FromBitReverseRadix2(operand.data(), operand.data(),
-                                     inv_root_powers.data(), n, &scalar);
+    Inverse_FFTLike_FromBitReverseRadix2(operand.data(), operand.data(),
+                                         inv_root_powers.data(), n, &scalar);
 
-    Forward_FFT_ToBitReverseRadix2(operand.data(), operand.data(),
-                                   root_powers.data(), n, &inv_scale);
+    Forward_FFTLike_ToBitReverseRadix2(operand.data(), operand.data(),
+                                       root_powers.data(), n, &inv_scale);
 
     CheckClose(expected, operand, 0.5);
   }

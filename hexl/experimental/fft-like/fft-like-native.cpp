@@ -1,7 +1,7 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "hexl/experimental/fft/fft-native.hpp"
+#include "hexl/experimental/fft-like/fft-like-native.hpp"
 
 #include <cstring>
 
@@ -53,7 +53,7 @@ inline void ScaledComplexInvButterflyRadix2(std::complex<double>* X_r,
   HEXL_VLOG(5, "Output X " << *X_r << ", Y " << *Y_r);
 }
 
-void Forward_FFT_ToBitReverseRadix2(
+void Forward_FFTLike_ToBitReverseRadix2(
     std::complex<double>* result, const std::complex<double>* operand,
     const std::complex<double>* root_of_unity_powers, const uint64_t n,
     const double* scalar) {
@@ -236,7 +236,7 @@ void Forward_FFT_ToBitReverseRadix2(
   }
 }
 
-void Inverse_FFT_FromBitReverseRadix2(
+void Inverse_FFTLike_FromBitReverseRadix2(
     std::complex<double>* result, const std::complex<double>* operand,
     const std::complex<double>* inv_root_of_unity_powers, const uint64_t n,
     const double* scalar) {

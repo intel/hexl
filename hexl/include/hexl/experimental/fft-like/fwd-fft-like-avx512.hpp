@@ -3,16 +3,17 @@
 
 #pragma once
 
-#include "hexl/experimental/fft/fft.hpp"
+#include "hexl/experimental/fft-like/fft-like.hpp"
 
 namespace intel {
 namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-/// @brief AVX512 implementation of the forward FFT
-/// @param[out] result_cmplx_intrlvd Output data. Overwritten with FFT output.
-/// Result is a vector of double with interleaved real and imaginary numbers.
+/// @brief AVX512 implementation of the forward FFT like
+/// @param[out] result_cmplx_intrlvd Output data. Overwritten with FFT like
+/// output. Result is a vector of double with interleaved real and imaginary
+/// numbers.
 /// @param[in] operand_cmplx_intrlvd Input data. A vector of double with
 /// interleaved real and imaginary numbers.
 /// @param[in] roots_of_unity_cmplx_intrlvd Powers of 2n'th root of unity. In
@@ -20,13 +21,11 @@ namespace hexl {
 /// @param[in] n Size of the transform, i.e. the polynomial degree. Must be a
 /// power of two.
 /// @param[in] scale Scale applied to output values
-void Forward_FFT_ToBitReverseAVX512(double* result_cmplx_intrlvd,
-                                    const double* operand_cmplx_intrlvd,
-                                    const double* roots_of_unity_cmplx_intrlvd,
-                                    const uint64_t n,
-                                    const double* scale = nullptr,
-                                    uint64_t recursion_depth = 0,
-                                    uint64_t recursion_half = 0);
+void Forward_FFTLike_ToBitReverseAVX512(
+    double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
+    const double* roots_of_unity_cmplx_intrlvd, const uint64_t n,
+    const double* scale = nullptr, uint64_t recursion_depth = 0,
+    uint64_t recursion_half = 0);
 
 /// @brief Construct floating-point values from CRT-composed polynomial with
 /// integer coefficients in AVX512.

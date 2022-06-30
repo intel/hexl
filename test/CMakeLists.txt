@@ -20,9 +20,9 @@ if (HEXL_EXPERIMENTAL)
         experimental/seal/test-dyadic-multiply.cpp
         experimental/seal/test-key-switch.cpp
         experimental/misc/test-lr-mat-vec-mult.cpp
-        experimental/fft/test-fft-avx512.cpp
-        experimental/fft/test-fft.cpp
-        experimental/fft/test-fft-native.cpp
+        experimental/fft-like/test-fft-like-avx512.cpp
+        experimental/fft-like/test-fft-like.cpp
+        experimental/fft-like/test-fft-like-native.cpp
     )
 endif()
 

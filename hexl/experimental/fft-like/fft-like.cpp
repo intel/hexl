@@ -1,16 +1,16 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "hexl/experimental/fft/fft.hpp"
+#include "hexl/experimental/fft-like/fft-like.hpp"
 
-#include "hexl/experimental/fft/fft-native.hpp"
+#include "hexl/experimental/fft-like/fft-like-native.hpp"
 #include "hexl/logging/logging.hpp"
 
 namespace intel {
 namespace hexl {
 
-FFT::FFT(uint64_t degree, double* in_scalar,
-         std::shared_ptr<AllocatorBase> alloc_ptr)
+FFTLike::FFTLike(uint64_t degree, double* in_scalar,
+                 std::shared_ptr<AllocatorBase> alloc_ptr)
     : m_degree(degree),
       scalar(in_scalar),
       m_alloc(alloc_ptr),
@@ -33,7 +33,7 @@ inline std::complex<double> swap_real_imag(std::complex<double> c) {
   return std::complex<double>(c.imag(), c.real());
 }
 
-void FFT::ComputeComplexRootsOfUnity() {
+void FFTLike::ComputeComplexRootsOfUnity() {
   AlignedVector64<std::complex<double>> roots_of_unity(m_degree, 0,
                                                        m_aligned_alloc);
   AlignedVector64<std::complex<double>> roots_in_bit_reverse(m_degree, 0,
@@ -70,9 +70,9 @@ void FFT::ComputeComplexRootsOfUnity() {
   m_inv_complex_roots_of_unity = inv_roots_in_bit_reverse;
 }
 
-void FFT::ComputeForwardFFT(std::complex<double>* result,
-                            const std::complex<double>* operand,
-                            const double* in_scale) {
+void FFTLike::ComputeForwardFFTLike(std::complex<double>* result,
+                                    const std::complex<double>* operand,
+                                    const double* in_scale) {
   HEXL_CHECK(result != nullptr, "result == nullptr");
   HEXL_CHECK(operand != nullptr, "operand == nullptr");
 
@@ -84,25 +84,25 @@ void FFT::ComputeForwardFFT(std::complex<double>* result,
   }
 
 #ifdef HEXL_HAS_AVX512DQ
-  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFT");
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ FwdFFTLike");
 
-  Forward_FFT_ToBitReverseAVX512(
+  Forward_FFTLike_ToBitReverseAVX512(
       &(reinterpret_cast<double(&)[2]>(result[0]))[0],
       &(reinterpret_cast<const double(&)[2]>(operand[0]))[0],
       &(reinterpret_cast<const double(&)[2]>(m_complex_roots_of_unity[0]))[0],
       m_degree, out_scale);
   return;
 #else
-  HEXL_VLOG(3, "Calling Native FwdFFT");
-  Forward_FFT_ToBitReverseRadix2(
+  HEXL_VLOG(3, "Calling Native FwdFFTLike");
+  Forward_FFTLike_ToBitReverseRadix2(
       result, operand, m_complex_roots_of_unity.data(), m_degree, out_scale);
   return;
 #endif
 }
 
-void FFT::ComputeInverseFFT(std::complex<double>* result,
-                            const std::complex<double>* operand,
-                            const double* in_scale) {
+void FFTLike::ComputeInverseFFTLike(std::complex<double>* result,
+                                    const std::complex<double>* operand,
+                                    const double* in_scale) {
   HEXL_CHECK(result != nullptr, "result==nullptr");
   HEXL_CHECK(operand != nullptr, "operand==nullptr");
 
@@ -114,9 +114,9 @@ void FFT::ComputeInverseFFT(std::complex<double>* result,
   }
 
 #ifdef HEXL_HAS_AVX512DQ
-  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ InvFFT");
+  HEXL_VLOG(3, "Calling 64-bit AVX512-DQ InvFFTLike");
 
-  Inverse_FFT_FromBitReverseAVX512(
+  Inverse_FFTLike_FromBitReverseAVX512(
       &(reinterpret_cast<double(&)[2]>(result[0]))[0],
       &(reinterpret_cast<const double(&)[2]>(operand[0]))[0],
       &(reinterpret_cast<const double(&)[2]>(
@@ -125,19 +125,20 @@ void FFT::ComputeInverseFFT(std::complex<double>* result,
 
   return;
 #else
-  HEXL_VLOG(3, "Calling Native InvFFT");
-  Inverse_FFT_FromBitReverseRadix2(result, operand,
-                                   m_inv_complex_roots_of_unity.data(),
-                                   m_degree, out_scale);
+  HEXL_VLOG(3, "Calling Native InvFFTLike");
+  Inverse_FFTLike_FromBitReverseRadix2(result, operand,
+                                       m_inv_complex_roots_of_unity.data(),
+                                       m_degree, out_scale);
   return;
 #endif
 }
 
-void FFT::BuildFloatingPoints(std::complex<double>* res, const uint64_t* plain,
-                              const uint64_t* threshold,
-                              const uint64_t* decryption_modulus,
-                              const double in_inv_scale, size_t mod_size,
-                              size_t coeff_count) {
+void FFTLike::BuildFloatingPoints(std::complex<double>* res,
+                                  const uint64_t* plain,
+                                  const uint64_t* threshold,
+                                  const uint64_t* decryption_modulus,
+                                  const double in_inv_scale, size_t mod_size,
+                                  size_t coeff_count) {
   HEXL_UNUSED(res);
   HEXL_UNUSED(plain);
   HEXL_UNUSED(threshold);

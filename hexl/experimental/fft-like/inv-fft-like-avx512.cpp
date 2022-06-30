@@ -1,8 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-#include "hexl/experimental/fft/inv-fft-avx512.hpp"
+#include "hexl/experimental/fft-like/inv-fft-like-avx512.hpp"
 
-#include "hexl/experimental/fft/fft-avx512-util.hpp"
+#include "hexl/experimental/fft-like/fft-like-avx512-util.hpp"
 #include "hexl/logging/logging.hpp"
 
 namespace intel {
@@ -10,7 +10,7 @@ namespace hexl {
 
 #ifdef HEXL_HAS_AVX512DQ
 
-/// @brief Final butterfly step for the Inverse FFT.
+/// @brief Final butterfly step for the Inverse FFT like.
 /// @param[in,out] X_real Double precision (DP) values in SIMD form representing
 /// the real part of 8 complex numbers.
 /// @param[in,out] X_imag DP values in SIMD form representing the
@@ -304,7 +304,7 @@ void ComplexFinalInvT8(double* operand_8C_intrlvd, const double* W_1C_intrlvd,
   }
 }
 
-void Inverse_FFT_FromBitReverseAVX512(
+void Inverse_FFTLike_FromBitReverseAVX512(
     double* result_cmplx_intrlvd, const double* operand_cmplx_intrlvd,
     const double* inv_root_of_unity_cmplx_intrlvd, const uint64_t n,
     const double* scale, uint64_t recursion_depth, uint64_t recursion_half) {
@@ -321,9 +321,9 @@ void Inverse_FFT_FromBitReverseAVX512(
   size_t m = n;    // (2*n >> 1);
   size_t W_idx = 2 + m * recursion_half;  // 2*1
 
-  static const size_t base_fft_size = 1024;
+  static const size_t base_fft_like_size = 1024;
 
-  if (n <= base_fft_size) {  // Perform breadth-first InvFFT
+  if (n <= base_fft_like_size) {  // Perform breadth-first InvFFT like
     // T1
     const double* W_cmplx_intrlvd = &inv_root_of_unity_cmplx_intrlvd[W_idx];
     ComplexInvT1(result_cmplx_intrlvd, operand_cmplx_intrlvd, W_cmplx_intrlvd,
@@ -363,7 +363,7 @@ void Inverse_FFT_FromBitReverseAVX512(
     if (recursion_depth == 0) {
       ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
       HEXL_VLOG(5,
-                "AVX512 returning INV FFT result "
+                "AVX512 returning INV FFT like result "
                     << std::vector<std::complex<double>>(
                            result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
     } else {
@@ -374,11 +374,11 @@ void Inverse_FFT_FromBitReverseAVX512(
     W_idx_delta = m * ((1ULL << (recursion_depth + 1)) - recursion_half);
     W_idx += W_idx_delta;
   } else {
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         result_cmplx_intrlvd, operand_cmplx_intrlvd,
         inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
         2 * recursion_half);
-    Inverse_FFT_FromBitReverseAVX512(
+    Inverse_FFTLike_FromBitReverseAVX512(
         &result_cmplx_intrlvd[n], &operand_cmplx_intrlvd[n],
         inv_root_of_unity_cmplx_intrlvd, n / 2, scale, recursion_depth + 1,
         2 * recursion_half + 1);
@@ -392,7 +392,7 @@ void Inverse_FFT_FromBitReverseAVX512(
     if (recursion_depth == 0) {
       ComplexFinalInvT8(result_cmplx_intrlvd, W_cmplx_intrlvd, gap, m, scale);
       HEXL_VLOG(5,
-                "AVX512 returning INV FFT result "
+                "AVX512 returning INV FFT like result "
                     << std::vector<std::complex<double>>(
                            result_cmplx_intrlvd, result_cmplx_intrlvd + 2 * n));
     } else {

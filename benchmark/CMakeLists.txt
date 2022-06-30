@@ -14,7 +14,7 @@ set(SRC main.cpp
 
 if (HEXL_EXPERIMENTAL)
     list(APPEND SRC
-      bench-fft.cpp
+      bench-fft-like.cpp
     )
 endif()
 
