@@ -24,7 +24,7 @@ namespace hexl {
 /// @param[in] recursion_depth Depth of recursive call
 /// @param[in] recursion_half Helper for indexing roots of unity
 /// @details The implementation is recursive. The base case is a breadth-first
-/// FFT like, where all the butterflies in a given stage are processed before 
+/// FFT like, where all the butterflies in a given stage are processed before
 /// any butterflies in the next stage. The base case is small enough to fit in
 /// the smallest cache. Larger FFTs are processed recursively in a depth-first
 /// manner, such that an entire subtransform is completed before moving to the
