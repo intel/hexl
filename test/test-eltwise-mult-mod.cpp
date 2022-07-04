@@ -254,8 +254,8 @@ TEST_P(ModulusInputModFactor, NativeRandom) {
   uint64_t length = 1024;
 
   uint64_t data_bound = modulus_data.input_mod_factor;
-  auto input_1 = GenerateInsecureUniformRandomValues(length, 0, data_bound);
-  auto input_2 = GenerateInsecureUniformRandomValues(length, 0, data_bound);
+  auto input_1 = GenerateInsecureUniformIntRandomValues(length, 0, data_bound);
+  auto input_2 = GenerateInsecureUniformIntRandomValues(length, 0, data_bound);
   std::vector<uint64_t> output(length, 0);
 
   std::vector<uint64_t> expected(length, 0);

@@ -23,10 +23,10 @@ static void BM_EltwiseFMAModAddNative(benchmark::State& state) {  //  NOLINT
   uint64_t modulus = 0xffffffffffc0001ULL;
   bool add = state.range(1);
 
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  uint64_t input2 = GenerateInsecureUniformIntRandomValue(0, modulus);
   AlignedVector64<uint64_t> input3 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+      GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   uint64_t* arg3 = add ? input3.data() : nullptr;
 
   for (auto _ : state) {
@@ -47,10 +47,10 @@ static void BM_EltwiseFMAModAVX512DQ(benchmark::State& state) {  //  NOLINT
   size_t modulus = 100;
   bool add = state.range(1);
 
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  uint64_t input2 = GenerateInsecureUniformIntRandomValue(0, modulus);
   AlignedVector64<uint64_t> input3 =
-      GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+      GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
 
   uint64_t* arg3 = add ? input3.data() : nullptr;
 
@@ -73,9 +73,9 @@ static void BM_EltwiseFMAModAVX512IFMA(benchmark::State& state) {  //  NOLINT
   size_t modulus = 100;
   bool add = state.range(1);
 
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  uint64_t input2 = GenerateInsecureUniformRandomValue(0, modulus);
-  auto input3 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  uint64_t input2 = GenerateInsecureUniformIntRandomValue(0, modulus);
+  auto input3 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
 
   uint64_t* arg3 = add ? input3.data() : nullptr;
 
