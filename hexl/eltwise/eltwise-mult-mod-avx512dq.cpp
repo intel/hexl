@@ -74,6 +74,7 @@ void EltwiseMultModAVX512DQIntLoopUnroll(__m512i* vp_result,
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
+
     vp_operand1 += CoeffCount / avx512_64bit_count / threads * id;
     vp_operand2 += CoeffCount / avx512_64bit_count / threads * id;
     vp_result += CoeffCount / avx512_64bit_count / threads * id;
@@ -385,7 +386,6 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
-    std::cout << "ID " << id << std::endl;
     int threads = omp_get_num_threads();
     vp_operand1 += id * n / 8 / threads;
     vp_operand2 += id * n / 8 / threads;

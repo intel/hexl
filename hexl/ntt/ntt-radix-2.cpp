@@ -290,7 +290,6 @@ void ForwardTransformToBitReverseRadix2(
   uint64_t twice_modulus = modulus << 1;
   static const size_t base_ntt_size = 1024;
   if (n <= base_ntt_size) {  // Perform breadth-first NTT
-
     size_t t = (n >> 1);
     size_t W_idx = (1 << recursion_depth) + (recursion_half);
 
@@ -520,7 +519,6 @@ void ForwardTransformToBitReverseRadix2(
     }
 
   } else {  // Perform depth-first NTT via recursive call
-
     size_t t = (n >> 1);
     size_t W_idx = (1ULL << recursion_depth) + recursion_half;
     const uint64_t W = root_of_unity_powers[W_idx];
@@ -552,7 +550,7 @@ void ForwardTransformToBitReverseRadix2(
     }
 
     if (recursion_depth == 0) {
-      omp_set_num_threads(62);
+      omp_set_num_threads(2);
 
 #pragma omp parallel
       {
