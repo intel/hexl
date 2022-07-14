@@ -145,6 +145,7 @@ if (NOT CpuFeatures_FOUND)
   add_subdirectory(cmake/third-party/cpu-features)
 else()
   message(STATUS "CpuFeatures: found")
+  set_target_properties(CpuFeatures::cpu_features PROPERTIES IMPORTED_GLOBAL TRUE)
   add_library(cpu_features ALIAS CpuFeatures::cpu_features)
   get_target_property(
     CpuFeatures_INCLUDE_DIR
