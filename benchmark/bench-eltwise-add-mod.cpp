@@ -66,6 +66,58 @@ BENCHMARK(BM_EltwiseVectorVectorAddModAVX512)
     ->Args({65536})
     ->Args({131072})
     ->Args({262144});
+
+// state[0] is the degree
+static void BM_EltwiseVectorVectorAddModAVX512_TBB(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1152921504606877697;
+
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseAddModAVX512_TBB(output.data(), input1.data(), input2.data(),
+                            input_size, modulus);
+  }
+}
+
+BENCHMARK(BM_EltwiseVectorVectorAddModAVX512_TBB)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+// state[0] is the degree
+static void BM_EltwiseVectorVectorAddModAVX512_OMP(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1152921504606877697;
+
+  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseAddModAVX512_OMP(output.data(), input1.data(), input2.data(),
+                            input_size, modulus);
+  }
+}
+
+BENCHMARK(BM_EltwiseVectorVectorAddModAVX512_OMP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 //=================================================================

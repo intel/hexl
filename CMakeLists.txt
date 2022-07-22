@@ -10,6 +10,7 @@ include(CheckCXXCompilerFlag)
 include(CMakePackageConfigHelpers)
 
 set(HEXL_CMAKE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/hexl")
+list(APPEND CMAKE_MODULE_PATH "~/intel/oneapi/tbb/2021.6.0/lib/cmake/")
 list(APPEND CMAKE_MODULE_PATH "${HEXL_CMAKE_PATH}")
 include(hexl-util)
 
@@ -144,6 +145,14 @@ if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
+
+find_package(TBB)
+if (TBB_FOUND)
+  message(STATUS "ROCHA TBB found")
+  include_directories("~/intel/oneapi/tbb/2021.6.0/include/")
+  #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ltbb")
+  #set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ltbb")
 endif()
 
 find_package(CpuFeatures CONFIG)

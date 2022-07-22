@@ -13,6 +13,9 @@
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
 #include "hexl/util/util.hpp"
+#include "tbb/blocked_range.h"
+#include "tbb/parallel_for.h"
+#include "tbb/parallel_invoke.h"
 #include "util/util-internal.hpp"
 
 namespace intel {
