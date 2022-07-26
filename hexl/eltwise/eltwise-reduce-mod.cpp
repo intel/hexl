@@ -3,6 +3,8 @@
 
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
 
+#include <iostream>
+
 #include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "eltwise/eltwise-reduce-mod-internal.hpp"
 #include "hexl/logging/logging.hpp"
