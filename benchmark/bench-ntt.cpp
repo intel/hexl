@@ -215,6 +215,36 @@ BENCHMARK(BM_FwdNTT_AVX512IFMA_TBB)
     ->Args({65536})
     ->Args({131072})
     ->Args({262144});
+
+// state[0] is the degree
+static void BM_FwdNTT_AVX512IFMA_Flow(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus_bits = 49;
+  size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetAVX512Precon52RootOfUnityPowers();
+
+  for (auto _ : state) {
+    Recursive_FFT_TBB(input.data(), input.data(), ntt_size, modulus,
+                      root_of_unity.data(), precon_root_of_unity.data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512IFMA_Flow)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 // state[0] is the degree
