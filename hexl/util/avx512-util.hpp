@@ -5,7 +5,6 @@
 
 #include <immintrin.h>
 
-#include <iostream>
 #include <vector>
 
 #include "hexl/logging/logging.hpp"
@@ -474,16 +473,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
       // alpha - beta == 52, so we only need high 52 bits
       __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, q_barr_64);
       // Z = prod_lo - (p * q_hat)_lo
-      if (log2(q[0]) < 52) {
-        x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
-      } else {
-        x = _mm512_madd52lo_epu64(x_lo, q_hat, v_neg_mod);
-      }
-      std::cout << "ROCHA X = " << x[0] << " q_hat " << q_hat[0] << " q "
-                << q[0] << " prod_right_shift " << prod_right_shift
-                << std::endl;
-      // std::cout << "ROCHA q_barr_64 = " << q_barr_64[0] << " q_barr_52 " <<
-      // q_barr_52[0] << " prod_right_shift " << prod_right_shift << std::endl;
+      x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
     } else {
       __m512i rnd1_hi = _mm512_hexl_mulhi_epi<52>(x, q_barr_52);
       __m512i tmp1_times_mod = _mm512_hexl_mullo_epi<52>(rnd1_hi, q);

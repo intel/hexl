@@ -4,7 +4,6 @@
 #pragma once
 
 #include <functional>
-#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -77,7 +76,6 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
   if (input_mod_factor == modulus) {
-    std::cout << "ROCHA mod" << std::endl;
     if (output_mod_factor == 2) {
       for (size_t i = 0; i < n_tmp; i += 8) {
         __m512i v_op = _mm512_loadu_si512(v_operand);
