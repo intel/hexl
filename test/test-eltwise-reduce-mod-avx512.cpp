@@ -329,7 +329,7 @@ TEST(EltwiseReduceMod, AVX512_52_Big_0_1) {
 
   size_t length = 8;
 
-  for (size_t bits = 45; bits <= 52; ++bits) {
+  for (size_t bits = 45; bits <= 51; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
 #ifdef HEXL_DEBUG
     size_t num_trials = 10;
@@ -337,7 +337,7 @@ TEST(EltwiseReduceMod, AVX512_52_Big_0_1) {
     size_t num_trials = 1;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 1 << 63);
+      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 1ULL << 63);
       auto op2 = op1;
 
       std::vector<uint64_t> result1(length, 0);
