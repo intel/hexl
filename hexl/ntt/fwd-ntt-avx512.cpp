@@ -520,8 +520,8 @@ void ForwardTransformToBitReverseAVX512(
   }
 }
 
-const int THREADS = 9;
-const int CALLS = 4;
+const int THREADS = 6;
+const int CALLS = 2;
 
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512_MT(
@@ -736,6 +736,209 @@ void ForwardTransformToBitReverseAVX512_MT(
           recursion_depth + 1, recursion_half * 2 + 1);
     }
   }
+}
+
+class FFT_body {
+ private:
+  uint64_t* result;
+  const uint64_t* operand;
+  uint64_t size;
+  uint64_t modulus;
+  const uint64_t* root_of_unity_powers;
+  const uint64_t* precon_root_of_unity_powers;
+  uint64_t input_mod_factor;
+  uint64_t output_mod_factor;
+  uint64_t recursion_depth;
+  uint64_t recursion_half;
+
+ public:
+  FFT_body(uint64_t* res, const uint64_t* op, uint64_t n, uint64_t mod,
+           const uint64_t* unity_powers, const uint64_t* precon_unity_powers,
+           uint64_t in_mod_factor, uint64_t out_mod_factor, uint64_t rec_depth,
+           uint64_t rec_half)
+      : result(res),
+        operand(op),
+        size(n),
+        modulus(mod),
+        root_of_unity_powers(unity_powers),
+        precon_root_of_unity_powers(precon_unity_powers),
+        input_mod_factor(in_mod_factor),
+        output_mod_factor(out_mod_factor),
+        recursion_depth(rec_depth),
+        recursion_half(rec_half) {}
+  void operator()(tbb::flow::continue_msg) const {
+    // std::cout << "ROCHA Body Op" << std::endl;
+    ForwardTransformToBitReverseAVX512<52>(
+        result, result, size, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth, recursion_half);
+  }
+};
+
+void DepthFirst_FFT_TBB(uint64_t* result, const uint64_t* operand, uint64_t n,
+                        uint64_t modulus, const uint64_t* root_of_unity_powers,
+                        const uint64_t* precon_root_of_unity_powers,
+                        uint64_t recursion_depth, uint64_t recursion_half) {
+  uint64_t twice_mod = modulus << 1;
+
+  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
+
+  size_t t = (n >> 1);
+  size_t W_idx = (1ULL << recursion_depth) + recursion_half;
+  const uint64_t* W = &root_of_unity_powers[W_idx];
+  const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
+
+  FwdT8<52, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
+                   W_precon);
+}
+
+class DepthFirst_fft_body {
+ private:
+  uint64_t* result;
+  const uint64_t* operand;
+  uint64_t size;
+  uint64_t modulus;
+  const uint64_t* root_of_unity_powers;
+  const uint64_t* precon_root_of_unity_powers;
+  uint64_t recursion_depth;
+  uint64_t recursion_half;
+
+ public:
+  DepthFirst_fft_body(uint64_t* res, const uint64_t* op, uint64_t n,
+                      uint64_t mod, const uint64_t* unity_powers,
+                      const uint64_t* precon_unity_powers, uint64_t rec_depth,
+                      uint64_t rec_half)
+      : result(res),
+        operand(op),
+        size(n),
+        modulus(mod),
+        root_of_unity_powers(unity_powers),
+        precon_root_of_unity_powers(precon_unity_powers),
+        recursion_depth(rec_depth),
+        recursion_half(rec_half) {}
+  void operator()(tbb::flow::continue_msg) const {
+    // std::cout << "ROCHA DepthFirst Op" << std::endl;
+    DepthFirst_FFT_TBB(result, result, size, modulus, root_of_unity_powers,
+                       precon_root_of_unity_powers, recursion_depth,
+                       recursion_half);
+  }
+};
+
+void Recursive_FFT_TBB(uint64_t* result, const uint64_t* operand, uint64_t n,
+                       uint64_t modulus, const uint64_t* root_of_unity_powers,
+                       const uint64_t* precon_root_of_unity_powers,
+                       uint64_t input_mod_factor, uint64_t output_mod_factor) {
+  uint64_t recursion_depth = 0;
+
+  // std::cout << "\nROCHA Start" << std::endl;
+  tbb::task_arena arena(THREADS);
+  arena.execute([&] {
+    tbb::flow::graph my_g;
+    // tbb::flow::continue_node<tbb::flow::continue_msg> start(my_g);
+    // tbb::flow::continue_node<tbb::flow::continue_msg> *tmp = &start;
+    tbb::flow::continue_node<tbb::flow::continue_msg>*
+        nodes[(2ULL << CALLS) - 1];
+
+    int index = 0;
+    int last_index = index;
+    for (; recursion_depth < CALLS; ++recursion_depth) {
+      uint64_t branches = (1ULL << recursion_depth);
+      for (uint64_t recursion_half = 0;
+           recursion_half < (1ULL << recursion_depth); ++recursion_half) {
+        if (index != last_index) {
+          nodes[index] = new tbb::flow::continue_node<tbb::flow::continue_msg>(
+              my_g,
+              DepthFirst_fft_body(&result[recursion_half * n / branches],
+                                  &result[recursion_half * n / branches],
+                                  n / branches, modulus, root_of_unity_powers,
+                                  precon_root_of_unity_powers, recursion_depth,
+                                  recursion_half));
+          tbb::flow::make_edge(*nodes[last_index], *nodes[index]);
+        } else {
+          nodes[index] = new tbb::flow::continue_node<tbb::flow::continue_msg>(
+              my_g, DepthFirst_fft_body(result, operand, n, modulus,
+                                        root_of_unity_powers,
+                                        precon_root_of_unity_powers,
+                                        recursion_depth, recursion_half));
+        }
+
+        last_index = index++;
+      }
+    }
+    uint64_t leafs = (1ULL << recursion_depth);
+    for (uint64_t recursion_half = 0; recursion_half < leafs;
+         ++recursion_half) {
+      // std::cout << "ROCHA Final call" << std::endl;
+      nodes[index] = new tbb::flow::continue_node<tbb::flow::continue_msg>(
+          my_g, FFT_body(&result[recursion_half * n / leafs],
+                         &result[recursion_half * n / leafs], n / leafs,
+                         modulus, root_of_unity_powers,
+                         precon_root_of_unity_powers, input_mod_factor,
+                         output_mod_factor, recursion_depth, recursion_half));
+      tbb::flow::make_edge(*nodes[last_index], *nodes[index++]);
+    }
+
+    nodes[0]->try_put(tbb::flow::continue_msg());
+    // std::cout << "ROCHA Waiting" << std::endl;
+    my_g.wait_for_all();
+  });
+  /*
+  if (recursion_depth == 0) {
+    // omp_set_num_threads(14);
+    std::cout << "ROCHA Start" << std::endl;
+    tbb::task_arena arena(THREADS);
+    arena.execute([&] {
+      tbb::flow::graph my_g;
+      tbb::flow::continue_node<tbb::flow::continue_msg> depth_fft(my_g,
+        DepthFirst_fft_body(result, operand, n, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, recursion_depth, recursion_half));
+
+      Recursive_FFT_TBB(&my_g, &depth_fft,
+        result, result, n / 2, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, recursion_half * 2);
+      Recursive_FFT_TBB(&my_g, &depth_fft,
+        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, recursion_half * 2 + 1);
+
+      depth_fft.try_put(tbb::flow::continue_msg());
+      std::cout << "ROCHA Waiting" << std::endl;
+      my_g.wait_for_all();
+    });
+  } else if (recursion_depth < CALLS && n > 2048) {
+    std::cout << "ROCHA Call " << recursion_depth << " for half " <<
+  recursion_half << std::endl; tbb::flow::continue_node<tbb::flow::continue_msg>
+  depth_fft(*g, DepthFirst_fft_body(result, operand, n, modulus,
+  root_of_unity_powers, precon_root_of_unity_powers, recursion_depth,
+  recursion_half));
+
+    tbb::flow::make_edge(*start, depth_fft);
+
+    Recursive_FFT_TBB( g, &depth_fft,
+      result, result, n / 2, modulus, root_of_unity_powers,
+      precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+      recursion_depth + 1, recursion_half * 2);
+    Recursive_FFT_TBB(g, &depth_fft,
+      &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+      precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+      recursion_depth + 1, recursion_half * 2 + 1);
+  } else {
+    std::cout << "ROCHA Final call" << std::endl;
+    tbb::flow::continue_node<tbb::flow::continue_msg> fft_body_1(*g, 1,
+  FFT_body( result, result, n / 2, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, recursion_half * 2));
+
+    tbb::flow::continue_node<tbb::flow::continue_msg> fft_body_2(*g, FFT_body(
+        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+        recursion_depth + 1, recursion_half * 2 + 1));
+
+    tbb::flow::make_edge(*start, fft_body_1);
+    tbb::flow::make_edge(*start, fft_body_2);
+  }*/
 }
 
 template <int BitShift>
