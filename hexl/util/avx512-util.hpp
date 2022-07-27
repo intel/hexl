@@ -463,7 +463,7 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
       __m512i x_hi = _mm512_srli_epi64(x, static_cast<unsigned int>(52ULL));
       __m512i x_lo = ClearTopBits64<52>(x);
 
-      // c1 = floor(U / 2^{n + beta}) 1,125,899,906,842,624
+      // c1 = floor(U / 2^{n + beta})
       __m512i c1_lo =
           _mm512_srli_epi64(x_lo, static_cast<unsigned int>(prod_right_shift));
       __m512i c1_hi = _mm512_slli_epi64(

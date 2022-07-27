@@ -206,7 +206,7 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
     size_t num_trials = 100;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformRandomValues(length, 0, 8 * modulus);
+      auto op1 = GenerateInsecureUniformRandomValues(length, 0, 1ULL << 63);
       auto op2 = op1;
 
       std::vector<uint64_t> result1(length, 0);
