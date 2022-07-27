@@ -3,8 +3,6 @@
 
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
 
-#include <iostream>
-
 #include "eltwise/eltwise-reduce-mod-avx512.hpp"
 #include "eltwise/eltwise-reduce-mod-internal.hpp"
 #include "hexl/logging/logging.hpp"
@@ -101,7 +99,8 @@ void EltwiseReduceMod(uint64_t* result, const uint64_t* operand, uint64_t n,
   }
 
 #ifdef HEXL_HAS_AVX512IFMA
-  if (has_avx512ifma && modulus < (1ULL << 52)) {
+  if (has_avx512ifma && modulus < (1ULL << 52) &&
+      (modulus < (1ULL << 51) || input_mod_factor <= 4)) {
     EltwiseReduceModAVX512<52>(result, operand, n, modulus, input_mod_factor,
                                output_mod_factor);
     return;

@@ -4,7 +4,6 @@
 #pragma once
 
 #include <functional>
-#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -165,8 +164,7 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
 
   uint64_t R = (1ULL << r);
-  HEXL_CHECK(std::gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
-             1);
+  HEXL_CHECK(std::gcd(modulus, R) == 1, "gcd(modulus, R) != 1");
   HEXL_CHECK(R > modulus, "Needs R bigger than q.");
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
@@ -250,8 +248,7 @@ void EltwiseMontgomeryFormInAVX512(uint64_t* result, const uint64_t* a,
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
 
   uint64_t R = (1ULL << r);
-  HEXL_CHECK(std::gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
-             1);
+  HEXL_CHECK(std::gcd(modulus, R) == 1, "gcd(modulus, R) != 1");
   HEXL_CHECK(R > modulus, "Needs R bigger than q.");
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones
@@ -331,8 +328,7 @@ void EltwiseMontgomeryFormOutAVX512(uint64_t* result, const uint64_t* a,
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
 
   uint64_t R = (1ULL << r);
-  HEXL_CHECK(std::gcd(static_cast<int64_t>(modulus), static_cast<int64_t>(R)),
-             1);
+  HEXL_CHECK(std::gcd(modulus, R) == 1, "gcd(modulus, R) != 1");
   HEXL_CHECK(R > modulus, "Needs R bigger than q.");
 
   // mod_R_mask[63:r] all zeros & mod_R_mask[r-1:0] all ones

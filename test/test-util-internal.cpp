@@ -12,14 +12,14 @@
 namespace intel {
 namespace hexl {
 
-TEST(GenerateInsecureUniformRandomValue, 10) {
+TEST(GenerateInsecureUniformIntRandomValue, 10) {
   uint64_t max_value = 10;
   uint64_t min_value = 5;
 
   bool reached_max = false;
   bool reached_min = false;
   for (size_t i = 0; i < 1000; ++i) {
-    uint64_t x = GenerateInsecureUniformRandomValue(min_value, max_value);
+    uint64_t x = GenerateInsecureUniformIntRandomValue(min_value, max_value);
     EXPECT_LT(x, max_value);
     EXPECT_GE(x, min_value);
     if (x == min_value) {
@@ -33,13 +33,13 @@ TEST(GenerateInsecureUniformRandomValue, 10) {
   EXPECT_TRUE(reached_max);
 }
 
-TEST(GenerateInsecureUniformRandomValues, 100) {
+TEST(GenerateInsecureUniformIntRandomValues, 100) {
   uint64_t max_value = 100;
   uint64_t min_value = 10;
   uint64_t length = 1024;
 
   AlignedVector64<uint64_t> values =
-      GenerateInsecureUniformRandomValues(length, min_value, max_value);
+      GenerateInsecureUniformIntRandomValues(length, min_value, max_value);
   EXPECT_EQ(values.size(), length);
   EXPECT_TRUE(std::all_of(values.begin(), values.end(), [&](uint64_t x) {
     return (x >= min_value) && (x < max_value);
@@ -48,6 +48,37 @@ TEST(GenerateInsecureUniformRandomValues, 100) {
                           [&](uint64_t x) { return x = min_value; }));
   EXPECT_TRUE(std::any_of(values.begin(), values.end(),
                           [&](uint64_t x) { return x == max_value - 1; }));
+}
+
+TEST(GenerateInsecureUniformRealRandomValue, 1_plus_2_exp_minus_15) {
+  double_t max_value = 1.000000000000002 * std::numeric_limits<double_t>::min();
+  double_t min_value = std::numeric_limits<double_t>::min();
+
+  bool reached_min = false;
+  for (size_t i = 0; i < 1000; ++i) {
+    double_t x = GenerateInsecureUniformRealRandomValue(min_value, max_value);
+    EXPECT_LT(x, max_value);
+    EXPECT_GE(x, min_value);
+    if (x == min_value) {
+      reached_min = true;
+    }
+  }
+  EXPECT_TRUE(reached_min);
+}
+
+TEST(GenerateInsecureUniformRealRandomValues, 1_plus_2_exp_minus_14) {
+  double_t max_value = 1.00000000000002 * std::numeric_limits<double_t>::min();
+  double_t min_value = std::numeric_limits<double_t>::min();
+  uint64_t length = 1024;
+
+  AlignedVector64<double_t> values =
+      GenerateInsecureUniformRealRandomValues(length, min_value, max_value);
+  EXPECT_EQ(values.size(), length);
+  EXPECT_TRUE(std::all_of(values.begin(), values.end(), [&](double_t x) {
+    return (x >= min_value) && (x < max_value);
+  }));
+  EXPECT_TRUE(std::any_of(values.begin(), values.end(),
+                          [&](double_t x) { return x = min_value; }));
 }
 
 }  // namespace hexl
