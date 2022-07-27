@@ -22,6 +22,10 @@ if (HEXL_EXPERIMENTAL)
         experimental/seal/dyadic-multiply-internal.cpp
         experimental/seal/key-switch-internal.cpp
         experimental/misc/lr-mat-vec-mult.cpp
+        experimental/fft-like/fft-like.cpp
+        experimental/fft-like/fft-like-native.cpp
+        experimental/fft-like/fwd-fft-like-avx512.cpp
+        experimental/fft-like/inv-fft-like-avx512.cpp
     )
 endif()
 
