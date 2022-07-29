@@ -36,6 +36,13 @@ template void ForwardTransformToBitReverseAVX512_MT<NTT::s_ifma_shift_bits>(
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
 
+template void ForwardTransformToBitReverseAVX512_MTN<NTT::s_ifma_shift_bits>(
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half);
+
 template void ForwardTransformToBitReverseAVX512_TBB<NTT::s_ifma_shift_bits>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
@@ -66,6 +73,13 @@ template void ForwardTransformToBitReverseAVX512_MT<32>(
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
 
+template void ForwardTransformToBitReverseAVX512_MTN<32>(
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half);
+
 template void ForwardTransformToBitReverseAVX512_TBB<32>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
@@ -74,6 +88,13 @@ template void ForwardTransformToBitReverseAVX512_TBB<32>(
     uint64_t recursion_half);
 
 template void ForwardTransformToBitReverseAVX512_MT<NTT::s_default_shift_bits>(
+    uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half);
+
+template void ForwardTransformToBitReverseAVX512_MTN<NTT::s_default_shift_bits>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
@@ -263,7 +284,6 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
            const uint64_t* W_precon) {
   size_t j1 = 0;
 
-  // std::cout << "t = " << t << " m = " << m << std::endl;
   HEXL_LOOP_UNROLL_4
   for (size_t i = 0; i < m; i++) {
     // Referencing operand
@@ -285,33 +305,6 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
     __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
 
     // assume 8 | t
-    // std::cout << "t/8 = " << t/8 << std::endl;
-
-    /*
-    if (m == 1) {
-      std::cout << "t/8 = " << t/8 << " m " << m << std::endl;
-      std::thread th_a (FwdT8Thread<BitShift, InputLessThanMod>,
-                        v_X_op_pt, v_Y_op_pt, v_X_r_pt, v_Y_r_pt, t/4, 4,
-                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
-      std::thread th_b (FwdT8Thread<BitShift, InputLessThanMod>,
-                        v_X_op_pt + 1 , v_Y_op_pt + 1,
-                        v_X_r_pt + 1, v_Y_r_pt + 1, t/4, 4,
-                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
-      std::thread th_c (FwdT8Thread<BitShift, InputLessThanMod>,
-                        v_X_op_pt + 2, v_Y_op_pt + 2,
-                        v_X_r_pt + 2, v_Y_r_pt + 2, t/4, 4,
-                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
-      std::thread th_d (FwdT8Thread<BitShift, InputLessThanMod>,
-                        v_X_op_pt + 3, v_Y_op_pt + 3,
-                        v_X_r_pt + 3, v_Y_r_pt + 3, t/4, 4,
-                        v_W, v_W_precon, v_neg_modulus, v_twice_mod);
-      th_a.join();
-      th_b.join();
-      th_c.join();
-      th_d.join();                // pauses until first finishes
-
-    } else {
-    */
     for (size_t j = t / 8; j > 0; --j) {
       __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
       __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
@@ -326,7 +319,127 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
       v_X_op_pt++;
       v_Y_op_pt++;
     }
-    //}
+
+    j1 += (t << 1);
+  }
+}
+
+// Out-of-place implementation
+template <int BitShift, bool InputLessThanMod>
+void FwdT8_MT(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
+              __m512i v_twice_mod, uint64_t t, uint64_t m, const uint64_t* W,
+              const uint64_t* W_precon) {
+  size_t j1 = 0;
+
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = 0; i < m; i++) {
+    // Referencing operand
+    const uint64_t* X_op = operand + j1;
+    const uint64_t* Y_op = X_op + t;
+
+    const __m512i* v_X_op_pt = reinterpret_cast<const __m512i*>(X_op);
+    const __m512i* v_Y_op_pt = reinterpret_cast<const __m512i*>(Y_op);
+
+    // Referencing result
+    uint64_t* X_r = result + j1;
+    uint64_t* Y_r = X_r + t;
+
+    __m512i* v_X_r_pt = reinterpret_cast<__m512i*>(X_r);
+    __m512i* v_Y_r_pt = reinterpret_cast<__m512i*>(Y_r);
+
+    // Weights and weights' preconditions
+    __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
+    __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
+
+    // assume 8 | t
+    int threads = 4;
+
+#pragma omp task
+    {
+      uint64_t offset = 3 * t / 8 / threads;
+      v_X_op_pt += offset;
+      v_Y_op_pt += offset;
+      v_X_r_pt += offset;
+      v_Y_r_pt += offset;
+      for (size_t j = t / 8 / threads; j > 0; --j) {
+        __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+        __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+
+        FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                 v_neg_modulus, v_twice_mod);
+
+        _mm512_storeu_si512(v_X_r_pt++, v_X);
+        _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+        // Increase operand pointers as well
+        v_X_op_pt++;
+        v_Y_op_pt++;
+      }
+    }
+
+#pragma omp task
+    {
+      uint64_t offset = 2 * t / 8 / threads;
+      v_X_op_pt += offset;
+      v_Y_op_pt += offset;
+      v_X_r_pt += offset;
+      v_Y_r_pt += offset;
+      for (size_t j = t / 8 / threads; j > 0; --j) {
+        __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+        __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+
+        FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                 v_neg_modulus, v_twice_mod);
+
+        _mm512_storeu_si512(v_X_r_pt++, v_X);
+        _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+        // Increase operand pointers as well
+        v_X_op_pt++;
+        v_Y_op_pt++;
+      }
+    }
+
+#pragma omp task
+    {
+      uint64_t offset = t / 8 / threads;
+      v_X_op_pt += offset;
+      v_Y_op_pt += offset;
+      v_X_r_pt += offset;
+      v_Y_r_pt += offset;
+      for (size_t j = t / 8 / threads; j > 0; --j) {
+        __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+        __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+
+        FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                 v_neg_modulus, v_twice_mod);
+
+        _mm512_storeu_si512(v_X_r_pt++, v_X);
+        _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+        // Increase operand pointers as well
+        v_X_op_pt++;
+        v_Y_op_pt++;
+      }
+    }
+
+#pragma omp task
+    {
+      for (size_t j = t / 8 / threads; j > 0; --j) {
+        __m512i v_X = _mm512_loadu_si512(v_X_op_pt);
+        __m512i v_Y = _mm512_loadu_si512(v_Y_op_pt);
+
+        FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                 v_neg_modulus, v_twice_mod);
+
+        _mm512_storeu_si512(v_X_r_pt++, v_X);
+        _mm512_storeu_si512(v_Y_r_pt++, v_Y);
+
+        // Increase operand pointers as well
+        v_X_op_pt++;
+        v_Y_op_pt++;
+      }
+    }
 
     j1 += (t << 1);
   }
@@ -492,21 +605,7 @@ void ForwardTransformToBitReverseAVX512(
 
     FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
                            W_precon);
-    /*
-    if (recursion_depth == 3) {
-      std::thread th_a (ForwardTransformToBitReverseAVX512<BitShift>,
-          result, result, n / 2, modulus, root_of_unity_powers,
-          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-          recursion_depth + 1, recursion_half * 2);
-      std::thread th_b (ForwardTransformToBitReverseAVX512<BitShift>,
-          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-          recursion_depth + 1, recursion_half * 2 + 1);
 
-      th_a.join();
-      th_b.join();
-    }else {
-    */
     ForwardTransformToBitReverseAVX512<BitShift>(
         result, result, n / 2, modulus, root_of_unity_powers,
         precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
@@ -520,7 +619,7 @@ void ForwardTransformToBitReverseAVX512(
   }
 }
 
-const int THREADS = 6;
+const int THREADS = 4;
 const int CALLS = 2;
 
 template <int BitShift>
@@ -719,6 +818,220 @@ void ForwardTransformToBitReverseAVX512_MT(
 #pragma omp task
       {
         ForwardTransformToBitReverseAVX512_MT<BitShift>(
+            &result[n / 2], &result[n / 2], n / 2, modulus,
+            root_of_unity_powers, precon_root_of_unity_powers, input_mod_factor,
+            output_mod_factor, recursion_depth + 1, recursion_half * 2 + 1);
+      }
+      // #pragma omp taskwait
+    } else {
+      ForwardTransformToBitReverseAVX512_MT<BitShift>(
+          result, result, n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2);
+
+      ForwardTransformToBitReverseAVX512_MT<BitShift>(
+          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2 + 1);
+    }
+  }
+}
+
+template <int BitShift>
+void ForwardTransformToBitReverseAVX512_MTN(
+    uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
+    const uint64_t* root_of_unity_powers,
+    const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
+    uint64_t output_mod_factor, uint64_t recursion_depth,
+    uint64_t recursion_half) {
+  HEXL_CHECK(NTT::CheckArguments(n, modulus), "");
+  HEXL_CHECK(modulus < NTT::s_max_fwd_modulus(BitShift),
+             "modulus " << modulus << " too large for BitShift " << BitShift
+                        << " => maximum value "
+                        << NTT::s_max_fwd_modulus(BitShift));
+  HEXL_CHECK_BOUNDS(precon_root_of_unity_powers, n, MaximumValue(BitShift),
+                    "precon_root_of_unity_powers too large");
+  HEXL_CHECK_BOUNDS(operand, n, MaximumValue(BitShift), "operand too large");
+  // Skip input bound checking for recursive steps
+  HEXL_CHECK_BOUNDS(operand, (recursion_depth == 0) ? n : 0,
+                    input_mod_factor * modulus,
+                    "operand larger than input_mod_factor * modulus ("
+                        << input_mod_factor << " * " << modulus << ")");
+  HEXL_CHECK(n >= 16,
+             "Don't support small transforms. Need n >= 16, got n = " << n);
+  HEXL_CHECK(
+      input_mod_factor == 1 || input_mod_factor == 2 || input_mod_factor == 4,
+      "input_mod_factor must be 1, 2, or 4; got " << input_mod_factor);
+  HEXL_CHECK(output_mod_factor == 1 || output_mod_factor == 4,
+             "output_mod_factor must be 1 or 4; got " << output_mod_factor);
+
+  uint64_t twice_mod = modulus << 1;
+
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
+  __m512i v_neg_modulus = _mm512_set1_epi64(-static_cast<int64_t>(modulus));
+  __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
+
+  HEXL_VLOG(5, "root_of_unity_powers " << std::vector<uint64_t>(
+                   root_of_unity_powers, root_of_unity_powers + n))
+  HEXL_VLOG(5,
+            "precon_root_of_unity_powers " << std::vector<uint64_t>(
+                precon_root_of_unity_powers, precon_root_of_unity_powers + n));
+  HEXL_VLOG(5, "operand " << std::vector<uint64_t>(operand, operand + n));
+
+  static const size_t base_ntt_size = 1024;
+  if (n <= base_ntt_size) {  // Perform breadth-first NTT
+    size_t t = (n >> 1);
+    size_t m = 1;
+    size_t W_idx = (m << recursion_depth) + (recursion_half * m);
+
+    // Copy for out-of-place in case m is <= base_ntt_size from start
+    if (result != operand) {
+      std::memcpy(result, operand, n * sizeof(uint64_t));
+    }
+
+    // First iteration assumes input in [0,p)
+    if (m < (n >> 3)) {
+      const uint64_t* W = &root_of_unity_powers[W_idx];
+      const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
+
+      if ((input_mod_factor <= 2) && (recursion_depth == 0)) {
+        FwdT8<BitShift, true>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                              W, W_precon);
+      } else {
+        FwdT8<BitShift, false>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                               W, W_precon);
+      }
+
+      t >>= 1;
+      m <<= 1;
+      W_idx <<= 1;
+    }
+    for (; m < (n >> 3); m <<= 1) {
+      const uint64_t* W = &root_of_unity_powers[W_idx];
+      const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
+      FwdT8<BitShift, false>(result, result, v_neg_modulus, v_twice_mod, t, m,
+                             W, W_precon);
+      t >>= 1;
+      W_idx <<= 1;
+    }
+
+    // Do T=4, T=2, T=1 separately
+    {
+      // Correction step needed due to extra copies of roots of unity in the
+      // AVX512 vectors loaded for FwdT2 and FwdT4
+      auto compute_new_W_idx = [&](size_t idx) {
+        // Originally, from root of unity vector index to loop:
+        // [0, N/8) => FwdT8
+        // [N/8, N/4) => FwdT4
+        // [N/4, N/2) => FwdT2
+        // [N/2, N) => FwdT1
+        // The new mapping from AVX512 root of unity vector index to loop:
+        // [0, N/8) => FwdT8
+        // [N/8, 5N/8) => FwdT4
+        // [5N/8, 9N/8) => FwdT2
+        // [9N/8, 13N/8) => FwdT1
+        size_t N = n << recursion_depth;
+
+        // FwdT8 range
+        if (idx <= N / 8) {
+          return idx;
+        }
+        // FwdT4 range
+        if (idx <= N / 4) {
+          return (idx - N / 8) * 4 + (N / 8);
+        }
+        // FwdT2 range
+        if (idx <= N / 2) {
+          return (idx - N / 4) * 2 + (5 * N / 8);
+        }
+        // FwdT1 range
+        return idx + (5 * N / 8);
+      };
+
+      size_t new_W_idx = compute_new_W_idx(W_idx);
+      const uint64_t* W = &root_of_unity_powers[new_W_idx];
+      const uint64_t* W_precon = &precon_root_of_unity_powers[new_W_idx];
+      FwdT4<BitShift>(result, v_neg_modulus, v_twice_mod, m, W, W_precon);
+
+      m <<= 1;
+      W_idx <<= 1;
+      new_W_idx = compute_new_W_idx(W_idx);
+      W = &root_of_unity_powers[new_W_idx];
+      W_precon = &precon_root_of_unity_powers[new_W_idx];
+      FwdT2<BitShift>(result, v_neg_modulus, v_twice_mod, m, W, W_precon);
+
+      m <<= 1;
+      W_idx <<= 1;
+      new_W_idx = compute_new_W_idx(W_idx);
+      W = &root_of_unity_powers[new_W_idx];
+      W_precon = &precon_root_of_unity_powers[new_W_idx];
+      FwdT1<BitShift>(result, v_neg_modulus, v_twice_mod, m, W, W_precon);
+    }
+
+    if (output_mod_factor == 1) {
+      // n power of two at least 8 => n divisible by 8
+      HEXL_CHECK(n % 8 == 0, "n " << n << " not a power of 2");
+      __m512i* v_X_pt = reinterpret_cast<__m512i*>(result);
+      for (size_t i = 0; i < n; i += 8) {
+        __m512i v_X = _mm512_loadu_si512(v_X_pt);
+
+        // Reduce from [0, 4q) to [0, q)
+        v_X = _mm512_hexl_small_mod_epu64(v_X, v_twice_mod);
+        v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
+
+        HEXL_CHECK_BOUNDS(ExtractValues(v_X).data(), 8, modulus,
+                          "v_X exceeds bound " << modulus);
+
+        _mm512_storeu_si512(v_X_pt, v_X);
+
+        ++v_X_pt;
+      }
+    }
+  } else {
+    // Perform depth-first NTT via recursive call
+    size_t t = (n >> 1);
+    size_t W_idx = (1ULL << recursion_depth) + recursion_half;
+    const uint64_t* W = &root_of_unity_powers[W_idx];
+    const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
+
+    FwdT8_MT<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1,
+                              W, W_precon);
+
+    if (recursion_depth == 0) {
+      omp_set_num_threads(THREADS);
+#pragma omp parallel
+      {
+#pragma omp single  // nowait
+        {
+#pragma omp task
+          {
+            ForwardTransformToBitReverseAVX512_MTN<BitShift>(
+                result, result, n / 2, modulus, root_of_unity_powers,
+                precon_root_of_unity_powers, input_mod_factor,
+                output_mod_factor, recursion_depth + 1, recursion_half * 2);
+          }
+#pragma omp task
+          {
+            ForwardTransformToBitReverseAVX512_MTN<BitShift>(
+                &result[n / 2], &result[n / 2], n / 2, modulus,
+                root_of_unity_powers, precon_root_of_unity_powers,
+                input_mod_factor, output_mod_factor, recursion_depth + 1,
+                recursion_half * 2 + 1);
+          }
+          // #pragma omp taskwait
+        }
+      }
+    } else if (recursion_depth < CALLS) {
+#pragma omp task
+      {
+        ForwardTransformToBitReverseAVX512_MTN<BitShift>(
+            result, result, n / 2, modulus, root_of_unity_powers,
+            precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+            recursion_depth + 1, recursion_half * 2);
+      }
+#pragma omp task
+      {
+        ForwardTransformToBitReverseAVX512_MTN<BitShift>(
             &result[n / 2], &result[n / 2], n / 2, modulus,
             root_of_unity_powers, precon_root_of_unity_powers, input_mod_factor,
             output_mod_factor, recursion_depth + 1, recursion_half * 2 + 1);
