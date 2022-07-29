@@ -27,7 +27,7 @@ static void BM_FwdNTTNativeRadix2InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
@@ -53,7 +53,7 @@ static void BM_FwdNTTNativeRadix2Copy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   AlignedVector64<uint64_t> output(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
@@ -80,7 +80,7 @@ static void BM_FwdNTTNativeRadix4InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
@@ -102,7 +102,7 @@ static void BM_FwdNTTNativeRadix4Copy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   AlignedVector64<uint64_t> output(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
@@ -129,7 +129,7 @@ static void BM_FwdNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
   size_t modulus_bits = 49;
   size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity =
@@ -192,7 +192,7 @@ static void BM_FwdNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
   size_t modulus_bits = 49;
   size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity =
@@ -262,7 +262,7 @@ static void BM_FwdNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   size_t modulus_bits = 29;
   size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity =
@@ -326,7 +326,7 @@ static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   size_t modulus_bits = 55;
   size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity =
@@ -391,7 +391,7 @@ static void BM_FwdNTTInPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 61, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
@@ -412,7 +412,7 @@ static void BM_FwdNTTCopy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   AlignedVector64<uint64_t> output(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
@@ -433,7 +433,7 @@ static void BM_InvNTTInPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   for (auto _ : state) {
@@ -454,7 +454,7 @@ static void BM_InvNTTCopy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   AlignedVector64<uint64_t> output(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
@@ -477,7 +477,7 @@ static void BM_InvNTTNativeRadix2InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
@@ -502,7 +502,7 @@ static void BM_InvNTTNativeRadix2Copy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   AlignedVector64<uint64_t> output(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
@@ -528,7 +528,7 @@ static void BM_InvNTTNativeRadix4InPlace(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
@@ -553,7 +553,7 @@ static void BM_InvNTTNativeRadix4Copy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 45, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   AlignedVector64<uint64_t> output(ntt_size, 1);
   NTT ntt(ntt_size, modulus);
 
@@ -581,7 +581,7 @@ static void BM_InvNTT_AVX512IFMA(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 49, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
@@ -638,7 +638,7 @@ static void BM_InvNTT_AVX512IFMALazy(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus = GeneratePrimes(1, 49, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
@@ -700,7 +700,7 @@ static void BM_InvNTT_AVX512DQ_32(benchmark::State& state) {  //  NOLINT
   uint64_t output_mod_factor = state.range(1);
   size_t modulus = GeneratePrimes(1, 29, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();
@@ -759,7 +759,7 @@ static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   uint64_t output_mod_factor = state.range(1);
   size_t modulus = GeneratePrimes(1, 61, true, ntt_size)[0];
 
-  auto input = GenerateInsecureUniformRandomValues(ntt_size, 0, modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
   NTT ntt(ntt_size, modulus);
 
   const AlignedVector64<uint64_t> root_of_unity = ntt.GetInvRootOfUnityPowers();

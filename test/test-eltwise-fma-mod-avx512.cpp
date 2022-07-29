@@ -164,11 +164,11 @@ TEST(EltwiseFMAMod, AVX512DQ) {
 #endif
 
       for (size_t trial = 0; trial < num_trials; ++trial) {
-        auto arg1 = GenerateInsecureUniformRandomValues(
+        auto arg1 = GenerateInsecureUniformIntRandomValues(
             length, 0, input_mod_factor * modulus);
-        uint64_t arg2 =
-            GenerateInsecureUniformRandomValue(0, input_mod_factor * modulus);
-        auto arg3 = GenerateInsecureUniformRandomValues(
+        uint64_t arg2 = GenerateInsecureUniformIntRandomValue(
+            0, input_mod_factor * modulus);
+        auto arg3 = GenerateInsecureUniformIntRandomValues(
             length, 0, input_mod_factor * modulus);
 
         std::vector<uint64_t> out_default(length, 0);
@@ -229,10 +229,10 @@ TEST(EltwiseFMAMod, AVX512IFMA) {
   for (size_t bits = 48; bits <= 51; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     for (size_t trial = 0; trial < 1000; ++trial) {
-      auto arg1 = GenerateInsecureUniformRandomValues(
+      auto arg1 = GenerateInsecureUniformIntRandomValues(
           length, 0, input_mod_factor * modulus);
-      uint64_t arg2 = GenerateInsecureUniformRandomValue(0, modulus);
-      auto arg3 = GenerateInsecureUniformRandomValues(
+      uint64_t arg2 = GenerateInsecureUniformIntRandomValue(0, modulus);
+      auto arg3 = GenerateInsecureUniformIntRandomValues(
           length, 0, input_mod_factor * modulus);
 
       auto arg1a = arg1;

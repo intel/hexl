@@ -121,10 +121,10 @@ TEST(EltwiseMultMod, avx512dqint_small) {
   uint64_t modulus = (1ULL << 53) + 7;
 
   for (size_t length = 1024; length <= 32768; length *= 2) {
-    auto op1 = GenerateInsecureUniformRandomValues(length, 0,
-                                                   input_mod_factor * modulus);
-    auto op2 = GenerateInsecureUniformRandomValues(length, 0,
-                                                   input_mod_factor * modulus);
+    auto op1 = GenerateInsecureUniformIntRandomValues(
+        length, 0, input_mod_factor * modulus);
+    auto op2 = GenerateInsecureUniformIntRandomValues(
+        length, 0, input_mod_factor * modulus);
 
     std::vector<uint64_t> out_avx(length, 0);
     std::vector<uint64_t> out_native(length, 0);
@@ -162,10 +162,10 @@ TEST(EltwiseMultMod, avx512dqint_big) {
 
         size_t num_trials = 1;
         for (size_t trial = 0; trial < num_trials; ++trial) {
-          auto op1 =
-              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
-          auto op2 =
-              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
+          auto op1 = GenerateInsecureUniformIntRandomValues(length, 0,
+                                                            data_upper_bound);
+          auto op2 = GenerateInsecureUniformIntRandomValues(length, 0,
+                                                            data_upper_bound);
 
           op1[0] = data_upper_bound - 1;
           op2[0] = data_upper_bound - 1;
@@ -235,8 +235,8 @@ TEST(EltwiseMultModMont_EConv, avx512dqint_big) {
   std::vector<uint64_t> rs2(length, 0);
 
   uint64_t modulus = (1ULL << 60) + 7;  // 1152921504606846983
-  auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
-  auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
+  auto op2 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
 
   int r = 61;  // R = 2305843009213693952
   // mod(2305843009213693952*2305843009213693952;1152921504606846983)
@@ -264,8 +264,8 @@ TEST(EltwiseMultModMont_NoConv, avx512dqint_big) {
   std::vector<uint64_t> rs2(length, 0);
 
   uint64_t modulus = 2305843009213693951;
-  auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
-  auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
+  auto op2 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
 
   int r = 61;  // R = 2305843009213693952
   uint64_t neg_inv_mod = HenselLemma2adicRoot(r, modulus);
@@ -308,10 +308,10 @@ TEST(EltwiseMultMod, avx512ifma_big) {
         size_t num_trials = 10;
 #endif
         for (size_t trial = 0; trial < num_trials; ++trial) {
-          auto op1 =
-              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
-          auto op2 =
-              GenerateInsecureUniformRandomValues(length, 0, data_upper_bound);
+          auto op1 = GenerateInsecureUniformIntRandomValues(length, 0,
+                                                            data_upper_bound);
+          auto op2 = GenerateInsecureUniformIntRandomValues(length, 0,
+                                                            data_upper_bound);
 
           op1[0] = data_upper_bound - 1;
           op2[0] = data_upper_bound - 1;
@@ -358,8 +358,8 @@ TEST(EltwiseMultModMont, avx512ifmaint_big) {
   std::vector<uint64_t> rs3(length, 0);
 
   uint64_t modulus = (1ULL << 49) + 7;  // 562949953421319
-  auto op1 = GenerateInsecureUniformRandomValues(length, 0, modulus);
-  auto op2 = GenerateInsecureUniformRandomValues(length, 0, modulus);
+  auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
+  auto op2 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
 
   int r = 50;  // R = 1125899906842624
   // mod(1125899906842624*1125899906842624;562949953421319)
