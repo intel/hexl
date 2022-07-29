@@ -31,6 +31,12 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(bench_hexl PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
+find_package(TBB)
+if (TBB_FOUND)
+  message(STATUS "ROCHA TBB found")
+  target_link_libraries(bench_hexl PUBLIC TBB::tbb)
+endif()
+
 target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads)
 if (HEXL_DEBUG)
     target_link_libraries(bench_hexl PRIVATE easyloggingpp)
