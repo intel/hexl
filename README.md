@@ -365,7 +365,7 @@ The Intel contributors to this project, sorted by last name, are
   - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
-  - [Jose Rojas](https://www.linkedin.com/in/joserochh/) (Lead)
+  - [Jose Rojas](https://www.linkedin.com/in/joserochh/) (lead)
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
 
 In addition to the Intel contributors listed, we are also grateful to
