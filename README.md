@@ -358,13 +358,14 @@ The Intel contributors to this project, sorted by last name, are
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
-  - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/) (lead)
+  - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
   - [Sergey Ivanov](https://www.linkedin.com/in/sergey-ivanov-451b72195/)
   - [Akshaya Jagannadharao](https://www.linkedin.com/in/akshaya-jagannadharao/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
+  - [Jose Rojas](https://www.linkedin.com/in/joserochh/) (lead)
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
 
 In addition to the Intel contributors listed, we are also grateful to
