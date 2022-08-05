@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # target_link_options and cmake -S . -B build require cmake 3.13
