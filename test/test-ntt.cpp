@@ -435,7 +435,7 @@ TEST_P(NttNativeTest, ForwardRadix4Random) {
 }
 
 TEST_P(NttNativeTest, ForwardRadix2Random) {
-  auto input = GenerateInsecureUniformRandomValues(m_N, 0, m_modulus);
+  auto input = GenerateInsecureUniformIntRandomValues(m_N, 0, m_modulus);
   auto input_radix2 = input;
 
   ForwardTransformToBitReverseRadix2(

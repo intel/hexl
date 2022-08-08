@@ -73,8 +73,8 @@ static void BM_EltwiseVectorVectorAddModAVX512_TBB(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {
@@ -99,8 +99,8 @@ static void BM_EltwiseVectorVectorAddModAVX512_OMP(
   size_t input_size = state.range(0);
   size_t modulus = 1152921504606877697;
 
-  auto input1 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
-  auto input2 = GenerateInsecureUniformRandomValues(input_size, 0, modulus);
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
 
   for (auto _ : state) {

@@ -619,8 +619,8 @@ void ForwardTransformToBitReverseAVX512(
   }
 }
 
-const int THREADS = 4;
-const int CALLS = 2;
+const int THREADS = 14;
+const int CALLS = 4;
 
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512_MT(

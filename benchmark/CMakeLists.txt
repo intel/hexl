@@ -24,7 +24,15 @@ if (HEXL_EXPERIMENTAL)
     list(APPEND SRC
       bench-fft-like.cpp
     )
+endif()
 
+add_executable(bench_hexl ${SRC})
+
+target_include_directories(bench_hexl PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${HEXL_SRC_ROOT_DIR} # Private headers
+    )
+    
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
 #    message(STATUS "OpenMP: pre-installed OpenMP found")
@@ -42,8 +50,6 @@ if (HEXL_DEBUG)
     target_link_libraries(bench_hexl PRIVATE easyloggingpp)
 endif()
 
-add_executable(bench_hexl ${SRC})
-
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(bench_hexl PRIVATE -Wall -Wextra -march=native -O3 -fopenmp)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -52,11 +58,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         /wd5105 # warning C5105: macro expansion producing 'defined' has undefined behavior
     )
 endif()
-
-target_include_directories(bench_hexl PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${HEXL_SRC_ROOT_DIR} # Private headers
-    )
 
 target_link_libraries(bench_hexl PRIVATE hexl benchmark::benchmark Threads::Threads)
 if (HEXL_DEBUG)
