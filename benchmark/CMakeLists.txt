@@ -42,6 +42,13 @@ target_include_directories(bench_hexl PRIVATE
     ${HEXL_SRC_ROOT_DIR} # Private headers
     )
 
+add_executable(bench_hexl ${SRC})
+
+target_include_directories(bench_hexl PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${HEXL_SRC_ROOT_DIR} # Private headers
+    )
+    
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
 #    message(STATUS "OpenMP: pre-installed OpenMP found")

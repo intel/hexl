@@ -123,7 +123,7 @@ static void BM_EltwiseReduceModAVX512_MT(benchmark::State& state) {  //  NOLINT
   size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
+      GenerateInsecureUniformIntRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -183,7 +183,7 @@ static void BM_EltwiseReduceModAVX512BitShift64_MT(
   size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
+      GenerateInsecureUniformIntRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 2;
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -243,7 +243,7 @@ static void BM_EltwiseReduceModAVX512BitShift52_MT(
   size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, 100 * modulus);
+      GenerateInsecureUniformIntRandomValues(input_size, 0, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 2;
   AlignedVector64<uint64_t> output(input_size, 0);
@@ -302,7 +302,7 @@ static void BM_EltwiseReduceModAVX512BitShift52GT_MT(
   size_t input_size = state.range(0);
   size_t modulus = 0xffffffffffc0001ULL;
 
-  auto input1 = GenerateInsecureUniformRandomValues(
+  auto input1 = GenerateInsecureUniformIntRandomValues(
       input_size, 4503599627370496, 100 * modulus);
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
@@ -357,7 +357,7 @@ static void BM_EltwiseReduceModAVX512BitShift52LT_MT(
   size_t modulus = 0xffffffffffc0001ULL;
 
   auto input1 =
-      GenerateInsecureUniformRandomValues(input_size, 0, 2251799813685248);
+      GenerateInsecureUniformIntRandomValues(input_size, 0, 2251799813685248);
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
   AlignedVector64<uint64_t> output(input_size, 0);
