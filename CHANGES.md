@@ -1,5 +1,15 @@
 # Changes
 
+## Version 1.2.5
+
+- Adds experimental FFT-like (https://github.com/intel/hexl/pull/104)
+- Adds big moduli tests for IFMA (https://github.com/intel/hexl/pull/123)
+- Fixes HEXL's example build (https://github.com/intel/hexl/pull/114)
+- Fixes IFMA/DQ logic error (https://github.com/intel/hexl/pull/118)
+- Fixes pre-built CpuFeatures Error on Cmake 3.16 (https://github.com/intel/hexl/pull/120)
+- Fixes 52-bit modulus issue https://github.com/intel/hexl/issues/121 (https://github.com/intel/hexl/pull/123)
+- Updates to documentation
+
 ## Version 1.2.4
 - Adds experimental HEXL-FPGA compatibility for dyadic multiply and key switch (https://github.com/intel/hexl/pull/109)
 - Adds vcpkg example of how to use previous hexl versions (https://github.com/intel/hexl/pull/103)
