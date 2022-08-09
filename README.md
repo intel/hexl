@@ -268,6 +268,7 @@ Intel HE Acceleration Library is single-threaded and thread-safe.
 
 Intel HE Acceleration Library has been integrated to the following homomorphic
 encryption libraries:
+- [OpenFHE](https://github.com/openfheorg/openfhe-development)
 - [PALISADE](https://gitlab.com/palisade/palisade-release)
 - [Microsoft SEAL](https://github.com/microsoft/SEAL)
 - [HElib](https://github.com/homenc/HElib)
