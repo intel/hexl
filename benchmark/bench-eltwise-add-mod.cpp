@@ -3,8 +3,8 @@
 
 #include <benchmark/benchmark.h>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
