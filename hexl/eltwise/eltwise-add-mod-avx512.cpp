@@ -5,6 +5,7 @@
 
 #include <immintrin.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #include <iostream>
 
@@ -12,6 +13,7 @@
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/util/check.hpp"
 #include "util/avx512-util.hpp"
+#include "hexl/util/thread-pool.hpp"
 
 #ifdef HEXL_HAS_AVX512DQ
 
@@ -21,6 +23,8 @@ namespace hexl {
 void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
                          const uint64_t* operand2, uint64_t n,
                          uint64_t modulus) {
+  //std::cout << "ROCHA Add Mod" << std::endl;
+
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
   HEXL_CHECK(operand2 != nullptr, "Require operand2 != nullptr");
@@ -32,6 +36,7 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand2, n, modulus,
                     "pre-add value in operand2 exceeds bound " << modulus);
 
+  static int call = 0;
   uint64_t n_mod_8 = n % 8;
   if (n_mod_8 != 0) {
     EltwiseAddModNative(result, operand1, operand2, n_mod_8, modulus);
@@ -45,6 +50,22 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
+
+  ThreadPoolExecutor::SetNumberOfThreads(6);
+
+  ThreadPoolExecutor::AddParallelTask([=] () {
+    sleep(ThreadPoolExecutor::GetThreadId());
+    std::cout << "ROCHA INSIDE " << call << " " << (*vp_operand1)[0] << std::endl;
+    std::cout << "ID " << std::this_thread::get_id() << " ID(" << ThreadPoolExecutor::GetThreadId() << ")" << std::endl;
+    sleep(ThreadPoolExecutor::GetNumberOfThreads() - ThreadPoolExecutor::GetThreadId());
+    // std::cout << "Total " << ThreadPoolExecutor::GetNumberOfThreads() << std::endl;
+  });
+
+  // std::cout << "ROCHA WAITING" << std::endl;
+  ThreadPoolExecutor::SetBarrier();
+  call++;
+
+  //std::cout << "ROCHA Jobs Launched" << std::endl;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
@@ -62,6 +83,7 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   }
 
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
+  //std::cout << "ROCHA Finished Add Mod" << std::endl;
 }
 
 void EltwiseAddModAVX512_OMP(uint64_t* result, const uint64_t* operand1,
