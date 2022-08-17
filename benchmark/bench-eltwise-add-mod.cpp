@@ -4,6 +4,7 @@
 #include <benchmark/benchmark.h>
 
 #include <vector>
+#include <iostream>
 
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
@@ -50,7 +51,6 @@ static void BM_EltwiseVectorVectorAddModAVX512(
   auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   auto input2 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
-
   for (auto _ : state) {
     EltwiseAddModAVX512(output.data(), input1.data(), input2.data(), input_size,
                         modulus);

@@ -100,6 +100,8 @@ if (HEXL_TREAT_WARNING_AS_ERROR)
   add_compile_options(-Werror)
 endif()
 
+add_compile_options(-pthread)
+
 set(HEXL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hexl)
 set(HEXL_INC_ROOT_DIR ${HEXL_SRC_ROOT_DIR}/include) # Public headers
