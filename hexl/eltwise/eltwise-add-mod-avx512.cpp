@@ -10,8 +10,8 @@
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/util/check.hpp"
-#include "util/avx512-util.hpp"
 #include "hexl/util/thread-pool.hpp"
+#include "util/avx512-util.hpp"
 
 #ifdef HEXL_HAS_AVX512DQ
 
@@ -21,7 +21,7 @@ namespace hexl {
 void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
                          const uint64_t* operand2, uint64_t n,
                          uint64_t modulus) {
-  //std::cout << "ROCHA Add Mod" << std::endl;
+  // std::cout << "ROCHA Add Mod" << std::endl;
 
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
   HEXL_CHECK(operand1 != nullptr, "Require operand1 != nullptr");
@@ -51,19 +51,23 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
 
   ThreadPoolExecutor::SetNumberOfThreads(6);
 
-  ThreadPoolExecutor::AddParallelTask([=] () {
+  ThreadPoolExecutor::AddParallelTask([=]() {
     sleep(ThreadPoolExecutor::GetThreadId());
-    std::cout << "ROCHA INSIDE " << call << " " << (*vp_operand1)[0] << std::endl;
-    std::cout << "ID " << std::this_thread::get_id() << " ID(" << ThreadPoolExecutor::GetThreadId() << ")" << std::endl;
-    sleep(ThreadPoolExecutor::GetNumberOfThreads() - ThreadPoolExecutor::GetThreadId());
-    // std::cout << "Total " << ThreadPoolExecutor::GetNumberOfThreads() << std::endl;
+    std::cout << "ROCHA INSIDE " << call << " " << (*vp_operand1)[0]
+              << std::endl;
+    std::cout << "ID " << std::this_thread::get_id() << " ID("
+              << ThreadPoolExecutor::GetThreadId() << ")" << std::endl;
+    sleep(ThreadPoolExecutor::GetNumberOfThreads() -
+          ThreadPoolExecutor::GetThreadId());
+    // std::cout << "Total " << ThreadPoolExecutor::GetNumberOfThreads() <<
+    // std::endl;
   });
 
   // std::cout << "ROCHA WAITING" << std::endl;
   ThreadPoolExecutor::SetBarrier();
   call++;
 
-  //std::cout << "ROCHA Jobs Launched" << std::endl;
+  // std::cout << "ROCHA Jobs Launched" << std::endl;
 
   HEXL_LOOP_UNROLL_4
   for (size_t i = n / 8; i > 0; --i) {
@@ -81,7 +85,7 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   }
 
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
-  //std::cout << "ROCHA Finished Add Mod" << std::endl;
+  // std::cout << "ROCHA Finished Add Mod" << std::endl;
 }
 
 void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
