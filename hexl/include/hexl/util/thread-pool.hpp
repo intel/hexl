@@ -44,19 +44,24 @@ class ThreadPool {
           {
             std::unique_lock<std::mutex> t_wake_lock{event_lock};
             working_threads--;
-            if (working_threads == 0) finish_condition.notify_one();
-
+            if (working_threads == 0) {
+              t_wake_lock.unlock();
+              finish_condition.notify_one();
+              t_wake_lock.lock();
+            }
+            // std::cout << "ROCHA Thread " << GetLocalThreadId() << " to wait.
+            // Working: " << working_threads << std::endl;
             wake_condition.wait(t_wake_lock,
                                 [=] { return stop_threads || !jobs.empty(); });
 
             if (stop_threads) break;
 
-            working_threads++;
+            // std::cout << "ROCHA Thread " << GetLocalThreadId() << " to work.
+            // Working: " << working_threads << std::endl;
 
             Job = std::move(jobs.front());
             jobs.pop();
           }
-
           Job();
         }
       });
@@ -101,9 +106,11 @@ class ThreadPool {
   void AddJob(std::function<void()> job) {
     // std::cout << "ROCHA Added Job" << std::endl;
     {
-      for (size_t i = 0; i < max_num_threads; i++) {
-        std::cout << "ROCHA Adding" << std::endl;
+      for (size_t i = 0; i < num_threads; i++) {
         std::unique_lock<std::mutex> lock{event_lock};
+        working_threads++;
+        // std::cout << "ROCHA Adding Job. Working: " << working_threads <<
+        // std::endl;
         jobs.emplace(job);  // Why to use move?
         wake_condition.notify_one();
       }
@@ -127,8 +134,9 @@ class ThreadPool {
 
   void WaitThreads() {
     std::unique_lock<std::mutex> lock{event_lock};
-    finish_condition.wait(lock);
-    // std::cout << "ROCHA All Jobs finished" << std::endl;
+    finish_condition.wait(lock, [=] { return working_threads == 0; });
+    // std::cout << "ROCHA All Jobs finished. Working: " << working_threads <<
+    // std::endl;
   }
 };
 
