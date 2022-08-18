@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021 Intel Corporation
+// Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
@@ -65,8 +65,9 @@ TEST(EltwiseReduceModMontInOut, avx512_64_mod_1) {
 }
 
 #ifdef HEXL_HAS_AVX512IFMA
+
 TEST(EltwiseReduceMod, avx512_52_mod_1) {
-  if (!has_avx512dq) {
+  if (!has_avx512ifma) {
     GTEST_SKIP();
   }
 
@@ -82,8 +83,8 @@ TEST(EltwiseReduceMod, avx512_52_mod_1) {
   CheckEqual(result, exp_out);
 }
 
-TEST(EltwiseReduceMod, avx512Big_mod_1) {
-  if (!has_avx512dq) {
+TEST(EltwiseReduceMod, avx512_52_Big_mod_1) {
+  if (!has_avx512ifma) {
     GTEST_SKIP();
   }
 
@@ -204,7 +205,7 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
     size_t num_trials = 100;
 #endif
     for (size_t trial = 0; trial < num_trials; ++trial) {
-      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, modulus);
+      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 1ULL << 63);
       auto op2 = op1;
 
       std::vector<uint64_t> result1(length, 0);
@@ -306,16 +307,146 @@ TEST(EltwiseReduceMod, AVX512Big_2_1) {
       std::vector<uint64_t> result1(length, 0);
       std::vector<uint64_t> result2(length, 0);
 
-      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 2,
                              1);
-      EltwiseReduceModAVX512_mt(result2.data(), op2.data(), op1.size(), modulus,
-                                4, 1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 2,
+                             1);
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);
     }
   }
 }
+
+#ifdef HEXL_HAS_AVX512IFMA
+// Checks AVX512 and native EltwiseReduceMod implementations match with randomly
+// generated inputs
+TEST(EltwiseReduceMod, AVX512_52_Big_0_1) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  size_t length = 8;
+
+  for (size_t bits = 45; bits <= 51; ++bits) {
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
+#ifdef HEXL_DEBUG
+    size_t num_trials = 10;
+#else
+    size_t num_trials = 1;
+#endif
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 1ULL << 63);
+      auto op2 = op1;
+
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus,
+                             modulus, 1);
+      EltwiseReduceModAVX512<52>(result2.data(), op2.data(), op1.size(),
+                                 modulus, modulus, 1);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
+    }
+  }
+}
+
+TEST(EltwiseReduceMod, AVX512_52_Big_4_1) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  size_t length = 8;
+
+  for (size_t bits = 45; bits <= 52; ++bits) {
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
+#ifdef HEXL_DEBUG
+    size_t num_trials = 10;
+#else
+    size_t num_trials = 1;
+#endif
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 4 * modulus);
+      auto op2 = op1;
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
+                             1);
+      EltwiseReduceModAVX512<52>(result2.data(), op2.data(), op1.size(),
+                                 modulus, 4, 1);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
+    }
+  }
+}
+
+TEST(EltwiseReduceMod, AVX512_52_Big_4_2) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  size_t length = 8;
+
+  for (size_t bits = 45; bits <= 52; ++bits) {
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
+#ifdef HEXL_DEBUG
+    size_t num_trials = 10;
+#else
+    size_t num_trials = 1;
+#endif
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 4 * modulus);
+      auto op2 = op1;
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
+                             2);
+      EltwiseReduceModAVX512<52>(result2.data(), op2.data(), op1.size(),
+                                 modulus, 4, 2);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
+    }
+  }
+}
+
+TEST(EltwiseReduceMod, AVX512_52_Big_2_1) {
+  if (!has_avx512ifma) {
+    GTEST_SKIP();
+  }
+
+  size_t length = 8;
+
+  for (size_t bits = 45; bits <= 52; ++bits) {
+    uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
+#ifdef HEXL_DEBUG
+    size_t num_trials = 10;
+#else
+    size_t num_trials = 1;
+#endif
+    for (size_t trial = 0; trial < num_trials; ++trial) {
+      auto op1 = GenerateInsecureUniformIntRandomValues(length, 0, 2 * modulus);
+      auto op2 = op1;
+      std::vector<uint64_t> result1(length, 0);
+      std::vector<uint64_t> result2(length, 0);
+
+      EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 2,
+                             1);
+      EltwiseReduceModAVX512<52>(result2.data(), op2.data(), op1.size(),
+                                 modulus, 2, 1);
+
+      ASSERT_EQ(result1, result2);
+      ASSERT_EQ(result1, result2);
+    }
+  }
+}
+
+#endif
 
 #endif
 

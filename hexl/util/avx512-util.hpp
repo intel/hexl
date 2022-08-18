@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021 Intel Corporation
+// Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -469,7 +469,6 @@ inline __m512i _mm512_hexl_barrett_reduce64(__m512i x, __m512i q,
 
       // alpha - beta == 52, so we only need high 52 bits
       __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, q_barr_64);
-
       // Z = prod_lo - (p * q_hat)_lo
       x = _mm512_hexl_mullo_add_lo_epi<52>(x_lo, q_hat, v_neg_mod);
     } else {

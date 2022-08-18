@@ -1,9 +1,9 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # target_link_options and cmake -S . -B build require cmake 3.13
 cmake_minimum_required(VERSION 3.13)
-project(HEXL VERSION 1.2.4 LANGUAGES C CXX)
+project(HEXL VERSION 1.2.5 LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
@@ -101,6 +101,8 @@ if (HEXL_TREAT_WARNING_AS_ERROR)
   add_compile_options(-Werror)
 endif()
 
+add_compile_options(-pthread)
+
 set(HEXL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(HEXL_SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hexl)
 set(HEXL_INC_ROOT_DIR ${HEXL_SRC_ROOT_DIR}/include) # Public headers
@@ -161,6 +163,7 @@ if (NOT CpuFeatures_FOUND)
   add_subdirectory(cmake/third-party/cpu-features)
 else()
   message(STATUS "CpuFeatures: found")
+  set_target_properties(CpuFeatures::cpu_features PROPERTIES IMPORTED_GLOBAL TRUE)
   add_library(cpu_features ALIAS CpuFeatures::cpu_features)
   get_target_property(
     CpuFeatures_INCLUDE_DIR

@@ -1,8 +1,9 @@
-// Copyright (C) 2020-2021 Intel Corporation
+// Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
 
+#include <iostream>
 #include <vector>
 
 #include "eltwise/eltwise-add-mod-avx512.hpp"
@@ -50,7 +51,6 @@ static void BM_EltwiseVectorVectorAddModAVX512(
   auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   auto input2 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
   AlignedVector64<uint64_t> output(input_size, 0);
-
   for (auto _ : state) {
     EltwiseAddModAVX512(output.data(), input1.data(), input2.data(), input_size,
                         modulus);
@@ -110,6 +110,31 @@ static void BM_EltwiseVectorVectorAddModAVX512_OMP(
 }
 
 BENCHMARK(BM_EltwiseVectorVectorAddModAVX512_OMP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+static void BM_EltwiseVectorVectorAddModAVX512_TP(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1152921504606877697;
+
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> output(input_size, 0);
+
+  for (auto _ : state) {
+    EltwiseAddModAVX512_TP(output.data(), input1.data(), input2.data(),
+                            input_size, modulus);
+  }
+}
+
+BENCHMARK(BM_EltwiseVectorVectorAddModAVX512_TP)
     ->Unit(benchmark::kMicrosecond)
     ->Args({4096})
     ->Args({8192})
