@@ -62,6 +62,27 @@ BENCHMARK(BM_EltwiseVectorVectorAddModAVX512)
     ->Args({1024})
     ->Args({4096})
     ->Args({16384});
+
+// state[0] is the degree
+static void BM_EltwiseVectorVectorAddModAVX512_TP(
+    benchmark::State& state) {  //  NOLINT
+  size_t input_size = state.range(0);
+  size_t modulus = 1152921504606877697;
+
+  auto input1 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  auto input2 = GenerateInsecureUniformIntRandomValues(input_size, 0, modulus);
+  AlignedVector64<uint64_t> output(input_size, 0);
+  for (auto _ : state) {
+    EltwiseAddModAVX512_TP(output.data(), input1.data(), input2.data(),
+                           input_size, modulus);
+  }
+}
+
+BENCHMARK(BM_EltwiseVectorVectorAddModAVX512_TP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1024})
+    ->Args({4096})
+    ->Args({16384});
 #endif
 
 //=================================================================
