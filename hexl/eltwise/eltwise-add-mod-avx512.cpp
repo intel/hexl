@@ -23,6 +23,8 @@
 namespace intel {
 namespace hexl {
 
+const int thread_num = 1;
+
 void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
                             const uint64_t* operand2, uint64_t n,
                             uint64_t modulus) {
@@ -76,11 +78,13 @@ void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
   */
 
   // std::cout << "ROCHA Jobs Launched" << std::endl;
-  ThreadPoolExecutor::SetNumberOfThreads(2);
+  ThreadPoolExecutor::SetNumberOfThreads(thread_num);
   // std::cout << "ROCHA call " << n << std::endl;
-  ThreadPoolExecutor::AddParallelTask([=]() {
-    int id = ThreadPoolExecutor::GetThreadId();
-    int threads = ThreadPoolExecutor::GetNumberOfThreads();
+  ThreadPoolExecutor::AddParallelTask([=](s_thread_info_t* thread_handler) {
+    //int id = ThreadPoolExecutor::GetThreadId();
+    int64_t id = thread_handler->thread_id;
+    //int threads = ThreadPoolExecutor::GetNumberOfThreads();
+    int64_t threads = thread_handler->total_threads; 
     __m512i* i_vp_result = vp_result + id * n / 8 / threads;
     // std::this_thread::sleep_for(std::chrono::nanoseconds(600));
     // std::cout << "ROCHA id " << id << " chunk " << n / 8 / threads <<
@@ -185,7 +189,7 @@ void EltwiseAddModAVX512_OMP(uint64_t* result, const uint64_t* operand1,
 
   // std::cout << "ROCHA " << std::endl;
   // std::cout << "n " << n << std::endl;
-  omp_set_num_threads(6);
+  omp_set_num_threads(thread_num);
 #pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
@@ -276,7 +280,7 @@ void EltwiseAddModAVX512_TBB(uint64_t* result, const uint64_t* operand1,
 
   // std::cout << "ROCHA " << std::endl;
   // std::cout << "n " << n << std::endl;
-  oneapi::tbb::task_arena arena(6);
+  oneapi::tbb::task_arena arena(thread_num);
   arena.execute([&] {
     // std::cout << this_task_arena::max_concurrency() << std::endl;
     tbb::parallel_for(
@@ -332,7 +336,7 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i v_operand2 = _mm512_set1_epi64(static_cast<int64_t>(operand2));
 
   // std::cout << "n " << n << std::endl;
-  omp_set_num_threads(2);
+  omp_set_num_threads(thread_num);
 #pragma omp parallel firstprivate(vp_operand1, vp_result)
   {
     int id = omp_get_thread_num();
