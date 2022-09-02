@@ -217,6 +217,7 @@ BENCHMARK(BM_FwdNTT_AVX512IFMA_MTN)
     ->Args({262144});
 
 // state[0] is the degree
+/*
 static void BM_FwdNTT_AVX512IFMA_TBB(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus_bits = 49;
@@ -276,6 +277,7 @@ BENCHMARK(BM_FwdNTT_AVX512IFMA_Flow)
     ->Args({65536})
     ->Args({131072})
     ->Args({262144});
+    */
 //=================================================================
 
 // state[0] is the degree
@@ -372,6 +374,7 @@ BENCHMARK(BM_FwdNTT_AVX512IFMALazy_MTN)
     ->Args({262144});
 
 // state[0] is the degree
+/*
 static void BM_FwdNTT_AVX512IFMALazy_TBB(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus_bits = 49;
@@ -400,7 +403,7 @@ BENCHMARK(BM_FwdNTT_AVX512IFMALazy_TBB)
     ->Args({32768})
     ->Args({65536})
     ->Args({131072})
-    ->Args({262144});
+    ->Args({262144});*/
 //=================================================================
 
 #endif
@@ -506,6 +509,7 @@ BENCHMARK(BM_FwdNTT_AVX512DQ_32_MTN)
 
 // state[0] is the degree
 // state[1] is the output modulus factor
+/*
 static void BM_FwdNTT_AVX512DQ_32_TBB(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   uint64_t output_mod_factor = state.range(1);
@@ -535,7 +539,7 @@ BENCHMARK(BM_FwdNTT_AVX512DQ_32_TBB)
     ->Args({65536, 4})
     ->Args({131072, 4})
     ->Args({262144, 4});
-
+*/
 // state[0] is the degree
 // state[1] is the output modulus factor
 static void BM_FwdNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
@@ -634,6 +638,7 @@ BENCHMARK(BM_FwdNTT_AVX512DQ_64_MTN)
 
 // state[0] is the degree
 // state[1] is the output modulus factor
+/*
 static void BM_FwdNTT_AVX512DQ_64_TBB(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   uint64_t output_mod_factor = state.range(1);
@@ -663,7 +668,7 @@ BENCHMARK(BM_FwdNTT_AVX512DQ_64_TBB)
     ->Args({65536, 1})
     ->Args({131072, 1})
     ->Args({262144, 1});
-
+*/
 #endif
 
 //=================================================================

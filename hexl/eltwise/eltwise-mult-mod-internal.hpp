@@ -70,9 +70,9 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
 
   const uint64_t twice_modulus = 2 * modulus;
 
-  omp_set_num_threads(2);
+  //omp_set_num_threads(34);
 
-#pragma omp parallel firstprivate(result, operand1, operand2)
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(result, operand1, operand2)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -112,6 +112,7 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
       ++result;
     }
   }
+  //omp_set_num_threads(32);
 }
 
 }  // namespace hexl

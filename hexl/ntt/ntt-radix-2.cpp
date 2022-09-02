@@ -550,9 +550,9 @@ void ForwardTransformToBitReverseRadix2(
     }
 
     if (recursion_depth == 0) {
-      omp_set_num_threads(2);
+      //omp_set_num_threads(34);
 
-#pragma omp parallel
+#pragma omp parallel num_threads(eltwise_num_threads)
       {
 #pragma omp single nowait
         {
@@ -574,6 +574,7 @@ void ForwardTransformToBitReverseRadix2(
 #pragma omp taskwait
         }
       }
+      //omp_set_num_threads(32);
     } else if (recursion_depth < 5) {
 #pragma omp task
       {

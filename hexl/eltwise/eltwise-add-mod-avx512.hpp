@@ -6,8 +6,8 @@
 #include <omp.h>
 #include <stdint.h>
 
-#include "tbb/blocked_range.h"
-#include "tbb/parallel_for.h"
+//#include "tbb/blocked_range.h"
+//#include "tbb/parallel_for.h"
 
 namespace intel {
 namespace hexl {

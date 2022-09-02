@@ -551,9 +551,9 @@ void InverseTransformFromBitReverseAVX512_MT(
     }
   } else {
     if (recursion_depth == 0) {
-      omp_set_num_threads(2);
+      //omp_set_num_threads(34);
 
-#pragma omp parallel
+#pragma omp parallel num_threads(ntt_num_threads)
       {
 #pragma omp single nowait
         {
@@ -574,7 +574,8 @@ void InverseTransformFromBitReverseAVX512_MT(
           }
         }
       }
-    } else if (recursion_depth < 1) {
+      //omp_set_num_threads(32);
+    } else if (recursion_depth < ntt_parallel_calls) {
 #pragma omp task
       {
         // int id = omp_get_thread_num();

@@ -94,12 +94,12 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
-  omp_set_num_threads(32);
+  //omp_set_num_threads(34);
 
   if (input_mod_factor == modulus) {
     if (output_mod_factor == 2) {
 // double start = omp_get_wtime();
-#pragma omp parallel firstprivate(v_operand, v_result)
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(v_operand, v_result)
       {
         // double end = omp_get_wtime();
         // std::cout << "ROCHA Time1 " << end - start << std::endl;
@@ -121,7 +121,7 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
     } else {
 // double start = omp_get_wtime();
 // std::cout << "n_tmp " << n_tmp << std::endl;
-#pragma omp parallel firstprivate(v_operand, v_result)
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(v_operand, v_result)
       {
         // double end = omp_get_wtime();
         // std::cout << "ROCHA Time2 " << end - start << std::endl;
@@ -142,7 +142,7 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
       }
     }
   }
-
+  //omp_set_num_threads(32);
   if (input_mod_factor == 2) {
     for (size_t i = 0; i < n_tmp; i += 8) {
       __m512i v_op = _mm512_loadu_si512(v_operand);

@@ -60,7 +60,12 @@ static void BM_EltwiseVectorVectorAddModAVX512(
 BENCHMARK(BM_EltwiseVectorVectorAddModAVX512)
     ->Unit(benchmark::kMicrosecond)
     ->Args({4096})
-    ->Args({16384});
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 //=================================================================

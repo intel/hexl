@@ -69,8 +69,8 @@ void EltwiseMultModAVX512DQIntLoopUnroll(__m512i* vp_result,
                 "avx512_64bit_count");
 
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(2);
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -316,6 +316,7 @@ void EltwiseMultModAVX512DQIntLoopUnroll(__m512i* vp_result,
       _mm512_storeu_si512(vp_result++, vr16);
     }
   }
+  //omp_set_num_threads(32);
 }
 
 /// @brief Algorithm 2 from
@@ -327,9 +328,9 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           __m512i v_barr_lo, __m512i v_modulus,
                                           __m512i v_twice_mod, uint64_t n) {
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(2);
+  //omp_set_num_threads(34);
 
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -370,6 +371,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
       ++vp_result;
     }
   }
+  //omp_set_num_threads(32);
 }
 
 /// @brief Algorithm 2 from
@@ -382,8 +384,8 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
                                           __m512i v_twice_mod, uint64_t n,
                                           uint64_t prod_right_shift) {
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(2);
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -426,6 +428,7 @@ void EltwiseMultModAVX512DQIntLoopDefault(__m512i* vp_result,
       ++vp_result;
     }
   }
+  //omp_set_num_threads(32);
 }
 
 template <int ProdRightShift, int InputModFactor>
@@ -610,9 +613,9 @@ inline void EltwiseMultModAVX512FloatLoopDefault(
   HEXL_UNUSED(v_twice_mod);
   // std::cout << " Float Default" << std::endl;
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
-  omp_set_num_threads(2);
+  //omp_set_num_threads(34);
 
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -651,6 +654,7 @@ inline void EltwiseMultModAVX512FloatLoopDefault(
       ++vp_result;
     }
   }
+  //omp_set_num_threads(32);
 }
 
 template <int InputModFactor, int CoeffCount>
@@ -669,9 +673,9 @@ inline void EltwiseMultModAVX512FloatLoopUnroll(
 
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
   // std::cout << "Float loop unroll" << std::endl;
-  omp_set_num_threads(2);
+  //omp_set_num_threads(34);
 
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -772,6 +776,7 @@ inline void EltwiseMultModAVX512FloatLoopUnroll(
       _mm512_storeu_si512(vp_result++, v_out_4);
     }
   }
+  //omp_set_num_threads(32);
 }
 
 template <int InputModFactor>

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <stdint.h>
-
+#include <cstdlib>
 #include <limits>
 #include <vector>
 
@@ -13,6 +13,10 @@
 
 namespace intel {
 namespace hexl {
+
+extern int eltwise_num_threads;
+extern int ntt_num_threads;
+extern int ntt_parallel_calls;
 
 /// @brief Pre-computes a Barrett factor with which modular multiplication can
 /// be performed more efficiently
