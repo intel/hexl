@@ -34,8 +34,8 @@ void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, uint64_t n,
   __m512i v_bound = _mm512_set1_epi64(static_cast<int64_t>(bound));
   const __m512i* v_op_ptr = reinterpret_cast<const __m512i*>(operand1);
   __m512i* v_result_ptr = reinterpret_cast<__m512i*>(result);
-  omp_set_num_threads(2);
-#pragma omp parallel firstprivate(v_op_ptr, v_result_ptr)
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(v_op_ptr, v_result_ptr)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -51,6 +51,7 @@ void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, uint64_t n,
       ++v_op_ptr;
     }
   }
+  //omp_set_num_threads(32);
 }
 #endif
 

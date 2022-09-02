@@ -57,8 +57,8 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
   std::cout << "Loop" << std::endl;
 
   HEXL_UNUSED(v_twice_mod);
-  omp_set_num_threads(2);
-#pragma omp parallel
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads)
   {
     int id = omp_get_thread_num();
     std::cout << " ID " << id << std::endl;
@@ -333,6 +333,7 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
       _mm512_storeu_si512(vp_result++, v_result_16);
     }
   }
+  //omp_set_num_threads(32);
 }
 
 // Algorithm 2 from https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
@@ -392,8 +393,8 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   // std::cout << "Default 1" << std::endl;
   HEXL_UNUSED(v_twice_mod);
 
-  omp_set_num_threads(2);
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -435,6 +436,7 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
       ++vp_result;
     }
   }
+  //omp_set_num_threads(32);
 }
 
 template <int ProdRightShift, int InputModFactor>

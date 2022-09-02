@@ -8,6 +8,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <cstdlib>
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/ntt/ntt.hpp"
@@ -18,8 +19,6 @@
 
 namespace intel {
 namespace hexl {
-
-const auto HEXL_THREAD_COUNT = std::thread::hardware_concurrency();
 
 #ifdef HEXL_HAS_AVX512IFMA
 template void ForwardTransformToBitReverseAVX512<NTT::s_ifma_shift_bits>(
@@ -42,15 +41,15 @@ template void ForwardTransformToBitReverseAVX512_MTN<NTT::s_ifma_shift_bits>(
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
-
+/*
 template void ForwardTransformToBitReverseAVX512_TBB<NTT::s_ifma_shift_bits>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
+*/
 #endif
-
 #ifdef HEXL_HAS_AVX512DQ
 template void ForwardTransformToBitReverseAVX512<32>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
@@ -80,12 +79,14 @@ template void ForwardTransformToBitReverseAVX512_MTN<32>(
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
 
+/*
 template void ForwardTransformToBitReverseAVX512_TBB<32>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
+*/
 
 template void ForwardTransformToBitReverseAVX512_MT<NTT::s_default_shift_bits>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
@@ -100,14 +101,16 @@ template void ForwardTransformToBitReverseAVX512_MTN<NTT::s_default_shift_bits>(
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
-
+/*
 template void ForwardTransformToBitReverseAVX512_TBB<NTT::s_default_shift_bits>(
     uint64_t* result, const uint64_t* operand, uint64_t degree, uint64_t mod,
     const uint64_t* root_of_unity_powers,
     const uint64_t* precon_root_of_unity_powers, uint64_t input_mod_factor,
     uint64_t output_mod_factor, uint64_t recursion_depth,
     uint64_t recursion_half);
+*/
 #endif
+
 
 #ifdef HEXL_HAS_AVX512DQ
 
@@ -783,14 +786,23 @@ void ForwardTransformToBitReverseAVX512_MT(
                            W_precon);
 
     if (recursion_depth == 0) {
-      omp_set_num_threads(THREADS);
+      //std::cout << "ROCHA TOP ID " << omp_get_thread_num() << " " << omp_get_num_threads() << std::endl;
+      //int out_threads = omp_get_num_threads();
+      //omp_set_num_threads(34);
 
-#pragma omp parallel
+#pragma omp parallel num_threads(ntt_num_threads)
       {
 #pragma omp single  // nowait
         {
 #pragma omp task
           {
+            //std::cout << "ROCHA NTT ID " << omp_get_thread_num() << " " << omp_get_num_threads() << std::endl;
+            //int in_threads =  omp_get_num_threads();
+            //if (out_threads > 1 && in_threads > 1) std::cout << "ROCHA: Both" << std::endl;
+            //if (out_threads > 1 && in_threads == 1) std::cout << "ROCHA: OpenFHE" << std::endl;
+            //if (out_threads == 1 && in_threads > 1) std::cout << "ROCHA: HEXL" << std::endl;
+            //if (out_threads == 1 && in_threads == 1) std::cout << "ROCHA: NONE" << std::endl;
+            //std::cout << "ROCHA Out" << out_threads << " In " << in_threads << std::endl;
             ForwardTransformToBitReverseAVX512_MT<BitShift>(
                 result, result, n / 2, modulus, root_of_unity_powers,
                 precon_root_of_unity_powers, input_mod_factor,
@@ -798,6 +810,7 @@ void ForwardTransformToBitReverseAVX512_MT(
           }
 #pragma omp task
           {
+            //std::cout << "ROCHA NTT ID " << omp_get_thread_num() << " " << omp_get_num_threads() << std::endl;
             ForwardTransformToBitReverseAVX512_MT<BitShift>(
                 &result[n / 2], &result[n / 2], n / 2, modulus,
                 root_of_unity_powers, precon_root_of_unity_powers,
@@ -807,7 +820,8 @@ void ForwardTransformToBitReverseAVX512_MT(
           // #pragma omp taskwait
         }
       }
-    } else if (recursion_depth < CALLS) {
+      //omp_set_num_threads(32);
+    } else if (recursion_depth < ntt_parallel_calls) {
 #pragma omp task
       {
         ForwardTransformToBitReverseAVX512_MT<BitShift>(
@@ -998,8 +1012,8 @@ void ForwardTransformToBitReverseAVX512_MTN(
                               W, W_precon);
 
     if (recursion_depth == 0) {
-      omp_set_num_threads(THREADS);
-#pragma omp parallel
+      //omp_set_num_threads(34);
+#pragma omp parallel num_threads(ntt_num_threads)
       {
 #pragma omp single  // nowait
         {
@@ -1021,7 +1035,8 @@ void ForwardTransformToBitReverseAVX512_MTN(
           // #pragma omp taskwait
         }
       }
-    } else if (recursion_depth < CALLS) {
+      //omp_set_num_threads(32);
+    } else if (recursion_depth < ntt_parallel_calls) {
 #pragma omp task
       {
         ForwardTransformToBitReverseAVX512_MTN<BitShift>(
@@ -1051,6 +1066,7 @@ void ForwardTransformToBitReverseAVX512_MTN(
   }
 }
 
+/*
 class FFT_body {
  private:
   uint64_t* result;
@@ -1196,63 +1212,8 @@ void Recursive_FFT_TBB(uint64_t* result, const uint64_t* operand, uint64_t n,
     // std::cout << "ROCHA Waiting" << std::endl;
     my_g.wait_for_all();
   });
-  /*
-  if (recursion_depth == 0) {
-    // omp_set_num_threads(14);
-    std::cout << "ROCHA Start" << std::endl;
-    tbb::task_arena arena(THREADS);
-    arena.execute([&] {
-      tbb::flow::graph my_g;
-      tbb::flow::continue_node<tbb::flow::continue_msg> depth_fft(my_g,
-        DepthFirst_fft_body(result, operand, n, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, recursion_depth, recursion_half));
-
-      Recursive_FFT_TBB(&my_g, &depth_fft,
-        result, result, n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2);
-      Recursive_FFT_TBB(&my_g, &depth_fft,
-        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2 + 1);
-
-      depth_fft.try_put(tbb::flow::continue_msg());
-      std::cout << "ROCHA Waiting" << std::endl;
-      my_g.wait_for_all();
-    });
-  } else if (recursion_depth < CALLS && n > 2048) {
-    std::cout << "ROCHA Call " << recursion_depth << " for half " <<
-  recursion_half << std::endl; tbb::flow::continue_node<tbb::flow::continue_msg>
-  depth_fft(*g, DepthFirst_fft_body(result, operand, n, modulus,
-  root_of_unity_powers, precon_root_of_unity_powers, recursion_depth,
-  recursion_half));
-
-    tbb::flow::make_edge(*start, depth_fft);
-
-    Recursive_FFT_TBB( g, &depth_fft,
-      result, result, n / 2, modulus, root_of_unity_powers,
-      precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-      recursion_depth + 1, recursion_half * 2);
-    Recursive_FFT_TBB(g, &depth_fft,
-      &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-      precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-      recursion_depth + 1, recursion_half * 2 + 1);
-  } else {
-    std::cout << "ROCHA Final call" << std::endl;
-    tbb::flow::continue_node<tbb::flow::continue_msg> fft_body_1(*g, 1,
-  FFT_body( result, result, n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2));
-
-    tbb::flow::continue_node<tbb::flow::continue_msg> fft_body_2(*g, FFT_body(
-        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2 + 1));
-
-    tbb::flow::make_edge(*start, fft_body_1);
-    tbb::flow::make_edge(*start, fft_body_2);
-  }*/
 }
+
 
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512_TBB(
@@ -1415,8 +1376,6 @@ void ForwardTransformToBitReverseAVX512_TBB(
                            W_precon);
 
     if (recursion_depth == 0) {
-      // omp_set_num_threads(14);
-
       tbb::task_arena arena(THREADS);
       arena.execute([&] {
         tbb::parallel_invoke(
@@ -1462,7 +1421,7 @@ void ForwardTransformToBitReverseAVX512_TBB(
     }
   }
 }
-
+*/
 #endif  // HEXL_HAS_AVX512DQ
 
 }  // namespace hexl

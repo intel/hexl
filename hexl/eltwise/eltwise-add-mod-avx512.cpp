@@ -23,7 +23,7 @@
 namespace intel {
 namespace hexl {
 
-const int thread_num = 1;
+const int thread_num = 32;
 
 void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
                             const uint64_t* operand2, uint64_t n,
@@ -189,8 +189,8 @@ void EltwiseAddModAVX512_OMP(uint64_t* result, const uint64_t* operand1,
 
   // std::cout << "ROCHA " << std::endl;
   // std::cout << "n " << n << std::endl;
-  omp_set_num_threads(thread_num);
-#pragma omp parallel firstprivate(vp_operand1, vp_operand2, vp_result)
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -212,12 +212,13 @@ void EltwiseAddModAVX512_OMP(uint64_t* result, const uint64_t* operand1,
       ++i_vp_operand2;
     }
   }
-
+  //omp_set_num_threads(32);
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 
 static const size_t N = 23;
 
+/*
 class ParallelEltwiseAddModAVX512 {
   __m512i* vp_result;
   const __m512i* vp_operand1;
@@ -302,13 +303,15 @@ void EltwiseAddModAVX512_TBB(uint64_t* result, const uint64_t* operand1,
             ++i_vp_operand1;
             ++i_vp_operand2;
           }
-        }*/
+        }
+        *//*
         ParallelEltwiseAddModAVX512(vp_result, vp_operand1, vp_operand2,
                                     v_modulus),
         tbb::static_partitioner());
   });
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
+*/
 
 void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
                          const uint64_t operand2, uint64_t n,
@@ -336,8 +339,8 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i v_operand2 = _mm512_set1_epi64(static_cast<int64_t>(operand2));
 
   // std::cout << "n " << n << std::endl;
-  omp_set_num_threads(thread_num);
-#pragma omp parallel firstprivate(vp_operand1, vp_result)
+  //omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_result)
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
@@ -356,6 +359,7 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
       ++vp_operand1;
     }
   }
+  //omp_set_num_threads(32);
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 

@@ -68,6 +68,7 @@ BENCHMARK(BM_EltwiseVectorVectorAddModAVX512)
     ->Args({262144});
 
 // state[0] is the degree
+/*
 static void BM_EltwiseVectorVectorAddModAVX512_TBB(
     benchmark::State& state) {  //  NOLINT
   size_t input_size = state.range(0);
@@ -92,7 +93,7 @@ BENCHMARK(BM_EltwiseVectorVectorAddModAVX512_TBB)
     ->Args({65536})
     ->Args({131072})
     ->Args({262144});
-
+*/
 // state[0] is the degree
 static void BM_EltwiseVectorVectorAddModAVX512_OMP(
     benchmark::State& state) {  //  NOLINT
