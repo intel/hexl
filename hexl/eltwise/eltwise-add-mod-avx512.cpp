@@ -6,6 +6,7 @@
 #include <immintrin.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <sched.h>
 
 #include <chrono>
 #include <thread>
@@ -78,17 +79,16 @@ void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
   */
 
   // std::cout << "ROCHA Jobs Launched" << std::endl;
-  ThreadPoolExecutor::SetNumberOfThreads(thread_num);
+  ThreadPoolExecutor::SetNumberOfThreads(eltwise_num_threads);
   // std::cout << "ROCHA call " << n << std::endl;
-  ThreadPoolExecutor::AddParallelTask([=](s_thread_info_t* thread_handler) {
+  ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2, v_modulus](s_thread_info_t* thread_handler) {
     //int id = ThreadPoolExecutor::GetThreadId();
     int64_t id = thread_handler->thread_id;
     //int threads = ThreadPoolExecutor::GetNumberOfThreads();
     int64_t threads = thread_handler->total_threads; 
     __m512i* i_vp_result = vp_result + id * n / 8 / threads;
     // std::this_thread::sleep_for(std::chrono::nanoseconds(600));
-    // std::cout << "ROCHA id " << id << " chunk " << n / 8 / threads <<
-    // std::endl;
+    //std::cout << "ROCHA id on CPU " << sched_getcpu() << std::endl;
     const __m512i* i_vp_operand1 = vp_operand1 + id * n / 8 / threads;
     const __m512i* i_vp_operand2 = vp_operand2 + id * n / 8 / threads;
     HEXL_LOOP_UNROLL_4
@@ -194,6 +194,7 @@ void EltwiseAddModAVX512_OMP(uint64_t* result, const uint64_t* operand1,
   {
     int id = omp_get_thread_num();
     int threads = omp_get_num_threads();
+    //std::cout << "ROCHA: on CPU " << sched_getcpu() << std::endl;
     __m512i* i_vp_result = vp_result + id * n / 8 / threads;
     const __m512i* i_vp_operand1 = vp_operand1 + id * n / 8 / threads;
     const __m512i* i_vp_operand2 = vp_operand2 + id * n / 8 / threads;
