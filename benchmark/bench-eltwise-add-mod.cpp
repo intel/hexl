@@ -23,23 +23,14 @@ namespace hexl {
 
 // state[0] is the mode
 static void BM_MT_Native(benchmark::State& state) {  //  NOLINT
-  size_t threads = state.range(0);
-
   for(auto _ : state){
-      std::this_thread::sleep_for(std::chrono::microseconds(5));
-    
+      for (int i = 0; i < 10000; i++){}
   }
 }
 
 BENCHMARK(BM_MT_Native)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({32})
-    ->Args({64})
-    ->Args({128})
-    ->Args({256})
-    ->Args({512})
-    ->Args({1024})
-    ->Args({2048});
+    ->Args({1});
 
 // state[0] is the mode
 static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
@@ -47,32 +38,27 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
 
   for(auto _ : state){
 
-#pragma omp parallel num_threads(eltwise_num_threads)
+#pragma omp parallel num_threads(threads)
     {
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
-      
+      for (int i = 0; i < 10000; i++){}
     }
   }
 }
 
 BENCHMARK(BM_MT_OMP)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({32})
-    ->Args({64})
-    ->Args({128})
-    ->Args({256})
-    ->Args({512})
-    ->Args({1024})
-    ->Args({2048});
+    ->Args({2})
+    ->Args({4})
+    ->Args({8})
+    ->Args({16});
 
 // state[0] is the mode
 static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
   for(auto _ : state){
-    ThreadPoolExecutor::SetNumberOfThreads(eltwise_num_threads);
-    ThreadPoolExecutor::AddParallelTask([](s_thread_info_t* thread_handler) {
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
-      
+    ThreadPoolExecutor::SetNumberOfThreads(threads);
+    ThreadPoolExecutor::AddParallelTask([]() {
+      for (int i = 0; i < 10000; i++){}
     });
     ThreadPoolExecutor::SetBarrier();
   }
@@ -80,13 +66,10 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_MT_TP)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({32})
-    ->Args({64})
-    ->Args({128})
-    ->Args({256})
-    ->Args({512})
-    ->Args({1024})
-    ->Args({2048});
+    ->Args({2})
+    ->Args({4})
+    ->Args({8})
+    ->Args({16});
 
 // state[0] is the degree
 static void BM_EltwiseVectorVectorAddModNative(
