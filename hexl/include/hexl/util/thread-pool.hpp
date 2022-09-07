@@ -41,7 +41,7 @@ class ThreadPool {
       s_thread_info_t* thread_handler = new s_thread_info_t();
       thread_handlers.emplace_back(thread_handler);
 
-      thread_handler->thread = std::thread([=] {
+      thread_handler->thread = std::thread([thread_handler] {
 
         while (true) {
           {

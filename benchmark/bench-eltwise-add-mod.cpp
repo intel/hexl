@@ -5,7 +5,10 @@
 
 #include <iostream>
 #include <vector>
-
+#include <omp.h>
+#include <chrono>
+#include <unistd.h>
+#include "hexl/util/thread-pool.hpp"
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
@@ -16,6 +19,74 @@
 
 namespace intel {
 namespace hexl {
+
+
+// state[0] is the mode
+static void BM_MT_Native(benchmark::State& state) {  //  NOLINT
+  size_t threads = state.range(0);
+
+  for(auto _ : state){
+      std::this_thread::sleep_for(std::chrono::microseconds(5));
+    
+  }
+}
+
+BENCHMARK(BM_MT_Native)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({32})
+    ->Args({64})
+    ->Args({128})
+    ->Args({256})
+    ->Args({512})
+    ->Args({1024})
+    ->Args({2048});
+
+// state[0] is the mode
+static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
+  size_t threads = state.range(0);
+
+  for(auto _ : state){
+
+#pragma omp parallel num_threads(eltwise_num_threads)
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(5));
+      
+    }
+  }
+}
+
+BENCHMARK(BM_MT_OMP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({32})
+    ->Args({64})
+    ->Args({128})
+    ->Args({256})
+    ->Args({512})
+    ->Args({1024})
+    ->Args({2048});
+
+// state[0] is the mode
+static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
+  size_t threads = state.range(0);
+  for(auto _ : state){
+    ThreadPoolExecutor::SetNumberOfThreads(eltwise_num_threads);
+    ThreadPoolExecutor::AddParallelTask([](s_thread_info_t* thread_handler) {
+        std::this_thread::sleep_for(std::chrono::microseconds(5));
+      
+    });
+    ThreadPoolExecutor::SetBarrier();
+  }
+}
+
+BENCHMARK(BM_MT_TP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({32})
+    ->Args({64})
+    ->Args({128})
+    ->Args({256})
+    ->Args({512})
+    ->Args({1024})
+    ->Args({2048});
 
 // state[0] is the degree
 static void BM_EltwiseVectorVectorAddModNative(
