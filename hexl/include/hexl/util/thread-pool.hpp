@@ -22,7 +22,8 @@ typedef struct s_thread_info {
   int64_t thread_id = 0;
   int64_t total_threads = 1;
   std::thread thread;
-  std::function<void(struct s_thread_info*)> task;
+  //std::function<void(struct s_thread_info*)> task;
+  std::function<void()> task;
 } s_thread_info_t;
 
 class ThreadPool {
@@ -58,7 +59,8 @@ class ThreadPool {
             //std::cout << "ROCHA: Thread working. Thread ID " << thread_handler->thread_id << "." << std::endl;
 
           }
-          thread_handler->task(thread_handler);
+          //thread_handler->task(thread_handler);
+          thread_handler->task();
         }
       });
     }
@@ -96,15 +98,16 @@ class ThreadPool {
   }
 
   // Add jobs to the queue
-  void AddJob(std::function<void(s_thread_info_t*)> task) {
+  //void AddJob(std::function<void(s_thread_info_t*)> task) {
+  void AddJob(std::function<void()> task) {
     // std::cout << "ROCHA Added Job" << std::endl;
     
     for (int i = 0; i < num_threads; i++) {
       s_thread_info_t* thread_handler = thread_handlers.at(i);
       {
         thread_handler->task = task;
-        thread_handler->thread_id = i;
-        thread_handler->total_threads = num_threads;
+        //thread_handler->thread_id = i;
+        //thread_handler->total_threads = num_threads;
         thread_handler->state.store(2);
         //std::cout << "ROCHA Added Job. ID: " << i << std::endl;
       }
@@ -143,7 +146,10 @@ class ThreadPoolExecutor {
     pool->SetupThreads(n_threads);
   }
 
-  static void AddParallelTask(std::function<void(s_thread_info_t*)> job) { pool->AddJob(job); }
+  //static void AddParallelTask(std::function<void(s_thread_info_t*)> job) { 
+  static void AddParallelTask(std::function<void()> job) { 
+    pool->AddJob(job); 
+  }
 
   static size_t GetNumberOfThreads() { return pool->GetNumThreads(); }
 
