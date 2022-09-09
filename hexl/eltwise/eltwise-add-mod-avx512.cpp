@@ -81,12 +81,13 @@ void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
   // std::cout << "ROCHA Jobs Launched" << std::endl;
   ThreadPoolExecutor::SetNumberOfThreads(eltwise_num_threads);
   // std::cout << "ROCHA call " << n << std::endl;
-   /*
-  ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2, v_modulus](s_thread_info_t* thread_handler) {
+   
+  //ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2, v_modulus](s_thread_info_t* thread_handler) {
+  ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2, v_modulus](int id, int threads) {
     //int id = ThreadPoolExecutor::GetThreadId();
-    int64_t id = thread_handler->thread_id;
+    //int64_t id = thread_handler->thread_id;
     //int threads = ThreadPoolExecutor::GetNumberOfThreads();
-    int64_t threads = thread_handler->total_threads; 
+    //int64_t threads = thread_handler->total_threads; 
     __m512i* i_vp_result = vp_result + id * n / 8 / threads;
     // std::this_thread::sleep_for(std::chrono::nanoseconds(600));
     //std::cout << "ROCHA id on CPU " << sched_getcpu() << std::endl;
@@ -106,7 +107,7 @@ void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
       ++i_vp_operand1;
       ++i_vp_operand2;
     }
-  });*/
+  });
 
   ThreadPoolExecutor::SetBarrier();
 
