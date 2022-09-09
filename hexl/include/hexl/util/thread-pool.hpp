@@ -43,8 +43,8 @@ class ThreadPool {
     for (int i = 0; i < new_threads; ++i) {
       s_thread_info_t* thread_handler = new s_thread_info_t();
       thread_handlers.emplace_back(thread_handler);
-
-      thread_handler->thread = std::thread([thread_handler, current_threads, i, new_threads] {
+      int* threads = &num_threads;
+      thread_handler->thread = std::thread([thread_handler, current_threads, i, threads] {
 
         while (true) {
           {
@@ -63,7 +63,7 @@ class ThreadPool {
           }
           //thread_handler->task(thread_handler);
           //thread_handler->task();
-          thread_handler->task(current_threads + i, current_threads + new_threads);
+          thread_handler->task(current_threads + i, *threads);
         }
       });
     }
@@ -111,7 +111,7 @@ class ThreadPool {
       {
         thread_handler->task = task;
         //thread_handler->thread_id = i;
-        //thread_handler->total_threads = num_threads;
+        thread_handler->total_threads = num_threads;
         thread_handler->state.store(2);
         //std::cout << "ROCHA Added Job. ID: " << i << std::endl;
       }
