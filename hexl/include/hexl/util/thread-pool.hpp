@@ -23,7 +23,8 @@ typedef struct s_thread_info {
   int64_t total_threads = 1;
   std::thread thread;
   //std::function<void(struct s_thread_info*)> task;
-  std::function<void()> task;
+  //std::function<void()> task;
+  std::function<void(int id, int threads)> task;
 } s_thread_info_t;
 
 class ThreadPool {
@@ -38,11 +39,12 @@ class ThreadPool {
   // Start a number of threads
   void StartThreads(int new_threads) {
     // std::cout << "ROCHA Start" << std::endl;
+    int current_threads = num_threads;
     for (int i = 0; i < new_threads; ++i) {
       s_thread_info_t* thread_handler = new s_thread_info_t();
       thread_handlers.emplace_back(thread_handler);
 
-      thread_handler->thread = std::thread([thread_handler] {
+      thread_handler->thread = std::thread([thread_handler, current_threads, i, new_threads] {
 
         while (true) {
           {
@@ -60,7 +62,8 @@ class ThreadPool {
 
           }
           //thread_handler->task(thread_handler);
-          thread_handler->task();
+          //thread_handler->task();
+          thread_handler->task(current_threads + i, current_threads + new_threads);
         }
       });
     }
@@ -99,7 +102,8 @@ class ThreadPool {
 
   // Add jobs to the queue
   //void AddJob(std::function<void(s_thread_info_t*)> task) {
-  void AddJob(std::function<void()> task) {
+  //void AddJob(std::function<void()> task) {
+  void AddJob(std::function<void(int id, int threads)> task) {
     // std::cout << "ROCHA Added Job" << std::endl;
     
     for (int i = 0; i < num_threads; i++) {
@@ -147,7 +151,8 @@ class ThreadPoolExecutor {
   }
 
   //static void AddParallelTask(std::function<void(s_thread_info_t*)> job) { 
-  static void AddParallelTask(std::function<void()> job) { 
+  //static void AddParallelTask(std::function<void()> job) { 
+  static void AddParallelTask(std::function<void(int id, int threads)> job) { 
     pool->AddJob(job); 
   }
 

@@ -23,8 +23,14 @@ namespace hexl {
 
 // state[0] is the mode
 static void BM_MT_Native(benchmark::State& state) {  //  NOLINT
+  
   for(auto _ : state){
-      for (int i = 0; i < 10000; i++){}
+    int sum = 0;
+    for (int i = 0; i < 101; i++){
+      sum++;
+      sum = sum%77;
+    }
+    if (sum > 75) std::cout << "Bla"  << sum << std::endl;
   }
 }
 
@@ -35,41 +41,68 @@ BENCHMARK(BM_MT_Native)
 // state[0] is the mode
 static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
+  size_t input_size = state.range(1);
+
+  AlignedVector64<uint64_t> input_v(input_size, 7);
+  uint64_t* input1 = input_v.data();
 
   for(auto _ : state){
 
 #pragma omp parallel num_threads(threads)
     {
-      for (int i = 0; i < 10000; i++){}
+      int threads = omp_get_num_threads();
+      int id = omp_get_thread_num();
+      uint64_t* input1_p = input1 + input_size/threads*id;
+      for (size_t i = 0; i < input_size/threads; i++){
+        //if (id == 0) if (*input1_p > 7) std::cout << "> 7 " << *input1_p << std::endl;
+        ++input1_p;
+      }
     }
   }
 }
 
-BENCHMARK(BM_MT_OMP)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({2})
-    ->Args({4})
-    ->Args({8})
-    ->Args({16});
 
 // state[0] is the mode
 static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
+  size_t input_size = state.range(1);
+  AlignedVector64<uint64_t> input_v(input_size, 7);
+  uint64_t* input1 = input_v.data();
+
   for(auto _ : state){
     ThreadPoolExecutor::SetNumberOfThreads(threads);
-    ThreadPoolExecutor::AddParallelTask([]() {
-      for (int i = 0; i < 10000; i++){}
+    ThreadPoolExecutor::AddParallelTask([&](int id, int threads) {
+
+      size_t n = input_size/threads;
+      uint64_t* input1_p = input1 + n*id;
+      for (size_t i = 0; i < n; i++){
+        //if (id == 0) if (*input1_p > 7) std::cout << "> 7" << std::endl;
+        ++input1_p;
+      }
     });
     ThreadPoolExecutor::SetBarrier();
   }
 }
 
+
+BENCHMARK(BM_MT_OMP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({1, 4096})
+    ->Args({2, 4096})
+    ->Args({4, 128})
+    ->Args({8, 128})
+    ->Args({16, 128})
+    ->Args({32, 128});
+
 BENCHMARK(BM_MT_TP)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({2})
-    ->Args({4})
-    ->Args({8})
-    ->Args({16});
+    ->Args({1, 4096})
+    ->Args({2, 4096})
+    ->Args({4, 128})
+    ->Args({8, 128})
+    ->Args({16, 128})
+    ->Args({32, 128});
+
 
 // state[0] is the degree
 static void BM_EltwiseVectorVectorAddModNative(
