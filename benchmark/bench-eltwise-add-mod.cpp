@@ -54,7 +54,8 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
       int id = omp_get_thread_num();
       uint64_t* input1_p = input1 + input_size/threads*id;
       for (size_t i = 0; i < input_size/threads; i++){
-        //if (id == 0) if (*input1_p > 7) std::cout << "> 7 " << *input1_p << std::endl;
+        //if (id == 0) 
+        if (*input1_p > 7) std::cout << "> 7 " << *input1_p << std::endl;
         ++input1_p;
       }
     }
@@ -69,14 +70,16 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
   AlignedVector64<uint64_t> input_v(input_size, 7);
   uint64_t* input1 = input_v.data();
 
-  for(auto _ : state){
-    ThreadPoolExecutor::SetNumberOfThreads(threads);
-    ThreadPoolExecutor::AddParallelTask([&](int id, int threads) {
+  ThreadPoolExecutor::SetNumberOfThreads(threads);
 
-      size_t n = input_size/threads;
+  for(auto _ : state){  
+    ThreadPoolExecutor::AddParallelTask([input_size, input1](int id, int in_threads) {
+
+      size_t n = input_size/in_threads;
       uint64_t* input1_p = input1 + n*id;
       for (size_t i = 0; i < n; i++){
-        //if (id == 0) if (*input1_p > 7) std::cout << "> 7" << std::endl;
+        //if (id == 0) 
+        if (*input1_p > 7) std::cout << "> 7" << std::endl;
         ++input1_p;
       }
     });
@@ -87,21 +90,21 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_MT_OMP)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1, 4096})
-    ->Args({2, 4096})
-    ->Args({4, 128})
-    ->Args({8, 128})
-    ->Args({16, 128})
-    ->Args({32, 128});
+    ->Args({1, 262144})
+    ->Args({2, 262144})
+    ->Args({4, 262144})
+    ->Args({8, 262144})
+    ->Args({16, 262144})
+    ->Args({32, 262144});
 
 BENCHMARK(BM_MT_TP)
     ->Unit(benchmark::kMicrosecond)
-    ->Args({1, 4096})
-    ->Args({2, 4096})
-    ->Args({4, 128})
-    ->Args({8, 128})
-    ->Args({16, 128})
-    ->Args({32, 128});
+    ->Args({1, 262144})
+    ->Args({2, 262144})
+    ->Args({4, 262144})
+    ->Args({8, 262144})
+    ->Args({16, 262144})
+    ->Args({32, 262144});
 
 
 // state[0] is the degree
