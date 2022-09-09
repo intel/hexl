@@ -45,7 +45,11 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
 
   AlignedVector64<uint64_t> input_v(input_size, 7);
   uint64_t* input1 = input_v.data();
-
+  AlignedVector64<uint64_t> input2_v(input_size, 7);
+  uint64_t* input2 = input2_v.data();
+  AlignedVector64<uint64_t> output_v(input_size, 7);
+  uint64_t* output = output_v.data();
+  
   for(auto _ : state){
 
 #pragma omp parallel num_threads(threads)
@@ -53,10 +57,15 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
       int threads = omp_get_num_threads();
       int id = omp_get_thread_num();
       uint64_t* input1_p = input1 + input_size/threads*id;
+      uint64_t* input2_p = input2 + input_size/threads*id;
+      uint64_t* output_p = output + input_size/threads*id;
       for (size_t i = 0; i < input_size/threads; i++){
         //if (id == 0) 
-        if (*input1_p > 7) std::cout << "> 7 " << *input1_p << std::endl;
+        //if (*input1_p > 7) std::cout << "> 7 " << *input1_p << std::endl;
+        *output_p = *input1_p + *input2_p;
+        ++*output_p;
         ++input1_p;
+        ++input2_p;
       }
     }
   }
@@ -67,20 +76,29 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
 static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
   size_t input_size = state.range(1);
-  AlignedVector64<uint64_t> input_v(input_size, 7);
-  uint64_t* input1 = input_v.data();
+  AlignedVector64<uint64_t> input1_v(input_size, 7);
+  uint64_t* input1 = input1_v.data();
+  AlignedVector64<uint64_t> input2_v(input_size, 7);
+  uint64_t* input2 = input2_v.data();
+  AlignedVector64<uint64_t> output_v(input_size, 7);
+  uint64_t* output = output_v.data();
 
   ThreadPoolExecutor::SetNumberOfThreads(threads);
 
   for(auto _ : state){  
-    ThreadPoolExecutor::AddParallelTask([input_size, input1](int id, int in_threads) {
+    ThreadPoolExecutor::AddParallelTask([input_size, input1, input2, output](int id, int in_threads) {
 
       size_t n = input_size/in_threads;
       uint64_t* input1_p = input1 + n*id;
+      uint64_t* input2_p = input2 + n*id;
+      uint64_t* output_p = output + n*id;
       for (size_t i = 0; i < n; i++){
         //if (id == 0) 
-        if (*input1_p > 7) std::cout << "> 7" << std::endl;
+        //if (*input1_p > 7) std::cout << "> 7" << std::endl;
+        *output_p = *input1_p + *input2_p;
+        ++*output_p;
         ++input1_p;
+        ++input2_p;
       }
     });
     ThreadPoolExecutor::SetBarrier();

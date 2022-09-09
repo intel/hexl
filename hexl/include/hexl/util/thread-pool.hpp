@@ -111,7 +111,7 @@ class ThreadPool {
       {
         thread_handler->task = task;
         //thread_handler->thread_id = i;
-        thread_handler->total_threads = num_threads;
+        //thread_handler->total_threads = num_threads;
         thread_handler->state.store(2);
         //std::cout << "ROCHA Added Job. ID: " << i << std::endl;
       }
