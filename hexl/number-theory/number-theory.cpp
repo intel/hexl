@@ -10,7 +10,7 @@
 namespace intel {
 namespace hexl {
 
-int eltwise_num_threads = static_cast<int>(std::strtol(std::getenv("ELTWISE_NUM_THREADS"),NULL,10));
+int eltwise_num_threads = 2;//static_cast<int>(std::strtol(std::getenv("ELTWISE_NUM_THREADS"),NULL,10));
 int ntt_num_threads = 2;//static_cast<int>(std::strtol(std::getenv("NTT_NUM_THREADS"),NULL,10));
 int ntt_parallel_calls = 1;//static_cast<int>(std::strtol(std::getenv("NTT_PARALLEL_CALLS"),NULL,10));
 

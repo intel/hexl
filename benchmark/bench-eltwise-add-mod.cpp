@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-
+#include <immintrin.h>
 #include <iostream>
 #include <vector>
 #include <omp.h>
@@ -16,6 +16,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "util/util-internal.hpp"
+#include "util/avx512-util.hpp"
 
 namespace intel {
 namespace hexl {
@@ -49,24 +50,60 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
   uint64_t* input2 = input2_v.data();
   AlignedVector64<uint64_t> output_v(input_size, 7);
   uint64_t* output = output_v.data();
-  
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(3));
+
   for(auto _ : state){
 
 #pragma omp parallel num_threads(threads)
     {
-      int threads = omp_get_num_threads();
+      // Level 0
+      /*
+      int sum = 0;
+      for (int i = 0; i < 101; i++){
+        sum++;
+        sum = sum%77;
+      }
+      if (sum > 75) std::cout << "Bla"  << sum << std::endl;
+      */
+
+      // Level 1
+      /*
+      int in_threads = omp_get_num_threads();
       int id = omp_get_thread_num();
-      uint64_t* input1_p = input1 + input_size/threads*id;
-      uint64_t* input2_p = input2 + input_size/threads*id;
-      uint64_t* output_p = output + input_size/threads*id;
-      for (size_t i = 0; i < input_size/threads; i++){
-        //if (id == 0) 
-        //if (*input1_p > 7) std::cout << "> 7 " << *input1_p << std::endl;
+      size_t n = input_size/in_threads;
+      uint64_t* input1_p = input1 + n*id;
+      uint64_t*  input2_p =input2 + n*id;
+      uint64_t*  output_p = output + n*id;
+      for (size_t i = 0; i < n; i++){
+
         *output_p = *input1_p + *input2_p;
-        ++*output_p;
+        ++output_p;
         ++input1_p;
         ++input2_p;
       }
+      */
+      
+      // Level 2
+      ///*
+      int in_threads = omp_get_num_threads();
+      int id = omp_get_thread_num();
+      size_t n = input_size/in_threads/8;
+      const __m512i* input1_p = reinterpret_cast<__m512i*>(input1) + n*id;
+      const __m512i* input2_p = reinterpret_cast<__m512i*>(input2) + n*id;
+      __m512i* output_p = reinterpret_cast<__m512i*>(output) + n*id;
+      for (size_t i = 0; i < n; i++){
+      __m512i v_operand1 = _mm512_loadu_si512(input1_p);
+      __m512i v_operand2 = _mm512_loadu_si512(input2_p);
+
+      //__m512i v_result = _mm512_add_epi64(v_operand1, v_operand2);
+      __m512i v_result = _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+
+      _mm512_storeu_si512(output_p, v_result);
+        ++output_p;
+        ++input1_p;
+        ++input2_p;
+      }
+      //*/
     }
   }
 }
@@ -82,29 +119,59 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
   uint64_t* input2 = input2_v.data();
   AlignedVector64<uint64_t> output_v(input_size, 7);
   uint64_t* output = output_v.data();
-
+  __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(3));
   ThreadPoolExecutor::SetNumberOfThreads(threads);
 
   for(auto _ : state){  
-    ThreadPoolExecutor::AddParallelTask([input_size, input1, input2, output](int id, int in_threads) {
+    ThreadPoolExecutor::AddParallelTask([=](int id, int in_threads) {
 
+      // Level 0
+      /*
+      int sum = 0;
+      for (int i = 0; i < 101; i++){
+        sum++;
+        sum = sum%77;
+      }
+      if (sum > 75) std::cout << "Bla"  << sum << std::endl;
+      */
+      
+      // Level 1
+      /*
       size_t n = input_size/in_threads;
       uint64_t* input1_p = input1 + n*id;
-      uint64_t* input2_p = input2 + n*id;
-      uint64_t* output_p = output + n*id;
+      uint64_t*  input2_p =input2 + n*id;
+      uint64_t*  output_p = output + n*id;
       for (size_t i = 0; i < n; i++){
-        //if (id == 0) 
-        //if (*input1_p > 7) std::cout << "> 7" << std::endl;
         *output_p = *input1_p + *input2_p;
-        ++*output_p;
+        ++output_p;
         ++input1_p;
         ++input2_p;
       }
+      */
+
+      // Level 2
+      ///*
+      size_t n = input_size/in_threads/8;
+      const __m512i* input1_p = reinterpret_cast<__m512i*>(input1) + n*id;
+      const __m512i* input2_p = reinterpret_cast<__m512i*>(input2) + n*id;
+      __m512i* output_p = reinterpret_cast<__m512i*>(output) + n*id;
+      for (size_t i = 0; i < n; i++){
+      __m512i v_operand1 = _mm512_loadu_si512(input1_p);
+      __m512i v_operand2 = _mm512_loadu_si512(input2_p);
+
+      //__m512i v_result = _mm512_add_epi64(v_operand1, v_operand2);
+      __m512i v_result = _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+
+      _mm512_storeu_si512(output_p, v_result);
+        ++output_p;
+        ++input1_p;
+        ++input2_p;
+      }
+      //*/
     });
     ThreadPoolExecutor::SetBarrier();
   }
 }
-
 
 BENCHMARK(BM_MT_OMP)
     ->Unit(benchmark::kMicrosecond)
@@ -123,7 +190,6 @@ BENCHMARK(BM_MT_TP)
     ->Args({8, 262144})
     ->Args({16, 262144})
     ->Args({32, 262144});
-
 
 // state[0] is the degree
 static void BM_EltwiseVectorVectorAddModNative(
