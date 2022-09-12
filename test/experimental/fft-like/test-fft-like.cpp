@@ -7,7 +7,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {

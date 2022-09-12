@@ -7,7 +7,7 @@
 
 #include "hexl/util/aligned-allocator.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 
 namespace intel {
 namespace hexl {

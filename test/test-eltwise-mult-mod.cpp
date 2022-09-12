@@ -10,7 +10,7 @@
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 
 namespace intel {
 namespace hexl {

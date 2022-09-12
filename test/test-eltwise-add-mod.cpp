@@ -9,7 +9,7 @@
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 
 namespace intel {
 namespace hexl {
