@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "test-util-avx512.hpp"
+#include "test/test-util-avx512.hpp"
 #include "util/avx512-util.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"

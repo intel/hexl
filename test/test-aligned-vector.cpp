@@ -6,7 +6,7 @@
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/defines.hpp"
 #include "hexl/util/types.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 
 namespace intel {
 namespace hexl {

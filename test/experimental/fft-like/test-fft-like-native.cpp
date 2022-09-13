@@ -9,7 +9,7 @@
 #include "hexl/experimental/fft-like/fft-like.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/defines.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"
 

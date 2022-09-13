@@ -10,7 +10,7 @@
 #include "hexl/eltwise/eltwise-sub-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
-#include "test-util-avx512.hpp"
+#include "test/test-util-avx512.hpp"
 #include "util/cpu-features.hpp"
 #include "util/util-internal.hpp"
 

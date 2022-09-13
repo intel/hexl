@@ -9,7 +9,7 @@
 #include "hexl/eltwise/eltwise-fma-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {

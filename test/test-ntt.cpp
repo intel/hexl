@@ -11,8 +11,8 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/defines.hpp"
 #include "ntt/ntt-internal.hpp"
-#include "test-ntt-util.hpp"
-#include "test-util.hpp"
+#include "test/test-ntt-util.hpp"
+#include "test/test-util.hpp"
 #include "util/cpu-features.hpp"
 
 namespace intel {

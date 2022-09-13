@@ -54,8 +54,11 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_definitions(unit-test PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
+set(HEXL_TEST_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 target_include_directories(unit-test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${HEXL_TEST_INC_DIR}
     ${HEXL_SRC_ROOT_DIR} # Private headers
 )
 

@@ -8,7 +8,7 @@
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/check.hpp"
-#include "test-util.hpp"
+#include "test/test-util.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
