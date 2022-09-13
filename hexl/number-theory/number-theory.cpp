@@ -1,3 +1,4 @@
+
 // Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,9 +11,15 @@
 namespace intel {
 namespace hexl {
 
-int eltwise_num_threads = 2;//static_cast<int>(std::strtol(std::getenv("ELTWISE_NUM_THREADS"),NULL,10));
-int ntt_num_threads = 2;//static_cast<int>(std::strtol(std::getenv("NTT_NUM_THREADS"),NULL,10));
-int ntt_parallel_calls = 1;//static_cast<int>(std::strtol(std::getenv("NTT_PARALLEL_CALLS"),NULL,10));
+int eltwise_num_threads =
+    2;  // static_cast<int>(std::strtol(std::getenv("ELTWISE_NUM_THREADS"),
+        // NULL,10));
+int ntt_num_threads =
+    6;  // static_cast<int>(std::strtol(std::getenv("NTT_NUM_THREADS"),
+        // NULL,10));
+int ntt_parallel_calls =
+    2;  // static_cast<int>(std::strtol(std::getenv("NTT_PARALLEL_CALLS"),
+        // NULL,10));
 
 uint64_t InverseMod(uint64_t input, uint64_t modulus) {
   uint64_t a = input % modulus;

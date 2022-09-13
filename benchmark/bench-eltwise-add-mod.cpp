@@ -3,41 +3,39 @@
 
 #include <benchmark/benchmark.h>
 #include <immintrin.h>
+#include <omp.h>
+#include <unistd.h>
+
+#include <chrono>
 #include <iostream>
 #include <vector>
-#include <omp.h>
-#include <chrono>
-#include <unistd.h>
-#include "hexl/util/thread-pool.hpp"
+
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
-#include "util/util-internal.hpp"
+#include "hexl/util/thread-pool.hpp"
 #include "util/avx512-util.hpp"
+#include "util/util-internal.hpp"
 
 namespace intel {
 namespace hexl {
 
-
 // state[0] is the mode
 static void BM_MT_Native(benchmark::State& state) {  //  NOLINT
-  
-  for(auto _ : state){
+  for (auto _ : state) {
     int sum = 0;
-    for (int i = 0; i < 101; i++){
+    for (int i = 0; i < 101; i++) {
       sum++;
-      sum = sum%77;
+      sum = sum % 77;
     }
-    if (sum > 75) std::cout << "Bla"  << sum << std::endl;
+    if (sum > 75) std::cout << "Bla" << sum << std::endl;
   }
 }
 
-BENCHMARK(BM_MT_Native)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({1});
+BENCHMARK(BM_MT_Native)->Unit(benchmark::kMicrosecond)->Args({1});
 
 // state[0] is the mode
 static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
@@ -52,19 +50,18 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
   uint64_t* output = output_v.data();
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(3));
 
-  for(auto _ : state){
-
+  for (auto _ : state) {
 #pragma omp parallel num_threads(threads)
     {
       // Level 0
-      /*
+      ///*
       int sum = 0;
-      for (int i = 0; i < 101; i++){
+      for (int i = 0; i < 101; i++) {
         sum++;
-        sum = sum%77;
+        sum = sum % 77;
       }
-      if (sum > 75) std::cout << "Bla"  << sum << std::endl;
-      */
+      if (sum > 75) std::cout << "Bla" << sum << std::endl;
+      //*/
 
       // Level 1
       /*
@@ -82,9 +79,9 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
         ++input2_p;
       }
       */
-      
+
       // Level 2
-      ///*
+      /*
       int in_threads = omp_get_num_threads();
       int id = omp_get_thread_num();
       size_t n = input_size/in_threads/8;
@@ -96,18 +93,18 @@ static void BM_MT_OMP(benchmark::State& state) {  //  NOLINT
       __m512i v_operand2 = _mm512_loadu_si512(input2_p);
 
       //__m512i v_result = _mm512_add_epi64(v_operand1, v_operand2);
-      __m512i v_result = _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+      __m512i v_result = _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2,
+      v_modulus);
 
       _mm512_storeu_si512(output_p, v_result);
         ++output_p;
         ++input1_p;
         ++input2_p;
       }
-      //*/
+      */
     }
   }
 }
-
 
 // state[0] is the mode
 static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
@@ -122,19 +119,18 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(3));
   ThreadPoolExecutor::SetNumberOfThreads(threads);
 
-  for(auto _ : state){  
+  for (auto _ : state) {
     ThreadPoolExecutor::AddParallelTask([=](int id, int in_threads) {
-
       // Level 0
-      /*
+      ///*
       int sum = 0;
-      for (int i = 0; i < 101; i++){
+      for (int i = 0; i < 101; i++) {
         sum++;
-        sum = sum%77;
+        sum = sum % 77;
       }
-      if (sum > 75) std::cout << "Bla"  << sum << std::endl;
-      */
-      
+      if (sum > 75) std::cout << "Bla" << sum << std::endl;
+      //*/
+
       // Level 1
       /*
       size_t n = input_size/in_threads;
@@ -150,7 +146,7 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
       */
 
       // Level 2
-      ///*
+      /*
       size_t n = input_size/in_threads/8;
       const __m512i* input1_p = reinterpret_cast<__m512i*>(input1) + n*id;
       const __m512i* input2_p = reinterpret_cast<__m512i*>(input2) + n*id;
@@ -160,14 +156,15 @@ static void BM_MT_TP(benchmark::State& state) {  //  NOLINT
       __m512i v_operand2 = _mm512_loadu_si512(input2_p);
 
       //__m512i v_result = _mm512_add_epi64(v_operand1, v_operand2);
-      __m512i v_result = _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+      __m512i v_result = _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2,
+      v_modulus);
 
       _mm512_storeu_si512(output_p, v_result);
         ++output_p;
         ++input1_p;
         ++input2_p;
       }
-      //*/
+      */
     });
     ThreadPoolExecutor::SetBarrier();
   }
@@ -305,7 +302,7 @@ static void BM_EltwiseVectorVectorAddModAVX512_TP(
 
   for (auto _ : state) {
     EltwiseAddModAVX512_TP(output.data(), input1.data(), input2.data(),
-                            input_size, modulus);
+                           input_size, modulus);
   }
 }
 

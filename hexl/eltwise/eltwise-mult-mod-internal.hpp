@@ -70,50 +70,48 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
 
   const uint64_t twice_modulus = 2 * modulus;
 
-  //omp_set_num_threads(34);
+  // omp_set_num_threads(34);
 
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(result, operand1, operand2)
-  {
-    int id = omp_get_thread_num();
-    int threads = omp_get_num_threads();
-    operand1 += n / threads * id;
-    operand2 += n / threads * id;
-    result += n / threads * id;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = 0; i < n / threads; ++i) {
-      uint64_t prod_hi, prod_lo, c2_hi, c2_lo, Z;
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(result, operand1, operand2) {
+  int id = omp_get_thread_num();
+  int threads = omp_get_num_threads();
+  operand1 += n / threads * id;
+  operand2 += n / threads * id;
+  result += n / threads * id;
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = 0; i < n / threads; ++i) {
+    uint64_t prod_hi, prod_lo, c2_hi, c2_lo, Z;
 
-      uint64_t x =
-          ReduceMod<InputModFactor>(*operand1, modulus, &twice_modulus);
-      uint64_t y =
-          ReduceMod<InputModFactor>(*operand2, modulus, &twice_modulus);
+    uint64_t x = ReduceMod<InputModFactor>(*operand1, modulus, &twice_modulus);
+    uint64_t y = ReduceMod<InputModFactor>(*operand2, modulus, &twice_modulus);
 
-      // Multiply inputs
-      MultiplyUInt64(x, y, &prod_hi, &prod_lo);
+    // Multiply inputs
+    MultiplyUInt64(x, y, &prod_hi, &prod_lo);
 
-      // floor(U / 2^{n + beta})
-      uint64_t c1 = (prod_lo >> (prod_right_shift)) +
-                    (prod_hi << (64 - (prod_right_shift)));
+    // floor(U / 2^{n + beta})
+    uint64_t c1 = (prod_lo >> (prod_right_shift)) +
+                  (prod_hi << (64 - (prod_right_shift)));
 
-      // c2 = floor(U / 2^{n + beta}) * mu
-      MultiplyUInt64(c1, barr_lo, &c2_hi, &c2_lo);
+    // c2 = floor(U / 2^{n + beta}) * mu
+    MultiplyUInt64(c1, barr_lo, &c2_hi, &c2_lo);
 
-      // alpha - beta == 64, so we only need high 64 bits
-      uint64_t q_hat = c2_hi;
+    // alpha - beta == 64, so we only need high 64 bits
+    uint64_t q_hat = c2_hi;
 
-      // only compute low bits, since we know high bits will be 0
-      Z = prod_lo - q_hat * modulus;
+    // only compute low bits, since we know high bits will be 0
+    Z = prod_lo - q_hat * modulus;
 
-      // Conditional subtraction
-      *result = (Z >= modulus) ? (Z - modulus) : Z;
+    // Conditional subtraction
+    *result = (Z >= modulus) ? (Z - modulus) : Z;
 
-      ++operand1;
-      ++operand2;
-      ++result;
-    }
+    ++operand1;
+    ++operand2;
+    ++result;
   }
-  //omp_set_num_threads(32);
 }
-
+// omp_set_num_threads(32);
 }  // namespace hexl
+
+}  // namespace intel
 }  // namespace intel

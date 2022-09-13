@@ -57,7 +57,7 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
   std::cout << "Loop" << std::endl;
 
   HEXL_UNUSED(v_twice_mod);
-  //omp_set_num_threads(34);
+  // omp_set_num_threads(34);
 #pragma omp parallel num_threads(eltwise_num_threads)
   {
     int id = omp_get_thread_num();
@@ -333,7 +333,7 @@ void EltwiseMultModAVX512IFMAIntLoopUnroll(__m512i* vp_result,
       _mm512_storeu_si512(vp_result++, v_result_16);
     }
   }
-  //omp_set_num_threads(32);
+  // omp_set_num_threads(32);
 }
 
 // Algorithm 2 from https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
@@ -393,50 +393,50 @@ void EltwiseMultModAVX512IFMAIntLoopDefault(
   // std::cout << "Default 1" << std::endl;
   HEXL_UNUSED(v_twice_mod);
 
-  //omp_set_num_threads(34);
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
-  {
-    int id = omp_get_thread_num();
-    int threads = omp_get_num_threads();
-    vp_operand1 += n / 8 / threads * id;
-    vp_operand2 += n / 8 / threads * id;
-    vp_result += n / 8 / threads * id;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = n / 8 / threads; i > 0; --i) {
-      __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
-      v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
-                                                          &v_twice_mod);
+  // omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(vp_operand1, vp_operand2, vp_result) {
+  int id = omp_get_thread_num();
+  int threads = omp_get_num_threads();
+  vp_operand1 += n / 8 / threads * id;
+  vp_operand2 += n / 8 / threads * id;
+  vp_result += n / 8 / threads * id;
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = n / 8 / threads; i > 0; --i) {
+    __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
+    v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
+                                                        &v_twice_mod);
 
-      __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
-      v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
-                                                          &v_twice_mod);
+    __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
+    v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
+                                                        &v_twice_mod);
 
-      // Compute product
-      __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
-      __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
+    // Compute product
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
-      __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, low_shift);
-      __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, high_shift);
-      __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
+    __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, low_shift);
+    __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, high_shift);
+    __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
-      // alpha - beta == 52, so we only need high 52 bits
-      __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
+    // alpha - beta == 52, so we only need high 52 bits
+    __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
 
-      // z = prod_lo - (p * q_hat)_lo
-      __m512i v_result =
-          _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, q_hat, v_neg_mod);
+    // z = prod_lo - (p * q_hat)_lo
+    __m512i v_result =
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, q_hat, v_neg_mod);
 
-      // Reduce result to [0, q)
-      v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
+    // Reduce result to [0, q)
+    v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
 
-      _mm512_storeu_si512(vp_result, v_result);
+    _mm512_storeu_si512(vp_result, v_result);
 
-      ++vp_operand1;
-      ++vp_operand2;
-      ++vp_result;
-    }
+    ++vp_operand1;
+    ++vp_operand2;
+    ++vp_result;
   }
-  //omp_set_num_threads(32);
+}
+// omp_set_num_threads(32);
 }
 
 template <int ProdRightShift, int InputModFactor>
@@ -634,5 +634,5 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
 
 #endif
 
-}  // namespace hexl
+}  // namespace intel
 }  // namespace intel

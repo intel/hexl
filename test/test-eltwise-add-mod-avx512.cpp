@@ -41,7 +41,8 @@ TEST(EltwiseAddMod, vector_vector_avx512_small_TP) {
   std::vector<uint64_t> op2{1, 3, 5, 7, 9, 2, 4, 6, 1, 3, 5, 7, 9, 2, 4, 6};
   std::vector<uint64_t> exp_out{2, 5, 8, 1, 4, 8, 1, 4, 2, 5, 8, 1, 4, 8, 1, 4};
   uint64_t modulus = 10;
-  EltwiseAddModAVX512_TP(op1.data(), op1.data(), op2.data(), op1.size(), modulus);
+  EltwiseAddModAVX512_TP(op1.data(), op1.data(), op2.data(), op1.size(),
+                         modulus);
 
   CheckEqual(op1, exp_out);
 }

@@ -94,58 +94,72 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
   __m512i v_twice_mod = _mm512_set1_epi64(static_cast<int64_t>(twice_mod));
 
-  //omp_set_num_threads(34);
+  // omp_set_num_threads(34);
 
   if (input_mod_factor == modulus) {
     if (output_mod_factor == 2) {
 // double start = omp_get_wtime();
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(v_operand, v_result)
-      {
-        // double end = omp_get_wtime();
-        // std::cout << "ROCHA Time1 " << end - start << std::endl;
-        // #pragma omp for
-        int threads = omp_get_num_threads();
-        int id = omp_get_thread_num();
-        v_operand += id * n_tmp / threads / 8;
-        v_result += id * n_tmp / threads / 8;
-        // std::cout << "n_tmp " << n_tmp << " id " << id << std::endl;
-        for (size_t i = 0; i < n_tmp / threads / 8; i++) {
-          __m512i v_op = _mm512_loadu_si512(v_operand);
-          v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
-              v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
-          _mm512_storeu_si512(v_result, v_op);
-          v_operand++;
-          v_result++;
-        }
-      }
-    } else {
-// double start = omp_get_wtime();
-// std::cout << "n_tmp " << n_tmp << std::endl;
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(v_operand, v_result)
-      {
-        // double end = omp_get_wtime();
-        // std::cout << "ROCHA Time2 " << end - start << std::endl;
-        // #pragma omp for
-        int threads = omp_get_num_threads();
-        int id = omp_get_thread_num();
-        v_operand += id * n_tmp / threads / 8;
-        v_result += id * n_tmp / threads / 8;
-        // std::cout << "n_tmp " << n_tmp << " id " << id << std::endl;
-        for (size_t i = 0; i < n_tmp / threads; i += 8) {
-          __m512i v_op = _mm512_loadu_si512(v_operand);
-          v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
-              v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
-          _mm512_storeu_si512(v_result, v_op);
-          v_operand++;
-          v_result++;
-        }
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(v_operand, v_result) {
+      // double end = omp_get_wtime();
+      // std::cout << "ROCHA Time1 " << end - start << std::endl;
+      // #pragma omp for
+      int threads = omp_get_num_threads();
+      int id = omp_get_thread_num();
+      v_operand += id * n_tmp / threads / 8;
+      v_result += id * n_tmp / threads / 8;
+      // std::cout << "n_tmp " << n_tmp << " id " << id << std::endl;
+      for (size_t i = 0; i < n_tmp / threads / 8; i++) {
+        __m512i v_op = _mm512_loadu_si512(v_operand);
+        v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
+            v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
+        _mm512_storeu_si512(v_result, v_op);
+        v_operand++;
+        v_result++;
       }
     }
+  } else {
+// double start = omp_get_wtime();
+// std::cout << "n_tmp " << n_tmp << std::endl;
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(v_operand, v_result) {
+    // double end = omp_get_wtime();
+    // std::cout << "ROCHA Time2 " << end - start << std::endl;
+    // #pragma omp for
+    int threads = omp_get_num_threads();
+    int id = omp_get_thread_num();
+    v_operand += id * n_tmp / threads / 8;
+    v_result += id * n_tmp / threads / 8;
+    // std::cout << "n_tmp " << n_tmp << " id " << id << std::endl;
+    for (size_t i = 0; i < n_tmp / threads; i += 8) {
+      __m512i v_op = _mm512_loadu_si512(v_operand);
+      v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
+          v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
+      _mm512_storeu_si512(v_result, v_op);
+      v_operand++;
+      v_result++;
+    }
   }
-  //omp_set_num_threads(32);
-  if (input_mod_factor == 2) {
+}
+}
+// omp_set_num_threads(32);
+if (input_mod_factor == 2) {
+  for (size_t i = 0; i < n_tmp; i += 8) {
+    __m512i v_op = _mm512_loadu_si512(v_operand);
+    v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
+    HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                      "v_op exceeds bound " << modulus);
+    _mm512_storeu_si512(v_result, v_op);
+    ++v_operand;
+    ++v_result;
+  }
+}
+
+if (input_mod_factor == 4) {
+  if (output_mod_factor == 1) {
     for (size_t i = 0; i < n_tmp; i += 8) {
       __m512i v_op = _mm512_loadu_si512(v_operand);
+      v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
       v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
       HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
                         "v_op exceeds bound " << modulus);
@@ -154,32 +168,18 @@ void EltwiseReduceModAVX512_mt(uint64_t* result, const uint64_t* operand,
       ++v_result;
     }
   }
-
-  if (input_mod_factor == 4) {
-    if (output_mod_factor == 1) {
-      for (size_t i = 0; i < n_tmp; i += 8) {
-        __m512i v_op = _mm512_loadu_si512(v_operand);
-        v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
-        v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
-        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
-                          "v_op exceeds bound " << modulus);
-        _mm512_storeu_si512(v_result, v_op);
-        ++v_operand;
-        ++v_result;
-      }
-    }
-    if (output_mod_factor == 2) {
-      for (size_t i = 0; i < n_tmp; i += 8) {
-        __m512i v_op = _mm512_loadu_si512(v_operand);
-        v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
-        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, twice_mod,
-                          "v_op exceeds bound " << twice_mod);
-        _mm512_storeu_si512(v_result, v_op);
-        ++v_operand;
-        ++v_result;
-      }
+  if (output_mod_factor == 2) {
+    for (size_t i = 0; i < n_tmp; i += 8) {
+      __m512i v_op = _mm512_loadu_si512(v_operand);
+      v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
+      HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, twice_mod,
+                        "v_op exceeds bound " << twice_mod);
+      _mm512_storeu_si512(v_result, v_op);
+      ++v_operand;
+      ++v_result;
     }
   }
+}
 }
 
 template <int BitShift = 64>

@@ -4,14 +4,13 @@
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 
 #include <immintrin.h>
+#include <sched.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <sched.h>
 
 #include <chrono>
-#include <thread>
-
 #include <iostream>
+#include <thread>
 
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
@@ -81,16 +80,18 @@ void EltwiseAddModAVX512_TP(uint64_t* result, const uint64_t* operand1,
   // std::cout << "ROCHA Jobs Launched" << std::endl;
   ThreadPoolExecutor::SetNumberOfThreads(eltwise_num_threads);
   // std::cout << "ROCHA call " << n << std::endl;
-   
-  //ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2, v_modulus](s_thread_info_t* thread_handler) {
-  ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2, v_modulus](int id, int threads) {
-    //int id = ThreadPoolExecutor::GetThreadId();
-    //int64_t id = thread_handler->thread_id;
-    //int threads = ThreadPoolExecutor::GetNumberOfThreads();
-    //int64_t threads = thread_handler->total_threads; 
+
+  // ThreadPoolExecutor::AddParallelTask([vp_result,n, vp_operand1, vp_operand2,
+  // v_modulus](s_thread_info_t* thread_handler) {
+  ThreadPoolExecutor::AddParallelTask([vp_result, n, vp_operand1, vp_operand2,
+                                       v_modulus](int id, int threads) {
+    // int id = ThreadPoolExecutor::GetThreadId();
+    // int64_t id = thread_handler->thread_id;
+    // int threads = ThreadPoolExecutor::GetNumberOfThreads();
+    // int64_t threads = thread_handler->total_threads;
     __m512i* i_vp_result = vp_result + id * n / 8 / threads;
     // std::this_thread::sleep_for(std::chrono::nanoseconds(600));
-    //std::cout << "ROCHA id on CPU " << sched_getcpu() << std::endl;
+    // std::cout << "ROCHA id on CPU " << sched_getcpu() << std::endl;
     const __m512i* i_vp_operand1 = vp_operand1 + id * n / 8 / threads;
     const __m512i* i_vp_operand2 = vp_operand2 + id * n / 8 / threads;
     HEXL_LOOP_UNROLL_4
@@ -191,33 +192,33 @@ void EltwiseAddModAVX512_OMP(uint64_t* result, const uint64_t* operand1,
 
   // std::cout << "ROCHA " << std::endl;
   // std::cout << "n " << n << std::endl;
-  //omp_set_num_threads(34);
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_operand2, vp_result)
-  {
-    int id = omp_get_thread_num();
-    int threads = omp_get_num_threads();
-    //std::cout << "ROCHA: on CPU " << sched_getcpu() << std::endl;
-    __m512i* i_vp_result = vp_result + id * n / 8 / threads;
-    const __m512i* i_vp_operand1 = vp_operand1 + id * n / 8 / threads;
-    const __m512i* i_vp_operand2 = vp_operand2 + id * n / 8 / threads;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = n / 8 / threads; i > 0; --i) {
-      __m512i v_operand1 = _mm512_loadu_si512(i_vp_operand1);
-      __m512i v_operand2 = _mm512_loadu_si512(i_vp_operand2);
+  // omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(vp_operand1, vp_operand2, vp_result) {
+  int id = omp_get_thread_num();
+  int threads = omp_get_num_threads();
+  // std::cout << "ROCHA: on CPU " << sched_getcpu() << std::endl;
+  __m512i* i_vp_result = vp_result + id * n / 8 / threads;
+  const __m512i* i_vp_operand1 = vp_operand1 + id * n / 8 / threads;
+  const __m512i* i_vp_operand2 = vp_operand2 + id * n / 8 / threads;
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = n / 8 / threads; i > 0; --i) {
+    __m512i v_operand1 = _mm512_loadu_si512(i_vp_operand1);
+    __m512i v_operand2 = _mm512_loadu_si512(i_vp_operand2);
 
-      __m512i v_result =
-          _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+    __m512i v_result =
+        _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
 
-      _mm512_storeu_si512(i_vp_result, v_result);
+    _mm512_storeu_si512(i_vp_result, v_result);
 
-      ++i_vp_result;
-      ++i_vp_operand1;
-      ++i_vp_operand2;
-    }
+    ++i_vp_result;
+    ++i_vp_operand1;
+    ++i_vp_operand2;
   }
-  //omp_set_num_threads(32);
-  HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
+// omp_set_num_threads(32);
+HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
+}  // namespace hexl
 
 static const size_t N = 23;
 
@@ -342,29 +343,29 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i v_operand2 = _mm512_set1_epi64(static_cast<int64_t>(operand2));
 
   // std::cout << "n " << n << std::endl;
-  //omp_set_num_threads(34);
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(vp_operand1, vp_result)
-  {
-    int id = omp_get_thread_num();
-    int threads = omp_get_num_threads();
-    vp_result += id * n / 8 / threads;
-    vp_operand1 += id * n / 8 / threads;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = n / 8 / threads; i > 0; --i) {
-      __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
+  // omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(vp_operand1, vp_result) {
+  int id = omp_get_thread_num();
+  int threads = omp_get_num_threads();
+  vp_result += id * n / 8 / threads;
+  vp_operand1 += id * n / 8 / threads;
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = n / 8 / threads; i > 0; --i) {
+    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
 
-      __m512i v_result =
-          _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+    __m512i v_result =
+        _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
 
-      _mm512_storeu_si512(vp_result, v_result);
+    _mm512_storeu_si512(vp_result, v_result);
 
-      ++vp_result;
-      ++vp_operand1;
-    }
+    ++vp_result;
+    ++vp_operand1;
   }
-  //omp_set_num_threads(32);
-  HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
+// omp_set_num_threads(32);
+HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
+}  // namespace intel
 
 }  // namespace hexl
 }  // namespace intel
