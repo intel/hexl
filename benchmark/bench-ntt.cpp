@@ -155,7 +155,7 @@ BENCHMARK(BM_FwdNTT_AVX512IFMA)
     ->Args({262144});
 
 // state[0] is the degree
-static void BM_FwdNTT_AVX512IFMA_MT(benchmark::State& state) {  //  NOLINT
+static void BM_FwdNTT_AVX512IFMA_OMP(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus_bits = 49;
   size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
@@ -175,7 +175,7 @@ static void BM_FwdNTT_AVX512IFMA_MT(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTT_AVX512IFMA_MT)
+BENCHMARK(BM_FwdNTT_AVX512IFMA_OMP)
     ->Unit(benchmark::kMicrosecond)
     ->Args({4096})
     ->Args({8192})
@@ -186,7 +186,38 @@ BENCHMARK(BM_FwdNTT_AVX512IFMA_MT)
     ->Args({262144});
 
 // state[0] is the degree
-static void BM_FwdNTT_AVX512IFMA_MTN(benchmark::State& state) {  //  NOLINT
+static void BM_FwdNTT_AVX512IFMA_TP(benchmark::State& state) {  //  NOLINT
+  size_t ntt_size = state.range(0);
+  size_t modulus_bits = 49;
+  size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
+
+  auto input = GenerateInsecureUniformIntRandomValues(ntt_size, 0, modulus);
+  NTT ntt(ntt_size, modulus);
+
+  const AlignedVector64<uint64_t> root_of_unity =
+      ntt.GetAVX512RootOfUnityPowers();
+  const AlignedVector64<uint64_t> precon_root_of_unity =
+      ntt.GetAVX512Precon52RootOfUnityPowers();
+
+  for (auto _ : state) {
+    ForwardTransformToBitReverseAVX512_TP<NTT::s_ifma_shift_bits>(
+        input.data(), input.data(), ntt_size, modulus, root_of_unity.data(),
+        precon_root_of_unity.data(), 2, 1);
+  }
+}
+
+BENCHMARK(BM_FwdNTT_AVX512IFMA_TP)
+    ->Unit(benchmark::kMicrosecond)
+    ->Args({4096})
+    ->Args({8192})
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
+
+// state[0] is the degree
+static void BM_FwdNTT_AVX512IFMA_NOMP(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
   size_t modulus_bits = 49;
   size_t modulus = GeneratePrimes(1, modulus_bits, true, ntt_size)[0];
@@ -206,7 +237,7 @@ static void BM_FwdNTT_AVX512IFMA_MTN(benchmark::State& state) {  //  NOLINT
   }
 }
 
-BENCHMARK(BM_FwdNTT_AVX512IFMA_MTN)
+BENCHMARK(BM_FwdNTT_AVX512IFMA_NOMP)
     ->Unit(benchmark::kMicrosecond)
     ->Args({4096})
     ->Args({8192})

@@ -34,26 +34,26 @@ void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, uint64_t n,
   __m512i v_bound = _mm512_set1_epi64(static_cast<int64_t>(bound));
   const __m512i* v_op_ptr = reinterpret_cast<const __m512i*>(operand1);
   __m512i* v_result_ptr = reinterpret_cast<__m512i*>(result);
-  //omp_set_num_threads(34);
-#pragma omp parallel num_threads(eltwise_num_threads) firstprivate(v_op_ptr, v_result_ptr)
-  {
-    int id = omp_get_thread_num();
-    int threads = omp_get_num_threads();
-    v_result_ptr += id * n / 8 / threads;
-    v_op_ptr += id * n / 8 / threads;
-    for (size_t i = n / 8 / threads; i > 0; --i) {
-      __m512i v_op = _mm512_loadu_si512(v_op_ptr);
-      __m512i v_add_diff = _mm512_hexl_cmp_epi64(v_op, v_bound, cmp, diff);
-      v_op = _mm512_add_epi64(v_op, v_add_diff);
-      _mm512_storeu_si512(v_result_ptr, v_op);
+  // omp_set_num_threads(34);
+#pragma omp parallel num_threads(eltwise_num_threads) \
+    firstprivate(v_op_ptr, v_result_ptr) {
+  int id = omp_get_thread_num();
+  int threads = omp_get_num_threads();
+  v_result_ptr += id * n / 8 / threads;
+  v_op_ptr += id * n / 8 / threads;
+  for (size_t i = n / 8 / threads; i > 0; --i) {
+    __m512i v_op = _mm512_loadu_si512(v_op_ptr);
+    __m512i v_add_diff = _mm512_hexl_cmp_epi64(v_op, v_bound, cmp, diff);
+    v_op = _mm512_add_epi64(v_op, v_add_diff);
+    _mm512_storeu_si512(v_result_ptr, v_op);
 
-      ++v_result_ptr;
-      ++v_op_ptr;
-    }
+    ++v_result_ptr;
+    ++v_op_ptr;
   }
-  //omp_set_num_threads(32);
+}
+// omp_set_num_threads(32);
 }
 #endif
 
-}  // namespace hexl
+}  // namespace intel
 }  // namespace intel
