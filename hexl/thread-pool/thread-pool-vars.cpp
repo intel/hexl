@@ -5,7 +5,7 @@
 
 namespace intel {
 namespace hexl {
-#ifdef HEXL_THREADS
+#ifdef HEXL_MULTI_THREADING
 int HEXL_NUM_THREADS = setup_num_threads("HEXL_NUM_THREADS");
 int HEXL_NTT_PARALLEL_DEPTH = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
 #else

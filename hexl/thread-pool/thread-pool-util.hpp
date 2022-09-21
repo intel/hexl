@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <atomic>
+#include <condition_variable>
 #include <functional>
+#include <mutex>
 #include <thread>
 
 #pragma once
@@ -23,8 +25,10 @@ enum STATE {
 // * 64 bytes struct as cache lines
 typedef struct s_thread_info {
   std::atomic_int state{STATE::NONE};
-  uint64_t filler1;
-  uint64_t filler2;
+  uint64_t counter;
+  uint64_t counter2;
+  // std::condition_variable waker;
+  // std::mutex wake_mutex;
   std::thread thread;
   std::function<void(int id, int threads)> task;
 } thread_info_t;

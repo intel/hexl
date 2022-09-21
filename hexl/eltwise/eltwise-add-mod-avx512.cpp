@@ -45,6 +45,8 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
 
+  ThreadPoolExecutor::SetNumberOfThreads(HEXL_NUM_THREADS);
+
   ThreadPoolExecutor::AddParallelJobs([vp_result, n, vp_operand1, vp_operand2,
                                        v_modulus](int id, int threads) {
     __m512i* i_vp_result = vp_result + id * n / 8 / threads;

@@ -12,14 +12,13 @@ namespace intel {
 namespace hexl {
 
 class ThreadPoolExecutor {
-#ifdef HEXL_THREADS
+#ifdef HEXL_MULTI_THREADING
 
  private:
   inline static ThreadPool* pool = new ThreadPool(HEXL_NUM_THREADS);
 
  public:
   static void SetNumberOfThreads(int n_threads) {
-    std::cout << "ROCHA " << n_threads << std::endl;
     pool->SetupThreads(n_threads);
   }
 
@@ -40,6 +39,7 @@ class ThreadPoolExecutor {
   static void SetNumberOfThreads(int n_threads) { HEXL_UNUSED(n_threads); }
 
   static void AddParallelJobs(std::function<void(int id, int threads)> job) {
+    std::cout << "SINGLE" << std::endl;
     job(0, 1);
   }
 

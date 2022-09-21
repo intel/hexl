@@ -16,7 +16,7 @@
 namespace intel {
 namespace hexl {
 
-#ifdef HEXL_THREADS
+#ifdef HEXL_MULTI_THREADING
 static int check_env_var(const char* var) {
   int value = -1;
 

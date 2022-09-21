@@ -38,6 +38,8 @@ else()
   set(HEXL_DEBUG OFF)
 endif()
 
+
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -61,7 +63,7 @@ option(HEXL_EXPERIMENTAL "Enable experimental features" OFF)
 option(HEXL_SHARED_LIB "Generate a shared library" OFF)
 option(HEXL_TESTING "Enable unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
-option(HEXL_THREADS "Enable multithreaading " ON)
+option(HEXL_MULTI_THREADING "Enabling multithreading" ON)
 
 if (NOT HEXL_FPGA_COMPATIBILITY)
     set(HEXL_FPGA_COMPATIBILITY "0" CACHE INTERNAL "Set FPGA compatibility mask" FORCE)
@@ -79,10 +81,16 @@ message(STATUS "HEXL_SHARED_LIB:               ${HEXL_SHARED_LIB}")
 message(STATUS "HEXL_TESTING:                  ${HEXL_TESTING}")
 message(STATUS "HEXL_TREAT_WARNING_AS_ERROR:   ${HEXL_TREAT_WARNING_AS_ERROR}")
 message(STATUS "HEXL_FPGA_COMPATIBILITY:       ${HEXL_FPGA_COMPATIBILITY}")
-message(STATUS "HEXL_THREADS:                  ${HEXL_THREADS}")
+message(STATUS "HEXL_MULTI_THREADING:          ${HEXL_MULTI_THREADING}")
 
 hexl_check_compiler_version()
 hexl_add_compiler_definition()
+
+if (HEXL_MULTI_THREADING STREQUAL "ON")
+  set(HEXL_MULTI_THREADED ON)
+else()
+  set(HEXL_MULTI_THREADED OFF)
+endif()
 
 if (HEXL_COVERAGE)
   if (NOT HEXL_USE_GNU)
