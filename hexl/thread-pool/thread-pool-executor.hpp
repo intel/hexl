@@ -33,6 +33,8 @@ class ThreadPoolExecutor {
   static size_t GetNumberOfThreads() { return pool->GetNumThreads(); }
 
   static void SetBarrier() { pool->WaitThreads(); }
+
+  static void StopThreads() { pool->StopThreads(); }
 #else
 
  public:
@@ -50,6 +52,8 @@ class ThreadPoolExecutor {
   static size_t GetNumberOfThreads() { return 1; }
 
   static void SetBarrier() {}
+
+  static void StopThreads() {}
 #endif
 };
 

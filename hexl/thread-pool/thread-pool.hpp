@@ -13,10 +13,13 @@
 #include <vector>
 
 #include "hexl/logging/logging.hpp"
+#include "hexl/util/check.hpp"
 #include "thread-pool/thread-pool-util.hpp"
 
 namespace intel {
 namespace hexl {
+
+using std::chrono::duration_cast;
 
 class ThreadPool {
  private:
@@ -24,6 +27,7 @@ class ThreadPool {
   uint total_threads = 0;                       // Total number of threads
   std::atomic_int next_thread{0};               // Points to next free thread
   std::vector<thread_info_t*> thread_handlers;  // Thread's info
+  bool setup_done = false;
 
   // Methods
   // StartThreads: Spawn a given number of threads
@@ -36,13 +40,44 @@ class ThreadPool {
       uint* threads = &total_threads;
       thread_handler->thread =
           std::thread([thread_handler, current_threads, i, threads] {
+            bool stop = false;
             while (true) {
               // std::cout << "ROCHA: Thread waiting. Thread ID " <<
               // current_threads + i << std::endl;
               thread_handler->state.store(STATE::DONE);
-              while (1) {  // Thread spin-up
+              auto spin_start = std::chrono::steady_clock::now();
+              while (true) {  // Thread spin-up
+                // Start or stop thread
                 if (thread_handler->state.load() == STATE::KICK_OFF) break;
+                if (thread_handler->state.load() == STATE::KILL) {
+                  stop = true;
+                  break;
+                }
+                // Enter sleep mode if idle
+                auto spin_current = std::chrono::steady_clock::now();
+                uint64_t duration = duration_cast<std::chrono::milliseconds>(
+                                        spin_current - spin_start)
+                                        .count();
+                if (duration > HEXL_THREAD_WAIT_TIME) {
+                  // cout << "ROCHA sleep  " << current_threads + i << endl;
+                  thread_handler->state.store(STATE::SLEEPING);
+                  std::unique_lock<std::mutex> lock{thread_handler->wake_mutex};
+                  thread_handler->waker.wait(lock, [&stop, thread_handler] {
+                    if (thread_handler->state.load() == STATE::KICK_OFF) {
+                      return true;
+                    }
+                    if (thread_handler->state.load() == STATE::KILL) {
+                      stop = true;
+                      return true;
+                    }
+                    return false;
+                  });
+                  break;
+                }
               }
+
+              if (stop) break;
+
               // std::cout << "ROCHA: Thread working. Thread ID " <<
               // current_threads + i << std::endl;
               thread_handler->state.store(STATE::RUNNING);
@@ -52,21 +87,6 @@ class ThreadPool {
     }
     total_threads += new_threads;
     // WaitThreads();
-  }
-
-  // Stop threads
-  void StopThreads() {
-    std::cout << "ROCHA Stop" << std::endl;
-    {
-      // std::lock_guard<std::mutex> lock{event_lock};
-      // stop_threads = true;
-    }
-
-    // wake_condition.notify_all();
-
-    // for (auto& thread : threads) {
-    //  thread.join();
-    //}
   }
 
  public:
@@ -87,17 +107,31 @@ class ThreadPool {
   // GetNumThreads: Returns total number of threads
   size_t GetNumThreads() { return total_threads; }
 
-  // AddParallelJobs: Runs the same function on total number of threads
+  // AddParallelJobs: Runs the same function on a total number of threads
   void AddParallelJobs(std::function<void(int id, int threads)> job) {
+    HEXL_CHECK(!job, "Require non empty job");
+
+    if (!setup_done) {
+      SetupThreads(HEXL_NUM_THREADS);
+      setup_done = true;
+    }
+
     // std::cout << "ROCHA Added Job" << std::endl;
     if (next_thread.load() == 0) {  // If all threads available
       for (uint i = 0; i < total_threads; i++) {
         thread_info_t* thread_handler = thread_handlers.at(i);
-        {
-          thread_handler->task = job;
+        thread_handler->task = job;
+        if (thread_handler->state.load() == STATE::DONE) {
           thread_handler->state.store(STATE::KICK_OFF);
-          // std::cout << "ROCHA Added Job. ID: " << i << std::endl;
+        } else if (thread_handler->state.load() == STATE::SLEEPING) {
+          // std::cout << "Waking up " << i << std::endl;
+          thread_handler->state.store(STATE::KICK_OFF);
+          thread_handler->waker.notify_one();
+        } else {
+          std::cout << "Else " << i << std::endl;
+          job(i, total_threads);
         }
+        // std::cout << "ROCHA Added Job. ID: " << i << std::endl;
       }
       next_thread.store(total_threads);
     } else {  // Run on single thread
@@ -107,13 +141,23 @@ class ThreadPool {
 
   // AddTask: Runs a task on next thread available
   void AddTask(std::function<void(int id, int threads)> task) {
+    HEXL_CHECK(!job, "Require non empty task");
+
     // std::cout << "ROCHA Added Job" << std::endl;
     uint next = next_thread.fetch_add(1);
-    if (next < total_threads) {
+    if (next <= total_threads) {
       // std::cout << "ROCHA Task Adding " << std::endl;
       thread_info_t* thread_handler = thread_handlers.at(next);
       thread_handler->task = task;
-      thread_handler->state.store(STATE::KICK_OFF);
+      if (thread_handler->state.load() == STATE::DONE) {
+        thread_handler->state.store(STATE::KICK_OFF);
+      } else if (thread_handler->state.load() == STATE::SLEEPING) {
+        // std::cout << "Waking up " << i << std::endl;
+        thread_handler->state.store(STATE::KICK_OFF);
+        thread_handler->waker.notify_one();
+      } else {
+        task(next - 1, total_threads);
+      }
       // std::cout << "ROCHA Task Added " << available << std::endl;
     } else {
       // std::cout << "ROCHA No available " << std::endl;
@@ -129,7 +173,7 @@ class ThreadPool {
         n_threads = std::thread::hardware_concurrency();
         HEXL_VLOG(
             3, "Exceeded platform's available number of threads. Setting to: "
-                   << std::thread::hardware_concurrency() << ".");
+                   << thread::hardware_concurrency() << ".");
       }
 
       // std::cout << "ROCHA Setup " << n_threads << " threads" << std::endl;
@@ -153,6 +197,18 @@ class ThreadPool {
     }
     next_thread.store(0);
     // std::cout << "ROCHA Barrier Done" << std::endl;
+  }
+
+  // Stop threads
+  void StopThreads() {
+    for (uint i = 0; i < total_threads; i++) {
+      thread_info_t* thread_handler = thread_handlers.at(i);
+      thread_handler->state.store(STATE::KILL);
+      thread_handler->thread.join();
+    }
+    thread_handlers.clear();
+    total_threads = 0;
+    setup_done = false;
   }
 };
 

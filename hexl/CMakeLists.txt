@@ -72,8 +72,6 @@ else()
     set_target_properties(hexl PROPERTIES OUTPUT_NAME "hexl")
 endif()
 
-
-
 target_include_directories(hexl
     PRIVATE ${HEXL_SRC_ROOT_DIR}                               # Private headers
     PUBLIC  $<BUILD_INTERFACE:${HEXL_INC_ROOT_DIR}>            # Public headers
