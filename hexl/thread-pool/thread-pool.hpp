@@ -93,17 +93,9 @@ class ThreadPool {
  public:
   // Methods
 
-  explicit ThreadPool(int n_threads) {
-    // std::cout << "ROCHA Thread pool constructed" << std::endl;
-    std::cout << "ROCHA struct size:" << sizeof(thread_info_t) << " threads "
-              << n_threads << std::endl;
-    StartThreads(n_threads);
-  }
+  ThreadPool() {}
 
-  ~ThreadPool() {
-    // std::cout << "ROCHA Thread pool destructor" << std::endl;
-    StopThreads();
-  }
+  ~ThreadPool() { StopThreads(); }
 
   // GetNumThreads: Returns total number of threads
   size_t GetNumThreads() { return total_threads; }
@@ -175,17 +167,19 @@ class ThreadPool {
 
   // SetupThreads: Spawns new threads if necessary
   void SetupThreads(uint n_threads) {
-    // std::cout << "ROCHA Setup" << std::endl;
+    HEXL_VLOG(3, "Thread Pool Info:");
+    HEXL_VLOG(3, "HEXL_NUM_THREADS                = " << HEXL_NUM_THREADS);
+    HEXL_VLOG(3,
+              "HEXL_NTT_PARALLEL_DEPTH         = " << HEXL_NTT_PARALLEL_DEPTH);
+
     if (total_threads < n_threads) {
       if (n_threads > std::thread::hardware_concurrency()) {
         n_threads = std::thread::hardware_concurrency();
-        // HEXL_VLOG(
-        //     3, "Exceeded platform's available number of threads. Setting to:
-        //     "
-        //            << std::thread::hardware_concurrency() << ".");
+        HEXL_VLOG(
+            3, "Exceeded platform's available number of threads. Setting to: "
+                   << std::thread::hardware_concurrency() << ".");
       }
 
-      // std::cout << "ROCHA Setup " << n_threads << " threads" << std::endl;
       int new_threads = n_threads - total_threads;
       StartThreads(new_threads);
 
@@ -194,6 +188,8 @@ class ThreadPool {
     }
 
     setup_done = true;
+    HEXL_VLOG(2,
+              "Setting up thread pool with " << GetNumThreads() << " threads.");
   }
 
   // WaitThreads: Sets a barrier to sync all threads

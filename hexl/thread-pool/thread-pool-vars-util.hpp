@@ -38,15 +38,12 @@ static int setup_num_threads(const char* var) {
   // Use default value in case of error
   if (value <= 0) {
     value = HEXL_DEFAULT_NUM_THREADS;
-    HEXL_VLOG(3, "Using default number of threads.");
   }
+
   // Check max threads available
   if (value > hw_val) {
     value = hw_val;
-    HEXL_VLOG(3, "Threads reduced to platform's maximum number of threads.");
   }
-  HEXL_VLOG(3, "Using " << value << " threads for thread pool.");
-
   return value;
 }
 
@@ -57,7 +54,6 @@ static int setup_ntt_calls(const char* var) {
   // Use default value in case of error
   if (value <= 0) {
     value = HEXL_DEFAULT_NTT_PARALLEL_DEPTH;
-    // HEXL_VLOG(3, "Using default NTT's parallel depth.");
   }
 
   // Sum of powers of 2 minus main thread
@@ -65,11 +61,9 @@ static int setup_ntt_calls(const char* var) {
 
   // Check max threads available
   if (threads > HEXL_NUM_THREADS) {
-    // HEXL_VLOG(3, "Provided NTT's parallel depth exceeds number of threads.");
     value = 0;
   }
 
-  // HEXL_VLOG(2, "Using depth " << value << " for parallel NTT calls.");
   return value;
 }
 #endif
