@@ -58,8 +58,10 @@ class ThreadPool {
                 uint64_t duration = duration_cast<std::chrono::milliseconds>(
                                         spin_current - spin_start)
                                         .count();
+                // std::cout << "Duration " << duration << std::endl;
                 if (duration > HEXL_THREAD_WAIT_TIME) {
-                  // cout << "ROCHA sleep  " << current_threads + i << endl;
+                  // std::cout << "ROCHA sleep  " << current_threads + i << " d
+                  // " << HEXL_THREAD_WAIT_TIME << std::endl;
                   thread_handler->state.store(STATE::SLEEPING);
                   std::unique_lock<std::mutex> lock{thread_handler->wake_mutex};
                   thread_handler->waker.wait(lock, [&stop, thread_handler] {
@@ -86,7 +88,6 @@ class ThreadPool {
           });
     }
     total_threads += new_threads;
-    // WaitThreads();
   }
 
  public:
@@ -109,7 +110,7 @@ class ThreadPool {
 
   // AddParallelJobs: Runs the same function on a total number of threads
   void AddParallelJobs(std::function<void(int id, int threads)> job) {
-    HEXL_CHECK(!job, "Require non empty job");
+    HEXL_CHECK(job, "Require non empty job");
 
     if (!setup_done) {
       SetupThreads(HEXL_NUM_THREADS);
@@ -128,12 +129,14 @@ class ThreadPool {
           thread_handler->state.store(STATE::KICK_OFF);
           thread_handler->waker.notify_one();
         } else {
-          std::cout << "Else " << i << std::endl;
           job(i, total_threads);
         }
         // std::cout << "ROCHA Added Job. ID: " << i << std::endl;
       }
       next_thread.store(total_threads);
+
+      WaitThreads();  // Wait till all job is done
+
     } else {  // Run on single thread
       job(0, 1);
     }
@@ -141,12 +144,17 @@ class ThreadPool {
 
   // AddTask: Runs a task on next thread available
   void AddTask(std::function<void(int id, int threads)> task) {
-    HEXL_CHECK(!job, "Require non empty task");
+    HEXL_CHECK(task, "Require non empty task");
 
-    // std::cout << "ROCHA Added Job" << std::endl;
+    if (!setup_done) {
+      SetupThreads(HEXL_NUM_THREADS);
+      setup_done = true;
+    }
+
+    // std::cout << "ROCHA AddTask" << std::endl;
     uint next = next_thread.fetch_add(1);
-    if (next <= total_threads) {
-      // std::cout << "ROCHA Task Adding " << std::endl;
+    if (next < total_threads) {
+      // std::cout << "ROCHA Task Adding " << next << std::endl;
       thread_info_t* thread_handler = thread_handlers.at(next);
       thread_handler->task = task;
       if (thread_handler->state.load() == STATE::DONE) {
@@ -171,15 +179,21 @@ class ThreadPool {
     if (total_threads < n_threads) {
       if (n_threads > std::thread::hardware_concurrency()) {
         n_threads = std::thread::hardware_concurrency();
-        HEXL_VLOG(
-            3, "Exceeded platform's available number of threads. Setting to: "
-                   << thread::hardware_concurrency() << ".");
+        // HEXL_VLOG(
+        //     3, "Exceeded platform's available number of threads. Setting to:
+        //     "
+        //            << std::thread::hardware_concurrency() << ".");
       }
 
       // std::cout << "ROCHA Setup " << n_threads << " threads" << std::endl;
       int new_threads = n_threads - total_threads;
       StartThreads(new_threads);
+
+      // Wait threads are ready
+      WaitThreads();
     }
+
+    setup_done = true;
   }
 
   // WaitThreads: Sets a barrier to sync all threads
@@ -189,7 +203,8 @@ class ThreadPool {
     for (uint i = 0; i < total_threads; i++) {
       thread_info_t* thread_handler = thread_handlers.at(i);
       while (1) {
-        if (thread_handler->state.load() == STATE::DONE) {
+        if (thread_handler->state.load() == STATE::DONE ||
+            thread_handler->state.load() == STATE::SLEEPING) {
           // std::cout << "ROCHA Thread "<< i << " Done" << std::endl;
           break;
         }
@@ -201,14 +216,29 @@ class ThreadPool {
 
   // Stop threads
   void StopThreads() {
+    WaitThreads();
+
     for (uint i = 0; i < total_threads; i++) {
       thread_info_t* thread_handler = thread_handlers.at(i);
-      thread_handler->state.store(STATE::KILL);
+      if (thread_handler->state.load() == STATE::SLEEPING) {
+        // std::cout << "Waking up " << i << std::endl;
+        thread_handler->state.store(STATE::KILL);
+        thread_handler->waker.notify_one();
+      } else {
+        thread_handler->state.store(STATE::KILL);
+      }
       thread_handler->thread.join();
+      delete thread_handler;
     }
     thread_handlers.clear();
     total_threads = 0;
     setup_done = false;
+  }
+
+  std::vector<const thread_info_t*> GetThreadHandlers() {
+    std::vector<const thread_info_t*> handlers;
+    handlers.assign(thread_handlers.begin(), thread_handlers.end());
+    return handlers;
   }
 };
 

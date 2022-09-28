@@ -18,7 +18,7 @@ class ThreadPoolExecutor {
   inline static ThreadPool* pool = new ThreadPool(HEXL_NUM_THREADS);
 
  public:
-  static void SetNumberOfThreads(int n_threads) {
+  static void SetNumberOfThreads(uint n_threads) {
     pool->SetupThreads(n_threads);
   }
 
@@ -35,6 +35,11 @@ class ThreadPoolExecutor {
   static void SetBarrier() { pool->WaitThreads(); }
 
   static void StopThreads() { pool->StopThreads(); }
+
+  static std::vector<const thread_info_t*> GetThreadHandlers() {
+    return pool->GetThreadHandlers();
+  }
+
 #else
 
  public:
@@ -54,6 +59,7 @@ class ThreadPoolExecutor {
   static void SetBarrier() {}
 
   static void StopThreads() {}
+
 #endif
 };
 

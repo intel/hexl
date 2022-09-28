@@ -13,6 +13,7 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
     test-util-internal.cpp
+    test-thread-pool.cpp
 )
 
 if (HEXL_EXPERIMENTAL)
