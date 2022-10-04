@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "hexl/thread-pool/thread-pool-vars.hpp"
 #include "thread-pool/thread-pool.hpp"
 
@@ -22,17 +20,18 @@ class ThreadPoolExecutor {
     pool->SetupThreads(n_threads);
   }
 
-  static void AddParallelJobs(std::function<void(int id, int threads)> job) {
+  static void AddParallelJobs(
+      std::function<void(size_t id, size_t threads)> job) {
     pool->AddParallelJobs(job);
   }
 
-  static void AddTask(std::function<void(int id, int threads)> task) {
+  static void AddTask(std::function<void(size_t id, size_t threads)> task) {
     pool->AddTask(task);
   }
 
   static size_t GetNumberOfThreads() { return pool->GetNumThreads(); }
 
-  static void SetBarrier() { pool->WaitThreads(); }
+  static void SetBarrier() { pool->SetBarrier(); }
 
   static void StopThreads() { pool->StopThreads(); }
 
@@ -48,7 +47,6 @@ class ThreadPoolExecutor {
   static void SetNumberOfThreads(int n_threads) { HEXL_UNUSED(n_threads); }
 
   static void AddParallelJobs(std::function<void(int id, int threads)> job) {
-    std::cout << "SINGLE" << std::endl;
     job(0, 1);
   }
 

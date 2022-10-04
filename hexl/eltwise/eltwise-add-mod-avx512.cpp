@@ -66,8 +66,6 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
     }
   });
 
-  ThreadPoolExecutor::SetBarrier();
-
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 

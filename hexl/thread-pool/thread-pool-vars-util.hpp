@@ -6,7 +6,6 @@
 #include <math.h>
 
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <thread>
 

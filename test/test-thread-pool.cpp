@@ -16,13 +16,13 @@ namespace hexl {
 
 // Testing number of threads across different phases
 TEST(ThreadPool, GetNumberOfThreads) {
-  uint threads = 4;
+  uint nthreads = 4;
   ThreadPoolExecutor::StopThreads();
-  ThreadPoolExecutor::SetNumberOfThreads(threads);
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
   // When setup. Correspond to SetNumberOfThreads.
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), threads);
+  ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
   // When running parallel jobs. Keep the same value.
@@ -32,7 +32,7 @@ TEST(ThreadPool, GetNumberOfThreads) {
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   });
   handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), threads);
+  ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
   // When running parallel task. Keep the same value.
@@ -42,13 +42,14 @@ TEST(ThreadPool, GetNumberOfThreads) {
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   });
   handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), threads);
+  ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
   // When all done. Keep the same value.
   ThreadPoolExecutor::SetBarrier();
+
   handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), threads);
+  ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
   // When sleeping. Keep the same value.
@@ -56,7 +57,7 @@ TEST(ThreadPool, GetNumberOfThreads) {
   std::this_thread::sleep_for(
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
   handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), threads);
+  ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
   // When stopped. Returns zero.
@@ -64,7 +65,6 @@ TEST(ThreadPool, GetNumberOfThreads) {
   handlers = ThreadPoolExecutor::GetThreadHandlers();
   ASSERT_EQ(handlers.size(), 0);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
-
   ThreadPoolExecutor::StopThreads();
 }
 
@@ -199,18 +199,18 @@ TEST(ThreadPool, SetNumberOfThreads) {
 
   {
     // Presedence over env variable
-    uint threads = 4;
+    uint nthreads = 4;
     HEXL_NUM_THREADS = 2;
     ThreadPoolExecutor::StopThreads();
-    ThreadPoolExecutor::SetNumberOfThreads(threads);
+    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
     auto value = ThreadPoolExecutor::GetNumberOfThreads();
-    ASSERT_EQ(value, threads);
+    ASSERT_EQ(value, nthreads);
 
     // Setting new bigger value
-    threads = 6;
-    ThreadPoolExecutor::SetNumberOfThreads(threads);
+    nthreads = 6;
+    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
     value = ThreadPoolExecutor::GetNumberOfThreads();
-    ASSERT_EQ(value, threads);
+    ASSERT_EQ(value, nthreads);
 
     // Setting new smaller value. TODO
   }
@@ -269,8 +269,8 @@ TEST(ThreadPool, SetBrrier) {
 
   // After parallel tasks with explicit barrier
   start = std::chrono::steady_clock::now();
-  for (uint i = 0; i < ThreadPoolExecutor::GetNumberOfThreads(); i++) {
-    ThreadPoolExecutor::AddTask([delay](int id, int threads) {
+  for (size_t i = 0; i < ThreadPoolExecutor::GetNumberOfThreads(); i++) {
+    ThreadPoolExecutor::AddTask([delay](size_t id, size_t threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
       std::this_thread::sleep_for(std::chrono::milliseconds(delay));
@@ -428,15 +428,18 @@ TEST(ThreadPool, AddParallelJob) {
   // Testing id and threads parameters
   std::list<int> expected, result;
   ThreadPoolExecutor::SetBarrier();  // Needed to wait on nested threads
-  int threads = ThreadPoolExecutor::GetNumberOfThreads();
-  for (int i = 0; i < threads; i++) expected.push_back(i);
-  for (int i = 0; i < threads; i++) expected.push_back(threads);
+  int nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+  for (int i = 0; i < nthreads; i++) {
+    expected.push_back(i);
+    expected.push_back(nthreads);
+  }
   ThreadPoolExecutor::AddParallelJobs(
       [&list_mutex, &result](int id, int threads) {
         std::lock_guard<std::mutex> lock(list_mutex);
         result.push_back(id);
         result.push_back(threads);
       });
+  expected.sort();
   result.sort();
   ASSERT_EQ(expected, result);
 
@@ -451,9 +454,11 @@ TEST(ThreadPool, AddTask) {
   std::mutex list_mutex;
   HEXL_NUM_THREADS = 4;
 
+  ThreadPoolExecutor::StopThreads();
+
   // Test: Add tasks without previous setup. Less than available threads
-  int threads = HEXL_NUM_THREADS - 1;
-  for (int i = 0; i < threads; i++) {
+  int nthreads = HEXL_NUM_THREADS - 1;
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([&list_mutex, &ids](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -464,16 +469,16 @@ TEST(ThreadPool, AddTask) {
   ThreadPoolExecutor::SetBarrier();
   ids.sort();
   ids.unique();
-  ASSERT_EQ(ids.size(), threads);
+  ASSERT_EQ(ids.size(), nthreads);
 
   ids.clear();
   ThreadPoolExecutor::StopThreads();
 
   // Test: Add tasks with previous setup different than env var.
   // Using all threads.
-  threads = 8;
-  ThreadPoolExecutor::SetNumberOfThreads(threads);
-  for (int i = 0; i < threads; i++) {
+  nthreads = 8;
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([&list_mutex, &ids](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -484,14 +489,14 @@ TEST(ThreadPool, AddTask) {
   ThreadPoolExecutor::SetBarrier();
   ids.sort();
   ids.unique();
-  ASSERT_EQ(ids.size(), threads);
+  ASSERT_EQ(ids.size(), nthreads);
 
   ids.clear();
 
   // Test: Add tasks on same thread pool when previous jobs are done.
-  // Ensured by barrier on previous thread.
   // Using more than available threads
-  for (int i = 0; i < threads + 3; i++) {
+  ThreadPoolExecutor::SetBarrier();
+  for (int i = 0; i < nthreads + 3; i++) {
     ThreadPoolExecutor::AddTask([&list_mutex, &ids](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -502,7 +507,7 @@ TEST(ThreadPool, AddTask) {
   ThreadPoolExecutor::SetBarrier();
   ids.sort();
   ids.unique();
-  ASSERT_EQ(ids.size(), threads + 1);  // threads + main thread
+  ASSERT_EQ(ids.size(), nthreads + 1);  // threads + main thread
 
   ids.clear();
 
@@ -510,7 +515,7 @@ TEST(ThreadPool, AddTask) {
   // Wait for threads to sleep
   std::this_thread::sleep_for(
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
-  for (int i = 0; i < threads; i++) {
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([&list_mutex, &ids](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -521,13 +526,13 @@ TEST(ThreadPool, AddTask) {
   ThreadPoolExecutor::SetBarrier();
   ids.sort();
   ids.unique();
-  ASSERT_EQ(ids.size(), threads);
+  ASSERT_EQ(ids.size(), nthreads);
 
   ids.clear();
 
   // Test: Add tasks when threads are busy
   // Making threads busy
-  for (int i = 0; i < threads; i++) {
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -535,7 +540,7 @@ TEST(ThreadPool, AddTask) {
     });
   }
   // Adding tasks
-  for (int i = 0; i < threads; i++) {
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([&list_mutex, &ids](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -552,7 +557,7 @@ TEST(ThreadPool, AddTask) {
 
   // Test: Add tasks when threads are done without preceding barrier
   // Using threads once
-  for (int i = 0; i < threads; i++) {
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -563,7 +568,7 @@ TEST(ThreadPool, AddTask) {
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   // Trying to use threads again
-  for (int i = 0; i < threads; i++) {
+  for (int i = 0; i < nthreads; i++) {
     ThreadPoolExecutor::AddTask([&list_mutex, &ids](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
@@ -576,33 +581,350 @@ TEST(ThreadPool, AddTask) {
   ids.unique();
   ASSERT_EQ(ids.size(), 1);
 
-  // Testing id and threads parameters
+  // Testing id and threads parameters. No concurrent AddTask calls.
   std::list<int> expected, result;
-  threads = ThreadPoolExecutor::GetNumberOfThreads();
-  for (int i = 0; i < threads; i++) expected.push_back(i);
-  for (int i = 0; i < threads; i++) expected.push_back(threads);
-  for (int i = 0; i < threads; i++) {
+  nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+  for (int i = 0; i < nthreads; i++) {
+    expected.push_back(i);
+    expected.push_back(nthreads);
     ThreadPoolExecutor::AddTask([&list_mutex, &result](int id, int threads) {
-      HEXL_UNUSED(id);
-      HEXL_UNUSED(threads);
-      {
-        std::lock_guard<std::mutex> lock(list_mutex);
-        result.push_back(id);
-        result.push_back(threads);
-      }
+      std::lock_guard<std::mutex> lock(list_mutex);
+      result.push_back(id);
+      result.push_back(threads);
     });
   }
   ThreadPoolExecutor::SetBarrier();
+  expected.sort();
   result.sort();
   ASSERT_EQ(expected, result);
 
   ThreadPoolExecutor::StopThreads();
 }
 
+TEST(ThreadPool, thread_safety) {
+  std::atomic_int sync = 2;
+
+  // Parallel setups
+  {
+    sync = 2;
+    ThreadPoolExecutor::StopThreads();
+    std::thread thread_object1([&sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::SetNumberOfThreads(2);
+    });
+    std::thread thread_object2([&sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::SetNumberOfThreads(4);
+    });
+    thread_object1.join();
+    thread_object2.join();
+    uint nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+    ASSERT_TRUE(nthreads == 4 || nthreads == 2);
+  }
+
+  //  Parallel stops
+  {
+    sync = 2;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(4);
+    std::thread thread_object1([&sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::StopThreads();
+    });
+    std::thread thread_object2([&sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::StopThreads();
+    });
+    thread_object1.join();
+    thread_object2.join();
+    uint nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+    ASSERT_EQ(nthreads, 0);
+  }
+
+  // Setup and stop in parallel
+  {
+    sync = 2;
+    ThreadPoolExecutor::StopThreads();
+    std::thread thread_object1([&sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::SetNumberOfThreads(4);
+    });
+    std::thread thread_object2([&sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::StopThreads();
+    });
+    thread_object1.join();
+    thread_object2.join();
+    uint nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+    ASSERT_TRUE(nthreads == 0 || nthreads == 4);
+  }
+
+  // Parallel Barriers
+  {
+    sync = 2;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(4);
+    int delay = 2;
+    auto start = std::chrono::steady_clock::now();
+    for (uint i = 0; i < ThreadPoolExecutor::GetNumberOfThreads(); i++) {
+      ThreadPoolExecutor::AddTask([delay](int id, int threads) {
+        HEXL_UNUSED(id);
+        HEXL_UNUSED(threads);
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+      });
+    }
+    std::chrono::steady_clock::time_point end1, end2;
+    std::thread thread_object1([&end1, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::SetBarrier();
+      end1 = std::chrono::steady_clock::now();
+    });
+    std::thread thread_object2([&end2, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::SetBarrier();
+      end2 = std::chrono::steady_clock::now();
+    });
+    thread_object1.join();
+    thread_object2.join();
+    auto duration1 =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start)
+            .count();
+    auto duration2 =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end2 - start)
+            .count();
+
+    ASSERT_EQ(duration2, duration1);
+  }
+
+  // Parallel add task
+  {
+    sync = 2;
+    std::atomic_int tasks = 0;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(4);
+    std::thread thread_object1([&tasks, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      for (uint i = 0; i < ThreadPoolExecutor::GetNumberOfThreads(); i++) {
+        ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+          HEXL_UNUSED(id);
+          HEXL_UNUSED(threads);
+          tasks.fetch_add(1);
+        });
+      }
+      ThreadPoolExecutor::SetBarrier();
+    });
+    std::thread thread_object2([&tasks, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      for (uint i = 0; i < ThreadPoolExecutor::GetNumberOfThreads(); i++) {
+        ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+          HEXL_UNUSED(id);
+          HEXL_UNUSED(threads);
+          tasks.fetch_add(1);
+        });
+      }
+      ThreadPoolExecutor::SetBarrier();
+    });
+
+    thread_object1.join();
+    thread_object2.join();
+
+    int counter = 0;
+    auto handlers = ThreadPoolExecutor::GetThreadHandlers();
+    for (size_t i = 0; i < handlers.size(); i++) {
+      auto handler = handlers.at(i);
+      if (handler->state.load() == STATE::DONE) {
+        counter++;
+      }
+    }
+    ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+    ASSERT_EQ(tasks.load(), 2 * ThreadPoolExecutor::GetNumberOfThreads());
+  }
+
+  // Nested add task
+  {
+    sync = 2;
+    std::atomic_int tasks = 0;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(4);
+
+    ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+      HEXL_UNUSED(id);
+      HEXL_UNUSED(threads);
+      tasks.fetch_add(1);
+      ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+        HEXL_UNUSED(id);
+        HEXL_UNUSED(threads);
+        tasks.fetch_add(1);
+        ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+          HEXL_UNUSED(id);
+          HEXL_UNUSED(threads);
+          tasks.fetch_add(1);
+          ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+            HEXL_UNUSED(id);
+            HEXL_UNUSED(threads);
+            tasks.fetch_add(1);
+          });
+        });
+      });
+    });
+
+    ThreadPoolExecutor::SetBarrier();
+
+    int counter = 0;
+    auto handlers = ThreadPoolExecutor::GetThreadHandlers();
+    for (size_t i = 0; i < handlers.size(); i++) {
+      auto handler = handlers.at(i);
+      if (handler->state.load() == STATE::DONE) {
+        counter++;
+      }
+    }
+    ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+    ASSERT_EQ(tasks.load(), 4);
+  }
+
+  // Add task & stop threads in parallel
+  {
+    sync = 2;
+    uint nthreads = 6;
+    std::atomic_int tasks = 0;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+    std::thread thread_object1([&tasks, &sync, nthreads]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      for (uint i = 0; i < nthreads; i++) {
+        ThreadPoolExecutor::AddTask([&tasks](int id, int threads) {
+          HEXL_UNUSED(id);
+          HEXL_UNUSED(threads);
+          tasks.fetch_add(1);
+        });
+      }
+      ThreadPoolExecutor::SetBarrier();
+    });
+    std::thread thread_object2([&tasks, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::StopThreads();
+    });
+
+    thread_object1.join();
+    thread_object2.join();
+
+    uint pool_size = ThreadPoolExecutor::GetNumberOfThreads();
+    ASSERT_TRUE(pool_size == 0 || pool_size == HEXL_NUM_THREADS);
+    ASSERT_EQ(tasks.load(), nthreads);
+  }
+
+  // Parallel add jobs
+  {
+    sync = 2;
+    std::atomic_int iterations = 0;
+    int N_size = 100;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(4);
+    std::thread thread_object1([&iterations, N_size, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::AddParallelJobs([&](int id, int threads) {
+        HEXL_UNUSED(id);
+        iterations.fetch_add(N_size / threads);
+      });
+    });
+    std::thread thread_object2([&iterations, N_size, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::AddParallelJobs([&](int id, int threads) {
+        HEXL_UNUSED(id);
+        iterations.fetch_add(N_size / threads);
+      });
+      ThreadPoolExecutor::SetBarrier();
+    });
+
+    thread_object1.join();
+    thread_object2.join();
+
+    int counter = 0;
+    auto handlers = ThreadPoolExecutor::GetThreadHandlers();
+    for (size_t i = 0; i < handlers.size(); i++) {
+      auto handler = handlers.at(i);
+      if (handler->state.load() == STATE::DONE) {
+        counter++;
+      }
+    }
+    ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+    ASSERT_EQ(iterations.load(), 2 * N_size);
+  }
+
+  // Add jobs and setup threads in parallel
+  {
+    sync = 2;
+    std::atomic_int iterations = 0;
+    int N_size = 100;
+    int nthreads = 4;
+    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+    std::thread thread_object1([&iterations, N_size, &sync]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::AddParallelJobs([&](int id, int threads) {
+        HEXL_UNUSED(id);
+        iterations.fetch_add(N_size / threads);
+      });
+    });
+    std::thread thread_object2([&iterations, N_size, &sync, nthreads]() {
+      sync.fetch_add(-1);
+      while (sync) {
+      }
+      ThreadPoolExecutor::SetNumberOfThreads(nthreads + 2);
+    });
+
+    thread_object1.join();
+    thread_object2.join();
+
+    int counter = 0;
+    auto handlers = ThreadPoolExecutor::GetThreadHandlers();
+    for (size_t i = 0; i < handlers.size(); i++) {
+      auto handler = handlers.at(i);
+      if (handler->state.load() == STATE::DONE) {
+        counter++;
+      }
+    }
+    ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+    ASSERT_EQ(iterations.load(), N_size);
+  }
+}
+
 #ifdef HEXL_DEBUG
 // Testing debug features
 TEST(ThreadPool, bad_input) {
-  // EXPECT_ANY_THROW(ThreadPoolExecutor::SetNumberOfThreads(2););
+  EXPECT_ANY_THROW(ThreadPoolExecutor::AddParallelJobs(nullptr));
+
+  EXPECT_ANY_THROW(ThreadPoolExecutor::AddTask(nullptr));
 }
 #endif
 

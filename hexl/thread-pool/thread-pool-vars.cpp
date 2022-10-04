@@ -8,9 +8,6 @@ namespace hexl {
 
 uint16_t HEXL_THREAD_WAIT_TIME = 20;  // ~ 100x wake up time on ICX machine
 
-// const uint HEXL_DEFAULT_NUM_THREADS = 16;
-// const uint HEXL_DEFAULT_NTT_PARALLEL_DEPTH = 1;
-
 #ifdef HEXL_MULTI_THREADING
 uint HEXL_NUM_THREADS = setup_num_threads("HEXL_NUM_THREADS");
 uint HEXL_NTT_PARALLEL_DEPTH = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");

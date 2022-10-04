@@ -23,15 +23,12 @@ enum STATE {
 };
 
 // Control variables per thread
-// * 64 bytes struct as cache lines
 typedef struct s_thread_info {
   std::atomic_int state{STATE::NONE};
-  uint64_t counter;
-  uint64_t counter2;
   std::condition_variable waker;
   std::mutex wake_mutex;
   std::thread thread;
-  std::function<void(int id, int threads)> task;
+  std::function<void(size_t id, size_t threads)> task;
 } thread_info_t;
 
 }  // namespace hexl
