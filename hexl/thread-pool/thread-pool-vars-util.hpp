@@ -19,6 +19,8 @@ const uint HEXL_DEFAULT_NUM_THREADS = 16;
 const uint HEXL_DEFAULT_NTT_PARALLEL_DEPTH = 1;
 
 #ifdef HEXL_MULTI_THREADING
+
+// Check for environment variable
 static int check_env_var(const char* var) {
   int value = 0;
 
@@ -30,6 +32,7 @@ static int check_env_var(const char* var) {
   return value;
 }
 
+// Verify for appropriate number of threads
 static int setup_num_threads(const char* var) {
   int hw_val = std::thread::hardware_concurrency();
   int value = check_env_var(var);
@@ -46,6 +49,7 @@ static int setup_num_threads(const char* var) {
   return value;
 }
 
+// Verify for appropriate number of recursive calls
 static int setup_ntt_calls(const char* var) {
   int value = check_env_var(var);
   uint threads;

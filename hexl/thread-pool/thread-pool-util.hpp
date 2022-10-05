@@ -15,7 +15,7 @@ namespace hexl {
 // Enum for thread states
 enum STATE {
   NONE,      // Undefined state
-  DONE,      // Task is coompleted and thread is on spin-up
+  DONE,      // Task is completed and thread is on spin-up
   KICK_OFF,  // There is a new task to execute, break spin-up
   RUNNING,   // Executing task
   SLEEPING,  // Thread is sleeping, waiting for wakeup

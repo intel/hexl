@@ -16,49 +16,45 @@ class ThreadPoolExecutor {
   inline static ThreadPool* pool = new ThreadPool();
 
  public:
+  // SetNumberOfThreads: Setup/kill thread pool by specifying number of threads
   static void SetNumberOfThreads(uint n_threads) {
     pool->SetupThreads(n_threads);
   }
 
-  static void AddParallelJobs(
-      std::function<void(size_t id, size_t threads)> job) {
-    pool->AddParallelJobs(job);
+  // AddParallelJobs: For parallel loops
+  static void AddParallelJobs(tp_task_t job) { pool->AddParallelJobs(job); }
+
+  // AddRecursiveCalls: For parallel recursion
+  static void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
+    pool->AddRecursiveCalls(task_a, task_b);
   }
 
-  static void AddTask(std::function<void(size_t id, size_t threads)> task) {
-    pool->AddTask(task);
-  }
-
+  // Return total number of threads
   static size_t GetNumberOfThreads() { return pool->GetNumThreads(); }
 
-  static void SetBarrier() { pool->SetBarrier(); }
-
-  static void StopThreads() { pool->StopThreads(); }
-
+  // Return vector of constant handlers
   static std::vector<const thread_info_t*> GetThreadHandlers() {
     return pool->GetThreadHandlers();
   }
 
+  // Destructor
   ~ThreadPoolExecutor() { delete pool; }
 
 #else
 
  public:
-  static void SetNumberOfThreads(int n_threads) { HEXL_UNUSED(n_threads); }
-
-  static void AddParallelJobs(std::function<void(int id, int threads)> job) {
-    job(0, 1);
+  inline static void SetNumberOfThreads(int n_threads) {
+    HEXL_UNUSED(n_threads);
   }
 
-  static void AddTask(std::function<void(int id, int threads)> task) {
-    task(0, 1);
+  inline static void AddParallelJobs(tp_task_t job) { job(0, 1); }
+
+  inline static void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
+    task_a(0, 1);
+    task_b(0, 1);
   }
 
-  static size_t GetNumberOfThreads() { return 1; }
-
-  static void SetBarrier() {}
-
-  static void StopThreads() {}
+  inline static size_t GetNumberOfThreads() { return 1; }
 
 #endif
 };

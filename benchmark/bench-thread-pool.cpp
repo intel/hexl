@@ -18,9 +18,8 @@ static void BM_ThreadPool_Setup(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ThreadPoolExecutor::SetNumberOfThreads(threads);
-    ThreadPoolExecutor::SetBarrier();
     state.PauseTiming();
-    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(0);
     state.ResumeTiming();
   }
 }
@@ -38,9 +37,8 @@ static void BM_ThreadPool_Join(benchmark::State& state) {  //  NOLINT
   for (auto _ : state) {
     state.PauseTiming();
     ThreadPoolExecutor::SetNumberOfThreads(threads);
-    ThreadPoolExecutor::SetBarrier();
     state.ResumeTiming();
-    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(0);
   }
 }
 
@@ -56,8 +54,7 @@ static void BM_ThreadPool_SetupJoin(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     ThreadPoolExecutor::SetNumberOfThreads(threads);
-    ThreadPoolExecutor::SetBarrier();
-    ThreadPoolExecutor::StopThreads();
+    ThreadPoolExecutor::SetNumberOfThreads(0);
   }
 }
 
@@ -79,9 +76,8 @@ static void BM_ThreadPool_WakeUp_Plus30ms(benchmark::State& state) {  //  NOLINT
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
     });
-    ThreadPoolExecutor::SetBarrier();
   }
-  ThreadPoolExecutor::StopThreads();
+  ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
 BENCHMARK(BM_ThreadPool_WakeUp_Plus30ms)

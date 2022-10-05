@@ -9,7 +9,6 @@
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 #include "hexl/util/check.hpp"
-#include "thread-pool/thread-pool-executor.hpp"
 #include "util/avx512-util.hpp"
 
 #ifdef HEXL_HAS_AVX512DQ
@@ -45,26 +44,20 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
   const __m512i* vp_operand1 = reinterpret_cast<const __m512i*>(operand1);
   const __m512i* vp_operand2 = reinterpret_cast<const __m512i*>(operand2);
 
-  ThreadPoolExecutor::AddParallelJobs([vp_result, n, vp_operand1, vp_operand2,
-                                       v_modulus](int id, int threads) {
-    __m512i* i_vp_result = vp_result + id * n / 8 / threads;
-    const __m512i* i_vp_operand1 = vp_operand1 + id * n / 8 / threads;
-    const __m512i* i_vp_operand2 = vp_operand2 + id * n / 8 / threads;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = n / 8 / threads; i > 0; --i) {
-      __m512i v_operand1 = _mm512_loadu_si512(i_vp_operand1);
-      __m512i v_operand2 = _mm512_loadu_si512(i_vp_operand2);
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = n / 8; i > 0; --i) {
+    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
+    __m512i v_operand2 = _mm512_loadu_si512(vp_operand2);
 
-      __m512i v_result =
-          _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
+    __m512i v_result =
+        _mm512_hexl_small_add_mod_epi64(v_operand1, v_operand2, v_modulus);
 
-      _mm512_storeu_si512(i_vp_result, v_result);
+    _mm512_storeu_si512(vp_result, v_result);
 
-      ++i_vp_result;
-      ++i_vp_operand1;
-      ++i_vp_operand2;
-    }
-  });
+    ++vp_result;
+    ++vp_operand1;
+    ++vp_operand2;
+  }
 
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }

@@ -19,12 +19,14 @@ class ThreadPool {
  private:
   // Properties
   size_t total_threads = 0;                     // Total number of threads
-  size_t next_thread = 0;                       // Points to next free thread
+  std::atomic_uint64_t next_thread{0};          // Points to next free thread
   std::vector<thread_info_t*> thread_handlers;  // Thread's info
   std::mutex pool_mutex;                        // Control pool's edition
   bool setup_done = false;                      // Is thread pool initialized
+  inline static thread_local bool child;        // True if on child thread
 
   // Methods
+
   // StartThreads: Spawn a given number of threads
   void StartThreads(size_t new_threads) {
     size_t current_threads = total_threads;
@@ -37,9 +39,11 @@ class ThreadPool {
 
       // Run thread with a handling function
       size_t* n_threads = &total_threads;  // To put within scope
+
       thread_handler->thread =
           std::thread([thread_handler, current_threads, i, n_threads] {
             bool stop = false;
+            ThreadPool::child = true;
 
             while (true) {
               // Thread ready
@@ -113,7 +117,7 @@ class ThreadPool {
     }
 
     // Next thread to be used
-    next_thread = 0;
+    next_thread.store(0);
   }
 
   // SetupThreads_Unlocked: Spawns new threads if necessary. Without mutex
@@ -123,8 +127,10 @@ class ThreadPool {
     HEXL_VLOG(3,
               "HEXL_NTT_PARALLEL_DEPTH         = " << HEXL_NTT_PARALLEL_DEPTH);
 
+    setup_done = true;
+
     // Add new threads if necessary
-    if (total_threads < n_threads) {
+    if (n_threads > total_threads) {
       // Can't exceed HW threads
       if (n_threads > std::thread::hardware_concurrency()) {
         n_threads = std::thread::hardware_concurrency();
@@ -138,10 +144,31 @@ class ThreadPool {
 
       // Wait for threads to be ready
       SetBarrier_Unlocked();
+
+    } else if (n_threads < total_threads) {
+      size_t to_remove = total_threads - n_threads;
+      for (size_t i = 0; i < to_remove; ++i) {
+        // Kill thread
+        thread_info_t* thread_handler = thread_handlers.at(total_threads - 1);
+        if (thread_handler->state.load() == STATE::SLEEPING) {
+          thread_handler->state.store(STATE::KILL);
+          thread_handler->waker.notify_one();
+        } else {
+          thread_handler->state.store(STATE::KILL);
+        }
+        thread_handler->thread.join();
+
+        // Update handlers
+        delete thread_handler;
+        auto it = thread_handlers.end() - 1;
+        thread_handlers.erase(it);
+        total_threads--;
+      }
     }
 
-    // Thread pool up
-    setup_done = true;
+    if (n_threads == 0) {
+      setup_done = false;
+    }
 
     HEXL_VLOG(2,
               "Setting up thread pool with " << total_threads << " threads.");
@@ -150,9 +177,9 @@ class ThreadPool {
  public:
   // Methods
 
-  ThreadPool() {}
+  ThreadPool() { ThreadPool::child = false; }
 
-  ~ThreadPool() { StopThreads(); }
+  ~ThreadPool() { SetupThreads(0); }
 
   // GetNumThreads: Returns total number of threads
   size_t GetNumThreads() {
@@ -170,7 +197,9 @@ class ThreadPool {
         SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
       }
 
-      if (next_thread == 0) {  // Only if all threads are available
+      size_t expected = 0;
+      // Only if all threads are available
+      if (next_thread.compare_exchange_weak(expected, total_threads)) {
         for (size_t i = 0; i < total_threads; i++) {
           thread_info_t* thread_handler = thread_handlers.at(i);
           if (thread_handler->state.load() == STATE::DONE) {
@@ -184,8 +213,6 @@ class ThreadPool {
             job(i, total_threads);
           }
         }
-        next_thread = total_threads;
-
         SetBarrier_Unlocked();  // Wait 'til all jobs are done
         pool_mutex.unlock();
       } else {  // Run on single thread
@@ -197,38 +224,68 @@ class ThreadPool {
     }
   }
 
-  // AddTask: Runs a task on next thread available
-  void AddTask(tp_task_t task) {
-    HEXL_CHECK(task, "Require non empty task");
+  // AddRecursiveCalls: Runs a task on next thread available
+  void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
+    HEXL_CHECK(task_a, "task_a: Require non empty task");
+    HEXL_CHECK(task_b, "task_b: Require non empty task");
+    bool locked = false;
 
     // Try using thread pool
-    if (pool_mutex.try_lock()) {
-      if (!setup_done) {
-        SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
+    if (!ThreadPool::child) {
+      locked = pool_mutex.try_lock();
+      if (!locked) {
+        task_a(0, 1);
+        task_b(0, 1);
+        return;
+      }
+    }
+
+    if (!setup_done) {
+      SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
+    }
+
+    size_t next = next_thread.fetch_add(2);
+    if (next <= total_threads - 2) {
+      thread_info_t* thread_handler = thread_handlers.at(next++);
+      if (thread_handler->state.load() == STATE::DONE) {
+        thread_handler->task = task_a;
+        thread_handler->state.store(STATE::KICK_OFF);
+      } else if (thread_handler->state.load() == STATE::SLEEPING) {
+        thread_handler->task = task_a;
+        thread_handler->state.store(STATE::KICK_OFF);
+        thread_handler->waker.notify_one();
+      } else {  // In case thread is not on expected state
+        task_a(next_thread.load() - 1, total_threads);
       }
 
-      size_t next = next_thread++;  // Get next thread to be used
-      if (next < total_threads) {
-        thread_info_t* thread_handler = thread_handlers.at(next);
-        if (thread_handler->state.load() == STATE::DONE) {
-          thread_handler->task = task;
-          thread_handler->state.store(STATE::KICK_OFF);
-          pool_mutex.unlock();
-        } else if (thread_handler->state.load() == STATE::SLEEPING) {
-          thread_handler->task = task;
-          thread_handler->state.store(STATE::KICK_OFF);
-          thread_handler->waker.notify_one();
-          pool_mutex.unlock();
-        } else {  // In case thread is not on expected state
-          pool_mutex.unlock();
-          task(next - 1, total_threads);
-        }
-      } else {
-        pool_mutex.unlock();
-        task(0, 1);
+      thread_handler = thread_handlers.at(next++);
+      if (thread_handler->state.load() == STATE::DONE) {
+        thread_handler->task = task_b;
+        thread_handler->state.store(STATE::KICK_OFF);
+      } else if (thread_handler->state.load() == STATE::SLEEPING) {
+        thread_handler->task = task_b;
+        thread_handler->state.store(STATE::KICK_OFF);
+        thread_handler->waker.notify_one();
+      } else {  // In case thread is not on expected state
+        task_b(next_thread.load() - 1, total_threads);
       }
+
+      // Implicit barrier
+      for (size_t i = next - 2; i < next; i++) {
+        WaitThread(thread_handlers.at(i));
+      }
+
+      // Next thread to be used
+      next_thread.fetch_add(-2);
+
     } else {
-      task(0, 1);
+      next_thread.fetch_add(-2);
+      task_a(0, 1);
+      task_b(0, 1);
+    }
+
+    if (locked) {
+      pool_mutex.unlock();
     }
   }
 
@@ -236,34 +293,6 @@ class ThreadPool {
   void SetupThreads(size_t n_threads) {
     std::lock_guard<std::mutex> lock(pool_mutex);
     SetupThreads_Unlocked(n_threads);
-  }
-
-  // WaitThreads: Sets a barrier to sync all threads with mutex
-  void SetBarrier() {
-    std::lock_guard<std::mutex> lock(pool_mutex);
-    SetBarrier_Unlocked();
-  }
-
-  // Stop threads
-  void StopThreads() {
-    std::lock_guard<std::mutex> lock(pool_mutex);
-
-    SetBarrier_Unlocked();  // Waits for threads to be ready
-
-    for (size_t i = 0; i < total_threads; i++) {
-      thread_info_t* thread_handler = thread_handlers.at(i);
-      if (thread_handler->state.load() == STATE::SLEEPING) {
-        thread_handler->state.store(STATE::KILL);
-        thread_handler->waker.notify_one();
-      } else {
-        thread_handler->state.store(STATE::KILL);
-      }
-      thread_handler->thread.join();
-      delete thread_handler;
-    }
-    thread_handlers.clear();
-    total_threads = 0;
-    setup_done = false;
   }
 
   // Return threads' handlers
