@@ -15,8 +15,8 @@
 namespace intel {
 namespace hexl {
 
-const uint HEXL_DEFAULT_NUM_THREADS = 16;
-const uint HEXL_DEFAULT_NTT_PARALLEL_DEPTH = 1;
+const uint64_t HEXL_DEFAULT_NUM_THREADS = 16;
+const uint64_t HEXL_DEFAULT_NTT_PARALLEL_DEPTH = 1;
 
 #ifdef HEXL_MULTI_THREADING
 
@@ -52,7 +52,7 @@ static int setup_num_threads(const char* var) {
 // Verify for appropriate number of recursive calls
 static int setup_ntt_calls(const char* var) {
   int value = check_env_var(var);
-  uint threads;
+  uint64_t threads;
 
   // Use default value in case of error
   if (value <= 0) {
