@@ -197,9 +197,10 @@ class ThreadPool {
         SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
       }
 
-      size_t expected = 0;
       // Only if all threads are available
-      if (next_thread.compare_exchange_weak(expected, total_threads)) {
+      if (next_thread.load() == 0) {
+        next_thread.store(total_threads);
+
         for (size_t i = 0; i < total_threads; i++) {
           thread_info_t* thread_handler = thread_handlers.at(i);
           if (thread_handler->state.load() == STATE::DONE) {

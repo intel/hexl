@@ -17,7 +17,7 @@ class ThreadPoolExecutor {
 
  public:
   // SetNumberOfThreads: Setup/kill thread pool by specifying number of threads
-  static void SetNumberOfThreads(uint n_threads) {
+  static void SetNumberOfThreads(uint64_t n_threads) {
     pool->SetupThreads(n_threads);
   }
 
