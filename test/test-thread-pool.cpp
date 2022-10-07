@@ -642,7 +642,8 @@ TEST(ThreadPool, thread_safety) {
     thread_object1.join();
     thread_object2.join();
     uint64_t nthreads = ThreadPoolExecutor::GetNumberOfThreads();
-    ASSERT_TRUE(nthreads == 4 || nthreads == 2);
+    ASSERT_TRUE(nthreads == 4 || nthreads == 2 ||
+                nthreads == std::thread::hardware_concurrency());
   }
 
   //  Parallel stops
