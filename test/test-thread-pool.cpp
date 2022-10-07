@@ -17,7 +17,7 @@ namespace hexl {
 // Testing number of threads across different phases
 TEST(ThreadPool, GetNumberOfThreads) {
   // With setup. Correspond to SetNumberOfThreads.
-  uint nthreads = 2;
+  uint64_t nthreads = 2;
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   ASSERT_EQ(handlers.size(), nthreads);
@@ -60,8 +60,8 @@ TEST(ThreadPool, GetNumberOfThreads) {
   ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
-  // Try biggest number
-  nthreads = std::thread::hardware_concurrency();
+  // Try at 80% of available threads
+  nthreads = static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.8);
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   handlers = ThreadPoolExecutor::GetThreadHandlers();
   ASSERT_EQ(handlers.size(), nthreads);
@@ -208,7 +208,7 @@ TEST(ThreadPool, SetNumberOfThreads) {
 
   {
     // Precedence over env variable
-    uint nthreads = 2;
+    uint64_t nthreads = 2;
     HEXL_NUM_THREADS = 1;
     ThreadPoolExecutor::SetNumberOfThreads(nthreads);
     auto value = ThreadPoolExecutor::GetNumberOfThreads();
@@ -459,8 +459,8 @@ TEST(ThreadPool, AddParallelJob) {
   result.sort();
   ASSERT_EQ(expected, result);
 
-  // Test: Biggest amount of threads
-  nthreads = std::thread::hardware_concurrency();
+  // Test: 80% of available threads
+  nthreads = static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.8);
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   ThreadPoolExecutor::AddParallelJobs(id_task);
   ids.sort();
@@ -617,7 +617,7 @@ TEST(ThreadPool, thread_safety) {
     });
     thread_object1.join();
     thread_object2.join();
-    uint nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+    uint64_t nthreads = ThreadPoolExecutor::GetNumberOfThreads();
     ASSERT_TRUE(nthreads == 4 || nthreads == 2);
   }
 
@@ -639,7 +639,7 @@ TEST(ThreadPool, thread_safety) {
     });
     thread_object1.join();
     thread_object2.join();
-    uint nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+    uint64_t nthreads = ThreadPoolExecutor::GetNumberOfThreads();
     ASSERT_EQ(nthreads, 0);
   }
 
@@ -661,7 +661,7 @@ TEST(ThreadPool, thread_safety) {
     });
     thread_object1.join();
     thread_object2.join();
-    uint nthreads = ThreadPoolExecutor::GetNumberOfThreads();
+    uint64_t nthreads = ThreadPoolExecutor::GetNumberOfThreads();
     ASSERT_TRUE(nthreads == 0 || nthreads == 4);
   }
 
@@ -751,7 +751,7 @@ TEST(ThreadPool, thread_safety) {
     thread_object1.join();
     thread_object2.join();
 
-    uint pool_size = ThreadPoolExecutor::GetNumberOfThreads();
+    uint64_t pool_size = ThreadPoolExecutor::GetNumberOfThreads();
     ASSERT_TRUE(pool_size == 0 || pool_size == HEXL_NUM_THREADS);
     ASSERT_EQ(tasks_counter.load(), 2);
   }
