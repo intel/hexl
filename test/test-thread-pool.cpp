@@ -791,7 +791,7 @@ TEST(ThreadPool, thread_safety) {
     sync.store(2);
     iterations.store(0);
     int N_size = 100;
-    ThreadPoolExecutor::SetNumberOfThreads(4);
+    ThreadPoolExecutor::SetNumberOfThreads(2);
     std::thread thread_object1([&]() {
       sync.fetch_add(-1);
       while (sync) {
@@ -824,7 +824,7 @@ TEST(ThreadPool, thread_safety) {
   {
     sync.store(2);
     iterations.store(0);
-    int nthreads = 4;
+    int nthreads = 2;
     ThreadPoolExecutor::SetNumberOfThreads(nthreads);
     std::thread thread_object1([&]() {
       sync.fetch_add(-1);
