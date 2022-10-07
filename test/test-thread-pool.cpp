@@ -472,7 +472,7 @@ TEST(ThreadPool, AddParallelJob) {
 }
 
 // Test adding parallel tasks
-TEST(ThreadPool, AddRecursiveCalls) {
+TEST(ThreadPool, AddRecursiveCalls_1) {
   std::list<std::thread::id> ids;
   std::mutex list_mutex;
   HEXL_NUM_THREADS = 4;
@@ -494,17 +494,15 @@ TEST(ThreadPool, AddRecursiveCalls) {
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 
-  // Test: Add tasks without previous setup. Using less than available threads
-  int nthreads = HEXL_NUM_THREADS - 2;
+  // Test: Add tasks without previous setup.
   ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
   ids.sort();
   ids.unique();
-  ASSERT_EQ(ids.size(), nthreads);
+  ASSERT_EQ(ids.size(), 2);
   ids.clear();
 
   // Test: Add tasks with previous setup different than env var.
-  // Using all threads.
-  nthreads = 2;
+  uint64_t nthreads = 2;
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Setup
   ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
   ids.sort();
@@ -512,7 +510,7 @@ TEST(ThreadPool, AddRecursiveCalls) {
   ASSERT_EQ(ids.size(), nthreads);
   ids.clear();
 
-  // Test: Add tasks on same thread pool when previous jobs are done.
+  // Test: Add tasks on same thread pool when previous jobs (Prev test) are done
   // Using more than available threads
   ThreadPoolExecutor::AddRecursiveCalls(
       [&](int id, int threads) {
@@ -536,38 +534,6 @@ TEST(ThreadPool, AddRecursiveCalls) {
   ASSERT_EQ(ids.size(), nthreads);  // threads
   ids.clear();
 
-  if (std::thread::hardware_concurrency() > 3) {
-    // Test: Add jobs when threads are busy without more free threads
-    std::thread thread_object([=]() {
-      ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task);
-    });
-    // Give time for previous threads to be running
-    std::this_thread::sleep_for(std::chrono::milliseconds(delay / 2));
-    ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-
-    ids.sort();
-    ids.unique();
-    ASSERT_EQ(ids.size(), 1);
-    thread_object.join();
-    ids.clear();
-
-    // Test: Add jobs when threads are busy with more free threads
-    nthreads = 4;
-    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-    std::thread thread_object2(
-        [=] { ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task); });
-
-    // Give time for previous threads to be running
-    std::this_thread::sleep_for(std::chrono::milliseconds(delay / 2));
-    ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-
-    ids.sort();
-    ids.unique();
-    ASSERT_EQ(ids.size(), 1);
-    thread_object2.join();
-    ids.clear();
-  }
-
   // Test: Add tasks when threads are sleeping. Threads from previous test.
   // Wait for threads to sleep
   nthreads = 2;
@@ -577,6 +543,64 @@ TEST(ThreadPool, AddRecursiveCalls) {
   ids.sort();
   ids.unique();
   ASSERT_EQ(ids.size(), nthreads);
+
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+}
+
+// Test adding parallel tasks
+TEST(ThreadPool, AddRecursiveCalls_2) {
+  if (std::thread::hardware_concurrency() < 4) {
+    GTEST_SKIP();
+  }
+
+  std::list<std::thread::id> ids;
+  std::mutex list_mutex;
+  HEXL_NUM_THREADS = 4;
+  int delay = 2;
+
+  // Common tasks
+  tp_task_t sleep_task([delay](int id, int threads) {
+    HEXL_UNUSED(id);
+    HEXL_UNUSED(threads);
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+  });
+
+  tp_task_t id_task([&list_mutex, &ids](int id, int threads) {
+    HEXL_UNUSED(id);
+    HEXL_UNUSED(threads);
+    std::lock_guard<std::mutex> lock(list_mutex);
+    ids.push_back(std::this_thread::get_id());
+  });
+
+  // Test: Add jobs when threads are busy without more free threads
+  ThreadPoolExecutor::SetNumberOfThreads(2);
+  std::thread thread_object(
+      [=]() { ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task); });
+  // Give time for previous threads to be running
+  std::this_thread::sleep_for(std::chrono::milliseconds(delay / 2));
+  ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+
+  ids.sort();
+  ids.unique();
+  ASSERT_EQ(ids.size(), 1);
+  thread_object.join();
+  ids.clear();
+
+  // Test: Add jobs when threads are busy with more free threads
+  uint64_t nthreads = 4;
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+  std::thread thread_object2(
+      [=] { ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task); });
+
+  // Give time for previous threads to be running
+  std::this_thread::sleep_for(std::chrono::milliseconds(delay / 2));
+  ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+
+  ids.sort();
+  ids.unique();
+  ASSERT_EQ(ids.size(), 1);
+  thread_object2.join();
+  ids.clear();
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
