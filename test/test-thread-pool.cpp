@@ -412,7 +412,7 @@ TEST(ThreadPool, AddParallelJob) {
   ids.clear();
 
   // Test: Add jobs when threads are sleeping
-  // Wait for threads to sleep
+  // Wait for threads from previous test to sleep
   std::this_thread::sleep_for(
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
   ThreadPoolExecutor::AddParallelJobs(id_task);
@@ -429,12 +429,12 @@ TEST(ThreadPool, AddParallelJob) {
     ThreadPoolExecutor::AddParallelJobs([](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
-      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      std::this_thread::sleep_for(std::chrono::milliseconds(8));
     });
   });
 
   // Give time for previous threads to be running
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  std::this_thread::sleep_for(std::chrono::milliseconds(4));
 
   ThreadPoolExecutor::AddParallelJobs(id_task);
 
