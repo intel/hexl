@@ -234,7 +234,8 @@ TEST(ThreadPool, SetNumberOfThreads) {
     auto handlers = ThreadPoolExecutor::GetThreadHandlers();
     for (size_t i = 0; i < handlers.size(); i++) {
       auto handler = handlers.at(i);
-      if (handler->state.load() == STATE::DONE) {
+      if (handler->state.load() == STATE::DONE ||
+          handler->state.load() == STATE::SLEEPING) {
         counter++;
       }
     }
@@ -291,11 +292,11 @@ TEST(ThreadPool, ImplicitBrriers) {
   // One thread is sleeping
   start = std::chrono::steady_clock::now();
   ThreadPoolExecutor::AddRecursiveCalls(
-      [delay](size_t id, size_t threads) {
+      [](size_t id, size_t threads) {
         HEXL_UNUSED(id);
         HEXL_UNUSED(threads);
       },
-      [delay](size_t id, size_t threads) {
+      [](size_t id, size_t threads) {
         HEXL_UNUSED(id);
         HEXL_UNUSED(threads);
         std::this_thread::sleep_for(
@@ -304,7 +305,7 @@ TEST(ThreadPool, ImplicitBrriers) {
   end = std::chrono::steady_clock::now();
   duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
                  .count();
-  ASSERT_EQ(duration, 2 * HEXL_THREAD_WAIT_TIME);
+  ASSERT_GE(duration, 2 * HEXL_THREAD_WAIT_TIME);
   // Barrier work on sleeping threads
 
   // On nested tasks
@@ -537,7 +538,7 @@ TEST(ThreadPool, AddRecursiveCalls) {
 
   if (std::thread::hardware_concurrency() > 3) {
     // Test: Add jobs when threads are busy without more free threads
-    std::thread thread_object([delay, sleep_task]() {
+    std::thread thread_object([=]() {
       ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task);
     });
     // Give time for previous threads to be running
@@ -553,9 +554,8 @@ TEST(ThreadPool, AddRecursiveCalls) {
     // Test: Add jobs when threads are busy with more free threads
     nthreads = 4;
     ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-    std::thread thread_object2([delay, sleep_task] {
-      ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task);
-    });
+    std::thread thread_object2(
+        [=] { ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task); });
 
     // Give time for previous threads to be running
     std::this_thread::sleep_for(std::chrono::milliseconds(delay / 2));
@@ -741,7 +741,7 @@ TEST(ThreadPool, thread_safety) {
       }
       ThreadPoolExecutor::AddRecursiveCalls(add_task, add_task);
     });
-    std::thread thread_object2([&tasks_counter, &sync]() {
+    std::thread thread_object2([&sync]() {
       sync.fetch_add(-1);
       while (sync) {
       }
@@ -803,7 +803,7 @@ TEST(ThreadPool, thread_safety) {
       }
       ThreadPoolExecutor::AddParallelJobs(add_iterations);
     });
-    std::thread thread_object2([&iterations, N_size, &sync, nthreads]() {
+    std::thread thread_object2([&sync, nthreads]() {
       sync.fetch_add(-1);
       while (sync) {
       }

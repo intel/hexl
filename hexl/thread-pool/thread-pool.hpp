@@ -256,7 +256,7 @@ class ThreadPool {
         thread_handler->state.store(STATE::KICK_OFF);
         thread_handler->waker.notify_one();
       } else {  // In case thread is not on expected state
-        task_a(next_thread.load() - 1, total_threads);
+        task_a(next - 1, total_threads);
       }
 
       thread_handler = thread_handlers.at(next++);
@@ -268,7 +268,7 @@ class ThreadPool {
         thread_handler->state.store(STATE::KICK_OFF);
         thread_handler->waker.notify_one();
       } else {  // In case thread is not on expected state
-        task_b(next_thread.load() - 1, total_threads);
+        task_b(next - 1, total_threads);
       }
 
       // Implicit barrier
