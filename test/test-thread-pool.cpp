@@ -286,7 +286,7 @@ TEST(ThreadPool, ImplicitBrriers) {
 
   duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
                  .count();
-  ASSERT_EQ(duration, delay);
+  ASSERT_GE(duration, delay);
 
   // One thread is sleeping
   start = std::chrono::steady_clock::now();
@@ -752,7 +752,8 @@ TEST(ThreadPool, thread_safety) {
     thread_object2.join();
 
     uint64_t pool_size = ThreadPoolExecutor::GetNumberOfThreads();
-    ASSERT_TRUE(pool_size == 0 || pool_size == HEXL_NUM_THREADS);
+    ASSERT_TRUE(pool_size == 0 || pool_size == HEXL_NUM_THREADS ||
+                pool_size == std::thread::hardware_concurrency());
     ASSERT_EQ(tasks_counter.load(), 2);
   }
 
