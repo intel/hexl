@@ -824,7 +824,7 @@ TEST(ThreadPool, thread_safety) {
   {
     sync.store(2);
     iterations.store(0);
-    int nthreads = 2;
+    int nthreads = 1;
     ThreadPoolExecutor::SetNumberOfThreads(nthreads);
     std::thread thread_object1([&]() {
       sync.fetch_add(-1);
@@ -836,7 +836,7 @@ TEST(ThreadPool, thread_safety) {
       sync.fetch_add(-1);
       while (sync) {
       }
-      ThreadPoolExecutor::SetNumberOfThreads(nthreads + 2);
+      ThreadPoolExecutor::SetNumberOfThreads(2);
     });
 
     thread_object1.join();
@@ -846,7 +846,8 @@ TEST(ThreadPool, thread_safety) {
     auto handlers = ThreadPoolExecutor::GetThreadHandlers();
     for (size_t i = 0; i < handlers.size(); i++) {
       auto handler = handlers.at(i);
-      if (handler->state.load() == STATE::DONE) {
+      if (handler->state.load() == STATE::DONE ||
+          handler->state.load() == STATE::SLEEPING) {
         counter++;
       }
     }
