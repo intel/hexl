@@ -61,7 +61,7 @@ TEST(ThreadPool, GetNumberOfThreads) {
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 
   // Try at 80% of available threads
-  nthreads = static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.8);
+  nthreads = static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.7);
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   handlers = ThreadPoolExecutor::GetThreadHandlers();
   ASSERT_EQ(handlers.size(), nthreads);
@@ -461,7 +461,7 @@ TEST(ThreadPool, AddParallelJob) {
   ASSERT_EQ(expected, result);
 
   // Test: 80% of available threads
-  nthreads = static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.8);
+  nthreads = static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.7);
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   ThreadPoolExecutor::AddParallelJobs(id_task);
   ids.sort();
@@ -687,7 +687,8 @@ TEST(ThreadPool, thread_safety) {
     thread_object1.join();
     thread_object2.join();
     uint64_t nthreads = ThreadPoolExecutor::GetNumberOfThreads();
-    ASSERT_TRUE(nthreads == 0 || nthreads == 4);
+    ASSERT_TRUE(nthreads == 0 || nthreads == 4 ||
+                nthreads == std::thread::hardware_concurrency());
   }
 
   // Parallel add task
