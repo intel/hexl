@@ -538,13 +538,12 @@ TEST(ThreadPool, AddRecursiveCalls_1) {
 
   // Test: Add tasks when threads are sleeping. Threads from previous test.
   // Wait for threads to sleep
-  nthreads = 2;
   std::this_thread::sleep_for(
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
   ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
   ids.sort();
   ids.unique();
-  ASSERT_EQ(ids.size(), nthreads);
+  ASSERT_EQ(ids.size(), 2);
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -722,7 +721,8 @@ TEST(ThreadPool, thread_safety) {
         counter++;
       }
     }
-    ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+    // Account for thread pools of 3 threads as tasks are added in pairs
+    ASSERT_NEAR(counter, ThreadPoolExecutor::GetNumberOfThreads(), 1);
     ASSERT_EQ(tasks_counter.load(), 4);
   }
 
@@ -754,7 +754,8 @@ TEST(ThreadPool, thread_safety) {
         counter++;
       }
     }
-    ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+    // Account for thread pools of 3 or 5 threads as tasks are added in pairs
+    ASSERT_NEAR(counter, ThreadPoolExecutor::GetNumberOfThreads(), 1);
     ASSERT_EQ(tasks_counter.load(), 6);
   }
 
