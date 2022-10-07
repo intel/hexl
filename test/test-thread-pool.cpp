@@ -423,7 +423,9 @@ TEST(ThreadPool, AddParallelJob) {
   ids.clear();
 
   // Test: Add jobs when threads are busy
+  ThreadPoolExecutor::SetNumberOfThreads(0);
   std::thread thread_object([]() {
+    ThreadPoolExecutor::SetNumberOfThreads(2);
     ThreadPoolExecutor::AddParallelJobs([](int id, int threads) {
       HEXL_UNUSED(id);
       HEXL_UNUSED(threads);
