@@ -15,6 +15,9 @@ namespace hexl {
 // state[0] is the threads
 static void BM_ThreadPool_Setup(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
+  if (threads > std::thread::hardware_concurrency()) {
+    state.SkipWithError("No threads available");
+  }
 
   for (auto _ : state) {
     ThreadPoolExecutor::SetNumberOfThreads(threads);
@@ -33,6 +36,9 @@ BENCHMARK(BM_ThreadPool_Setup)
 // state[0] is the threads
 static void BM_ThreadPool_Join(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
+  if (threads > std::thread::hardware_concurrency()) {
+    state.SkipWithError("No threads available");
+  }
 
   for (auto _ : state) {
     state.PauseTiming();
@@ -51,6 +57,9 @@ BENCHMARK(BM_ThreadPool_Join)
 // state[0] is the threads
 static void BM_ThreadPool_SetupJoin(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
+  if (threads > std::thread::hardware_concurrency()) {
+    state.SkipWithError("No threads available");
+  }
 
   for (auto _ : state) {
     ThreadPoolExecutor::SetNumberOfThreads(threads);
@@ -67,6 +76,9 @@ BENCHMARK(BM_ThreadPool_SetupJoin)
 // state[0] is the threads
 static void BM_ThreadPool_WakeUp_Plus30ms(benchmark::State& state) {  //  NOLINT
   size_t threads = state.range(0);
+  if (threads > std::thread::hardware_concurrency()) {
+    state.SkipWithError("No threads available");
+  }
 
   ThreadPoolExecutor::SetNumberOfThreads(threads);
 
