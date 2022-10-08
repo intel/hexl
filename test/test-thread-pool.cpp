@@ -5,7 +5,6 @@
 
 #include <list>
 
-#include "test/test-thread-pool-util.hpp"
 #include "test/test-util.hpp"
 #include "thread-pool/thread-pool-executor.hpp"
 #include "thread-pool/thread-pool-vars-util.hpp"
