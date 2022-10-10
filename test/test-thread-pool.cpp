@@ -374,7 +374,6 @@ TEST(ThreadPool, StopThreads) {
 
 // Test adding parallel loop jobs
 TEST(ThreadPool, AddParallelJob) {
-  std::atomic_int sync{2};
   std::list<std::thread::id> ids;
   std::mutex list_mutex;
   HEXL_NUM_THREADS = 4;
@@ -420,28 +419,6 @@ TEST(ThreadPool, AddParallelJob) {
   ids.sort();
   ids.unique();
   ASSERT_EQ(ids.size(), ThreadPoolExecutor::GetNumberOfThreads());
-
-  ids.clear();
-
-  // Test: Add jobs when threads are busy
-  ThreadPoolExecutor::SetNumberOfThreads(2);
-  std::thread thread_object([&]() {
-    ThreadPoolExecutor::AddParallelJobs([&](int id, int threads) {
-      HEXL_UNUSED(id);
-      HEXL_UNUSED(threads);
-      sync.fetch_add(-1);
-      std::this_thread::sleep_for(std::chrono::milliseconds(2));
-    });
-  });
-  // Wait for threads to be running
-  while (sync) {
-  }
-  ThreadPoolExecutor::AddParallelJobs(id_task);
-
-  ids.sort();
-  ids.unique();
-  ASSERT_EQ(ids.size(), 1);
-  thread_object.join();
 
   ids.clear();
 
@@ -544,69 +521,6 @@ TEST(ThreadPool, AddRecursiveCalls_1) {
   ids.sort();
   ids.unique();
   ASSERT_EQ(ids.size(), 2);
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Test adding parallel tasks
-TEST(ThreadPool, AddRecursiveCalls_2) {
-  if (std::thread::hardware_concurrency() < 4) {
-    GTEST_SKIP();
-  }
-
-  std::atomic_int sync{2};
-  std::list<std::thread::id> ids;
-  std::mutex list_mutex;
-  HEXL_NUM_THREADS = 4;
-  int delay = 4;
-
-  // Common tasks
-  tp_task_t sleep_task([&](int id, int threads) {
-    HEXL_UNUSED(id);
-    HEXL_UNUSED(threads);
-    sync.fetch_add(-1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-  });
-
-  tp_task_t id_task([&list_mutex, &ids](int id, int threads) {
-    HEXL_UNUSED(id);
-    HEXL_UNUSED(threads);
-    std::lock_guard<std::mutex> lock(list_mutex);
-    ids.push_back(std::this_thread::get_id());
-  });
-
-  // Test: Add jobs when threads are busy. Without more free threads
-  ThreadPoolExecutor::SetNumberOfThreads(2);
-  std::thread thread_object(
-      [&]() { ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task); });
-  // Give time for previous threads to be running
-  while (sync) {
-  }
-  ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-
-  ids.sort();
-  ids.unique();
-  ASSERT_EQ(ids.size(), 1);
-  thread_object.join();
-  ids.clear();
-
-  // Test: Add jobs when threads are busy. With more free threads
-  uint64_t nthreads = 4;
-  sync.store(2);
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  std::thread thread_object2(
-      [=] { ThreadPoolExecutor::AddRecursiveCalls(sleep_task, sleep_task); });
-
-  // Give time for previous threads to be running
-  while (sync) {
-  }
-  ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-
-  ids.sort();
-  ids.unique();
-  ASSERT_EQ(ids.size(), 1);
-  thread_object2.join();
-  ids.clear();
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
