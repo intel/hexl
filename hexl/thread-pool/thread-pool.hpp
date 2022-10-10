@@ -40,59 +40,63 @@ class ThreadPool {
       // Run thread with a handling function
       size_t* n_threads = &total_threads;  // To put within scope
 
-      thread_handler->thread =
-          std::thread([thread_handler, current_threads, i, n_threads] {
-            bool stop = false;
-            ThreadPool::child = true;
+      thread_handler->thread = std::thread([thread_handler, current_threads, i,
+                                            n_threads] {
+        bool stop = false;
+        ThreadPool::child = true;
 
-            while (true) {
-              // Thread ready
-              thread_handler->state.store(STATE::DONE);
+        while (true) {
+          // Thread ready
+          thread_handler->state.store(static_cast<int>(STATE::DONE));
 
-              // Start waiting timestamp
-              auto spin_start = std::chrono::steady_clock::now();
+          // Start waiting timestamp
+          auto spin_start = std::chrono::steady_clock::now();
 
-              // Thread waiting
-              while (true) {
-                // Start or stop thread
-                if (thread_handler->state.load() == STATE::KICK_OFF) break;
-                if (thread_handler->state.load() == STATE::KILL) {
-                  stop = true;
-                  break;
-                }
-
-                // Check waiting time
-                auto spin_current = std::chrono::steady_clock::now();
-                uint64_t duration = duration_cast<std::chrono::milliseconds>(
-                                        spin_current - spin_start)
-                                        .count();
-                if (duration > HEXL_THREAD_WAIT_TIME) {
-                  // Got to sleep mode
-                  thread_handler->state.store(STATE::SLEEPING);
-
-                  // Wait for start or stop
-                  std::unique_lock<std::mutex> lock{thread_handler->wake_mutex};
-                  thread_handler->waker.wait(lock, [&stop, thread_handler] {
-                    if (thread_handler->state.load() == STATE::KICK_OFF) {
-                      return true;
-                    }
-                    if (thread_handler->state.load() == STATE::KILL) {
-                      stop = true;
-                      return true;
-                    }
-                    return false;
-                  });
-                  break;
-                }
-              }
-
-              if (stop) break;  // Finish handling function
-
-              // Thread is running task
-              thread_handler->state.store(STATE::RUNNING);
-              thread_handler->task(current_threads + i, *n_threads);
+          // Thread waiting
+          while (true) {
+            // Start or stop thread
+            if (thread_handler->state.load() ==
+                static_cast<int>(STATE::KICK_OFF))
+              break;
+            if (thread_handler->state.load() == static_cast<int>(STATE::KILL)) {
+              stop = true;
+              break;
             }
-          });
+
+            // Check waiting time
+            auto spin_current = std::chrono::steady_clock::now();
+            uint64_t duration = duration_cast<std::chrono::milliseconds>(
+                                    spin_current - spin_start)
+                                    .count();
+            if (duration > HEXL_THREAD_WAIT_TIME) {
+              // Got to sleep mode
+              thread_handler->state.store(static_cast<int>(STATE::SLEEPING));
+
+              // Wait for start or stop
+              std::unique_lock<std::mutex> lock{thread_handler->wake_mutex};
+              thread_handler->waker.wait(lock, [&stop, thread_handler] {
+                if (thread_handler->state.load() ==
+                    static_cast<int>(STATE::KICK_OFF)) {
+                  return true;
+                }
+                if (thread_handler->state.load() ==
+                    static_cast<int>(STATE::KILL)) {
+                  stop = true;
+                  return true;
+                }
+                return false;
+              });
+              break;
+            }
+          }
+
+          if (stop) break;  // Finish handling function
+
+          // Thread is running task
+          thread_handler->state.store(static_cast<int>(STATE::RUNNING));
+          thread_handler->task(current_threads + i, *n_threads);
+        }
+      });
     }
 
     // New threads added
@@ -102,8 +106,8 @@ class ThreadPool {
   // WaitThread: Wait for one thread to be ready
   void WaitThread(thread_info_t* thread_handler) {
     while (1) {
-      if (thread_handler->state.load() == STATE::DONE ||
-          thread_handler->state.load() == STATE::SLEEPING) {
+      if (thread_handler->state.load() == static_cast<int>(STATE::DONE) ||
+          thread_handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
         break;
       }
     }
@@ -150,11 +154,11 @@ class ThreadPool {
       for (size_t i = 0; i < to_remove; ++i) {
         // Kill thread
         thread_info_t* thread_handler = thread_handlers.at(total_threads - 1);
-        if (thread_handler->state.load() == STATE::SLEEPING) {
-          thread_handler->state.store(STATE::KILL);
+        if (thread_handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
+          thread_handler->state.store(static_cast<int>(STATE::KILL));
           thread_handler->waker.notify_one();
         } else {
-          thread_handler->state.store(STATE::KILL);
+          thread_handler->state.store(static_cast<int>(STATE::KILL));
         }
         thread_handler->thread.join();
 
@@ -203,12 +207,13 @@ class ThreadPool {
 
         for (size_t i = 0; i < total_threads; i++) {
           thread_info_t* thread_handler = thread_handlers.at(i);
-          if (thread_handler->state.load() == STATE::DONE) {
+          if (thread_handler->state.load() == static_cast<int>(STATE::DONE)) {
             thread_handler->task = job;
-            thread_handler->state.store(STATE::KICK_OFF);
-          } else if (thread_handler->state.load() == STATE::SLEEPING) {
+            thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+          } else if (thread_handler->state.load() ==
+                     static_cast<int>(STATE::SLEEPING)) {
             thread_handler->task = job;
-            thread_handler->state.store(STATE::KICK_OFF);
+            thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
             thread_handler->waker.notify_one();
           } else {  // In case thread is not on expected state
             job(i, total_threads);
@@ -248,24 +253,26 @@ class ThreadPool {
     size_t next = next_thread.fetch_add(2);
     if (next <= total_threads - 2) {
       thread_info_t* thread_handler = thread_handlers.at(next++);
-      if (thread_handler->state.load() == STATE::DONE) {
+      if (thread_handler->state.load() == static_cast<int>(STATE::DONE)) {
         thread_handler->task = task_a;
-        thread_handler->state.store(STATE::KICK_OFF);
-      } else if (thread_handler->state.load() == STATE::SLEEPING) {
+        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+      } else if (thread_handler->state.load() ==
+                 static_cast<int>(STATE::SLEEPING)) {
         thread_handler->task = task_a;
-        thread_handler->state.store(STATE::KICK_OFF);
+        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
         thread_handler->waker.notify_one();
       } else {  // In case thread is not on expected state
         task_a(next - 1, total_threads);
       }
 
       thread_handler = thread_handlers.at(next++);
-      if (thread_handler->state.load() == STATE::DONE) {
+      if (thread_handler->state.load() == static_cast<int>(STATE::DONE)) {
         thread_handler->task = task_b;
-        thread_handler->state.store(STATE::KICK_OFF);
-      } else if (thread_handler->state.load() == STATE::SLEEPING) {
+        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+      } else if (thread_handler->state.load() ==
+                 static_cast<int>(STATE::SLEEPING)) {
         thread_handler->task = task_b;
-        thread_handler->state.store(STATE::KICK_OFF);
+        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
         thread_handler->waker.notify_one();
       } else {  // In case thread is not on expected state
         task_b(next - 1, total_threads);

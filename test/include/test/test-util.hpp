@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <complex>
 #include <vector>

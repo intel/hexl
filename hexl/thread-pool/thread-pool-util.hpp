@@ -13,18 +13,18 @@ namespace intel {
 namespace hexl {
 
 // Enum for thread states
-enum STATE {
-  NONE,      // Undefined state
-  DONE,      // Task is completed and thread is on spin-up
-  KICK_OFF,  // There is a new task to execute, break spin-up
-  RUNNING,   // Executing task
-  SLEEPING,  // Thread is sleeping, waiting for wakeup
-  KILL       // To join thread
+enum class STATE {
+  NONE = 0,      // Undefined state
+  DONE = 1,      // Task is completed and thread is on spin-up
+  KICK_OFF = 2,  // There is a new task to execute, break spin-up
+  RUNNING = 3,   // Executing task
+  SLEEPING = 4,  // Thread is sleeping, waiting for wakeup
+  KILL = 5       // To join thread
 };
 
 // Control variables per thread
 struct thread_info_t {
-  std::atomic_int state{STATE::NONE};
+  std::atomic_int state{static_cast<int>(STATE::NONE)};
   std::condition_variable waker;
   std::mutex wake_mutex;
   std::thread thread;
