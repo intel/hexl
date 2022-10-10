@@ -3,10 +3,13 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <list>
 #include <mutex>
 #include <thread>
+
+#include "hexl/util/check.hpp"
 
 namespace intel {
 namespace hexl {
