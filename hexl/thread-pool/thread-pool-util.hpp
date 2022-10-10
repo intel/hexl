@@ -23,13 +23,13 @@ enum STATE {
 };
 
 // Control variables per thread
-typedef struct s_thread_info {
+struct thread_info_t {
   std::atomic_int state{STATE::NONE};
   std::condition_variable waker;
   std::mutex wake_mutex;
   std::thread thread;
   std::function<void(size_t id, size_t threads)> task;
-} thread_info_t;
+};
 
 }  // namespace hexl
 }  // namespace intel

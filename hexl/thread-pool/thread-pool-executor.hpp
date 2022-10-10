@@ -43,18 +43,16 @@ class ThreadPoolExecutor {
 #else
 
  public:
-  inline static void SetNumberOfThreads(int n_threads) {
-    HEXL_UNUSED(n_threads);
-  }
+  static void SetNumberOfThreads(int n_threads) { HEXL_UNUSED(n_threads); }
 
-  inline static void AddParallelJobs(tp_task_t job) { job(0, 1); }
+  static void AddParallelJobs(tp_task_t job) { job(0, 1); }
 
-  inline static void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
+  static void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
     task_a(0, 1);
     task_b(0, 1);
   }
 
-  inline static size_t GetNumberOfThreads() { return 1; }
+  static size_t GetNumberOfThreads() { return 1; }
 
 #endif
 };

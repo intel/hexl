@@ -13,7 +13,7 @@ namespace intel {
 namespace hexl {
 
 using std::chrono::duration_cast;
-typedef std::function<void(size_t id, size_t threads)> tp_task_t;
+using tp_task_t = std::function<void(size_t id, size_t threads)>;
 
 class ThreadPool {
  private:
