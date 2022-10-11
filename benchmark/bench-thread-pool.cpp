@@ -12,47 +12,6 @@ namespace intel {
 namespace hexl {
 
 #ifdef HEXL_MULTI_THREADING
-// state[0] is the threads
-static void BM_ThreadPool_Setup(benchmark::State& state) {  //  NOLINT
-  size_t threads = state.range(0);
-  if (threads > std::thread::hardware_concurrency()) {
-    state.SkipWithError("No threads available");
-  }
-
-  for (auto _ : state) {
-    ThreadPoolExecutor::SetNumberOfThreads(threads);
-    state.PauseTiming();
-    ThreadPoolExecutor::SetNumberOfThreads(0);
-    state.ResumeTiming();
-  }
-}
-
-BENCHMARK(BM_ThreadPool_Setup)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({2})
-    ->Args({8})
-    ->Args({32});
-
-// state[0] is the threads
-static void BM_ThreadPool_Join(benchmark::State& state) {  //  NOLINT
-  size_t threads = state.range(0);
-  if (threads > std::thread::hardware_concurrency()) {
-    state.SkipWithError("No threads available");
-  }
-
-  for (auto _ : state) {
-    state.PauseTiming();
-    ThreadPoolExecutor::SetNumberOfThreads(threads);
-    state.ResumeTiming();
-    ThreadPoolExecutor::SetNumberOfThreads(0);
-  }
-}
-
-BENCHMARK(BM_ThreadPool_Join)
-    ->Unit(benchmark::kMicrosecond)
-    ->Args({2})
-    ->Args({8})
-    ->Args({32});
 
 // state[0] is the threads
 static void BM_ThreadPool_SetupJoin(benchmark::State& state) {  //  NOLINT
@@ -71,7 +30,7 @@ BENCHMARK(BM_ThreadPool_SetupJoin)
     ->Unit(benchmark::kMicrosecond)
     ->Args({2})
     ->Args({8})
-    ->Args({32});
+    ->Args({16});
 
 // state[0] is the threads
 static void BM_ThreadPool_WakeUp_Plus30ms(benchmark::State& state) {  //  NOLINT
@@ -96,7 +55,7 @@ BENCHMARK(BM_ThreadPool_WakeUp_Plus30ms)
     ->Unit(benchmark::kMicrosecond)
     ->Args({2})
     ->Args({8})
-    ->Args({32});
+    ->Args({16});
 
 #endif
 

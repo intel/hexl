@@ -53,11 +53,9 @@ class ThreadPool {
           auto spin_start = std::chrono::steady_clock::now();
 
           // Thread waiting
-          while (true) {
-            // Start or stop thread
-            if (thread_handler->state.load() ==
-                static_cast<int>(STATE::KICK_OFF))
-              break;
+          while (thread_handler->state.load() !=
+                 static_cast<int>(STATE::KICK_OFF)) {
+            // Stop thread
             if (thread_handler->state.load() == static_cast<int>(STATE::KILL)) {
               stop = true;
               break;
@@ -105,11 +103,8 @@ class ThreadPool {
 
   // WaitThread: Wait for one thread to be ready
   void WaitThread(thread_info_t* thread_handler) {
-    while (1) {
-      if (thread_handler->state.load() == static_cast<int>(STATE::DONE) ||
-          thread_handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
-        break;
-      }
+    while (thread_handler->state.load() != static_cast<int>(STATE::DONE) &&
+           thread_handler->state.load() != static_cast<int>(STATE::SLEEPING)) {
     }
   }
 
@@ -164,8 +159,7 @@ class ThreadPool {
 
         // Update handlers
         delete thread_handler;
-        auto it = thread_handlers.end() - 1;
-        thread_handlers.erase(it);
+        thread_handlers.pop_back();
         total_threads--;
       }
     }
@@ -253,29 +247,33 @@ class ThreadPool {
     size_t next = next_thread.fetch_add(2);
     if (next <= total_threads - 2) {
       thread_info_t* thread_handler = thread_handlers.at(next++);
-      if (thread_handler->state.load() == static_cast<int>(STATE::DONE)) {
-        thread_handler->task = task_a;
-        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
-      } else if (thread_handler->state.load() ==
-                 static_cast<int>(STATE::SLEEPING)) {
-        thread_handler->task = task_a;
-        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
-        thread_handler->waker.notify_one();
-      } else {  // In case thread is not on expected state
-        task_a(next - 1, total_threads);
+      switch (thread_handler->state.load()) {
+        case static_cast<int>(STATE::DONE):
+          thread_handler->task = task_a;
+          thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+          break;
+        case static_cast<int>(STATE::SLEEPING):
+          thread_handler->task = task_a;
+          thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+          thread_handler->waker.notify_one();
+          break;
+        default:  // In case thread is not on expected state
+          task_a(next - 1, total_threads);
       }
 
       thread_handler = thread_handlers.at(next++);
-      if (thread_handler->state.load() == static_cast<int>(STATE::DONE)) {
-        thread_handler->task = task_b;
-        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
-      } else if (thread_handler->state.load() ==
-                 static_cast<int>(STATE::SLEEPING)) {
-        thread_handler->task = task_b;
-        thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
-        thread_handler->waker.notify_one();
-      } else {  // In case thread is not on expected state
-        task_b(next - 1, total_threads);
+      switch (thread_handler->state.load()) {
+        case static_cast<int>(STATE::DONE):
+          thread_handler->task = task_b;
+          thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+          break;
+        case static_cast<int>(STATE::SLEEPING):
+          thread_handler->task = task_b;
+          thread_handler->state.store(static_cast<int>(STATE::KICK_OFF));
+          thread_handler->waker.notify_one();
+          break;
+        default:  // In case thread is not on expected state
+          task_b(next - 1, total_threads);
       }
 
       // Implicit barrier
@@ -306,9 +304,9 @@ class ThreadPool {
   // Return threads' handlers
   std::vector<const thread_info_t*> GetThreadHandlers() {
     std::lock_guard<std::mutex> lock(pool_mutex);
-    std::vector<const thread_info_t*> handlers;
-    handlers.assign(thread_handlers.begin(), thread_handlers.end());
-    return handlers;
+    // returns a copy
+    return std::vector<const thread_info_t*>{thread_handlers.begin(),
+                                             thread_handlers.end()};
   }
 };
 

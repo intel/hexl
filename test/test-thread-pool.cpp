@@ -239,7 +239,7 @@ TEST(ThreadPool, SetNumberOfThreads_set) {
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers.at(i);
+    auto handler = handlers[i];
     if (handler->state.load() == static_cast<int>(STATE::DONE) ||
         handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
       counter++;
@@ -288,7 +288,7 @@ TEST(ThreadPool, SetNumberOfThreads_sleeping) {
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers.at(i);
+    auto handler = handlers[i];
     if (handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
       counter++;
     }
@@ -353,7 +353,7 @@ TEST(ThreadPool, ImplicitBrriers_setup) {
 
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers.at(i);
+    auto handler = handlers[i];
     if (handler->state.load() == static_cast<int>(STATE::DONE) ||
         handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
       counter++;
@@ -652,7 +652,7 @@ TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
   int counter = 0;
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers.at(i);
+    auto handler = handlers[i];
     if (handler->state.load() == static_cast<int>(STATE::DONE)) {
       counter++;
     }

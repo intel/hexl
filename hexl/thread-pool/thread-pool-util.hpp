@@ -13,7 +13,7 @@ namespace intel {
 namespace hexl {
 
 // Enum for thread states
-enum class STATE {
+enum class STATE : int {
   NONE = 0,      // Undefined state
   DONE = 1,      // Task is completed and thread is on spin-up
   KICK_OFF = 2,  // There is a new task to execute, break spin-up
