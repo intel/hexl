@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <charconv>
 #include <cstdlib>
 #include <string>
 #include <thread>
@@ -26,8 +25,7 @@ static int env_var_to_int(const char* var) {
   // Get value from env variable
   char* var_value = std::getenv(var);
   if (var_value != nullptr) {
-    std::string str = var_value;
-    std::from_chars(str.data(), str.data() + str.size(), value);
+    value = static_cast<int>(std::strtol(var_value, nullptr, 10));
   }
   return value;
 }
