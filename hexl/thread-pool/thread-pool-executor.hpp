@@ -13,32 +13,32 @@ class ThreadPoolExecutor {
 #ifdef HEXL_MULTI_THREADING
 
  private:
-  inline static ThreadPool* pool = new ThreadPool();
+  inline static ThreadPool pool = ThreadPool();
 
  public:
   // SetNumberOfThreads: Setup/kill thread pool by specifying number of threads
   static void SetNumberOfThreads(uint64_t n_threads) {
-    pool->SetupThreads(n_threads);
+    pool.SetupThreads(n_threads);
   }
 
   // AddParallelJobs: For parallel loops
-  static void AddParallelJobs(tp_task_t job) { pool->AddParallelJobs(job); }
+  static void AddParallelJobs(tp_task_t job) { pool.AddParallelJobs(job); }
 
   // AddRecursiveCalls: For parallel recursion
   static void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
-    pool->AddRecursiveCalls(task_a, task_b);
+    pool.AddRecursiveCalls(task_a, task_b);
   }
 
   // Return total number of threads
-  static size_t GetNumberOfThreads() { return pool->GetNumThreads(); }
+  static size_t GetNumberOfThreads() { return pool.GetNumThreads(); }
 
   // Return vector of constant handlers
-  static std::vector<const thread_info_t*> GetThreadHandlers() {
-    return pool->GetThreadHandlers();
+  static std::vector<const ThreadInfo*> GetThreadHandlers() {
+    return pool.GetThreadHandlers();
   }
 
   // Destructor
-  ~ThreadPoolExecutor() { delete pool; }
+  ~ThreadPoolExecutor() {}
 
 #else
 

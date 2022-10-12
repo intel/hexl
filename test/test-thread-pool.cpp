@@ -240,8 +240,8 @@ TEST(ThreadPool, SetNumberOfThreads_set) {
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
     auto handler = handlers[i];
-    if (handler->state.load() == static_cast<int>(STATE::DONE) ||
-        handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
+    if (handler->state.load() == STATE::DONE ||
+        handler->state.load() == STATE::SLEEPING) {
       counter++;
     }
   }
@@ -289,7 +289,7 @@ TEST(ThreadPool, SetNumberOfThreads_sleeping) {
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
     auto handler = handlers[i];
-    if (handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
+    if (handler->state.load() == STATE::SLEEPING) {
       counter++;
     }
   }
@@ -354,8 +354,8 @@ TEST(ThreadPool, ImplicitBrriers_setup) {
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   for (size_t i = 0; i < handlers.size(); i++) {
     auto handler = handlers[i];
-    if (handler->state.load() == static_cast<int>(STATE::DONE) ||
-        handler->state.load() == static_cast<int>(STATE::SLEEPING)) {
+    if (handler->state.load() == STATE::DONE ||
+        handler->state.load() == STATE::SLEEPING) {
       counter++;
     }
   }
@@ -601,6 +601,8 @@ TEST(ThreadPool, AddRecursiveCalls_threads_sleeping) {
 }
 
 // Test thread safety of the thread pool
+
+// Parallel Setup
 TEST(ThreadPool, thread_safety_SetNumberOfThreads) {
   uint64_t nthreads = 2;
   sync.store(2);
@@ -628,6 +630,9 @@ TEST(ThreadPool, thread_safety_SetNumberOfThreads) {
 
 // Parallel recursive task
 TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
+  if (std::thread::hardware_concurrency() < 4) {
+    GTEST_SKIP();
+  }
   uint64_t nthreads = 4;
   sync.store(2);
   task_ids.clear();
@@ -649,14 +654,6 @@ TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
   thread_object1.join();
   thread_object2.join();
 
-  int counter = 0;
-  auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers[i];
-    if (handler->state.load() == static_cast<int>(STATE::DONE)) {
-      counter++;
-    }
-  }
   ASSERT_EQ(task_ids.size(), 4);
   task_ids.sort();
   task_ids.unique();

@@ -23,8 +23,8 @@ enum class STATE : int {
 };
 
 // Control variables per thread
-struct thread_info_t {
-  std::atomic_int state{static_cast<int>(STATE::NONE)};
+struct ThreadInfo {
+  std::atomic<STATE> state{STATE::NONE};
   std::condition_variable waker;
   std::mutex wake_mutex;
   std::thread thread;
