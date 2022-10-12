@@ -118,12 +118,16 @@ class ThreadPool {
 
   // SetupThreads_Unlocked: Spawns new threads if necessary. Without mutex
   void SetupThreads_Unlocked(size_t n_threads) {
-    HEXL_VLOG(3, "Thread Pool Info:");
-    HEXL_VLOG(3, "HEXL_NUM_THREADS                = " << HEXL_NUM_THREADS);
-    HEXL_VLOG(3,
-              "HEXL_NTT_PARALLEL_DEPTH         = " << HEXL_NTT_PARALLEL_DEPTH);
-
-    setup_done = true;
+    if (n_threads == 0) {
+      setup_done = false;
+    } else {
+      HEXL_VLOG(3, "Thread Pool Info:");
+      HEXL_VLOG(3, "HEXL_NUM_THREADS        = " << HEXL_NUM_THREADS);
+      HEXL_VLOG(3, "HEXL_NTT_PARALLEL_DEPTH = " << HEXL_NTT_PARALLEL_DEPTH);
+      HEXL_VLOG(3, "HW Threads              = "
+                       << std::thread::hardware_concurrency());
+      setup_done = true;
+    }
 
     // Add new threads if necessary
     if (n_threads > total_threads) {
@@ -160,13 +164,6 @@ class ThreadPool {
         total_threads--;
       }
     }
-
-    if (n_threads == 0) {
-      setup_done = false;
-    }
-
-    HEXL_VLOG(2,
-              "Setting up thread pool with " << total_threads << " threads.");
   }
 
  public:
