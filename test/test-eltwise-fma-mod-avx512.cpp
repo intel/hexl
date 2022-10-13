@@ -221,7 +221,7 @@ TEST(EltwiseFMAMod, AVX512IFMA) {
 
   constexpr uint64_t input_mod_factor = 8;
 
-  for (size_t bits = 48; bits <= 51; ++bits) {
+  for (size_t bits = 48; bits <= 52; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
     for (size_t trial = 0; trial < 1000; ++trial) {
       auto arg1 = GenerateInsecureUniformIntRandomValues(
@@ -238,7 +238,7 @@ TEST(EltwiseFMAMod, AVX512IFMA) {
       EltwiseFMAMod(arg1.data(), arg1.data(), arg2, arg3_data, arg1.size(),
                     modulus, input_mod_factor);
 
-      if (has_avx512ifma) {
+      if (has_avx512ifma && input_mod_factor * modulus < (1ULL << 51)) {
         EltwiseFMAModAVX512<52, input_mod_factor>(
             arg1a.data(), arg1a.data(), arg2, arg3_data, arg1.size(), modulus);
         ASSERT_EQ(arg1, arg1a);

@@ -40,7 +40,7 @@ void EltwiseFMAMod(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
                  << (input_mod_factor * modulus));
 
 #ifdef HEXL_HAS_AVX512IFMA
-  if (has_avx512ifma && input_mod_factor * modulus < (1ULL << 52)) {
+  if (has_avx512ifma && input_mod_factor * modulus < (1ULL << 51)) {
     HEXL_VLOG(3, "Calling 52-bit EltwiseFMAModAVX512");
 
     switch (input_mod_factor) {
