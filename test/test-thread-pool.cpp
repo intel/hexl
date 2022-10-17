@@ -19,7 +19,7 @@ TEST(ThreadPool, setup_num_threads_env_var) {
 
   // Overshooting: Max HW's value is set
   {
-    char env[] = "HEXL_NUM_THREADS=999999999";
+    char env[] = "HEXL_NUM_THREADS=999999";
     putenv(env);
     auto value = setup_num_threads("HEXL_NUM_THREADS");
     ASSERT_EQ(value, std::thread::hardware_concurrency());
@@ -44,22 +44,6 @@ TEST(ThreadPool, setup_num_threads_env_var) {
   // Undefined: Default value is set
   {
     char env[] = "HEXL_NUM_THREADS";
-    putenv(env);
-    auto value = setup_num_threads("HEXL_NUM_THREADS");
-    ASSERT_EQ(value, max_or_default);
-  }
-
-  // Negative: Default value is set
-  {
-    char env[] = "HEXL_NUM_THREADS=-2";
-    putenv(env);
-    auto value = setup_num_threads("HEXL_NUM_THREADS");
-    ASSERT_EQ(value, max_or_default);
-  }
-
-  // String: Default value is set
-  {
-    char env[] = "HEXL_NUM_THREADS=error";
     putenv(env);
     auto value = setup_num_threads("HEXL_NUM_THREADS");
     ASSERT_EQ(value, max_or_default);
@@ -94,28 +78,12 @@ TEST(ThreadPool, setup_ntt_calls_env_var) {
     ASSERT_EQ(value, HEXL_DEFAULT_NTT_PARALLEL_DEPTH);
   }
 
-  // Negative: Default value is set
-  {
-    char env[] = "HEXL_NTT_PARALLEL_DEPTH=-2";
-    putenv(env);
-    auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
-    ASSERT_EQ(value, HEXL_DEFAULT_NTT_PARALLEL_DEPTH);
-  }
-
   // Floating point: Rounded value is set
   {
     char env[] = "HEXL_NTT_PARALLEL_DEPTH=1.5";
     putenv(env);
     auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
     ASSERT_EQ(value, 1);
-  }
-
-  // String: Default value is set
-  {
-    char env[] = "HEXL_NTT_PARALLEL_DEPTH=error";
-    putenv(env);
-    auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
-    ASSERT_EQ(value, HEXL_DEFAULT_NTT_PARALLEL_DEPTH);
   }
 }
 
@@ -238,8 +206,7 @@ TEST(ThreadPool, SetNumberOfThreads_set) {
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers[i];
+  for (auto handler : handlers) {
     if (handler->state.load() == STATE::DONE ||
         handler->state.load() == STATE::SLEEPING) {
       counter++;
@@ -287,8 +254,7 @@ TEST(ThreadPool, SetNumberOfThreads_sleeping) {
   std::this_thread::sleep_for(
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers[i];
+  for (auto handler : handlers) {
     if (handler->state.load() == STATE::SLEEPING) {
       counter++;
     }
@@ -352,8 +318,7 @@ TEST(ThreadPool, ImplicitBrriers_setup) {
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Implicit barrier
 
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  for (size_t i = 0; i < handlers.size(); i++) {
-    auto handler = handlers[i];
+  for (auto handler : handlers) {
     if (handler->state.load() == STATE::DONE ||
         handler->state.load() == STATE::SLEEPING) {
       counter++;

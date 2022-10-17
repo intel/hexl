@@ -6,11 +6,14 @@
 #include <atomic>
 #include <condition_variable>
 #include <functional>
+#include <iostream>
 #include <mutex>
 #include <thread>
-
+#include <vector>
 namespace intel {
 namespace hexl {
+
+static thread_local bool isChildThread;  // True if on child thread
 
 // Enum for thread states
 enum class STATE : int {
@@ -22,13 +25,94 @@ enum class STATE : int {
   KILL = 5       // To join thread
 };
 
-// Control variables per thread
-struct ThreadInfo {
-  std::atomic<STATE> state{STATE::NONE};
-  std::condition_variable waker;
-  std::mutex wake_mutex;
+using tp_task_t = std::function<void(size_t id, size_t threads)>;
+
+// Controls thread
+class ThreadHandler {
+ private:
+  bool stop_thread = false;  // To exit main thread loop
+
+  // Waits for wake up signal on conditional variable
+  void wait_for_wakeup() {
+    // Set to sleeping mode
+    state.store(STATE::SLEEPING);
+
+    // Wait for KICK_OFF or KILL
+    std::unique_lock<std::mutex> lock{wake_mutex};
+    waker.wait(lock, [&rstop_thread = stop_thread, &rstate = state] {
+      if (rstate.load() == STATE::KICK_OFF) {
+        return true;
+      }
+      if (rstate.load() == STATE::KILL) {
+        rstop_thread = true;
+        return true;
+      }
+      return false;  // Keep waiting
+    });
+  }
+
+  // Returns elapsed time from given start time
+  uint64_t elapsed_time(
+      std::chrono::time_point<std::chrono::steady_clock> since) {
+    // Timestamp: Current active waiting time
+    auto spin_current = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(spin_current -
+                                                                 since)
+        .count();
+  }
+
+ public:
+  // Control variables
+  std::atomic<STATE> state{STATE::NONE};  // Keeps thread's state
+  std::condition_variable waker;          // To wake thread up
+  std::mutex wake_mutex;                  // For cond. variable
   std::thread thread;
-  std::function<void(size_t id, size_t threads)> task;
+  tp_task_t task;  // To be run by thread
+  // Vector of all threads
+  const std::vector<ThreadHandler*>& parent_container;
+  size_t thread_id;  // Used for proper chunking
+
+  // Constructor
+  ThreadHandler(const std::vector<ThreadHandler*>& handlers, size_t id)
+      : parent_container(handlers), thread_id(id) {
+    thread = std::thread(&ThreadHandler::runner, &(*this));
+  }
+
+  // Thread Runner
+  void runner() {
+    // This is a child thread
+    isChildThread = true;
+    // Handling loop
+    while (true) {
+      // Set thread ready
+      state.store(STATE::DONE);
+
+      // Timestamp: start active waiting
+      auto spin_start = std::chrono::steady_clock::now();
+      // Active waiting for KICK_OFF (or KILL)
+      while (state.load() != STATE::KICK_OFF) {
+        // Terminate thread?
+        if (state.load() == STATE::KILL) {
+          stop_thread = true;
+          break;
+        }
+        // Go to sleep?
+        if (elapsed_time(spin_start) > HEXL_THREAD_WAIT_TIME) {
+          // Sleep waiting
+          wait_for_wakeup();
+          break;
+        }
+      }
+
+      if (stop_thread) break;  // Finish handling function
+
+      // Specify the task its thread id and the total number of threads
+      // at the time the task is run because thread pool size can change
+      // while existing threads are running.
+      state.store(STATE::RUNNING);
+      task(thread_id, parent_container.size());
+    }
+  }
 };
 
 }  // namespace hexl

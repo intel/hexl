@@ -13,7 +13,7 @@ class ThreadPoolExecutor {
 #ifdef HEXL_MULTI_THREADING
 
  private:
-  inline static ThreadPool pool = ThreadPool();
+  inline static ThreadPool pool{};
 
  public:
   // SetNumberOfThreads: Setup/kill thread pool by specifying number of threads
@@ -33,12 +33,9 @@ class ThreadPoolExecutor {
   static size_t GetNumberOfThreads() { return pool.GetNumThreads(); }
 
   // Return vector of constant handlers
-  static std::vector<const ThreadInfo*> GetThreadHandlers() {
+  static std::vector<const ThreadHandler*> GetThreadHandlers() {
     return pool.GetThreadHandlers();
   }
-
-  // Destructor
-  ~ThreadPoolExecutor() {}
 
 #else
 

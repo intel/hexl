@@ -12,94 +12,34 @@
 namespace intel {
 namespace hexl {
 
-using std::chrono::duration_cast;
-using tp_task_t = std::function<void(size_t id, size_t threads)>;
-
 class ThreadPool {
  private:
   // Properties
-  size_t total_threads = 0;                  // Total number of threads
-  std::atomic_uint64_t next_thread{0};       // Points to next free thread
-  std::vector<ThreadInfo*> thread_handlers;  // Thread's info
-  std::mutex pool_mutex;                     // Control pool's edition
-  bool setup_done = false;                   // Is thread pool initialized
-  inline static thread_local bool child;     // True if on child thread
+  std::atomic_uint64_t next_thread{0};          // Points to next free thread
+  std::vector<ThreadHandler*> thread_handlers;  // Thread's info
+  mutable std::mutex pool_mutex;                // Control pool's edition
+  bool setup_done = false;                      // Is thread pool initialized
 
   // Methods
 
   // StartThreads: Spawn a given number of threads
   void StartThreads(size_t new_threads) {
-    size_t current_threads = total_threads;
-
     // Add N new threads
-    for (size_t i = 0; i < new_threads; ++i) {
+    auto old_size = thread_handlers.size();
+    thread_handlers.reserve(old_size + new_threads);
+
+    for (size_t i = old_size; i < old_size + new_threads; ++i) {
       // Create handler and add it to vector of threads
-      ThreadInfo* thread_handler = new ThreadInfo();
-      thread_handlers.emplace_back(thread_handler);
+      // Let handler know its parent container and its position in the vector
+      thread_handlers.emplace_back(new ThreadHandler(thread_handlers, i));
 
-      // Run thread with a handling function
-      // size_t* n_threads = &total_threads;  // To put within scope
-
-      thread_handler->thread = std::thread(
-          [thread_handler, current_threads, i, &n_threads = total_threads] {
-            bool stop = false;
-            ThreadPool::child = true;
-
-            while (true) {
-              // Thread ready
-              thread_handler->state.store(STATE::DONE);
-
-              // Start waiting timestamp
-              auto spin_start = std::chrono::steady_clock::now();
-
-              // Thread waiting
-              while (thread_handler->state.load() != STATE::KICK_OFF) {
-                // Stop thread
-                if (thread_handler->state.load() == STATE::KILL) {
-                  stop = true;
-                  break;
-                }
-
-                // Check waiting time
-                auto spin_current = std::chrono::steady_clock::now();
-                uint64_t duration = duration_cast<std::chrono::milliseconds>(
-                                        spin_current - spin_start)
-                                        .count();
-                if (duration > HEXL_THREAD_WAIT_TIME) {
-                  // Got to sleep mode
-                  thread_handler->state.store(STATE::SLEEPING);
-
-                  // Wait for start or stop
-                  std::unique_lock<std::mutex> lock{thread_handler->wake_mutex};
-                  thread_handler->waker.wait(lock, [&stop, thread_handler] {
-                    if (thread_handler->state.load() == STATE::KICK_OFF) {
-                      return true;
-                    }
-                    if (thread_handler->state.load() == STATE::KILL) {
-                      stop = true;
-                      return true;
-                    }
-                    return false;
-                  });
-                  break;
-                }
-              }
-
-              if (stop) break;  // Finish handling function
-
-              // Thread is running task
-              thread_handler->state.store(STATE::RUNNING);
-              thread_handler->task(current_threads + i, n_threads);
-            }
-          });
+      // Create thread
+      // thread_handler->thread = std::thread(*thread_handler);
     }
-
-    // New threads added
-    total_threads += new_threads;
   }
 
   // WaitThread: Wait for one thread to be ready
-  void WaitThread(ThreadInfo* thread_handler) {
+  void WaitThread(ThreadHandler* thread_handler) {
     while (thread_handler->state.load() != STATE::DONE &&
            thread_handler->state.load() != STATE::SLEEPING) {
     }
@@ -108,8 +48,8 @@ class ThreadPool {
   // SetBarrier_Unlocked: Sets a barrier to sync all threads. Without mutex
   void SetBarrier_Unlocked() {
     // Waits until all threads are DONE or SLEEPING
-    for (size_t i = 0; i < total_threads; i++) {
-      WaitThread(thread_handlers.at(i));
+    for (auto handler : thread_handlers) {
+      WaitThread(handler);
     }
 
     // Next thread to be used
@@ -130,7 +70,8 @@ class ThreadPool {
     }
 
     // Add new threads if necessary
-    if (n_threads > total_threads) {
+    size_t t_threads = thread_handlers.size();
+    if (n_threads > t_threads) {
       // Can't exceed HW threads
       if (n_threads > std::thread::hardware_concurrency()) {
         n_threads = std::thread::hardware_concurrency();
@@ -139,17 +80,35 @@ class ThreadPool {
                    << std::thread::hardware_concurrency() << ".");
       }
 
-      size_t new_threads = n_threads - total_threads;
+      size_t new_threads = n_threads - t_threads;
       StartThreads(new_threads);  // Start extra threads
 
       // Wait for threads to be ready
       SetBarrier_Unlocked();
 
-    } else if (n_threads < total_threads) {
-      size_t to_remove = total_threads - n_threads;
+      // Remove threads if necessary
+    } else if (n_threads < t_threads) {
+      // Kill lambda
+      auto kill_thread = [](ThreadHandler* thread_handler) {
+        if (thread_handler->state.load() == STATE::SLEEPING) {
+          thread_handler->state.store(STATE::KILL);
+          thread_handler->waker.notify_one();
+        } else {
+          thread_handler->state.store(STATE::KILL);
+        }
+        thread_handler->thread.join();
+
+        // Update handlers
+        delete thread_handler;
+      };
+      std::for_each_n(thread_handlers.rbegin(), t_threads - n_threads,
+                      kill_thread);
+      thread_handlers.resize(n_threads);
+
+      /*size_t to_remove = t_threads - n_threads;
       for (size_t i = 0; i < to_remove; ++i) {
         // Kill thread
-        ThreadInfo* thread_handler = thread_handlers.at(total_threads - 1);
+        ThreadHandler* thread_handler = thread_handlers.at(--t_threads);
         if (thread_handler->state.load() == STATE::SLEEPING) {
           thread_handler->state.store(STATE::KILL);
           thread_handler->waker.notify_one();
@@ -161,22 +120,21 @@ class ThreadPool {
         // Update handlers
         delete thread_handler;
         thread_handlers.pop_back();
-        total_threads--;
-      }
+      }*/
     }
   }
 
  public:
   // Methods
 
-  ThreadPool() { ThreadPool::child = false; }
+  ThreadPool() { isChildThread = false; }
 
   ~ThreadPool() { SetupThreads(0); }
 
   // GetNumThreads: Returns total number of threads
-  size_t GetNumThreads() {
+  size_t GetNumThreads() const {
     std::lock_guard<std::mutex> lock(pool_mutex);
-    return total_threads;
+    return thread_handlers.size();
   }
 
   // AddParallelJobs: Runs the same function on a total number of threads
@@ -186,27 +144,29 @@ class ThreadPool {
     // Try using thread pool
     if (pool_mutex.try_lock()) {
       if (!setup_done) {
-        SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
+        SetupThreads_Unlocked(
+            HEXL_NUM_THREADS);  // Setup if thread pool is down
       }
 
       // Only if all threads are available
       if (next_thread.load() == 0) {
-        next_thread.store(total_threads);
+        const size_t t_threads = thread_handlers.size();
+        next_thread.store(t_threads);
 
-        for (size_t i = 0; i < total_threads; i++) {
-          ThreadInfo* thread_handler = thread_handlers.at(i);
-          switch (thread_handler->state.load()) {
+        for (size_t i = 0; i < t_threads; ++i) {
+          auto handler = thread_handlers[i];
+          switch (handler->state.load()) {
             case STATE::DONE:
-              thread_handler->task = job;
-              thread_handler->state.store(STATE::KICK_OFF);
+              handler->task = job;
+              handler->state.store(STATE::KICK_OFF);
               break;
             case STATE::SLEEPING:
-              thread_handler->task = job;
-              thread_handler->state.store(STATE::KICK_OFF);
-              thread_handler->waker.notify_one();
+              handler->task = job;
+              handler->state.store(STATE::KICK_OFF);
+              handler->waker.notify_one();
               break;
-            default:  // In case thread is not on expected state
-              job(i, total_threads);
+            default:  // In case thread is not in expected state
+              job(i, t_threads);
           }
         }
         SetBarrier_Unlocked();  // Wait 'til all jobs are done
@@ -227,7 +187,7 @@ class ThreadPool {
     bool locked = false;
 
     // Try using thread pool
-    if (!ThreadPool::child) {
+    if (!isChildThread) {
       locked = pool_mutex.try_lock();
       if (!locked) {
         task_a(0, 1);
@@ -240,36 +200,37 @@ class ThreadPool {
       SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
     }
 
+    const size_t t_threads = thread_handlers.size();
     size_t next = next_thread.fetch_add(2);
-    if (next <= total_threads - 2) {
-      ThreadInfo* thread_handler = thread_handlers.at(next++);
-      switch (thread_handler->state.load()) {
+    if (next <= t_threads - 2) {
+      ThreadHandler* handler = thread_handlers.at(next++);
+      switch (handler->state.load()) {
         case STATE::DONE:
-          thread_handler->task = task_a;
-          thread_handler->state.store(STATE::KICK_OFF);
+          handler->task = task_a;
+          handler->state.store(STATE::KICK_OFF);
           break;
         case STATE::SLEEPING:
-          thread_handler->task = task_a;
-          thread_handler->state.store(STATE::KICK_OFF);
-          thread_handler->waker.notify_one();
+          handler->task = task_a;
+          handler->state.store(STATE::KICK_OFF);
+          handler->waker.notify_one();
           break;
         default:  // In case thread is not on expected state
-          task_a(next - 1, total_threads);
+          task_a(next - 1, t_threads);
       }
 
-      thread_handler = thread_handlers.at(next++);
-      switch (thread_handler->state.load()) {
+      handler = thread_handlers.at(next++);
+      switch (handler->state.load()) {
         case STATE::DONE:
-          thread_handler->task = task_b;
-          thread_handler->state.store(STATE::KICK_OFF);
+          handler->task = task_b;
+          handler->state.store(STATE::KICK_OFF);
           break;
         case STATE::SLEEPING:
-          thread_handler->task = task_b;
-          thread_handler->state.store(STATE::KICK_OFF);
-          thread_handler->waker.notify_one();
+          handler->task = task_b;
+          handler->state.store(STATE::KICK_OFF);
+          handler->waker.notify_one();
           break;
         default:  // In case thread is not on expected state
-          task_b(next - 1, total_threads);
+          task_b(next - 1, t_threads);
       }
 
       // Implicit barrier
@@ -298,11 +259,11 @@ class ThreadPool {
   }
 
   // Return threads' handlers
-  std::vector<const ThreadInfo*> GetThreadHandlers() {
+  std::vector<const ThreadHandler*> GetThreadHandlers() const {
     std::lock_guard<std::mutex> lock(pool_mutex);
     // returns a copy
-    return std::vector<const ThreadInfo*>{thread_handlers.begin(),
-                                          thread_handlers.end()};
+    return std::vector<const ThreadHandler*>{thread_handlers.begin(),
+                                             thread_handlers.end()};
   }
 };
 
