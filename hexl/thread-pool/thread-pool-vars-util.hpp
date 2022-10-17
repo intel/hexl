@@ -33,18 +33,18 @@ static int64_t env_var_to_int(const char* var) {
 
   // Checks
   if (errno == ERANGE) {
-    std::cout << "ERROR: Env variable '" << var << "=" << var_value;
-    std::cout << "' is out of range." << std::endl;
+    std::cerr << "ERROR: Env variable '" << var << "=" << var_value
+              << "' is out of range.\n";
     exit(1);
   }
 
   if (value <= 0) {
-    std::cout << "ERROR: Env variable '" << var << "=" << var_value;
-    std::cout << "' is not valid." << std::endl;
+    std::cerr << "ERROR: Env variable '" << var << "=" << var_value
+              << "' is not valid.\n";
     exit(1);
   }
 
-  return (value < 0L) ? 0L : value;  // not negative number
+  return value;  // not negative number
 }
 
 // Verify for appropriate number of threads
@@ -68,7 +68,7 @@ static int64_t setup_ntt_calls(const char* var) {
   int64_t value = env_var_to_int(var);
 
   // Use default value in case of error
-  if (value <= 0) {
+  if (value == 0) {
     value = HEXL_DEFAULT_NTT_PARALLEL_DEPTH;
   }
 

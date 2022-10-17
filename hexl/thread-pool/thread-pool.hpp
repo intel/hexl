@@ -7,12 +7,163 @@
 
 #include "hexl/logging/logging.hpp"
 #include "hexl/util/check.hpp"
-#include "thread-pool/thread-pool-util.hpp"
+#include "thread-pool/thread-handler.hpp"
 
 namespace intel {
 namespace hexl {
 
 class ThreadPool {
+ public:
+  // Methods
+
+  ThreadPool() { isChildThread = false; }
+
+  ~ThreadPool() { SetupThreads(0); }
+
+  // GetNumThreads: Returns total number of threads
+  size_t GetNumThreads() const {
+    std::lock_guard<std::mutex> lock(pool_mutex);
+    return thread_handlers.size();
+  }
+
+  // AddParallelJobs: Runs the same function on a total number of threads
+  void AddParallelJobs(tp_task_t job) {
+    HEXL_CHECK(job, "Require non empty job");
+
+    // Try using thread pool
+    if (pool_mutex.try_lock()) {
+      if (!setup_done) {
+        SetupThreads_Unlocked(
+            HEXL_NUM_THREADS);  // Setup if thread pool is down
+      }
+
+      // Only if all threads are available
+      if (next_thread.load() == 0) {
+        const size_t t_threads = thread_handlers.size();
+        next_thread.store(t_threads);
+
+        for (size_t i = 0; i < t_threads; ++i) {
+          auto handler = thread_handlers[i];
+          switch (handler->state.load()) {
+            case STATE::DONE:
+              handler->task = job;
+              handler->state.store(STATE::KICK_OFF);
+              break;
+            case STATE::SLEEPING:
+              handler->task = job;
+              handler->state.store(STATE::KICK_OFF);
+              {
+                std::lock_guard<std::mutex> lock(handler->wake_mutex);
+                handler->waker.notify_one();
+              }
+              break;
+            default:  // In case thread is not in expected state
+              job(i, t_threads);
+          }
+        }
+        SetBarrier_Unlocked();  // Wait 'til all jobs are done
+        pool_mutex.unlock();
+      } else {  // Run on single thread
+        pool_mutex.unlock();
+        job(0, 1);
+      }
+    } else {
+      job(0, 1);
+    }
+  }
+
+  // AddRecursiveCalls: Runs a task on next thread available
+  void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
+    HEXL_CHECK(task_a, "task_a: Require non empty task");
+    HEXL_CHECK(task_b, "task_b: Require non empty task");
+    bool locked = false;
+
+    // Try using thread pool
+    if (!isChildThread) {
+      locked = pool_mutex.try_lock();
+      if (!locked) {
+        task_a(0, 1);
+        task_b(0, 1);
+        return;
+      }
+    }
+
+    if (!setup_done) {
+      SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
+    }
+
+    const size_t t_threads = thread_handlers.size();
+    size_t next = next_thread.fetch_add(2);
+    if (next <= t_threads - 2) {
+      ThreadHandler* handler = thread_handlers.at(next++);
+      switch (handler->state.load()) {
+        case STATE::DONE:
+          handler->task = task_a;
+          handler->state.store(STATE::KICK_OFF);
+          break;
+        case STATE::SLEEPING:
+          handler->task = task_a;
+          handler->state.store(STATE::KICK_OFF);
+          {
+            std::lock_guard<std::mutex> lock(handler->wake_mutex);
+            handler->waker.notify_one();
+          }
+          break;
+        default:  // In case thread is not on expected state
+          task_a(next - 1, t_threads);
+      }
+
+      handler = thread_handlers.at(next++);
+      switch (handler->state.load()) {
+        case STATE::DONE:
+          handler->task = task_b;
+          handler->state.store(STATE::KICK_OFF);
+          break;
+        case STATE::SLEEPING:
+          handler->task = task_b;
+          handler->state.store(STATE::KICK_OFF);
+          {
+            std::lock_guard<std::mutex> lock(handler->wake_mutex);
+            handler->waker.notify_one();
+          }
+          break;
+        default:  // In case thread is not on expected state
+          task_b(next - 1, t_threads);
+      }
+
+      // Implicit barrier
+      for (size_t i = next - 2; i < next; i++) {
+        WaitThread(thread_handlers.at(i));
+      }
+
+      // Next thread to be used
+      next_thread.fetch_add(-2);
+
+    } else {
+      next_thread.fetch_add(-2);
+      task_a(0, 1);
+      task_b(0, 1);
+    }
+
+    if (locked) {
+      pool_mutex.unlock();
+    }
+  }
+
+  // SetupThreads: Spawns new threads if necessary
+  void SetupThreads(size_t n_threads) {
+    std::lock_guard<std::mutex> lock(pool_mutex);
+    SetupThreads_Unlocked(n_threads);
+  }
+
+  // Return threads' handlers
+  std::vector<const ThreadHandler*> GetThreadHandlers() const {
+    std::lock_guard<std::mutex> lock(pool_mutex);
+    // returns a copy
+    return std::vector<const ThreadHandler*>{thread_handlers.begin(),
+                                             thread_handlers.end()};
+  }
+
  private:
   // Properties
   std::atomic_uint64_t next_thread{0};          // Points to next free thread
@@ -27,14 +178,10 @@ class ThreadPool {
     // Add N new threads
     auto old_size = thread_handlers.size();
     thread_handlers.reserve(old_size + new_threads);
-
     for (size_t i = old_size; i < old_size + new_threads; ++i) {
       // Create handler and add it to vector of threads
       // Let handler know its parent container and its position in the vector
       thread_handlers.emplace_back(new ThreadHandler(thread_handlers, i));
-
-      // Create thread
-      // thread_handler->thread = std::thread(*thread_handler);
     }
   }
 
@@ -106,148 +253,6 @@ class ThreadPool {
                     thread_handlers.rend() - n_threads, kill_thread);
       thread_handlers.resize(n_threads);
     }
-  }
-
- public:
-  // Methods
-
-  ThreadPool() { isChildThread = false; }
-
-  ~ThreadPool() { SetupThreads(0); }
-
-  // GetNumThreads: Returns total number of threads
-  size_t GetNumThreads() const {
-    std::lock_guard<std::mutex> lock(pool_mutex);
-    return thread_handlers.size();
-  }
-
-  // AddParallelJobs: Runs the same function on a total number of threads
-  void AddParallelJobs(tp_task_t job) {
-    HEXL_CHECK(job, "Require non empty job");
-
-    // Try using thread pool
-    if (pool_mutex.try_lock()) {
-      if (!setup_done) {
-        SetupThreads_Unlocked(
-            HEXL_NUM_THREADS);  // Setup if thread pool is down
-      }
-
-      // Only if all threads are available
-      if (next_thread.load() == 0) {
-        const size_t t_threads = thread_handlers.size();
-        next_thread.store(t_threads);
-
-        for (size_t i = 0; i < t_threads; ++i) {
-          auto handler = thread_handlers[i];
-          switch (handler->state.load()) {
-            case STATE::DONE:
-              handler->task = job;
-              handler->state.store(STATE::KICK_OFF);
-              break;
-            case STATE::SLEEPING:
-              handler->task = job;
-              handler->state.store(STATE::KICK_OFF);
-              handler->waker.notify_one();
-              break;
-            default:  // In case thread is not in expected state
-              job(i, t_threads);
-          }
-        }
-        SetBarrier_Unlocked();  // Wait 'til all jobs are done
-        pool_mutex.unlock();
-      } else {  // Run on single thread
-        pool_mutex.unlock();
-        job(0, 1);
-      }
-    } else {
-      job(0, 1);
-    }
-  }
-
-  // AddRecursiveCalls: Runs a task on next thread available
-  void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
-    HEXL_CHECK(task_a, "task_a: Require non empty task");
-    HEXL_CHECK(task_b, "task_b: Require non empty task");
-    bool locked = false;
-
-    // Try using thread pool
-    if (!isChildThread) {
-      locked = pool_mutex.try_lock();
-      if (!locked) {
-        task_a(0, 1);
-        task_b(0, 1);
-        return;
-      }
-    }
-
-    if (!setup_done) {
-      SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
-    }
-
-    const size_t t_threads = thread_handlers.size();
-    size_t next = next_thread.fetch_add(2);
-    if (next <= t_threads - 2) {
-      ThreadHandler* handler = thread_handlers.at(next++);
-      switch (handler->state.load()) {
-        case STATE::DONE:
-          handler->task = task_a;
-          handler->state.store(STATE::KICK_OFF);
-          break;
-        case STATE::SLEEPING:
-          handler->task = task_a;
-          handler->state.store(STATE::KICK_OFF);
-          handler->waker.notify_one();
-          break;
-        default:  // In case thread is not on expected state
-          task_a(next - 1, t_threads);
-      }
-
-      handler = thread_handlers.at(next++);
-      switch (handler->state.load()) {
-        case STATE::DONE:
-          handler->task = task_b;
-          handler->state.store(STATE::KICK_OFF);
-          break;
-        case STATE::SLEEPING:
-          handler->task = task_b;
-          handler->state.store(STATE::KICK_OFF);
-          handler->waker.notify_one();
-          break;
-        default:  // In case thread is not on expected state
-          task_b(next - 1, t_threads);
-      }
-
-      // Implicit barrier
-      for (size_t i = next - 2; i < next; i++) {
-        WaitThread(thread_handlers.at(i));
-      }
-
-      // Next thread to be used
-      next_thread.fetch_add(-2);
-
-    } else {
-      next_thread.fetch_add(-2);
-      task_a(0, 1);
-      task_b(0, 1);
-    }
-
-    if (locked) {
-      pool_mutex.unlock();
-    }
-  }
-
-  // SetupThreads: Spawns new threads if necessary
-  void SetupThreads(size_t n_threads) {
-    std::lock_guard<std::mutex> lock(pool_mutex);
-    SetupThreads_Unlocked(n_threads);
-  }
-
-  // Return threads' handlers
-  std::vector<const ThreadHandler*> GetThreadHandlers() const {
-    std::lock_guard<std::mutex> lock(pool_mutex);
-    // returns a copy
-    return std::vector<const ThreadHandler*>{thread_handlers.begin(),
-                                             thread_handlers.end()};
   }
 };
 
