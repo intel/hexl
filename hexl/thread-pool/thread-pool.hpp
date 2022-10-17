@@ -101,26 +101,10 @@ class ThreadPool {
         // Update handlers
         delete thread_handler;
       };
-      std::for_each_n(thread_handlers.rbegin(), t_threads - n_threads,
-                      kill_thread);
+
+      std::for_each(thread_handlers.rbegin(),
+                    thread_handlers.rend() - n_threads, kill_thread);
       thread_handlers.resize(n_threads);
-
-      /*size_t to_remove = t_threads - n_threads;
-      for (size_t i = 0; i < to_remove; ++i) {
-        // Kill thread
-        ThreadHandler* thread_handler = thread_handlers.at(--t_threads);
-        if (thread_handler->state.load() == STATE::SLEEPING) {
-          thread_handler->state.store(STATE::KILL);
-          thread_handler->waker.notify_one();
-        } else {
-          thread_handler->state.store(STATE::KILL);
-        }
-        thread_handler->thread.join();
-
-        // Update handlers
-        delete thread_handler;
-        thread_handlers.pop_back();
-      }*/
     }
   }
 
