@@ -30,7 +30,6 @@ static int64_t env_var_to_int(const char* var) {
 
   errno = 0;
   int64_t value = std::strtol(var_value, nullptr, 10);
-  std::cout << "value " << value << std::endl;
 
   // Checks
   if (errno == ERANGE) {
