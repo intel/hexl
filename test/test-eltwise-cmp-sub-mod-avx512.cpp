@@ -23,7 +23,7 @@ TEST(EltwiseCmpSubMod, AVX512_52) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  uint64_t length = 9;
+  uint64_t length = 17;  // Not divisible by 8 and can be run in two threads
   uint64_t modulus = 1125896819525633;
 
   for (size_t trial = 0; trial < 200; ++trial) {
@@ -56,7 +56,7 @@ TEST(EltwiseCmpSubMod, AVX512) {
     GTEST_SKIP();
   }
 
-  uint64_t length = 172;
+  uint64_t length = 181;  // Not divisible by 8 and can be run in two threads
   for (size_t cmp = 0; cmp < 8; ++cmp) {
     for (size_t bits = 48; bits <= 51; ++bits) {
       uint64_t modulus = GeneratePrimes(1, bits, true, 1024)[0];
@@ -94,7 +94,7 @@ TEST(EltwiseCmpSubMod, AVX512_64) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  uint64_t length = 9;
+  uint64_t length = 17;  // Not divisible by 8 and can be run in two threads
   uint64_t modulus = 1152921504606748673;
 
   for (size_t trial = 0; trial < 200; ++trial) {

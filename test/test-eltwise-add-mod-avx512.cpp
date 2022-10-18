@@ -23,9 +23,10 @@ TEST(EltwiseAddMod, vector_vector_avx512_small) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
-  std::vector<uint64_t> op2{1, 3, 5, 7, 9, 2, 4, 6};
-  std::vector<uint64_t> exp_out{2, 5, 8, 1, 4, 8, 1, 4};
+  // Repeated data so it can run in at least 2 threads
+  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint64_t> op2{1, 3, 5, 7, 9, 2, 4, 6, 1, 3, 5, 7, 9, 2, 4, 6};
+  std::vector<uint64_t> exp_out{2, 5, 8, 1, 4, 8, 1, 4, 2, 5, 8, 1, 4, 8, 1, 4};
   uint64_t modulus = 10;
   EltwiseAddModAVX512(op1.data(), op1.data(), op2.data(), op1.size(), modulus);
 
@@ -37,9 +38,10 @@ TEST(EltwiseAddMod, vector_scalar_avx512_small) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
+  // Repeated data so it can run in at least 2 threads
+  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t op2{3};
-  std::vector<uint64_t> exp_out{4, 5, 6, 7, 8, 9, 0, 1};
+  std::vector<uint64_t> exp_out{4, 5, 6, 7, 8, 9, 0, 1, 4, 5, 6, 7, 8, 9, 0, 1};
   uint64_t modulus = 10;
   EltwiseAddModAVX512(op1.data(), op1.data(), op2, op1.size(), modulus);
 
@@ -53,13 +55,20 @@ TEST(EltwiseAddMod, vector_vector_avx512_big) {
 
   uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
+  // Repeated data so it can run in at least 2 threads
   std::vector<uint64_t> op1{modulus - 1, modulus - 1, modulus - 2, modulus - 2,
+                            modulus - 3, modulus - 3, modulus - 4, modulus - 4,
+                            modulus - 1, modulus - 1, modulus - 2, modulus - 2,
                             modulus - 3, modulus - 3, modulus - 4, modulus - 4};
   std::vector<uint64_t> op2{modulus - 1, modulus - 2, modulus - 3, modulus - 4,
+                            modulus - 5, modulus - 6, modulus - 7, modulus - 8,
+                            modulus - 1, modulus - 2, modulus - 3, modulus - 4,
                             modulus - 5, modulus - 6, modulus - 7, modulus - 8};
-  std::vector<uint64_t> exp_out{modulus - 2,  modulus - 3, modulus - 5,
-                                modulus - 6,  modulus - 8, modulus - 9,
-                                modulus - 11, modulus - 12};
+  std::vector<uint64_t> exp_out{
+      modulus - 2, modulus - 3, modulus - 5,  modulus - 6,
+      modulus - 8, modulus - 9, modulus - 11, modulus - 12,
+      modulus - 2, modulus - 3, modulus - 5,  modulus - 6,
+      modulus - 8, modulus - 9, modulus - 11, modulus - 12};
 
   EltwiseAddModAVX512(op1.data(), op1.data(), op2.data(), op1.size(), modulus);
 
@@ -72,13 +81,17 @@ TEST(EltwiseAddMod, vector_scalar_avx512_big) {
   }
 
   uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
-
+  // Repeated data so it can run in at least 2 threads
   std::vector<uint64_t> op1{modulus - 1, modulus - 1, modulus - 2, modulus - 2,
+                            modulus - 3, modulus - 3, modulus - 4, modulus - 4,
+                            modulus - 1, modulus - 1, modulus - 2, modulus - 2,
                             modulus - 3, modulus - 3, modulus - 4, modulus - 4};
   uint64_t op2{modulus - 1};
-  std::vector<uint64_t> exp_out{modulus - 2, modulus - 2, modulus - 3,
-                                modulus - 3, modulus - 4, modulus - 4,
-                                modulus - 5, modulus - 5};
+  std::vector<uint64_t> exp_out{
+      modulus - 2, modulus - 2, modulus - 3, modulus - 3,
+      modulus - 4, modulus - 4, modulus - 5, modulus - 5,
+      modulus - 2, modulus - 2, modulus - 3, modulus - 3,
+      modulus - 4, modulus - 4, modulus - 5, modulus - 5};
 
   EltwiseAddModAVX512(op1.data(), op1.data(), op2, op1.size(), modulus);
 
@@ -93,7 +106,8 @@ TEST(EltwiseAddMod, vector_vector_avx512_native_match) {
     GTEST_SKIP();
   }
 
-  size_t length = 173;
+  size_t length = 181;  // Not divisible by 8 and resulting vector for AVX can
+                        // be divided in two threads
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;
@@ -128,7 +142,8 @@ TEST(EltwiseAddMod, vector_scalar_avx512_native_match) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  size_t length = 173;
+  size_t length = 181;  // Not divisible by 8 and resulting vector for AVX can
+                        // be divided in two threads
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;

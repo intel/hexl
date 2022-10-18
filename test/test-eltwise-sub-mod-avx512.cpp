@@ -23,9 +23,9 @@ TEST(EltwiseSubMod, vector_vector_avx512_small) {
     GTEST_SKIP();
   }
 
-  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
-  std::vector<uint64_t> op2{1, 3, 5, 7, 9, 2, 4, 6};
-  std::vector<uint64_t> exp_out{0, 9, 8, 7, 6, 4, 3, 2};
+  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint64_t> op2{1, 3, 5, 7, 9, 2, 4, 6, 1, 3, 5, 7, 9, 2, 4, 6};
+  std::vector<uint64_t> exp_out{0, 9, 8, 7, 6, 4, 3, 2, 0, 9, 8, 7, 6, 4, 3, 2};
   uint64_t modulus = 10;
   EltwiseSubModAVX512(op1.data(), op1.data(), op2.data(), op1.size(), modulus);
 

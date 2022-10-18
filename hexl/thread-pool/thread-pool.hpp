@@ -137,10 +137,10 @@ class ThreadPool {
       }
 
       // Next thread to be used
-      next_thread.fetch_add(-2);
+      next_thread.fetch_add(-2LL);
 
     } else {
-      next_thread.fetch_add(-2);
+      next_thread.fetch_add(-2LL);
       task_a(0, 1);
       task_b(0, 1);
     }

@@ -11,6 +11,9 @@ namespace hexl {
 
 #ifdef HEXL_MULTI_THREADING
 
+uint64_t number_of_threads = ThreadPoolExecutor::GetNumberOfThreads();
+uint64_t ntt_calls = HEXL_NTT_PARALLEL_DEPTH;
+
 // Testing function that sets number of threads from env variable
 TEST(ThreadPool, setup_num_threads_env_var) {
   // Max or default value result
@@ -713,7 +716,9 @@ TEST(ThreadPool, thread_safety_AddJobs_n_setup) {
   ASSERT_TRUE(pool_size == nthreads || pool_size == nthreads >> 1);
   ASSERT_EQ(iterations.load(), N_size);
 
-  ThreadPoolExecutor::SetNumberOfThreads(2);
+  // *** Restore values in last test
+  ThreadPoolExecutor::SetNumberOfThreads(number_of_threads);
+  HEXL_NTT_PARALLEL_DEPTH = ntt_calls;
 }
 
 #ifdef HEXL_DEBUG
