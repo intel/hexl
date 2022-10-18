@@ -9,6 +9,7 @@
 #include "eltwise/eltwise-cmp-sub-mod-internal.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
+#include "thread-pool/thread-pool-executor.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -36,8 +37,8 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
   }
   HEXL_CHECK(diff < modulus, "Diff " << diff << " >= modulus " << modulus);
 
-  const __m512i* v_op_ptr = reinterpret_cast<const __m512i*>(operand1);
-  __m512i* v_result_ptr = reinterpret_cast<__m512i*>(result);
+  const __m512i* vp_op = reinterpret_cast<const __m512i*>(operand1);
+  __m512i* vp_result = reinterpret_cast<__m512i*>(result);
   __m512i v_bound = _mm512_set1_epi64(static_cast<int64_t>(bound));
   __m512i v_diff = _mm512_set1_epi64(static_cast<int64_t>(diff));
   __m512i v_modulus = _mm512_set1_epi64(static_cast<int64_t>(modulus));
@@ -64,22 +65,28 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
 
   __m512i v_mu_64 = _mm512_set1_epi64(static_cast<int64_t>(mu_64));
 
-  for (size_t i = n / 8; i > 0; --i) {
-    __m512i v_op = _mm512_loadu_si512(v_op_ptr);
-    __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
+  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
+    auto in_vp_op = vp_op + id * n / 8 / threads;
+    auto in_vp_result = vp_result + id * n / 8 / threads;
 
-    v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
-        v_op, v_modulus, v_mu_64, v_mu, prod_right_shift, v_neg_mod);
+    for (size_t i = n / 8 / threads; i > 0; --i) {
+      __m512i v_op = _mm512_loadu_si512(in_vp_op);
+      __mmask8 op_le_cmp = _mm512_hexl_cmp_epu64_mask(v_op, v_bound, Not(cmp));
 
-    __m512i v_to_add = _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
-    v_to_add = _mm512_sub_epi64(v_to_add, v_diff);
-    v_to_add = _mm512_mask_set1_epi64(v_to_add, op_le_cmp, 0);
+      v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
+          v_op, v_modulus, v_mu_64, v_mu, prod_right_shift, v_neg_mod);
 
-    v_op = _mm512_add_epi64(v_op, v_to_add);
-    _mm512_storeu_si512(v_result_ptr, v_op);
-    ++v_op_ptr;
-    ++v_result_ptr;
-  }
+      __m512i v_to_add =
+          _mm512_hexl_cmp_epi64(v_op, v_diff, CMPINT::LT, modulus);
+      v_to_add = _mm512_sub_epi64(v_to_add, v_diff);
+      v_to_add = _mm512_mask_set1_epi64(v_to_add, op_le_cmp, 0);
+
+      v_op = _mm512_add_epi64(v_op, v_to_add);
+      _mm512_storeu_si512(in_vp_result, v_op);
+      ++in_vp_op;
+      ++in_vp_result;
+    }
+  });
 }
 #endif
 
