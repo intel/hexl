@@ -12,6 +12,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
+#include "thread-pool/thread-pool-executor.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -390,16 +391,36 @@ void ForwardTransformToBitReverseAVX512(
 
     FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
                            W_precon);
+    if (recursion_depth < HEXL_NTT_PARALLEL_DEPTH) {
+      ThreadPoolExecutor::AddRecursiveCalls(
+          [=](int id, int threads) {
+            HEXL_UNUSED(id);
+            HEXL_UNUSED(threads);
+            ForwardTransformToBitReverseAVX512<BitShift>(
+                result, result, n / 2, modulus, root_of_unity_powers,
+                precon_root_of_unity_powers, input_mod_factor,
+                output_mod_factor, recursion_depth + 1, recursion_half * 2);
+          },
+          [=](int id, int threads) {
+            HEXL_UNUSED(id);
+            HEXL_UNUSED(threads);
+            ForwardTransformToBitReverseAVX512<BitShift>(
+                &result[n / 2], &result[n / 2], n / 2, modulus,
+                root_of_unity_powers, precon_root_of_unity_powers,
+                input_mod_factor, output_mod_factor, recursion_depth + 1,
+                recursion_half * 2 + 1);
+          });
+    } else {
+      ForwardTransformToBitReverseAVX512<BitShift>(
+          result, result, n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2);
 
-    ForwardTransformToBitReverseAVX512<BitShift>(
-        result, result, n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2);
-
-    ForwardTransformToBitReverseAVX512<BitShift>(
-        &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
-        precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, recursion_half * 2 + 1);
+      ForwardTransformToBitReverseAVX512<BitShift>(
+          &result[n / 2], &result[n / 2], n / 2, modulus, root_of_unity_powers,
+          precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, recursion_half * 2 + 1);
+    }
   }
 }
 

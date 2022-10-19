@@ -47,9 +47,9 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
 
   ThreadPoolExecutor::AddParallelJobs([vp_result, n, vp_operand1, vp_operand2,
                                        v_modulus](int id, int threads) {
-    __m512i* in_vp_result = vp_result + id * n / 8 / threads;
-    const __m512i* in_vp_operand1 = vp_operand1 + id * n / 8 / threads;
-    const __m512i* in_vp_operand2 = vp_operand2 + id * n / 8 / threads;
+    auto in_vp_result = vp_result + id * n / 8 / threads;
+    auto in_vp_operand1 = vp_operand1 + id * n / 8 / threads;
+    auto in_vp_operand2 = vp_operand2 + id * n / 8 / threads;
     HEXL_LOOP_UNROLL_4
     for (size_t i = n / 8 / threads; i > 0; --i) {
       __m512i v_operand1 = _mm512_loadu_si512(in_vp_operand1);
@@ -93,8 +93,8 @@ void EltwiseAddModAVX512(uint64_t* result, const uint64_t* operand1,
 
   ThreadPoolExecutor::AddParallelJobs([vp_result, n, vp_operand1, v_operand2,
                                        v_modulus](int id, int threads) {
-    __m512i* in_vp_result = vp_result + id * n / 8 / threads;
-    const __m512i* in_vp_operand1 = vp_operand1 + id * n / 8 / threads;
+    auto in_vp_result = vp_result + id * n / 8 / threads;
+    auto in_vp_operand1 = vp_operand1 + id * n / 8 / threads;
     HEXL_LOOP_UNROLL_4
     for (size_t i = n / 8 / threads; i > 0; --i) {
       __m512i v_operand1 = _mm512_loadu_si512(in_vp_operand1);

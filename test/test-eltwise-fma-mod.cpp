@@ -44,10 +44,13 @@ TEST(EltwiseFMAMod, null) {
 #endif
 
 TEST(EltwiseFMAMod, small) {
-  std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
+  // Repeated data so it can be run in two threads
+  std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t arg2 = 1;
-  std::vector<uint64_t> arg3{9, 10, 11, 12, 13, 14, 15, 16};
-  std::vector<uint64_t> exp_out{10, 12, 14, 16, 18, 20, 22, 24};
+  std::vector<uint64_t> arg3{9, 10, 11, 12, 13, 14, 15, 16,
+                             9, 10, 11, 12, 13, 14, 15, 16};
+  std::vector<uint64_t> exp_out{10, 12, 14, 16, 18, 20, 22, 24,
+                                10, 12, 14, 16, 18, 20, 22, 24};
   uint64_t modulus = 769;
 
   EltwiseFMAMod(arg1.data(), arg1.data(), arg2, arg3.data(), arg1.size(),

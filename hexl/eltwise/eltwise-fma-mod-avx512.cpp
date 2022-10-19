@@ -8,6 +8,7 @@
 #include "hexl/eltwise/eltwise-fma-mod.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
+#include "thread-pool/thread-pool-executor.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -99,54 +100,68 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
 
   if (arg3) {
     const __m512i* vp_arg3 = reinterpret_cast<const __m512i*>(arg3);
-    HEXL_LOOP_UNROLL_8
-    for (size_t i = n / 8; i > 0; --i) {
-      __m512i varg1 = _mm512_loadu_si512(vp_arg1);
-      __m512i varg3 = _mm512_loadu_si512(vp_arg3);
+    ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
+      auto in_vp_arg1 = vp_arg1 + id * n / 8 / threads;
+      auto in_vp_arg3 = vp_arg3 + id * n / 8 / threads;
+      auto in_vp_result = vp_result + id * n / 8 / threads;
+      auto in_v2_modulus = v2_modulus;
+      auto in_v4_modulus = v4_modulus;
+      HEXL_LOOP_UNROLL_8
+      for (size_t i = n / 8 / threads; i > 0; --i) {
+        __m512i varg1 = _mm512_loadu_si512(in_vp_arg1);
+        __m512i varg3 = _mm512_loadu_si512(in_vp_arg3);
 
-      varg1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-          varg1, vmodulus, &v2_modulus, &v4_modulus);
-      varg3 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-          varg3, vmodulus, &v2_modulus, &v4_modulus);
+        varg1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+            varg1, vmodulus, &in_v2_modulus, &in_v4_modulus);
+        varg3 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+            varg3, vmodulus, &in_v2_modulus, &in_v4_modulus);
 
-      __m512i va_times_b = _mm512_hexl_mullo_epi<BitShift>(varg1, varg2);
-      __m512i vq = _mm512_hexl_mulhi_epi<BitShift>(varg1, varg2_barr);
+        __m512i va_times_b = _mm512_hexl_mullo_epi<BitShift>(varg1, varg2);
+        __m512i vq = _mm512_hexl_mulhi_epi<BitShift>(varg1, varg2_barr);
 
-      // Compute vq in [0, 2 * p) where p is the modulus
-      // a * b - q * p
-      vq = _mm512_hexl_mullo_add_lo_epi<BitShift>(va_times_b, vq, vneg_modulus);
+        // Compute vq in [0, 2 * p) where p is the modulus
+        // a * b - q * p
+        vq = _mm512_hexl_mullo_add_lo_epi<BitShift>(va_times_b, vq,
+                                                    vneg_modulus);
 
-      // Add arg3, bringing vq to [0, 3 * p)
-      vq = _mm512_add_epi64(vq, varg3);
-      // Reduce to [0, p)
-      vq = _mm512_hexl_small_mod_epu64<4>(vq, vmodulus, &v2_modulus);
+        // Add arg3, bringing vq to [0, 3 * p)
+        vq = _mm512_add_epi64(vq, varg3);
+        // Reduce to [0, p)
+        vq = _mm512_hexl_small_mod_epu64<4>(vq, vmodulus, &in_v2_modulus);
 
-      _mm512_storeu_si512(vp_result, vq);
-
-      ++vp_arg1;
-      ++vp_result;
-      ++vp_arg3;
-    }
+        _mm512_storeu_si512(in_vp_result, vq);
+        ++in_vp_arg1;
+        ++in_vp_arg3;
+        ++in_vp_result;
+      }
+    });
   } else {  // arg3 == nullptr
-    HEXL_LOOP_UNROLL_8
-    for (size_t i = n / 8; i > 0; --i) {
-      __m512i varg1 = _mm512_loadu_si512(vp_arg1);
-      varg1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
-          varg1, vmodulus, &v2_modulus, &v4_modulus);
+    ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
+      auto in_vp_arg1 = vp_arg1 + id * n / 8 / threads;
+      auto in_vp_result = vp_result + id * n / 8 / threads;
+      auto in_v2_modulus = v2_modulus;
+      auto in_v4_modulus = v4_modulus;
+      HEXL_LOOP_UNROLL_8
+      for (size_t i = n / 8 / threads; i > 0; --i) {
+        __m512i varg1 = _mm512_loadu_si512(in_vp_arg1);
+        varg1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
+            varg1, vmodulus, &in_v2_modulus, &in_v4_modulus);
 
-      __m512i va_times_b = _mm512_hexl_mullo_epi<BitShift>(varg1, varg2);
-      __m512i vq = _mm512_hexl_mulhi_epi<BitShift>(varg1, varg2_barr);
+        __m512i va_times_b = _mm512_hexl_mullo_epi<BitShift>(varg1, varg2);
+        __m512i vq = _mm512_hexl_mulhi_epi<BitShift>(varg1, varg2_barr);
 
-      // Compute vq in [0, 2 * p) where p is the modulus
-      // a * b - q * p
-      vq = _mm512_hexl_mullo_add_lo_epi<BitShift>(va_times_b, vq, vneg_modulus);
-      // Conditional Barrett subtraction
-      vq = _mm512_hexl_small_mod_epu64(vq, vmodulus);
-      _mm512_storeu_si512(vp_result, vq);
+        // Compute vq in [0, 2 * p) where p is the modulus
+        // a * b - q * p
+        vq = _mm512_hexl_mullo_add_lo_epi<BitShift>(va_times_b, vq,
+                                                    vneg_modulus);
+        // Conditional Barrett subtraction
+        vq = _mm512_hexl_small_mod_epu64(vq, vmodulus);
+        _mm512_storeu_si512(in_vp_result, vq);
 
-      ++vp_arg1;
-      ++vp_result;
-    }
+        ++in_vp_arg1;
+        ++in_vp_result;
+      }
+    });
   }
 }
 

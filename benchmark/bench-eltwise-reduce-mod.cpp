@@ -35,7 +35,11 @@ BENCHMARK(BM_EltwiseReduceModInPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -60,7 +64,11 @@ BENCHMARK(BM_EltwiseReduceModCopy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -85,7 +93,11 @@ BENCHMARK(BM_EltwiseReduceModNative)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -111,7 +123,11 @@ BENCHMARK(BM_EltwiseReduceModAVX512)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 //=================================================================
@@ -139,7 +155,11 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift64)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 ////=================================================================
@@ -167,7 +187,11 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 ////=================================================================
@@ -195,7 +219,11 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52GT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 static void BM_EltwiseReduceModAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
@@ -218,7 +246,11 @@ BENCHMARK(BM_EltwiseReduceModAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 ////=================================================================
@@ -249,7 +281,11 @@ BENCHMARK(BM_EltwiseReduceModMontAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 static void BM_EltwiseReduceModMontFormInAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
@@ -275,7 +311,11 @@ BENCHMARK(BM_EltwiseReduceModMontFormInAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 static void BM_EltwiseReduceModMontFormInAVX512BitShift64LT(
     benchmark::State& state) {  //  NOLINT
@@ -301,7 +341,11 @@ BENCHMARK(BM_EltwiseReduceModMontFormInAVX512BitShift64LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 static void BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT(
     benchmark::State& state) {  //  NOLINT
@@ -328,7 +372,11 @@ BENCHMARK(BM_EltwiseReduceModInOutMontFormAVX512BitShift52LT)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 #endif
 

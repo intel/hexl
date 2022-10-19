@@ -14,6 +14,7 @@
 #include "hexl/number-theory/number-theory.hpp"
 #include "ntt/ntt-avx512-util.hpp"
 #include "ntt/ntt-internal.hpp"
+#include "thread-pool/thread-pool-executor.hpp"
 #include "util/avx512-util.hpp"
 
 namespace intel {
@@ -316,16 +317,36 @@ void InverseTransformFromBitReverseAVX512(
       }
     }
   } else {
-    InverseTransformFromBitReverseAVX512<BitShift>(
-        result, operand, n / 2, modulus, inv_root_of_unity_powers,
-        precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor,
-        recursion_depth + 1, 2 * recursion_half);
-    InverseTransformFromBitReverseAVX512<BitShift>(
-        &result[n / 2], &operand[n / 2], n / 2, modulus,
-        inv_root_of_unity_powers, precon_inv_root_of_unity_powers,
-        input_mod_factor, output_mod_factor, recursion_depth + 1,
-        2 * recursion_half + 1);
-
+    if (recursion_depth < HEXL_NTT_PARALLEL_DEPTH) {
+      ThreadPoolExecutor::AddRecursiveCalls(
+          [=](int id, int threads) {
+            HEXL_UNUSED(id);
+            HEXL_UNUSED(threads);
+            InverseTransformFromBitReverseAVX512<BitShift>(
+                result, operand, n / 2, modulus, inv_root_of_unity_powers,
+                precon_inv_root_of_unity_powers, input_mod_factor,
+                output_mod_factor, recursion_depth + 1, 2 * recursion_half);
+          },
+          [=](int id, int threads) {
+            HEXL_UNUSED(id);
+            HEXL_UNUSED(threads);
+            InverseTransformFromBitReverseAVX512<BitShift>(
+                &result[n / 2], &operand[n / 2], n / 2, modulus,
+                inv_root_of_unity_powers, precon_inv_root_of_unity_powers,
+                input_mod_factor, output_mod_factor, recursion_depth + 1,
+                2 * recursion_half + 1);
+          });
+    } else {
+      InverseTransformFromBitReverseAVX512<BitShift>(
+          result, operand, n / 2, modulus, inv_root_of_unity_powers,
+          precon_inv_root_of_unity_powers, input_mod_factor, output_mod_factor,
+          recursion_depth + 1, 2 * recursion_half);
+      InverseTransformFromBitReverseAVX512<BitShift>(
+          &result[n / 2], &operand[n / 2], n / 2, modulus,
+          inv_root_of_unity_powers, precon_inv_root_of_unity_powers,
+          input_mod_factor, output_mod_factor, recursion_depth + 1,
+          2 * recursion_half + 1);
+    }
     uint64_t W_idx_delta =
         m * ((1ULL << (recursion_depth + 1)) - recursion_half);
     for (; m > 2; m >>= 1) {
