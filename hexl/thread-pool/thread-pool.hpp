@@ -16,7 +16,7 @@ class ThreadPool {
  public:
   // Methods
 
-  ThreadPool() { isChildThread = false; }
+  ThreadPool() { ThreadHandler::isChildThread = false; }
 
   ~ThreadPool() { SetupThreads(0); }
 
@@ -79,7 +79,7 @@ class ThreadPool {
     bool locked = false;
 
     // Try using thread pool
-    if (!isChildThread) {
+    if (!ThreadHandler::isChildThread) {
       locked = pool_mutex.try_lock();
       if (!locked) {
         task_a(0, 1);

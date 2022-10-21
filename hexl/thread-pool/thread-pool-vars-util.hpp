@@ -21,7 +21,7 @@ constexpr uint64_t HEXL_DEFAULT_NTT_PARALLEL_DEPTH = 1;
 #ifdef HEXL_MULTI_THREADING
 
 // Check for environment variable
-static int64_t env_var_to_int(const char* var) {
+inline int64_t env_var_to_int(const char* var) {
   // Get value from env variable
   char* var_value = std::getenv(var);
   if (var_value == nullptr) {
@@ -48,7 +48,7 @@ static int64_t env_var_to_int(const char* var) {
 }
 
 // Verify for appropriate number of threads
-static int64_t setup_num_threads(const char* var) {
+inline int64_t setup_num_threads(const char* var) {
   int64_t value = env_var_to_int(var);
 
   // Use default value in case of error
@@ -64,7 +64,7 @@ static int64_t setup_num_threads(const char* var) {
 }
 
 // Verify for appropriate number of recursive calls
-static int64_t setup_ntt_calls(const char* var) {
+inline int64_t setup_ntt_calls(const char* var) {
   int64_t value = env_var_to_int(var);
 
   // Use default value in case of error
@@ -72,11 +72,10 @@ static int64_t setup_ntt_calls(const char* var) {
     value = HEXL_DEFAULT_NTT_PARALLEL_DEPTH;
   }
 
-  // Sum of powers of 2 minus main thread
-  uint64_t threads = (1ULL << (value + 1)) - 2;
-
   // Check max threads available
-  if (threads > HEXL_NUM_THREADS) {
+  // Sum of powers of 2 minus main thread
+  if (uint64_t threads = (1ULL << (value + 1)) - 2;
+      threads > HEXL_NUM_THREADS) {
     value = 0;
   }
 
