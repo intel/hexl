@@ -13,8 +13,6 @@
 namespace intel {
 namespace hexl {
 
-static thread_local bool isChildThread;  // True if on child thread
-
 // Enum for thread states
 enum class STATE : int {
   NONE = 0,      // Undefined state
@@ -38,18 +36,19 @@ class ThreadHandler {
   tp_task_t task;  // To be run by thread
   // Vector of all threads
   const std::vector<ThreadHandler*>& parent_container;
-  size_t thread_id;  // Used for proper chunking
+  size_t thread_id;                               // Used for proper chunking
+  inline static thread_local bool isChildThread;  // True if on child thread
 
   // Constructor
   ThreadHandler(const std::vector<ThreadHandler*>& handlers, size_t id)
       : parent_container(handlers), thread_id(id) {
-    thread = std::thread(&ThreadHandler::runner, &(*this));
+    thread = std::thread(&ThreadHandler::runner, this);
   }
 
   // Thread Runner
   void runner() {
     // This is a child thread
-    isChildThread = true;
+    ThreadHandler::isChildThread = true;
     // Handling loop
     while (true) {
       // Set thread ready

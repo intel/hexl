@@ -532,6 +532,35 @@ TEST(ThreadPool, AddRecursiveCalls_threads_done) {
   task_ids.clear();
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+  ThreadPoolExecutor::AddRecursiveCalls(dummy_task, dummy_task);
+
+  ThreadPoolExecutor::AddRecursiveCalls(
+      [&](int id, int threads) {
+        ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+        id_task(id, threads);
+      },
+      [&](int id, int threads) {
+        ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+        id_task(id, threads);
+      });
+
+  task_ids.sort();
+  ASSERT_EQ(task_ids.size(), 6);  // calls
+  task_ids.unique();
+  ASSERT_EQ(task_ids.size(), nthreads);  // threads
+
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+}
+
+// Test: Add nested tasks
+TEST(ThreadPool, AddRecursiveCalls_threads_nested) {
+  if (std::thread::hardware_concurrency() < 6) {
+    GTEST_SKIP();
+  }
+  uint64_t nthreads = 6;
+  task_ids.clear();
+
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
   ThreadPoolExecutor::AddRecursiveCalls(
       [&](int id, int threads) {
