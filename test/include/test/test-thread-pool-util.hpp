@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "hexl/util/check.hpp"
+#include "thread-pool/thread-pool-executor.hpp"
 
 namespace intel {
 namespace hexl {
@@ -43,6 +44,27 @@ void id_task(int id, int threads) {
 void add_iterations(int id, int threads) {
   HEXL_UNUSED(id);
   iterations.fetch_add(N_size / threads);
+}
+
+void recursive_calls(uint64_t depth, uint64_t level, uint64_t half) {
+  if (level < depth) {
+    ThreadPoolExecutor::AddRecursiveCalls(
+        level, half,
+        [&](int id, int threads) {
+          HEXL_UNUSED(id);
+          HEXL_UNUSED(threads);
+          recursive_calls(depth, level + 1, 2 * half);
+        },
+        [&](int id, int threads) {
+          HEXL_UNUSED(id);
+          HEXL_UNUSED(threads);
+          recursive_calls(depth, level + 1, 2 * half + 1);
+        });
+  }
+  {
+    std::lock_guard<std::mutex> lock(tasks_mutex);
+    task_ids.push_back(std::this_thread::get_id());
+  }
 }
 
 }  // namespace hexl

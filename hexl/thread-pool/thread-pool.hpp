@@ -37,43 +37,38 @@ class ThreadPool {
             HEXL_NUM_THREADS);  // Setup if thread pool is down
       }
 
-      // Only if all threads are available
-      if (next_thread.load() == 0) {
-        const size_t t_threads = thread_handlers.size();
-        next_thread.store(t_threads);
+      const size_t t_threads = thread_handlers.size();
 
-        for (size_t i = 0; i < t_threads; ++i) {
-          auto handler = thread_handlers[i];
-          switch (handler->state.load()) {
-            case STATE::DONE:
-              handler->task = job;
-              handler->state.store(STATE::KICK_OFF);
-              break;
-            case STATE::SLEEPING:
-              handler->task = job;
-              handler->state.store(STATE::KICK_OFF);
-              {
-                std::lock_guard<std::mutex> lock(handler->wake_mutex);
-                handler->waker.notify_one();
-              }
-              break;
-            default:  // In case thread is not in expected state
-              job(i, t_threads);
-          }
+      for (size_t i = 0; i < t_threads; ++i) {
+        auto handler = thread_handlers[i];
+        switch (handler->state.load()) {
+          case STATE::DONE:
+            handler->task = job;
+            handler->state.store(STATE::KICK_OFF);
+            break;
+          case STATE::SLEEPING:
+            handler->task = job;
+            handler->state.store(STATE::KICK_OFF);
+            {
+              std::lock_guard<std::mutex> lock(handler->wake_mutex);
+              handler->waker.notify_one();
+            }
+            break;
+          default:  // In case thread is not in expected state
+            job(i, t_threads);
         }
-        SetBarrier_Unlocked();  // Wait 'til all jobs are done
-        pool_mutex.unlock();
-      } else {  // Run on single thread
-        pool_mutex.unlock();
-        job(0, 1);
       }
-    } else {
+      SetBarrier_Unlocked();  // Wait 'til all jobs are done
+      pool_mutex.unlock();
+    } else {  // Run on single thread
+      pool_mutex.unlock();
       job(0, 1);
     }
   }
 
   // AddRecursiveCalls: Runs a task on next thread available
-  void AddRecursiveCalls(tp_task_t task_a, tp_task_t task_b) {
+  void AddRecursiveCalls(uint64_t depth, uint64_t half, tp_task_t task_a,
+                         tp_task_t task_b) {
     HEXL_CHECK(task_a, "task_a: Require non empty task");
     HEXL_CHECK(task_b, "task_b: Require non empty task");
     bool locked = false;
@@ -93,7 +88,7 @@ class ThreadPool {
     }
 
     const size_t t_threads = thread_handlers.size();
-    size_t next = next_thread.fetch_add(2);
+    size_t next = (1 << (depth + 1)) - 2 + 2 * half;
     if (next <= t_threads - 2) {
       ThreadHandler* handler = thread_handlers.at(next++);
       switch (handler->state.load()) {
@@ -135,12 +130,7 @@ class ThreadPool {
       for (size_t i = next - 2; i < next; i++) {
         WaitThread(thread_handlers.at(i));
       }
-
-      // Next thread to be used
-      next_thread.fetch_add(-2LL);
-
     } else {
-      next_thread.fetch_add(-2LL);
       task_a(0, 1);
       task_b(0, 1);
     }
@@ -166,7 +156,6 @@ class ThreadPool {
 
  private:
   // Properties
-  std::atomic_uint64_t next_thread{0};          // Points to next free thread
   std::vector<ThreadHandler*> thread_handlers;  // Thread's info
   mutable std::mutex pool_mutex;                // Control pool's edition
   bool setup_done = false;                      // Is thread pool initialized
@@ -198,9 +187,6 @@ class ThreadPool {
     for (auto handler : thread_handlers) {
       WaitThread(handler);
     }
-
-    // Next thread to be used
-    next_thread.store(0);
   }
 
   // SetupThreads_Unlocked: Spawns new threads if necessary. Without mutex

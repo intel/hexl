@@ -3,7 +3,6 @@
 
 #include "test/test-thread-pool-util.hpp"
 #include "test/test-util.hpp"
-#include "thread-pool/thread-pool-executor.hpp"
 #include "thread-pool/thread-pool-vars-util.hpp"
 
 namespace intel {
@@ -139,7 +138,7 @@ TEST(ThreadPool, GetNumberOfThreads_after_AddRecursiveCalls) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 
   HEXL_NUM_THREADS = nthreads;
-  ThreadPoolExecutor::AddRecursiveCalls(dummy_task, dummy_task);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, dummy_task, dummy_task);
   auto handlers = ThreadPoolExecutor::GetThreadHandlers();
   ASSERT_EQ(handlers.size(), nthreads);
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
@@ -296,7 +295,7 @@ TEST(ThreadPool, StopThreads_after_AddRecursiveCalls) {
   uint64_t nthreads = 2;
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  ThreadPoolExecutor::AddRecursiveCalls(dummy_task, dummy_task);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, dummy_task, dummy_task);
   ThreadPoolExecutor::SetNumberOfThreads(0);  // Stop when jobs finish
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), 0);
 }
@@ -357,7 +356,7 @@ TEST(ThreadPool, ImplicitBrriers_AddRecursiveCalls) {
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
   auto start = std::chrono::steady_clock::now();
-  ThreadPoolExecutor::AddRecursiveCalls(working_task, working_task);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, working_task, working_task);
   auto end = std::chrono::steady_clock::now();
 
   uint64_t duration =
@@ -376,6 +375,7 @@ TEST(ThreadPool, ImplicitBrriers_Sleeping) {
 
   auto start = std::chrono::steady_clock::now();
   ThreadPoolExecutor::AddRecursiveCalls(
+      0, 0,
       [](size_t id, size_t threads) {
         HEXL_UNUSED(id);
         HEXL_UNUSED(threads);
@@ -403,15 +403,16 @@ TEST(ThreadPool, ImplicitBrriers_NestedTasks) {
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Implicit barrier
   auto start = std::chrono::steady_clock::now();
   ThreadPoolExecutor::AddRecursiveCalls(
+      0, 0,
       [=](size_t id, size_t threads) {
         HEXL_UNUSED(id);
         HEXL_UNUSED(threads);
-        ThreadPoolExecutor::AddRecursiveCalls(working_task, working_task);
+        ThreadPoolExecutor::AddRecursiveCalls(1, 0, working_task, working_task);
       },
       [=](size_t id, size_t threads) {
         HEXL_UNUSED(id);
         HEXL_UNUSED(threads);
-        ThreadPoolExecutor::AddRecursiveCalls(working_task, working_task);
+        ThreadPoolExecutor::AddRecursiveCalls(1, 1, working_task, working_task);
       });
   auto end = std::chrono::steady_clock::now();
   uint64_t duration =
@@ -517,7 +518,7 @@ TEST(ThreadPool, AddRecursiveCalls_threads_new) {
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Setup
-  ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, id_task, id_task);
   task_ids.sort();
   task_ids.unique();
   ASSERT_EQ(task_ids.size(), nthreads);
@@ -532,43 +533,16 @@ TEST(ThreadPool, AddRecursiveCalls_threads_done) {
   task_ids.clear();
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  ThreadPoolExecutor::AddRecursiveCalls(dummy_task, dummy_task);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, dummy_task, dummy_task);
 
   ThreadPoolExecutor::AddRecursiveCalls(
+      0, 0,
       [&](int id, int threads) {
-        ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+        ThreadPoolExecutor::AddRecursiveCalls(1, 0, id_task, id_task);
         id_task(id, threads);
       },
       [&](int id, int threads) {
-        ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-        id_task(id, threads);
-      });
-
-  task_ids.sort();
-  ASSERT_EQ(task_ids.size(), 6);  // calls
-  task_ids.unique();
-  ASSERT_EQ(task_ids.size(), nthreads);  // threads
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Test: Add nested tasks. Two level
-TEST(ThreadPool, AddRecursiveCalls_threads_nested_2) {
-  if (std::thread::hardware_concurrency() < 6) {
-    GTEST_SKIP();
-  }
-  uint64_t nthreads = 6;
-  task_ids.clear();
-
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-
-  ThreadPoolExecutor::AddRecursiveCalls(
-      [&](int id, int threads) {
-        ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-        id_task(id, threads);
-      },
-      [&](int id, int threads) {
-        ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+        ThreadPoolExecutor::AddRecursiveCalls(1, 1, id_task, id_task);
         id_task(id, threads);
       });
 
@@ -581,45 +555,21 @@ TEST(ThreadPool, AddRecursiveCalls_threads_nested_2) {
 }
 
 // Test: Add nested tasks. Three level
-TEST(ThreadPool, AddRecursiveCalls_threads_nested_3) {
-  if (std::thread::hardware_concurrency() < 14) {
-    GTEST_SKIP();
+TEST(ThreadPool, AddRecursiveCalls_threads_nested) {
+  int depth = 1;
+  uint64_t nthreads = 2;
+  while (nthreads < std::thread::hardware_concurrency()) {
+    task_ids.clear();
+    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+
+    recursive_calls(depth, 0, 0);
+
+    task_ids.sort();
+    ASSERT_EQ(task_ids.size(), nthreads + 1);  // calls
+    task_ids.unique();
+    ASSERT_EQ(task_ids.size(), nthreads + 1);  // threads
+    nthreads = (1ULL << (++depth + 1)) - 2;
   }
-  uint64_t nthreads = 14;
-  task_ids.clear();
-
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-
-  ThreadPoolExecutor::AddRecursiveCalls(
-      [&](int id, int threads) {
-        ThreadPoolExecutor::AddRecursiveCalls(
-            [&](int id, int threads) {
-              ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-              id_task(id, threads);
-            },
-            [&](int id, int threads) {
-              ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-              id_task(id, threads);
-            });
-        id_task(id, threads);
-      },
-      [&](int id, int threads) {
-        ThreadPoolExecutor::AddRecursiveCalls(
-            [&](int id, int threads) {
-              ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-              id_task(id, threads);
-            },
-            [&](int id, int threads) {
-              ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
-              id_task(id, threads);
-            });
-        id_task(id, threads);
-      });
-
-  task_ids.sort();
-  ASSERT_EQ(task_ids.size(), 14);  // calls
-  task_ids.unique();
-  ASSERT_EQ(task_ids.size(), nthreads);  // threads
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -633,7 +583,7 @@ TEST(ThreadPool, AddRecursiveCalls_threads_sleeping) {
   // Wait for threads to sleep
   std::this_thread::sleep_for(
       std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
-  ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, id_task, id_task);
   task_ids.sort();
   task_ids.unique();
   ASSERT_EQ(task_ids.size(), nthreads);
@@ -683,13 +633,13 @@ TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
     sync.fetch_add(-1);
     while (sync) {
     }
-    ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+    ThreadPoolExecutor::AddRecursiveCalls(0, 0, id_task, id_task);
   });
   std::thread thread_object2([]() {
     sync.fetch_add(-1);
     while (sync) {
     }
-    ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+    ThreadPoolExecutor::AddRecursiveCalls(0, 0, id_task, id_task);
   });
 
   thread_object1.join();
@@ -714,7 +664,7 @@ TEST(ThreadPool, thread_safety_AddJobs_n_stop) {
     sync.fetch_add(-1);
     while (sync) {
     }
-    ThreadPoolExecutor::AddRecursiveCalls(id_task, id_task);
+    ThreadPoolExecutor::AddRecursiveCalls(0, 0, id_task, id_task);
   });
   std::thread thread_object2([]() {
     sync.fetch_add(-1);
@@ -804,9 +754,9 @@ TEST(ThreadPool, bad_input) {
 
   EXPECT_ANY_THROW(ThreadPoolExecutor::AddParallelJobs(nullptr));
 
-  EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(nullptr, task));
+  EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(0, 0, nullptr, task));
 
-  EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(task, nullptr));
+  EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(0, 0, task, nullptr));
 }
 #endif
 
