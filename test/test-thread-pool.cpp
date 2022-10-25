@@ -558,7 +558,7 @@ TEST(ThreadPool, AddRecursiveCalls_threads_done) {
 TEST(ThreadPool, AddRecursiveCalls_threads_nested) {
   int depth = 1;
   uint64_t nthreads = 2;
-  while (nthreads < std::thread::hardware_concurrency()) {
+  while (nthreads < 6 && nthreads < std::thread::hardware_concurrency()) {
     task_ids.clear();
     ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
