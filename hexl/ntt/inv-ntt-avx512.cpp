@@ -319,6 +319,7 @@ void InverseTransformFromBitReverseAVX512(
   } else {
     if (recursion_depth < HEXL_NTT_PARALLEL_DEPTH) {
       ThreadPoolExecutor::AddRecursiveCalls(
+          recursion_depth, recursion_half,
           [=](int id, int threads) {
             HEXL_UNUSED(id);
             HEXL_UNUSED(threads);
