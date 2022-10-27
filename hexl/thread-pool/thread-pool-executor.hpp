@@ -47,6 +47,8 @@ class ThreadPoolExecutor {
 
   static void AddRecursiveCalls(uint64_t depth, uint64_t half, tp_task_t task_a,
                                 tp_task_t task_b) {
+    HEXL_UNUSED(depth);
+    HEXL_UNUSED(half);
     task_a(0, 1);
     task_b(0, 1);
   }
