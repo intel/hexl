@@ -61,7 +61,6 @@ class ThreadPool {
       SetBarrier_Unlocked();  // Wait 'til all jobs are done
       pool_mutex.unlock();
     } else {  // Run on single thread
-      pool_mutex.unlock();
       job(0, 1);
     }
   }
@@ -135,7 +134,7 @@ class ThreadPool {
       task_b(0, 1);
     }
 
-    if (locked) {
+    if (!ThreadHandler::isChildThread) {
       pool_mutex.unlock();
     }
   }
