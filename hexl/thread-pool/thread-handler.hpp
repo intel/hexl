@@ -23,7 +23,7 @@ enum class STATE : int {
   KILL = 5       // To join thread
 };
 
-using tp_task_t = std::function<void(size_t id, size_t threads)>;
+using Task = std::function<void(size_t id, size_t threads)>;
 
 // Controls thread
 class ThreadHandler {
@@ -33,7 +33,7 @@ class ThreadHandler {
   std::condition_variable waker;          // To wake thread up
   std::mutex wake_mutex;                  // For cond. variable
   std::thread thread;
-  tp_task_t task;                                 // To be run by thread
+  Task task;                                      // To be run by thread
   size_t thread_id;                               // Used for proper chunking
   inline static thread_local bool isChildThread;  // True if on child thread
 

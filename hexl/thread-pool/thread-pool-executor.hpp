@@ -22,11 +22,11 @@ class ThreadPoolExecutor {
   }
 
   // AddParallelJobs: For parallel loops
-  static void AddParallelJobs(tp_task_t job) { pool.AddParallelJobs(job); }
+  static void AddParallelJobs(Task job) { pool.AddParallelJobs(job); }
 
   // AddRecursiveCalls: For parallel recursion
-  static void AddRecursiveCalls(uint64_t depth, uint64_t half, tp_task_t task_a,
-                                tp_task_t task_b) {
+  static void AddRecursiveCalls(uint64_t depth, uint64_t half, Task task_a,
+                                Task task_b) {
     pool.AddRecursiveCalls(depth, half, task_a, task_b);
   }
 
@@ -43,10 +43,10 @@ class ThreadPoolExecutor {
  public:
   static void SetNumberOfThreads(int n_threads) { HEXL_UNUSED(n_threads); }
 
-  static void AddParallelJobs(tp_task_t job) { job(0, 1); }
+  static void AddParallelJobs(Task job) { job(0, 1); }
 
-  static void AddRecursiveCalls(uint64_t depth, uint64_t half, tp_task_t task_a,
-                                tp_task_t task_b) {
+  static void AddRecursiveCalls(uint64_t depth, uint64_t half, Task task_a,
+                                Task task_b) {
     HEXL_UNUSED(depth);
     HEXL_UNUSED(half);
     task_a(0, 1);

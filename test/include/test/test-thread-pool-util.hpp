@@ -64,6 +64,7 @@ void recursive_calls(uint64_t depth, uint64_t level, uint64_t half) {
   {
     std::lock_guard<std::mutex> lock(tasks_mutex);
     task_ids.push_back(std::this_thread::get_id());
+    std::this_thread::sleep_for(std::chrono::microseconds(1));
   }
 }
 
