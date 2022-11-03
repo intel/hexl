@@ -27,7 +27,7 @@ class ThreadPool {
   }
 
   // AddParallelJobs: Runs the same function on a total number of threads
-  void AddParallelJobs(tp_task_t job) {
+  void AddParallelJobs(Task job) {
     HEXL_CHECK(job, "Require non empty job");
 
     // Try using thread pool
@@ -61,14 +61,13 @@ class ThreadPool {
       SetBarrier_Unlocked();  // Wait 'til all jobs are done
       pool_mutex.unlock();
     } else {  // Run on single thread
-      pool_mutex.unlock();
       job(0, 1);
     }
   }
 
   // AddRecursiveCalls: Runs a task on next thread available
-  void AddRecursiveCalls(uint64_t depth, uint64_t half, tp_task_t task_a,
-                         tp_task_t task_b) {
+  void AddRecursiveCalls(uint64_t depth, uint64_t half, Task task_a,
+                         Task task_b) {
     HEXL_CHECK(task_a, "task_a: Require non empty task");
     HEXL_CHECK(task_b, "task_b: Require non empty task");
     bool locked = false;
@@ -135,7 +134,7 @@ class ThreadPool {
       task_b(0, 1);
     }
 
-    if (locked) {
+    if (!ThreadHandler::isChildThread) {
       pool_mutex.unlock();
     }
   }

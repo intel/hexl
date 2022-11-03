@@ -653,6 +653,35 @@ TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
+// Test: Add nested tasks. Three level
+TEST(ThreadPool, thread_safety_AddRecursiveCalls_stress) {
+  int depth = 1;
+  uint64_t nthreads = 2;
+  int iterations = 1000;
+  while (nthreads < 6 && nthreads < std::thread::hardware_concurrency()) {
+    task_ids.clear();
+    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+
+    std::thread thread_object1([=]() {
+      for (int i = 0; i < iterations; i++) recursive_calls(depth, 0, 0);
+    });
+    std::thread thread_object2([=]() {
+      for (int i = 0; i < iterations; i++) recursive_calls(depth, 0, 0);
+    });
+
+    thread_object1.join();
+    thread_object2.join();
+
+    task_ids.sort();
+    ASSERT_EQ(task_ids.size(), 2 * iterations * (nthreads + 1));  // calls
+    task_ids.unique();
+    ASSERT_EQ(task_ids.size(), nthreads + 2);  // threads
+    nthreads = (1ULL << (++depth + 1)) - 2;
+  }
+
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+}
+
 // Add task & stop threads in parallel
 TEST(ThreadPool, thread_safety_AddJobs_n_stop) {
   HEXL_NUM_THREADS = 2;
@@ -747,7 +776,7 @@ TEST(ThreadPool, thread_safety_AddJobs_n_setup) {
 #ifdef HEXL_DEBUG
 // Testing debug features
 TEST(ThreadPool, bad_input) {
-  tp_task_t task([](int id, int threads) {
+  Task task([](int id, int threads) {
     HEXL_UNUSED(id);
     HEXL_UNUSED(threads);
   });
