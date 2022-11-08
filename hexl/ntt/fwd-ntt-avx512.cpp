@@ -231,6 +231,85 @@ void FwdT8(uint64_t* result, const uint64_t* operand, __m512i v_neg_modulus,
   }
 }
 
+// Out-of-place implementation
+template <int BitShift, bool InputLessThanMod>
+void FwdT8_parallel(uint64_t* result, const uint64_t* operand,
+                    __m512i v_neg_modulus, __m512i v_twice_mod, uint64_t t,
+                    const uint64_t* W, const uint64_t* W_precon,
+                    const uint64_t depth, const uint64_t half) {
+  size_t j1 = 0;
+
+  // Referencing operand
+  const uint64_t* X_op = operand + j1;
+  const uint64_t* Y_op = X_op + t;
+
+  const __m512i* v_X_op_pt = reinterpret_cast<const __m512i*>(X_op);
+  const __m512i* v_Y_op_pt = reinterpret_cast<const __m512i*>(Y_op);
+
+  // Referencing result
+  uint64_t* X_r = result + j1;
+  uint64_t* Y_r = X_r + t;
+
+  __m512i* v_X_r_pt = reinterpret_cast<__m512i*>(X_r);
+  __m512i* v_Y_r_pt = reinterpret_cast<__m512i*>(Y_r);
+
+  // Weights and weights' preconditions
+  __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W++));
+  __m512i v_W_precon = _mm512_set1_epi64(static_cast<int64_t>(*W_precon++));
+
+  ThreadPoolExecutor::AddRecursiveCalls(
+      depth, half,
+      [=](int id, int threads) {
+        HEXL_UNUSED(id);
+        HEXL_UNUSED(threads);
+        auto in_v_X_op_pt = v_X_op_pt;
+        auto in_v_Y_op_pt = v_Y_op_pt;
+        auto in_v_X_r_pt = v_X_r_pt;
+        auto in_v_Y_r_pt = v_Y_r_pt;
+
+        // assume 8 | t
+        for (size_t j = t / 8 / 2; j > 0; --j) {
+          __m512i v_X = _mm512_loadu_si512(in_v_X_op_pt);
+          __m512i v_Y = _mm512_loadu_si512(in_v_Y_op_pt);
+
+          FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                   v_neg_modulus, v_twice_mod);
+
+          _mm512_storeu_si512(in_v_X_r_pt++, v_X);
+          _mm512_storeu_si512(in_v_Y_r_pt++, v_Y);
+
+          // Increase operand pointers as well
+          in_v_X_op_pt++;
+          in_v_Y_op_pt++;
+        }
+      },
+      [=](int id, int threads) {
+        HEXL_UNUSED(id);
+        HEXL_UNUSED(threads);
+        uint64_t offset = t / 8 / 2;
+        const __m512i* in_v_X_op_pt = v_X_op_pt + offset;
+        const __m512i* in_v_Y_op_pt = v_Y_op_pt + offset;
+        __m512i* in_v_X_r_pt = v_X_r_pt + offset;
+        __m512i* in_v_Y_r_pt = v_Y_r_pt + offset;
+
+        // assume 8 | t
+        for (size_t j = offset; j > 0; --j) {
+          __m512i v_X = _mm512_loadu_si512(in_v_X_op_pt);
+          __m512i v_Y = _mm512_loadu_si512(in_v_Y_op_pt);
+
+          FwdButterfly<BitShift, InputLessThanMod>(&v_X, &v_Y, v_W, v_W_precon,
+                                                   v_neg_modulus, v_twice_mod);
+
+          _mm512_storeu_si512(in_v_X_r_pt++, v_X);
+          _mm512_storeu_si512(in_v_Y_r_pt++, v_Y);
+
+          // Increase operand pointers as well
+          in_v_X_op_pt++;
+          in_v_Y_op_pt++;
+        }
+      });
+}
+
 template <int BitShift>
 void ForwardTransformToBitReverseAVX512(
     uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
@@ -389,9 +468,11 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-    FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1, W,
-                           W_precon);
     if (recursion_depth < HEXL_NTT_PARALLEL_DEPTH) {
+      FwdT8_parallel<BitShift, false>(result, operand, v_neg_modulus,
+                                      v_twice_mod, t, W, W_precon,
+                                      recursion_depth, recursion_half);
+
       ThreadPoolExecutor::AddRecursiveCalls(
           recursion_depth, recursion_half,
           [=](int id, int threads) {
@@ -412,6 +493,9 @@ void ForwardTransformToBitReverseAVX512(
                 recursion_half * 2 + 1);
           });
     } else {
+      FwdT8<BitShift, false>(result, operand, v_neg_modulus, v_twice_mod, t, 1,
+                             W, W_precon);
+
       ForwardTransformToBitReverseAVX512<BitShift>(
           result, result, n / 2, modulus, root_of_unity_powers,
           precon_root_of_unity_powers, input_mod_factor, output_mod_factor,
