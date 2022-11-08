@@ -23,12 +23,10 @@ TEST(EltwiseFMAMod, avx512_small) {
     GTEST_SKIP();
   }
 
-  // Repeated data so it can be run in two threads
-  std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t arg2 = 2;
-  std::vector<uint64_t> arg3{1, 1, 1, 1, 2, 3, 1, 0, 1, 1, 1, 1, 2, 3, 1, 0};
-  std::vector<uint64_t> exp_out{3, 5, 7, 9, 12, 15, 15, 16,
-                                3, 5, 7, 9, 12, 15, 15, 16};
+  std::vector<uint64_t> arg3{1, 1, 1, 1, 2, 3, 1, 0};
+  std::vector<uint64_t> exp_out{3, 5, 7, 9, 12, 15, 15, 16};
 
   uint64_t modulus = 101;
   EltwiseFMAModAVX512<64, 1>(arg1.data(), arg1.data(), arg2, arg3.data(),
@@ -42,13 +40,10 @@ TEST(EltwiseFMAMod, avx512_small2) {
     GTEST_SKIP();
   }
 
-  // Repeated data so it can be run in two threads
-  std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint64_t> arg1{1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t arg2 = 17;
-  std::vector<uint64_t> arg3{9, 10, 11, 12, 13, 14, 15, 16,
-                             9, 10, 11, 12, 13, 14, 15, 16};
-  std::vector<uint64_t> exp_out{26, 44, 62, 80, 98, 15, 33, 51,
-                                26, 44, 62, 80, 98, 15, 33, 51};
+  std::vector<uint64_t> arg3{9, 10, 11, 12, 13, 14, 15, 16};
+  std::vector<uint64_t> exp_out{26, 44, 62, 80, 98, 15, 33, 51};
 
   uint64_t modulus = 101;
 
@@ -62,7 +57,7 @@ TEST(EltwiseFMAMod, avx512_mult1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data so it can be run in two threads
+
   std::vector<uint64_t> arg1{1, 2,  3,  4,  5,  6,  7,  8,
                              9, 10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -83,7 +78,7 @@ TEST(EltwiseFMAMod, avx512_mult2) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data so it can be run in two threads
+
   std::vector<uint64_t> arg1{102, 2,  3,  4,  5,  6,  7,  8,
                              9,   10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -104,7 +99,7 @@ TEST(EltwiseFMAMod, avx512_mult4) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data so it can be run in two threads
+
   std::vector<uint64_t> arg1{400, 2,  3,  4,  5,  6,  7,  8,
                              9,   10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -125,7 +120,7 @@ TEST(EltwiseFMAMod, avx512_mult8) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data so it can be run in two threads
+
   std::vector<uint64_t> arg1{800, 2,  3,  4,  5,  6,  7,  8,
                              9,   10, 11, 12, 13, 14, 15, 16};
   uint64_t arg2 = 17;
@@ -145,7 +140,7 @@ TEST(EltwiseFMAMod, avx512_mult8) {
 
 // Check AVX512DQ and native eltwise FMA implementations match
 #ifdef HEXL_HAS_AVX512DQ
-TEST(EltwiseFMAMod, avx512_dq) {
+TEST(EltwiseFMAMod, AVX512DQ) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -217,7 +212,7 @@ TEST(EltwiseFMAMod, avx512_dq) {
 
 // Checks AVX512IFMA and native eltwise FMA implementations match
 #ifdef HEXL_HAS_AVX512IFMA
-TEST(EltwiseFMAMod, avx512_ifma) {
+TEST(EltwiseFMAMod, AVX512IFMA) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }

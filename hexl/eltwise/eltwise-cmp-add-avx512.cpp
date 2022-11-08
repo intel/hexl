@@ -36,11 +36,11 @@ void EltwiseCmpAddAVX512(uint64_t* result, const uint64_t* operand1, uint64_t n,
   __m512i* vp_result = reinterpret_cast<__m512i*>(result);
 
   ThreadPoolExecutor::AddParallelJobs(
-      [vp_result, n, vp_op, v_bound, cmp, diff](int id, int threads) {
-        auto in_vp_result = vp_result + id * n / 8 / threads;
-        auto in_vp_op = vp_op + id * n / 8 / threads;
+      n / 8, [vp_result, vp_op, v_bound, cmp, diff](size_t start, size_t end) {
+        auto in_vp_result = vp_result + start;
+        auto in_vp_op = vp_op + start;
 
-        for (size_t i = n / 8 / threads; i > 0; --i) {
+        for (size_t i = start; i < end; ++i) {
           __m512i v_op = _mm512_loadu_si512(in_vp_op);
           __m512i v_add_diff = _mm512_hexl_cmp_epi64(v_op, v_bound, cmp, diff);
           v_op = _mm512_add_epi64(v_op, v_add_diff);

@@ -37,10 +37,9 @@ TEST(EltwiseSubMod, vector_scalar_avx512_small) {
     GTEST_SKIP();
   }
 
-  // Repeated data (16 elements) so it can be run in two threads
-  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint64_t> op1{1, 2, 3, 4, 5, 6, 7, 8};
   uint64_t op2{3};
-  std::vector<uint64_t> exp_out{8, 9, 0, 1, 2, 3, 4, 5, 8, 9, 0, 1, 2, 3, 4, 5};
+  std::vector<uint64_t> exp_out{8, 9, 0, 1, 2, 3, 4, 5};
   uint64_t modulus = 10;
   EltwiseSubModAVX512(op1.data(), op1.data(), op2, op1.size(), modulus);
 
@@ -51,18 +50,15 @@ TEST(EltwiseSubMod, vector_vector_avx512_big) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data (16 elements) so it can be run in two threads
+
   uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
 
-  std::vector<uint64_t> op1{
-      0, 1, 2, 3, modulus - 1, modulus - 2, modulus - 3, modulus - 4,
-      0, 1, 2, 3, modulus - 1, modulus - 2, modulus - 3, modulus - 4};
-  std::vector<uint64_t> op2{
-      modulus - 1, modulus - 2, 3, 2, modulus - 3, modulus - 4, 1, 0,
-      modulus - 1, modulus - 2, 3, 2, modulus - 3, modulus - 4, 1, 0};
-  std::vector<uint64_t> exp_out{
-      1, 3, modulus - 1, 1, 2, 2, modulus - 4, modulus - 4,
-      1, 3, modulus - 1, 1, 2, 2, modulus - 4, modulus - 4};
+  std::vector<uint64_t> op1{0,           1,           2,           3,
+                            modulus - 1, modulus - 2, modulus - 3, modulus - 4};
+  std::vector<uint64_t> op2{modulus - 1, modulus - 2, 3, 2,
+                            modulus - 3, modulus - 4, 1, 0};
+  std::vector<uint64_t> exp_out{1, 3, modulus - 1, 1,
+                                2, 2, modulus - 4, modulus - 4};
 
   EltwiseSubModAVX512(op1.data(), op1.data(), op2.data(), op1.size(), modulus);
 
@@ -75,14 +71,12 @@ TEST(EltwiseSubMod, vector_scalar_avx512_big) {
   }
 
   uint64_t modulus = GeneratePrimes(1, 60, true, 1024)[0];
-  // Repeated data (16 elements) so it can be run in two threads
-  std::vector<uint64_t> op1{
-      0, 1, 2, 3, modulus - 1, modulus - 2, modulus - 3, modulus - 4,
-      0, 1, 2, 3, modulus - 1, modulus - 2, modulus - 3, modulus - 4};
+
+  std::vector<uint64_t> op1{0,           1,           2,           3,
+                            modulus - 1, modulus - 2, modulus - 3, modulus - 4};
   uint64_t op2{modulus - 1};
-  std::vector<uint64_t> exp_out{
-      1, 2, 3, 4, 0, modulus - 1, modulus - 2, modulus - 3,
-      1, 2, 3, 4, 0, modulus - 1, modulus - 2, modulus - 3};
+  std::vector<uint64_t> exp_out{1, 2,           3,           4,
+                                0, modulus - 1, modulus - 2, modulus - 3};
 
   EltwiseSubModAVX512(op1.data(), op1.data(), op2, op1.size(), modulus);
 
@@ -97,7 +91,7 @@ TEST(EltwiseSubMod, vector_vector_avx512_native_match) {
     GTEST_SKIP();
   }
 
-  size_t length = 181;  // Not divisible by 8 and can be run in two threads
+  size_t length = 173;
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;
@@ -134,7 +128,7 @@ TEST(EltwiseSubMod, vector_scalar_avx512_native_match) {
     GTEST_SKIP();
   }
 
-  size_t length = 181;  // Not divisible by 8 and can be run in two threads
+  size_t length = 173;
 
   for (size_t bits = 1; bits <= 62; ++bits) {
     uint64_t modulus = 1ULL << bits;

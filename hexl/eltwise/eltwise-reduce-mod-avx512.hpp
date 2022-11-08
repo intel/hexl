@@ -77,85 +77,90 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 
   if (input_mod_factor == modulus) {
     if (output_mod_factor == 2) {
-      ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-        auto in_vp_operand = vp_operand + id * n / 8 / threads;
-        auto in_vp_result = vp_result + id * n / 8 / threads;
-        for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
-          __m512i v_op = _mm512_loadu_si512(in_vp_operand);
-          v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
-              v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
-          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
-                            "v_op exceeds bound " << modulus);
-          _mm512_storeu_si512(in_vp_result, v_op);
-          ++in_vp_operand;
-          ++in_vp_result;
-        }
-      });
+      ThreadPoolExecutor::AddParallelJobs(
+          n_tmp / 8, [=](size_t start, size_t end) {
+            auto in_vp_operand = vp_operand + start;
+            auto in_vp_result = vp_result + start;
+            for (size_t i = start; i < end; ++i) {
+              __m512i v_op = _mm512_loadu_si512(in_vp_operand);
+              v_op = _mm512_hexl_barrett_reduce64<BitShift, 2>(
+                  v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
+              HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                                "v_op exceeds bound " << modulus);
+              _mm512_storeu_si512(in_vp_result, v_op);
+              ++in_vp_operand;
+              ++in_vp_result;
+            }
+          });
     } else {
-      ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-        auto in_vp_operand = vp_operand + id * n / 8 / threads;
-        auto in_vp_result = vp_result + id * n / 8 / threads;
-        for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
-          __m512i v_op = _mm512_loadu_si512(in_vp_operand);
-          v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
-              v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
-          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
-                            "v_op exceeds bound " << modulus);
-          _mm512_storeu_si512(in_vp_result, v_op);
-          ++in_vp_operand;
-          ++in_vp_result;
-        }
-      });
+      ThreadPoolExecutor::AddParallelJobs(
+          n_tmp / 8, [=](size_t start, size_t end) {
+            auto in_vp_operand = vp_operand + start;
+            auto in_vp_result = vp_result + start;
+            for (size_t i = start; i < end; ++i) {
+              __m512i v_op = _mm512_loadu_si512(in_vp_operand);
+              v_op = _mm512_hexl_barrett_reduce64<BitShift, 1>(
+                  v_op, v_modulus, v_bf, v_bf_52, prod_right_shift, v_neg_mod);
+              HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                                "v_op exceeds bound " << modulus);
+              _mm512_storeu_si512(in_vp_result, v_op);
+              ++in_vp_operand;
+              ++in_vp_result;
+            }
+          });
     }
   }
 
   if (input_mod_factor == 2) {
-    ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-      auto in_vp_operand = vp_operand + id * n / 8 / threads;
-      auto in_vp_result = vp_result + id * n / 8 / threads;
-      for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
-        __m512i v_op = _mm512_loadu_si512(in_vp_operand);
-        v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
-        HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
-                          "v_op exceeds bound " << modulus);
-        _mm512_storeu_si512(in_vp_result, v_op);
-        ++in_vp_operand;
-        ++in_vp_result;
-      }
-    });
+    ThreadPoolExecutor::AddParallelJobs(
+        n_tmp / 8, [=](size_t start, size_t end) {
+          auto in_vp_operand = vp_operand + start;
+          auto in_vp_result = vp_result + start;
+          for (size_t i = start; i < end; ++i) {
+            __m512i v_op = _mm512_loadu_si512(in_vp_operand);
+            v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
+            HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                              "v_op exceeds bound " << modulus);
+            _mm512_storeu_si512(in_vp_result, v_op);
+            ++in_vp_operand;
+            ++in_vp_result;
+          }
+        });
   }
 
   if (input_mod_factor == 4) {
     if (output_mod_factor == 1) {
-      ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-        auto in_vp_operand = vp_operand + id * n / 8 / threads;
-        auto in_vp_result = vp_result + id * n / 8 / threads;
-        for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
-          __m512i v_op = _mm512_loadu_si512(in_vp_operand);
-          v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
-          v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
-          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
-                            "v_op exceeds bound " << modulus);
-          _mm512_storeu_si512(in_vp_result, v_op);
-          ++in_vp_operand;
-          ++in_vp_result;
-        }
-      });
+      ThreadPoolExecutor::AddParallelJobs(
+          n_tmp / 8, [=](size_t start, size_t end) {
+            auto in_vp_operand = vp_operand + start;
+            auto in_vp_result = vp_result + start;
+            for (size_t i = start; i < end; ++i) {
+              __m512i v_op = _mm512_loadu_si512(in_vp_operand);
+              v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
+              v_op = _mm512_hexl_small_mod_epu64(v_op, v_modulus);
+              HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, modulus,
+                                "v_op exceeds bound " << modulus);
+              _mm512_storeu_si512(in_vp_result, v_op);
+              ++in_vp_operand;
+              ++in_vp_result;
+            }
+          });
     }
     if (output_mod_factor == 2) {
-      ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-        auto in_vp_operand = vp_operand + id * n / 8 / threads;
-        auto in_vp_result = vp_result + id * n / 8 / threads;
-        for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
-          __m512i v_op = _mm512_loadu_si512(in_vp_operand);
-          v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
-          HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, twice_mod,
-                            "v_op exceeds bound " << twice_mod);
-          _mm512_storeu_si512(in_vp_result, v_op);
-          ++in_vp_operand;
-          ++in_vp_result;
-        }
-      });
+      ThreadPoolExecutor::AddParallelJobs(
+          n_tmp / 8, [=](size_t start, size_t end) {
+            auto in_vp_operand = vp_operand + start;
+            auto in_vp_result = vp_result + start;
+            for (size_t i = start; i < end; ++i) {
+              __m512i v_op = _mm512_loadu_si512(in_vp_operand);
+              v_op = _mm512_hexl_small_mod_epu64(v_op, v_twice_mod);
+              HEXL_CHECK_BOUNDS(ExtractValues(v_op).data(), 8, twice_mod,
+                                "v_op exceeds bound " << twice_mod);
+              _mm512_storeu_si512(in_vp_result, v_op);
+              ++in_vp_operand;
+              ++in_vp_result;
+            }
+          });
     }
   }
 }
@@ -218,11 +223,11 @@ void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
   __m512i v_modulus = _mm512_set1_epi64(modulus);
   __m512i v_neg_inv_mod = _mm512_set1_epi64(neg_inv_mod);
   __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
-  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-    auto in_vp_a = vp_a + id * n / 8 / threads;
-    auto in_vp_b = vp_b + id * n / 8 / threads;
-    auto in_vp_result = vp_result + id * n / 8 / threads;
-    for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
+  ThreadPoolExecutor::AddParallelJobs(n_tmp / 8, [=](size_t start, size_t end) {
+    auto in_vp_a = vp_a + start;
+    auto in_vp_b = vp_b + start;
+    auto in_vp_result = vp_result + start;
+    for (size_t i = start; i < end; ++i) {
       __m512i v_a_op = _mm512_loadu_si512(in_vp_a);
       __m512i v_b_op = _mm512_loadu_si512(in_vp_b);
       __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b_op);
@@ -306,10 +311,10 @@ void EltwiseMontgomeryFormInAVX512(uint64_t* result, const uint64_t* a,
   __m512i v_neg_inv_mod = _mm512_set1_epi64(neg_inv_mod);
   __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
 
-  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-    auto in_vp_a = vp_a + id * n / 8 / threads;
-    auto in_vp_result = vp_result + id * n / 8 / threads;
-    for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
+  ThreadPoolExecutor::AddParallelJobs(n_tmp / 8, [=](size_t start, size_t end) {
+    auto in_vp_a = vp_a + start;
+    auto in_vp_result = vp_result + start;
+    for (size_t i = start; i < end; ++i) {
       __m512i v_a_op = _mm512_loadu_si512(in_vp_a);
       __m512i v_T_hi = _mm512_hexl_mulhi_epi<BitShift>(v_a_op, v_b);
       __m512i v_T_lo = _mm512_hexl_mullo_epi<BitShift>(v_a_op, v_b);
@@ -386,10 +391,10 @@ void EltwiseMontgomeryFormOutAVX512(uint64_t* result, const uint64_t* a,
   __m512i v_prod_rs = _mm512_set1_epi64(prod_rs);
   __m512i v_T_hi = _mm512_set1_epi64(0);
 
-  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-    auto in_vp_a = vp_a + id * n / 8 / threads;
-    auto in_vp_result = vp_result + id * n / 8 / threads;
-    for (size_t i = 0; i < n_tmp / 8 / threads; ++i) {
+  ThreadPoolExecutor::AddParallelJobs(n_tmp / 8, [=](size_t start, size_t end) {
+    auto in_vp_a = vp_a + start;
+    auto in_vp_result = vp_result + start;
+    for (size_t i = start; i < end; ++i) {
       __m512i v_T_lo = _mm512_loadu_si512(in_vp_a);
       __m512i v_c = _mm512_hexl_montgomery_reduce<BitShift, r>(
           v_T_hi, v_T_lo, v_modulus, v_neg_inv_mod, v_prod_rs);

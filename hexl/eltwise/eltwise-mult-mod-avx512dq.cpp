@@ -68,14 +68,15 @@ void EltwiseMultModAVX512DQIntLoopUnroll(__m512i* vp_result,
                 "CoeffCount must be a factor of manual_unroll_factor * "
                 "avx512_64bit_count");
   HEXL_UNUSED(v_twice_mod);
-  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-    auto in_vp_operand1 = vp_operand1 + id * CoeffCount / 8 / threads;
-    auto in_vp_operand2 = vp_operand2 + id * CoeffCount / 8 / threads;
-    auto in_vp_result = vp_result + id * CoeffCount / 8 / threads;
+  ThreadPoolExecutor::AddParallelJobs(loop_count, [=](size_t start,
+                                                      size_t end) {
+    auto in_vp_operand1 = vp_operand1 + start * manual_unroll_factor;
+    auto in_vp_operand2 = vp_operand2 + start * manual_unroll_factor;
+    auto in_vp_result = vp_result + start * manual_unroll_factor;
     auto in_v_twice_mod = v_twice_mod;
 
     HEXL_LOOP_UNROLL_4
-    for (size_t i = loop_count / threads; i > 0; --i) {
+    for (size_t i = start; i < end; ++i) {
       __m512i x1 = _mm512_loadu_si512(in_vp_operand1++);
       __m512i y1 = _mm512_loadu_si512(in_vp_operand2++);
       __m512i x2 = _mm512_loadu_si512(in_vp_operand1++);
@@ -588,13 +589,13 @@ inline void EltwiseMultModAVX512FloatLoopDefault(
 
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 
-  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-    auto in_vp_operand1 = vp_operand1 + id * n / 8 / threads;
-    auto in_vp_operand2 = vp_operand2 + id * n / 8 / threads;
-    auto in_vp_result = vp_result + id * n / 8 / threads;
+  ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
+    auto in_vp_operand1 = vp_operand1 + start;
+    auto in_vp_operand2 = vp_operand2 + start;
+    auto in_vp_result = vp_result + start;
     auto in_v_twice_mod = v_twice_mod;
     HEXL_LOOP_UNROLL_4
-    for (size_t i = n / 8 / threads; i > 0; --i) {
+    for (size_t i = start; i < end; ++i) {
       __m512i v_op1 = _mm512_loadu_si512(in_vp_operand1);
       v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
                                                           &in_v_twice_mod);
@@ -643,13 +644,14 @@ inline void EltwiseMultModAVX512FloatLoopUnroll(
 
   constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 
-  ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-    auto in_vp_operand1 = vp_operand1 + id * CoeffCount / 8 / threads;
-    auto in_vp_operand2 = vp_operand2 + id * CoeffCount / 8 / threads;
-    auto in_vp_result = vp_result + id * CoeffCount / 8 / threads;
+  ThreadPoolExecutor::AddParallelJobs(loop_count, [=](size_t start,
+                                                      size_t end) {
+    auto in_vp_operand1 = vp_operand1 + start * manual_unroll_factor;
+    auto in_vp_operand2 = vp_operand2 + start * manual_unroll_factor;
+    auto in_vp_result = vp_result + start * manual_unroll_factor;
     auto in_v_twice_mod = v_twice_mod;
     HEXL_LOOP_UNROLL_4
-    for (size_t i = loop_count / threads; i > 0; --i) {
+    for (size_t i = start; i < end; ++i) {
       __m512i op1_1 = _mm512_loadu_si512(in_vp_operand1++);
       __m512i op1_2 = _mm512_loadu_si512(in_vp_operand1++);
       __m512i op1_3 = _mm512_loadu_si512(in_vp_operand1++);

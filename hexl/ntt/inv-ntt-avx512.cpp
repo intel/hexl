@@ -476,12 +476,12 @@ void InverseTransformFromBitReverseAVX512(
 
     __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
     __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
-    ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-      auto in_v_X_pt = v_X_pt + id * n / 16 / threads;
-      auto in_v_Y_pt = v_Y_pt + id * n / 16 / threads;
+    ThreadPoolExecutor::AddParallelJobs(n / 16, [=](size_t start, size_t end) {
+      auto in_v_X_pt = v_X_pt + start;
+      auto in_v_Y_pt = v_Y_pt + start;
       // Merge final InvNTT loop with modulus reduction baked-in
       HEXL_LOOP_UNROLL_4
-      for (size_t j = n / 16 / threads; j > 0; --j) {
+      for (size_t j = start; j < end; ++j) {
         __m512i v_X = _mm512_loadu_si512(in_v_X_pt);
         __m512i v_Y = _mm512_loadu_si512(in_v_Y_pt);
 

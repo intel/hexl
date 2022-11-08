@@ -23,15 +23,10 @@ TEST(EltwiseMultMod, avx512_small) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op1{1, 2, 3, 1, 1, 1, 0, 1, 0,
-                            1, 2, 3, 1, 1, 1, 0, 1, 0};
-  std::vector<uint64_t> op2{1, 1, 1, 1, 2, 3, 1, 0, 0,
-                            1, 1, 1, 1, 2, 3, 1, 0, 0};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0};
-  std::vector<uint64_t> exp_out{1, 2, 3, 1, 2, 3, 0, 0, 0,
-                                1, 2, 3, 1, 2, 3, 0, 0, 0};
+  std::vector<uint64_t> op1{1, 2, 3, 1, 1, 1, 0, 1, 0};
+  std::vector<uint64_t> op2{1, 1, 1, 1, 2, 3, 1, 0, 0};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> exp_out{1, 2, 3, 1, 2, 3, 0, 0, 0};
 
   uint64_t modulus = 769;
   EltwiseMultModAVX512Float<1>(result.data(), op1.data(), op2.data(),
@@ -84,10 +79,9 @@ TEST(EltwiseMultMod, Big) {
 }
 
 TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
-  size_t length = 16;  // 16 so it can be run in two threads
   uint64_t modulus = 281474976546817;
 
-  std::vector<uint64_t> data_native(length, 998771110802331);
+  std::vector<uint64_t> data_native(8, 998771110802331);
   auto data_avx = data_native;
 
   EltwiseMultModAVX512Float<4>(data_avx.data(), data_avx.data(),
@@ -96,8 +90,8 @@ TEST(EltwiseMultMod, AVX512FloatInPlaceNoInputReduceMod) {
   EltwiseMultModNative<4>(data_native.data(), data_native.data(),
                           data_native.data(), data_avx.size(), modulus);
 
-  CheckEqual(data_native, std::vector<uint64_t>(length, 273497826869315));
-  CheckEqual(data_avx, std::vector<uint64_t>(length, 273497826869315));
+  CheckEqual(data_native, std::vector<uint64_t>(8, 273497826869315));
+  CheckEqual(data_avx, std::vector<uint64_t>(8, 273497826869315));
   CheckEqual(data_avx, data_native);
 }
 
@@ -109,7 +103,7 @@ TEST(EltwiseMultMod, avx512dqint_small) {
   uint64_t input_mod_factor = 1;
   uint64_t modulus = (1ULL << 53) + 7;
 
-  for (size_t length = 512; length <= 32768; length *= 2) {
+  for (size_t length = 1024; length <= 32768; length *= 2) {
     auto op1 = GenerateInsecureUniformIntRandomValues(
         length, 0, input_mod_factor * modulus);
     auto op2 = GenerateInsecureUniformIntRandomValues(
@@ -273,8 +267,7 @@ TEST(EltwiseMultMod, avx512ifma_big) {
     GTEST_SKIP();
   }
 
-  // Length 16 so it can be run in two threads
-  for (size_t length = 16; length <= 16; length *= 2) {
+  for (size_t length = 8; length <= 8; length *= 2) {
     std::vector<uint64_t> op1(length, 0);
     std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> result_native(length, 0);

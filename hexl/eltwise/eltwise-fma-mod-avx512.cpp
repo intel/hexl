@@ -100,14 +100,14 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
 
   if (arg3) {
     const __m512i* vp_arg3 = reinterpret_cast<const __m512i*>(arg3);
-    ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-      auto in_vp_arg1 = vp_arg1 + id * n / 8 / threads;
-      auto in_vp_arg3 = vp_arg3 + id * n / 8 / threads;
-      auto in_vp_result = vp_result + id * n / 8 / threads;
+    ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
+      auto in_vp_arg1 = vp_arg1 + start;
+      auto in_vp_arg3 = vp_arg3 + start;
+      auto in_vp_result = vp_result + start;
       auto in_v2_modulus = v2_modulus;
       auto in_v4_modulus = v4_modulus;
       HEXL_LOOP_UNROLL_8
-      for (size_t i = n / 8 / threads; i > 0; --i) {
+      for (size_t i = start; i < end; ++i) {
         __m512i varg1 = _mm512_loadu_si512(in_vp_arg1);
         __m512i varg3 = _mm512_loadu_si512(in_vp_arg3);
 
@@ -136,13 +136,13 @@ void EltwiseFMAModAVX512(uint64_t* result, const uint64_t* arg1, uint64_t arg2,
       }
     });
   } else {  // arg3 == nullptr
-    ThreadPoolExecutor::AddParallelJobs([=](int id, int threads) {
-      auto in_vp_arg1 = vp_arg1 + id * n / 8 / threads;
-      auto in_vp_result = vp_result + id * n / 8 / threads;
+    ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
+      auto in_vp_arg1 = vp_arg1 + start;
+      auto in_vp_result = vp_result + start;
       auto in_v2_modulus = v2_modulus;
       auto in_v4_modulus = v4_modulus;
       HEXL_LOOP_UNROLL_8
-      for (size_t i = n / 8 / threads; i > 0; --i) {
+      for (size_t i = start; i < end; ++i) {
         __m512i varg1 = _mm512_loadu_si512(in_vp_arg1);
         varg1 = _mm512_hexl_small_mod_epu64<InputModFactor>(
             varg1, vmodulus, &in_v2_modulus, &in_v4_modulus);

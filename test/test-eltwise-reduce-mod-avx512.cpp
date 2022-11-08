@@ -23,12 +23,9 @@ TEST(EltwiseReduceMod, avx512_64_mod_1) {
     GTEST_SKIP();
   }
 
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op{0, 111, 250, 340, 769, 900, 1200, 1530,
-                           0, 111, 250, 340, 769, 900, 1200, 1530};
-  std::vector<uint64_t> exp_out{0, 111, 250, 340, 0, 131, 431, 761,
-                                0, 111, 250, 340, 0, 131, 431, 761};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> op{0, 111, 250, 340, 769, 900, 1200, 1530};
+  std::vector<uint64_t> exp_out{0, 111, 250, 340, 0, 131, 431, 761};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 769;
   const uint64_t input_mod_factor = modulus;
@@ -44,7 +41,6 @@ TEST(EltwiseReduceModMontInOut, avx512_64_mod_1) {
   }
 
   uint64_t modulus = 67280421310725ULL;
-  // Repeated data (8 elements) so it can be run in two threads
   std::vector<uint64_t> input_a{0,
                                 67280421310000,
                                 25040294381203,
@@ -52,16 +48,8 @@ TEST(EltwiseReduceModMontInOut, avx512_64_mod_1) {
                                 769231483400,
                                 90032324,
                                 120042353,
-                                1530,
-                                0,
-                                67280421310000,
-                                25040294381203,
-                                340231313,
-                                769231483400,
-                                90032324,
-                                120042353,
                                 1530};
-  std::vector<uint64_t> output{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> output{0, 0, 0, 0, 0, 0, 0, 0};
 
   int r = 46;  // R^2 mod N = 42006526039321
   uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
@@ -83,12 +71,9 @@ TEST(EltwiseReduceMod, avx512_52_mod_1) {
     GTEST_SKIP();
   }
 
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op{0, 111, 250, 340, 769, 900, 1200, 1530,
-                           0, 111, 250, 340, 769, 900, 1200, 1530};
-  std::vector<uint64_t> exp_out{0, 111, 250, 340, 0, 131, 431, 761,
-                                0, 111, 250, 340, 0, 131, 431, 761};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> op{0, 111, 250, 340, 769, 900, 1200, 1530};
+  std::vector<uint64_t> exp_out{0, 111, 250, 340, 0, 131, 431, 761};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 769;
   const uint64_t input_mod_factor = modulus;
@@ -98,23 +83,18 @@ TEST(EltwiseReduceMod, avx512_52_mod_1) {
   CheckEqual(result, exp_out);
 }
 
-TEST(EltwiseReduceMod, avx512_52_big_mod_1) {
+TEST(EltwiseReduceMod, avx512_52_Big_mod_1) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op{
-      914704788761805005, 224925333812073588, 592788284123677125,
-      142439467624940029, 146023272535470246, 979015887843024185,
-      496780369302017539, 1073741441,         914704788761805005,
-      224925333812073588, 592788284123677125, 142439467624940029,
-      146023272535470246, 979015887843024185, 496780369302017539,
-      1073741441};
+
+  std::vector<uint64_t> op{914704788761805005, 224925333812073588,
+                           592788284123677125, 142439467624940029,
+                           146023272535470246, 979015887843024185,
+                           496780369302017539, 1073741441};
   std::vector<uint64_t> exp_out{802487803, 754009873, 962097738, 36142730,
-                                687617508, 519876583, 630345322, 0,
-                                802487803, 754009873, 962097738, 36142730,
                                 687617508, 519876583, 630345322, 0};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 1073741441;
   const uint64_t input_mod_factor = modulus;
@@ -132,7 +112,6 @@ TEST(EltwiseReduceModMontInOut, avx512_52_mod_1) {
   }
 
   uint64_t modulus = 67280421310725ULL;
-  // Repeated data (8 elements) so it can be run in two threads
   std::vector<uint64_t> input_a{0,
                                 67280421310000,
                                 25040294381203,
@@ -140,16 +119,8 @@ TEST(EltwiseReduceModMontInOut, avx512_52_mod_1) {
                                 769231483400,
                                 90032324,
                                 120042353,
-                                1530,
-                                0,
-                                67280421310000,
-                                25040294381203,
-                                340231313,
-                                769231483400,
-                                90032324,
-                                120042353,
                                 1530};
-  std::vector<uint64_t> output{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint64_t> output{0, 0, 0, 0, 0, 0, 0, 0};
 
   int r = 46;  // R^2 mod N = 42006526039321
   uint64_t R_reduced = ReduceMod<2>(1ULL << r, modulus);
@@ -170,13 +141,10 @@ TEST(EltwiseReduceMod, avx512_2_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op{0, 54, 100, 135, 201, 18, 148, 168, 201,
-                           0, 54, 100, 135, 201, 18, 148, 168, 201};
-  std::vector<uint64_t> exp_out{0, 54, 100, 34, 100, 18, 47, 67, 100,
-                                0, 54, 100, 34, 100, 18, 47, 67, 100};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  std::vector<uint64_t> op{0, 54, 100, 135, 201, 18, 148, 168, 201};
+  std::vector<uint64_t> exp_out{0, 54, 100, 34, 100, 18, 47, 67, 100};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 2;
@@ -190,13 +158,10 @@ TEST(EltwiseReduceMod, avx512_4_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op{0, 54, 100, 135, 201, 220, 350, 370, 403,
-                           0, 54, 100, 135, 201, 220, 350, 370, 403};
-  std::vector<uint64_t> exp_out{0, 54, 100, 34, 100, 18, 47, 67, 100,
-                                0, 54, 100, 34, 100, 18, 47, 67, 100};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  std::vector<uint64_t> op{0, 54, 100, 135, 201, 220, 350, 370, 403};
+  std::vector<uint64_t> exp_out{0, 54, 100, 34, 100, 18, 47, 67, 100};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 4;
@@ -210,13 +175,10 @@ TEST(EltwiseReduceMod, avx512_4_2) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
-  // Repeated data (8 elements) so it can be run in two threads
-  std::vector<uint64_t> op{0, 54, 100, 135, 201, 220, 350, 370, 403,
-                           0, 54, 100, 135, 201, 220, 350, 370, 403};
-  std::vector<uint64_t> exp_out{0, 54, 100, 135, 201, 18, 148, 168, 201,
-                                0, 54, 100, 135, 201, 18, 148, 168, 201};
-  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  std::vector<uint64_t> op{0, 54, 100, 135, 201, 220, 350, 370, 403};
+  std::vector<uint64_t> exp_out{0, 54, 100, 135, 201, 18, 148, 168, 201};
+  std::vector<uint64_t> result{0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 4;
@@ -228,7 +190,7 @@ TEST(EltwiseReduceMod, avx512_4_2) {
 
 // Checks AVX512 and native EltwiseReduceMod implementations match with randomly
 // generated inputs
-TEST(EltwiseReduceMod, avx512_big_0_1) {
+TEST(EltwiseReduceMod, AVX512Big_0_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -261,7 +223,7 @@ TEST(EltwiseReduceMod, avx512_big_0_1) {
   }
 }
 
-TEST(EltwiseReduceMod, avx512_big_4_1) {
+TEST(EltwiseReduceMod, AVX512Big_4_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -293,7 +255,7 @@ TEST(EltwiseReduceMod, avx512_big_4_1) {
   }
 }
 
-TEST(EltwiseReduceMod, avx512_big_4_2) {
+TEST(EltwiseReduceMod, AVX512Big_4_2) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -325,7 +287,7 @@ TEST(EltwiseReduceMod, avx512_big_4_2) {
   }
 }
 
-TEST(EltwiseReduceMod, avx512_big_2_1) {
+TEST(EltwiseReduceMod, AVX512Big_2_1) {
   if (!has_avx512dq) {
     GTEST_SKIP();
   }
@@ -360,12 +322,12 @@ TEST(EltwiseReduceMod, avx512_big_2_1) {
 #ifdef HEXL_HAS_AVX512IFMA
 // Checks AVX512 and native EltwiseReduceMod implementations match with randomly
 // generated inputs
-TEST(EltwiseReduceMod, avx512_52_big_0_1) {
+TEST(EltwiseReduceMod, AVX512_52_Big_0_1) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
 
-  size_t length = 16;  // So it ca be run in two threads
+  size_t length = 8;
 
   for (size_t bits = 45; bits <= 51; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
@@ -392,12 +354,12 @@ TEST(EltwiseReduceMod, avx512_52_big_0_1) {
   }
 }
 
-TEST(EltwiseReduceMod, avx512_52_big_4_1) {
+TEST(EltwiseReduceMod, AVX512_52_Big_4_1) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
 
-  size_t length = 16;  // So ti can be run it at least two threads
+  size_t length = 8;
 
   for (size_t bits = 45; bits <= 52; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
@@ -423,12 +385,12 @@ TEST(EltwiseReduceMod, avx512_52_big_4_1) {
   }
 }
 
-TEST(EltwiseReduceMod, avx512_52_big_4_2) {
+TEST(EltwiseReduceMod, AVX512_52_Big_4_2) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
 
-  size_t length = 16;  // So ti can be run it at least two threads
+  size_t length = 8;
 
   for (size_t bits = 45; bits <= 52; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
@@ -454,12 +416,12 @@ TEST(EltwiseReduceMod, avx512_52_big_4_2) {
   }
 }
 
-TEST(EltwiseReduceMod, avx512_52_big_2_1) {
+TEST(EltwiseReduceMod, AVX512_52_Big_2_1) {
   if (!has_avx512ifma) {
     GTEST_SKIP();
   }
 
-  size_t length = 16;  // So ti can be run it at least two threads
+  size_t length = 8;
 
   for (size_t bits = 45; bits <= 52; ++bits) {
     uint64_t modulus = GeneratePrimes(1, bits, true, length)[0];
