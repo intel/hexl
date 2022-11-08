@@ -43,9 +43,9 @@ static void BM_ThreadPool_WakeUp_Plus30ms(benchmark::State& state) {  //  NOLINT
 
   for (auto _ : state) {
     std::this_thread::sleep_for(std::chrono::milliseconds(30));
-    ThreadPoolExecutor::AddParallelJobs([](size_t id, size_t threads) {
-      HEXL_UNUSED(id);
-      HEXL_UNUSED(threads);
+    ThreadPoolExecutor::AddParallelJobs(0, [](size_t start, size_t end) {
+      HEXL_UNUSED(start);
+      HEXL_UNUSED(end);
     });
   }
   ThreadPoolExecutor::SetNumberOfThreads(0);

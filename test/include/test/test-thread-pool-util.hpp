@@ -23,41 +23,38 @@ std::list<std::thread::id> task_ids;
 std::atomic_int sync;
 std::atomic_int iterations;
 
-void dummy_task(int id, int threads) {
-  HEXL_UNUSED(id);
-  HEXL_UNUSED(threads);
+void dummy_task(int start, int end) {
+  HEXL_UNUSED(start);
+  HEXL_UNUSED(end);
 }
 
-void working_task(size_t id, size_t threads) {
-  HEXL_UNUSED(id);
-  HEXL_UNUSED(threads);
+void working_task(size_t start, size_t end) {
+  HEXL_UNUSED(start);
+  HEXL_UNUSED(end);
   std::this_thread::sleep_for(std::chrono::milliseconds(work_delay));
 }
 
-void id_task(int id, int threads) {
-  HEXL_UNUSED(id);
-  HEXL_UNUSED(threads);
+void id_task(int start, int end) {
+  HEXL_UNUSED(start);
+  HEXL_UNUSED(end);
   std::lock_guard<std::mutex> lock(tasks_mutex);
   task_ids.push_back(std::this_thread::get_id());
 }
 
-void add_iterations(int id, int threads) {
-  HEXL_UNUSED(id);
-  iterations.fetch_add(N_size / threads);
-}
+void add_iterations(int start, int end) { iterations.fetch_add(end - start); }
 
 void recursive_calls(uint64_t depth, uint64_t level, uint64_t half) {
   if (level < depth) {
     ThreadPoolExecutor::AddRecursiveCalls(
         level, half,
-        [&](int id, int threads) {
-          HEXL_UNUSED(id);
-          HEXL_UNUSED(threads);
+        [&](int start, int end) {
+          HEXL_UNUSED(start);
+          HEXL_UNUSED(end);
           recursive_calls(depth, level + 1, 2 * half);
         },
-        [&](int id, int threads) {
-          HEXL_UNUSED(id);
-          HEXL_UNUSED(threads);
+        [&](int start, int end) {
+          HEXL_UNUSED(start);
+          HEXL_UNUSED(end);
           recursive_calls(depth, level + 1, 2 * half + 1);
         });
   }

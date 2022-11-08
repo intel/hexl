@@ -27,7 +27,7 @@ class ThreadPool {
   }
 
   // AddParallelJobs: Runs the same function on a total number of threads
-  void AddParallelJobs(Task job) {
+  void AddParallelJobs(size_t N, Task job) {
     HEXL_CHECK(job, "Require non empty job");
 
     // Try using thread pool
@@ -38,16 +38,24 @@ class ThreadPool {
       }
 
       const size_t t_threads = thread_handlers.size();
+      const size_t residue = N % t_threads;
+      const size_t chunk_size = (N - residue) / t_threads;
+      size_t start = 0;
+      size_t end = chunk_size + residue;
 
       for (size_t i = 0; i < t_threads; ++i) {
         auto handler = thread_handlers[i];
         switch (handler->state.load()) {
           case STATE::DONE:
             handler->task = job;
+            handler->chunk_start = start;
+            handler->chunk_end = end;
             handler->state.store(STATE::KICK_OFF);
             break;
           case STATE::SLEEPING:
             handler->task = job;
+            handler->chunk_start = start;
+            handler->chunk_end = end;
             handler->state.store(STATE::KICK_OFF);
             {
               std::lock_guard<std::mutex> lock(handler->wake_mutex);
@@ -55,13 +63,15 @@ class ThreadPool {
             }
             break;
           default:  // In case thread is not in expected state
-            job(i, t_threads);
+            job(start, end);
         }
+        start = end;
+        end += chunk_size;
       }
       SetBarrier_Unlocked();  // Wait 'til all jobs are done
       pool_mutex.unlock();
     } else {  // Run on single thread
-      job(0, 1);
+      job(0, N);
     }
   }
 
@@ -76,8 +86,8 @@ class ThreadPool {
     if (!ThreadHandler::isChildThread) {
       locked = pool_mutex.try_lock();
       if (!locked) {
-        task_a(0, 1);
-        task_b(0, 1);
+        task_a(0, 0);
+        task_b(0, 0);
         return;
       }
     }
@@ -104,7 +114,7 @@ class ThreadPool {
           }
           break;
         default:  // In case thread is not on expected state
-          task_a(next - 1, t_threads);
+          task_a(0, 0);
       }
 
       handler = thread_handlers.at(next++);
@@ -122,7 +132,7 @@ class ThreadPool {
           }
           break;
         default:  // In case thread is not on expected state
-          task_b(next - 1, t_threads);
+          task_b(0, 0);
       }
 
       // Implicit barrier
@@ -130,8 +140,8 @@ class ThreadPool {
         WaitThread(thread_handlers.at(i));
       }
     } else {
-      task_a(0, 1);
-      task_b(0, 1);
+      task_a(0, 0);
+      task_b(0, 0);
     }
 
     if (!ThreadHandler::isChildThread) {
@@ -168,8 +178,7 @@ class ThreadPool {
     thread_handlers.reserve(old_size + new_threads);
     for (size_t i = old_size; i < old_size + new_threads; ++i) {
       // Create handler and add it to vector of threads
-      // Let handler know its parent container and its position in the vector
-      thread_handlers.emplace_back(new ThreadHandler(thread_handlers, i));
+      thread_handlers.emplace_back(new ThreadHandler());
     }
   }
 

@@ -23,7 +23,7 @@ enum class STATE : int {
   KILL = 5       // To join thread
 };
 
-using Task = std::function<void(size_t id, size_t threads)>;
+using Task = std::function<void(size_t start, size_t end)>;
 
 // Controls thread
 class ThreadHandler {
@@ -34,17 +34,15 @@ class ThreadHandler {
   std::mutex wake_mutex;                  // For cond. variable
   std::thread thread;
   Task task;                                      // To be run by thread
-  size_t thread_id;                               // Used for proper chunking
+  size_t chunk_start;                             // Start of loop portion
+  size_t chunk_end;                               // End of loop portion
   inline static thread_local bool isChildThread;  // True if on child thread
 
   // Constructor
-  ThreadHandler(const std::vector<ThreadHandler*>& handlers, size_t id)
-      : thread_id(id) {
-    thread = std::thread(&ThreadHandler::runner, this, std::cref(handlers));
-  }
+  ThreadHandler() { thread = std::thread(&ThreadHandler::runner, this); }
 
   // Thread Runner
-  void runner(const std::vector<ThreadHandler*>& parent_container) {
+  void runner() {
     // This is a child thread
     ThreadHandler::isChildThread = true;
     // Handling loop
@@ -75,7 +73,7 @@ class ThreadHandler {
       // at the time the task is run because thread pool size can change
       // while existing threads are running.
       state.store(STATE::RUNNING);
-      task(thread_id, parent_container.size());
+      task(chunk_start, chunk_end);
     }
   }
 
