@@ -816,7 +816,7 @@ TEST(ThreadPool, bad_input) {
     HEXL_UNUSED(threads);
   });
 
-  EXPECT_ANY_THROW(ThreadPoolExecutor::AddParallelJobs(nullptr));
+  EXPECT_ANY_THROW(ThreadPoolExecutor::AddParallelJobs(N_size, nullptr));
 
   EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(0, 0, nullptr, task));
 
