@@ -63,7 +63,6 @@ class ThreadHandler {
         if (elapsed_time(spin_start) > HEXL_THREAD_WAIT_TIME) {
           // Sleep waiting
           wait_for_wakeup();
-          // break;
         }
       }
 

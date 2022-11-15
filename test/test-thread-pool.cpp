@@ -1,6 +1,8 @@
 // Copyright (C) 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
+#ifdef HEXL_MULTI_THREADING
 
+#include "test/test-thread-pool-common.hpp"
 #include "test/test-thread-pool-util.hpp"
 #include "test/test-util.hpp"
 #include "thread-pool/thread-pool-vars-util.hpp"
@@ -8,10 +10,7 @@
 namespace intel {
 namespace hexl {
 
-#ifdef HEXL_MULTI_THREADING
-
-uint64_t number_of_threads = ThreadPoolExecutor::GetNumberOfThreads();
-uint64_t ntt_calls = HEXL_NTT_PARALLEL_DEPTH;
+// Env Variables ***************************************************************
 
 // Testing function that sets number of threads from env variable
 TEST(ThreadPool, setup_num_threads_env_var) {
@@ -89,11 +88,14 @@ TEST(ThreadPool, setup_ntt_calls_env_var) {
   }
 }
 
-// Testing number of threads across different phases
+// Testing number of threads across different phases ***************************
 
 // After setup. Correspond to SetNumberOfThreads.
-TEST(ThreadPool, GetNumberOfThreads_after_setup) {
-  uint64_t nthreads = 2;
+TEST_P(ParallelThreads, GetNumberOfThreads_after_setup) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 
@@ -106,8 +108,11 @@ TEST(ThreadPool, GetNumberOfThreads_after_setup) {
 }
 
 // After stopped. Returns zero.
-TEST(ThreadPool, GetNumberOfThreads_after_stop) {
-  uint64_t nthreads = 2;
+TEST_P(ParallelThreads, GetNumberOfThreads_after_stop) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
@@ -119,7 +124,7 @@ TEST(ThreadPool, GetNumberOfThreads_after_stop) {
 // After running parallel jobs. Without previous setup.
 TEST(ThreadPool, GetNumberOfThreads_after_AddParallelJobs) {
   uint64_t nthreads = 2;
-
+  int N_size = 100;
   ThreadPoolExecutor::SetNumberOfThreads(0);
 
   HEXL_NUM_THREADS = nthreads;
@@ -147,7 +152,7 @@ TEST(ThreadPool, GetNumberOfThreads_after_AddRecursiveCalls) {
 }
 
 // After sleeping. Keep the same value.
-TEST(ThreadPool, GetNumberOfThreads_after_sleep) {
+TEST(ThreadPool, GetNumberOfThreads_after_sleeping) {
   uint64_t nthreads = 2;
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
@@ -162,21 +167,7 @@ TEST(ThreadPool, GetNumberOfThreads_after_sleep) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
-// Using 50% of available threads
-TEST(ThreadPool, GetNumberOfThreads_50p_threads) {
-  uint64_t nthreads =
-      static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.5);
-
-  // Try at 50% of available threads
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), nthreads);
-  ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Test setting number of threads programmatically
+// Test setting number of threads programmatically *****************************
 
 // Overshooting HEXL_NUM_THREADS: Max HW's value is set
 TEST(ThreadPool, SetNumberOfThreads_overshoot) {
@@ -202,8 +193,11 @@ TEST(ThreadPool, SetNumberOfThreads_precedence) {
 }
 
 // Test: N threads get started
-TEST(ThreadPool, SetNumberOfThreads_set) {
-  uint64_t nthreads = 2;
+TEST_P(ParallelThreads, SetNumberOfThreads_state_setup) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
   uint64_t counter = 0;
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
@@ -246,8 +240,11 @@ TEST(ThreadPool, SetNumberOfThreads_set_smaller_value) {
 }
 
 // Test: N threads get to sleep
-TEST(ThreadPool, SetNumberOfThreads_sleeping) {
-  uint64_t nthreads = 2;
+TEST_P(ParallelThreads, SetNumberOfThreads_state_sleeping) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
   uint64_t counter = 0;
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
@@ -266,20 +263,12 @@ TEST(ThreadPool, SetNumberOfThreads_sleeping) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
-// Test threads are deleted
-// Stop ready threads
-TEST(ThreadPool, StopThreads_ready) {
-  uint64_t nthreads = 2;
-
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-  ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), 0);
-}
+// StopThreads *****************************************************************
 
 // Stop done threads after parallel jobs
 TEST(ThreadPool, StopThreads_after_AddParallelJobs) {
   uint64_t nthreads = 2;
-
+  int N_size = 100;
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   ThreadPoolExecutor::AddParallelJobs(N_size, working_task);
   ThreadPoolExecutor::SetNumberOfThreads(0);  // Stop when jobs finish
@@ -308,29 +297,16 @@ TEST(ThreadPool, StopThreads_sleeping) {
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), 0);
 }
 
-// Test synchronization barrier
-TEST(ThreadPool, ImplicitBrriers_setup) {
-  uint64_t nthreads = 2;
-  uint64_t counter = 0;
+// Testing sync barriers *******************************************************
 
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Implicit barrier
-
-  auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  for (auto handler : handlers) {
-    if (handler->state.load() == STATE::DONE ||
-        handler->state.load() == STATE::SLEEPING) {
-      counter++;
-    }
+// Barrier waits until threads are done after parallel jobs
+TEST_P(ParallelThreads, ImplicitBrriers) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
   }
-  ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
 
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Barrier waits 'til threads are done after parallel jobs
-TEST(ThreadPool, ImplicitBrriers_AddParallelJobs) {
-  uint64_t nthreads = 2;
-
+  int N_size = 100;
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
   auto start = std::chrono::steady_clock::now();
@@ -346,15 +322,17 @@ TEST(ThreadPool, ImplicitBrriers_AddParallelJobs) {
 }
 
 // After parallel recursive tasks
-TEST(ThreadPool, ImplicitBrriers_AddRecursiveCalls) {
-  uint64_t nthreads = 2;
+TEST_P(ParallelRecursion, ImplicitBrriers) {
+  uint64_t depth = GetParam();
+  uint64_t nthreads = (1ULL << (depth + 1)) - 2;
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
 
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Implicit barrier
   auto start = std::chrono::steady_clock::now();
-  ThreadPoolExecutor::AddRecursiveCalls(0, 0, working_task, working_task);
+  recursive_calls(work_delay, depth, 0, 0);
   auto end = std::chrono::steady_clock::now();
-
   uint64_t duration =
       std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
           .count();
@@ -364,7 +342,7 @@ TEST(ThreadPool, ImplicitBrriers_AddRecursiveCalls) {
 }
 
 // One thread is sleeping
-TEST(ThreadPool, ImplicitBrriers_Sleeping) {
+TEST(ThreadPool, ImplicitBrriers_1SleepingTask) {
   uint64_t nthreads = 2;
 
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
@@ -372,13 +350,13 @@ TEST(ThreadPool, ImplicitBrriers_Sleeping) {
   auto start = std::chrono::steady_clock::now();
   ThreadPoolExecutor::AddRecursiveCalls(
       0, 0,
-      [](size_t id, size_t threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
+      [](size_t s, size_t e) {
+        HEXL_UNUSED(s);
+        HEXL_UNUSED(e);
       },
-      [](size_t id, size_t threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
+      [](size_t s, size_t e) {
+        HEXL_UNUSED(s);
+        HEXL_UNUSED(e);
         std::this_thread::sleep_for(
             std::chrono::milliseconds(2 * HEXL_THREAD_WAIT_TIME));
       });
@@ -392,36 +370,15 @@ TEST(ThreadPool, ImplicitBrriers_Sleeping) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
-// On nested tasks
-TEST(ThreadPool, ImplicitBrriers_NestedTasks) {
-  uint64_t nthreads = 6;
-
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Implicit barrier
-  auto start = std::chrono::steady_clock::now();
-  ThreadPoolExecutor::AddRecursiveCalls(
-      0, 0,
-      [=](size_t id, size_t threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
-        ThreadPoolExecutor::AddRecursiveCalls(1, 0, working_task, working_task);
-      },
-      [=](size_t id, size_t threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
-        ThreadPoolExecutor::AddRecursiveCalls(1, 1, working_task, working_task);
-      });
-  auto end = std::chrono::steady_clock::now();
-  uint64_t duration =
-      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-          .count();
-  ASSERT_GE(duration, work_delay);
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
+// Parallel Loops **************************************************************
 
 // Test adding parallel loop jobs
-TEST(ThreadPool, AddParallelJob_threads_new) {
-  uint64_t nthreads = 2;
+TEST_P(ParallelThreads, ThreadIDs) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
+  int N_size = 100;
 
   task_ids.clear();
   ThreadPoolExecutor::SetNumberOfThreads(0);
@@ -436,9 +393,9 @@ TEST(ThreadPool, AddParallelJob_threads_new) {
 }
 
 // Test: Add jobs on same thread pool when previous jobs are done
-TEST(ThreadPool, AddParallelJob_threads_done) {
+TEST(ThreadPool, AddParallelJob_after_done) {
   uint64_t nthreads = 2;
-
+  int N_size = 100;
   task_ids.clear();
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   ThreadPoolExecutor::AddParallelJobs(N_size, dummy_task);
@@ -452,9 +409,9 @@ TEST(ThreadPool, AddParallelJob_threads_done) {
 }
 
 // Test: Add jobs when threads are sleeping
-TEST(ThreadPool, AddParallelJob_threads_sleeping) {
+TEST(ThreadPool, AddParallelJob_after_sleeping) {
   uint64_t nthreads = 2;
-
+  int N_size = 100;
   task_ids.clear();
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
@@ -470,7 +427,7 @@ TEST(ThreadPool, AddParallelJob_threads_sleeping) {
 }
 
 // Test: Testing start and end parameters
-TEST(ThreadPool, AddParallelJob_threads_ids_even) {
+TEST(ThreadPool, AddParallelJob_size_even) {
   uint64_t nthreads = 2;
 
   task_ids.clear();
@@ -491,7 +448,7 @@ TEST(ThreadPool, AddParallelJob_threads_ids_even) {
 }
 
 // Test: Testing start and end parameters
-TEST(ThreadPool, AddParallelJob_threads_ids_odd) {
+TEST(ThreadPool, AddParallelJob_size_odd) {
   uint64_t nthreads = 2;
 
   task_ids.clear();
@@ -512,7 +469,7 @@ TEST(ThreadPool, AddParallelJob_threads_ids_odd) {
 }
 
 // Test: Testing start and end parameters
-TEST(ThreadPool, AddParallelJob_threads_ids_small) {
+TEST(ThreadPool, AddParallelJob_size_small) {
   uint64_t nthreads = 2;
 
   task_ids.clear();
@@ -532,38 +489,32 @@ TEST(ThreadPool, AddParallelJob_threads_ids_small) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
-// Test: 50% of available threads
-TEST(ThreadPool, AddParallelJob_50p_threads) {
-  uint64_t nthreads =
-      static_cast<uint64_t>(std::thread::hardware_concurrency() * 0.5);
+// Recursive Calls *************************************************************
 
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  ThreadPoolExecutor::AddParallelJobs(N_size, id_task);
-  task_ids.sort();
-  task_ids.unique();
-  ASSERT_EQ(task_ids.size(), ThreadPoolExecutor::GetNumberOfThreads());
+// Test: Add nested tasks
+TEST_P(ParallelRecursion, ThreadIDs) {
+  uint64_t depth = GetParam();
+  uint64_t nthreads = (1ULL << (depth + 1)) - 2;
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
 
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Test adding parallel tasks
-TEST(ThreadPool, AddRecursiveCalls_threads_new) {
-  uint64_t nthreads = 2;
   task_ids.clear();
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
 
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);  // Setup
-  ThreadPoolExecutor::AddRecursiveCalls(0, 0, id_task, id_task);
+  recursive_calls(0, depth, 0, 0);
+
   task_ids.sort();
+  ASSERT_EQ(task_ids.size(), nthreads + 1);  // calls
   task_ids.unique();
-  ASSERT_EQ(task_ids.size(), nthreads);
+  ASSERT_EQ(task_ids.size(), nthreads + 1);  // threads
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
 // Test: Add tasks on same thread pool when previous jobs are done
 // Using more than available threads
-TEST(ThreadPool, AddRecursiveCalls_threads_done) {
+TEST(ThreadPool, AddRecursiveCalls_after_done) {
   uint64_t nthreads = 2;
   task_ids.clear();
 
@@ -589,28 +540,8 @@ TEST(ThreadPool, AddRecursiveCalls_threads_done) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
-// Test: Add nested tasks. Three level
-TEST(ThreadPool, AddRecursiveCalls_threads_nested) {
-  int depth = 1;
-  uint64_t nthreads = 2;
-  while (nthreads < 6 && nthreads < std::thread::hardware_concurrency()) {
-    task_ids.clear();
-    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-
-    recursive_calls(depth, 0, 0);
-
-    task_ids.sort();
-    ASSERT_EQ(task_ids.size(), nthreads + 1);  // calls
-    task_ids.unique();
-    ASSERT_EQ(task_ids.size(), nthreads + 1);  // threads
-    nthreads = (1ULL << (++depth + 1)) - 2;
-  }
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
 // Test: Add tasks when threads are sleeping.
-TEST(ThreadPool, AddRecursiveCalls_threads_sleeping) {
+TEST(ThreadPool, AddRecursiveCalls_after_sleeping) {
   uint64_t nthreads = 2;
   task_ids.clear();
 
@@ -626,7 +557,7 @@ TEST(ThreadPool, AddRecursiveCalls_threads_sleeping) {
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
 
-// Test thread safety of the thread pool
+// Test thread safety of the thread pool ***************************************
 
 // Parallel Setup
 TEST(ThreadPool, thread_safety_SetNumberOfThreads) {
@@ -650,6 +581,63 @@ TEST(ThreadPool, thread_safety_SetNumberOfThreads) {
   thread_object2.join();
   uint64_t pool_size = ThreadPoolExecutor::GetNumberOfThreads();
   ASSERT_TRUE(pool_size == nthreads || pool_size == nthreads >> 1);
+
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+}
+
+// Test: Add nested tasks.
+TEST_P(ParallelRecursion, Stress) {
+  uint64_t depth = GetParam();
+  uint64_t nthreads = (1ULL << (depth + 1)) - 2;
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
+
+  task_ids.clear();
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+
+  std::thread thread_object1([=]() {
+    for (size_t i = 0; i < m_num_trials; i++) recursive_calls(1, depth, 0, 0);
+  });
+  std::thread thread_object2([=]() {
+    for (size_t i = 0; i < m_num_trials; i++) recursive_calls(1, depth, 0, 0);
+  });
+
+  thread_object1.join();
+  thread_object2.join();
+
+  task_ids.sort();
+  ASSERT_EQ(task_ids.size(), 2 * m_num_trials * (nthreads + 1));  // calls
+  task_ids.unique();
+  ASSERT_EQ(task_ids.size(), nthreads + 2);  // threads
+
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+}
+
+// Test: Add parallel jobs
+TEST_P(ParallelThreads, Stress) {
+  uint64_t nthreads = GetParam();
+  if (nthreads > std::thread::hardware_concurrency()) {
+    GTEST_SKIP();
+  }
+  int N_size = 100;
+  iterations.store(0);
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+
+  std::thread thread_object1([=]() {
+    for (size_t i = 0; i < m_num_trials; i++)
+      ThreadPoolExecutor::AddParallelJobs(N_size, add_iterations);
+  });
+  std::thread thread_object2([=]() {
+    for (size_t i = 0; i < m_num_trials; i++)
+      ThreadPoolExecutor::AddParallelJobs(N_size, add_iterations);
+  });
+
+  thread_object1.join();
+  thread_object2.join();
+
+  ASSERT_EQ(iterations.load(), 2 * m_num_trials * N_size);  // calls
+  task_ids.unique();
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -684,35 +672,6 @@ TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
   task_ids.sort();
   task_ids.unique();
   ASSERT_EQ(task_ids.size(), 3);
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Test: Add nested tasks. Three level
-TEST(ThreadPool, thread_safety_AddRecursiveCalls_stress) {
-  int depth = 1;
-  uint64_t nthreads = 2;
-  int iterations = 1000;
-  while (nthreads < 6 && nthreads < std::thread::hardware_concurrency()) {
-    task_ids.clear();
-    ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-
-    std::thread thread_object1([=]() {
-      for (int i = 0; i < iterations; i++) recursive_calls(depth, 0, 0);
-    });
-    std::thread thread_object2([=]() {
-      for (int i = 0; i < iterations; i++) recursive_calls(depth, 0, 0);
-    });
-
-    thread_object1.join();
-    thread_object2.join();
-
-    task_ids.sort();
-    ASSERT_EQ(task_ids.size(), 2 * iterations * (nthreads + 1));  // calls
-    task_ids.unique();
-    ASSERT_EQ(task_ids.size(), nthreads + 2);  // threads
-    nthreads = (1ULL << (++depth + 1)) - 2;
-  }
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -753,25 +712,27 @@ TEST(ThreadPool, thread_safety_AddParallelJobs) {
   sync.store(2);
   iterations.store(0);
   int N_size = 100;
+  task_ids.clear();
   ThreadPoolExecutor::SetNumberOfThreads(nthreads);
   std::thread thread_object1([=]() {
     sync.fetch_add(-1);
     while (sync) {
     }
-    ThreadPoolExecutor::AddParallelJobs(N_size, add_iterations);
+    ThreadPoolExecutor::AddParallelJobs(N_size, id_task);
   });
   std::thread thread_object2([=]() {
     sync.fetch_add(-1);
     while (sync) {
     }
-    ThreadPoolExecutor::AddParallelJobs(N_size, add_iterations);
+    ThreadPoolExecutor::AddParallelJobs(N_size, id_task);
   });
 
   thread_object1.join();
   thread_object2.join();
 
-  ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), nthreads);
-  ASSERT_EQ(iterations.load(), 2 * N_size);
+  task_ids.sort();
+  task_ids.unique();
+  ASSERT_EQ(task_ids.size(), nthreads + 1);
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -781,9 +742,10 @@ TEST(ThreadPool, thread_safety_AddJobs_n_setup) {
   uint64_t nthreads = 2;
   sync.store(2);
   iterations.store(0);
+  int N_size = 100;
   ThreadPoolExecutor::SetNumberOfThreads(nthreads >> 1);
 
-  std::thread thread_object1([]() {
+  std::thread thread_object1([=]() {
     sync.fetch_add(-1);
     while (sync) {
     }
@@ -803,27 +765,36 @@ TEST(ThreadPool, thread_safety_AddJobs_n_setup) {
   ASSERT_TRUE(pool_size == nthreads || pool_size == nthreads >> 1);
   ASSERT_EQ(iterations.load(), N_size);
 
-  // *** Restore values in last test
-  ThreadPoolExecutor::SetNumberOfThreads(number_of_threads);
-  HEXL_NTT_PARALLEL_DEPTH = ntt_calls;
+  // *** Restore to some values in last test
+  ThreadPoolExecutor::SetNumberOfThreads(2);
+  HEXL_NTT_PARALLEL_DEPTH = 1;
 }
 
+// Test suites *****************************************************************
+INSTANTIATE_TEST_SUITE_P(ThreadPool, ParallelRecursion,
+                         ::testing::Values(0, 1, 2, 3, 4, 5));
+
+INSTANTIATE_TEST_SUITE_P(ThreadPool, ParallelThreads,
+                         ::testing::Values(0, 1, 2, 4, 8, 16, 32, 64));
+
 #ifdef HEXL_DEBUG
-// Testing debug features
+
+// Testing debug features ******************************************************
 TEST(ThreadPool, bad_input) {
   Task task([](int id, int threads) {
     HEXL_UNUSED(id);
     HEXL_UNUSED(threads);
   });
 
-  EXPECT_ANY_THROW(ThreadPoolExecutor::AddParallelJobs(N_size, nullptr));
+  EXPECT_ANY_THROW(ThreadPoolExecutor::AddParallelJobs(0, nullptr));
 
   EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(0, 0, nullptr, task));
 
   EXPECT_ANY_THROW(ThreadPoolExecutor::AddRecursiveCalls(0, 0, task, nullptr));
 }
-#endif
+#endif  // HEXL_DEBUG
 
-#endif
 }  // namespace hexl
 }  // namespace intel
+
+#endif  // HEXL_MULTI_THREADING
