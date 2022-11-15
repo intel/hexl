@@ -37,6 +37,7 @@ set(AVX512_TEST_SRC
     test-eltwise-reduce-mod-avx512.cpp
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
+    test-thread-pool-ntt-avx512.cpp
 )
 
 set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")
