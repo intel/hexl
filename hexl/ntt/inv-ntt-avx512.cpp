@@ -227,14 +227,12 @@ void InvT8_parallel(uint64_t* operand, __m512i v_neg_modulus,
                     __m512i v_twice_mod, uint64_t t, const uint64_t* W,
                     const uint64_t* W_precon, const uint64_t depth,
                     const uint64_t half) {
-  size_t j1 = 0;
-
   ThreadPoolExecutor::AddRecursiveCalls(
       depth, half,
-      [=](int id, int threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
-        uint64_t* X = operand + j1;
+      [=](int s, int e) {
+        HEXL_UNUSED(s);
+        HEXL_UNUSED(e);
+        uint64_t* X = operand;
         uint64_t* Y = X + t;
 
         __m512i v_W = _mm512_set1_epi64(static_cast<int64_t>(*W));
@@ -244,7 +242,7 @@ void InvT8_parallel(uint64_t* operand, __m512i v_neg_modulus,
         __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
 
         // assume 8 | t
-        for (size_t j = t / 8 / 2; j > 0; --j) {
+        for (size_t j = t / 8; j > 0; --j) {
           __m512i v_X = _mm512_loadu_si512(v_X_pt);
           __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
 
@@ -255,9 +253,9 @@ void InvT8_parallel(uint64_t* operand, __m512i v_neg_modulus,
           _mm512_storeu_si512(v_Y_pt++, v_Y);
         }
       },
-      [=](int id, int threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
+      [=](int s, int e) {
+        HEXL_UNUSED(s);
+        HEXL_UNUSED(e);
         auto in_W = W + 1;
         auto in_W_precon = W_precon + 1;
         uint64_t* X = operand + (t << 1);
@@ -271,7 +269,7 @@ void InvT8_parallel(uint64_t* operand, __m512i v_neg_modulus,
         __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
 
         // assume 8 | t
-        for (size_t j = t / 8 / 2; j > 0; --j) {
+        for (size_t j = t / 8; j > 0; --j) {
           __m512i v_X = _mm512_loadu_si512(v_X_pt);
           __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
 
@@ -410,6 +408,7 @@ void InverseTransformFromBitReverseAVX512(
       if (m == 2) {
         const uint64_t* W = &inv_root_of_unity_powers[W_idx];
         const uint64_t* W_precon = &precon_inv_root_of_unity_powers[W_idx];
+
         InvT8_parallel<BitShift>(result, v_neg_modulus, v_twice_mod, t, W,
                                  W_precon, recursion_depth, recursion_half);
         t <<= 1;
