@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include <atomic>
 #include <chrono>
 #include <list>
@@ -15,55 +17,37 @@
 namespace intel {
 namespace hexl {
 
-// Common task
-constexpr uint64_t work_delay = 2;
-constexpr uint64_t N_size = 100;
-std::mutex tasks_mutex;
-std::list<std::thread::id> task_ids;
-std::atomic_int sync;
-std::atomic_int iterations;
-
-void dummy_task(int start, int end) {
-  HEXL_UNUSED(start);
-  HEXL_UNUSED(end);
-}
-
-void working_task(size_t start, size_t end) {
-  HEXL_UNUSED(start);
-  HEXL_UNUSED(end);
-  std::this_thread::sleep_for(std::chrono::milliseconds(work_delay));
-}
-
-void id_task(int start, int end) {
-  HEXL_UNUSED(start);
-  HEXL_UNUSED(end);
-  std::lock_guard<std::mutex> lock(tasks_mutex);
-  task_ids.push_back(std::this_thread::get_id());
-}
-
-void add_iterations(int start, int end) { iterations.fetch_add(end - start); }
-
-void recursive_calls(uint64_t depth, uint64_t level, uint64_t half) {
-  if (level < depth) {
-    ThreadPoolExecutor::AddRecursiveCalls(
-        level, half,
-        [&](int start, int end) {
-          HEXL_UNUSED(start);
-          HEXL_UNUSED(end);
-          recursive_calls(depth, level + 1, 2 * half);
-        },
-        [&](int start, int end) {
-          HEXL_UNUSED(start);
-          HEXL_UNUSED(end);
-          recursive_calls(depth, level + 1, 2 * half + 1);
-        });
+// Parameters = (recursive depth)
+class ParallelRecursion : public ::testing::TestWithParam<uint64_t> {
+ protected:
+  void SetUp() {
+#ifdef HEXL_DEBUG
+    m_num_trials = 1;
+#else
+    m_num_trials = 1000;
+#endif
   }
-  {
-    std::lock_guard<std::mutex> lock(tasks_mutex);
-    task_ids.push_back(std::this_thread::get_id());
-    std::this_thread::sleep_for(std::chrono::microseconds(1));
+  void TearDown() {}
+
+ public:
+  uint64_t m_num_trials;
+};
+
+// Parameters = (number of threads)
+class ParallelThreads : public ::testing::TestWithParam<uint64_t> {
+ protected:
+  void SetUp() {
+#ifdef HEXL_DEBUG
+    m_num_trials = 1;
+#else
+    m_num_trials = 1000;
+#endif
   }
-}
+  void TearDown() {}
+
+ public:
+  uint64_t m_num_trials;
+};
 
 }  // namespace hexl
 }  // namespace intel

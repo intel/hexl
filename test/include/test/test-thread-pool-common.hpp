@@ -12,6 +12,8 @@
 #include "hexl/util/check.hpp"
 #include "thread-pool/thread-pool-executor.hpp"
 
+#ifdef HEXL_MULTI_THREADING
+
 namespace intel {
 namespace hexl {
 
@@ -76,3 +78,5 @@ static void recursive_calls(uint64_t delay, uint64_t depth, uint64_t level,
 
 }  // namespace hexl
 }  // namespace intel
+
+#endif  // HEXL_MULTI_THREADING
