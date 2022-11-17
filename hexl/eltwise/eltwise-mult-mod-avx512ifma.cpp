@@ -339,50 +339,43 @@ template <int ProdRightShift, int InputModFactor>
 void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
     __m512i v_barr_lo, __m512i v_modulus, __m512i v_neg_mod,
-    __m512i v_twice_mod, uint64_t n) {
-  HEXL_UNUSED(v_twice_mod);
-  ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
-    auto in_vp_operand1 = vp_operand1 + start;
-    auto in_vp_operand2 = vp_operand2 + start;
-    auto in_vp_result = vp_result + start;
-    auto in_v_twice_mod = v_twice_mod;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = start; i < end; ++i) {
-      __m512i v_op1 = _mm512_loadu_si512(in_vp_operand1);
-      v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
-                                                          &in_v_twice_mod);
+    __m512i v_twice_mod, size_t start, size_t end) {
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = start; i < end; ++i) {
+    __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
+    v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
+                                                        &v_twice_mod);
 
-      __m512i v_op2 = _mm512_loadu_si512(in_vp_operand2);
-      v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
-                                                          &in_v_twice_mod);
+    __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
+    v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
+                                                        &v_twice_mod);
 
-      // Compute product U
-      __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
-      __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
+    // Compute product U
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
-      // c1 = floor(U / 2^{n + beta})
-      __m512i c1_lo = _mm512_srli_epi64(
-          v_prod_lo, static_cast<unsigned int>(ProdRightShift));
-      __m512i c1_hi = _mm512_slli_epi64(
-          v_prod_hi, static_cast<unsigned int>(52ULL - (ProdRightShift)));
-      __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
+    // c1 = floor(U / 2^{n + beta})
+    __m512i c1_lo =
+        _mm512_srli_epi64(v_prod_lo, static_cast<unsigned int>(ProdRightShift));
+    __m512i c1_hi = _mm512_slli_epi64(
+        v_prod_hi, static_cast<unsigned int>(52ULL - (ProdRightShift)));
+    __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
-      // alpha - beta == 52, so we only need high 52 bits
-      __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
+    // alpha - beta == 52, so we only need high 52 bits
+    __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
 
-      // Z = prod_lo - (p * q_hat)_lo
-      __m512i v_result =
-          _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, q_hat, v_neg_mod);
+    // Z = prod_lo - (p * q_hat)_lo
+    __m512i v_result =
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, q_hat, v_neg_mod);
 
-      // Reduce result to [0, q)
-      v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
-      _mm512_storeu_si512(in_vp_result, v_result);
+    // Reduce result to [0, q)
+    v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
+    _mm512_storeu_si512(vp_result, v_result);
 
-      ++in_vp_operand1;
-      ++in_vp_operand2;
-      ++in_vp_result;
-    }
-  });
+    ++vp_operand1;
+    ++vp_operand2;
+    ++vp_result;
+  }
 }
 
 // Algorithm 2 from https://homes.esat.kuleuven.be/~fvercaut/papers/bar_mont.pdf
@@ -390,51 +383,44 @@ template <int InputModFactor>
 void EltwiseMultModAVX512IFMAIntLoopDefault(
     __m512i* vp_result, const __m512i* vp_operand1, const __m512i* vp_operand2,
     __m512i v_barr_lo, __m512i v_modulus, __m512i v_neg_mod,
-    __m512i v_twice_mod, uint64_t n, uint64_t prod_right_shift) {
+    __m512i v_twice_mod, uint64_t prod_right_shift, size_t start, size_t end) {
   unsigned int low_shift = static_cast<unsigned int>(prod_right_shift);
   unsigned int high_shift = static_cast<unsigned int>(52 - prod_right_shift);
 
-  HEXL_UNUSED(v_twice_mod);
-  ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
-    auto in_vp_operand1 = vp_operand1 + start;
-    auto in_vp_operand2 = vp_operand2 + start;
-    auto in_vp_result = vp_result + start;
-    auto in_v_twice_mod = v_twice_mod;
-    HEXL_LOOP_UNROLL_4
-    for (size_t i = start; i < end; ++i) {
-      __m512i v_op1 = _mm512_loadu_si512(in_vp_operand1);
-      v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
-                                                          &in_v_twice_mod);
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = start; i < end; ++i) {
+    __m512i v_op1 = _mm512_loadu_si512(vp_operand1);
+    v_op1 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op1, v_modulus,
+                                                        &v_twice_mod);
 
-      __m512i v_op2 = _mm512_loadu_si512(in_vp_operand2);
-      v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
-                                                          &in_v_twice_mod);
+    __m512i v_op2 = _mm512_loadu_si512(vp_operand2);
+    v_op2 = _mm512_hexl_small_mod_epu64<InputModFactor>(v_op2, v_modulus,
+                                                        &v_twice_mod);
 
-      // Compute product
-      __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
-      __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
+    // Compute product
+    __m512i v_prod_hi = _mm512_hexl_mulhi_epi<52>(v_op1, v_op2);
+    __m512i v_prod_lo = _mm512_hexl_mullo_epi<52>(v_op1, v_op2);
 
-      __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, low_shift);
-      __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, high_shift);
-      __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
+    __m512i c1_lo = _mm512_srli_epi64(v_prod_lo, low_shift);
+    __m512i c1_hi = _mm512_slli_epi64(v_prod_hi, high_shift);
+    __m512i c1 = _mm512_or_epi64(c1_lo, c1_hi);
 
-      // alpha - beta == 52, so we only need high 52 bits
-      __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
+    // alpha - beta == 52, so we only need high 52 bits
+    __m512i q_hat = _mm512_hexl_mulhi_epi<52>(c1, v_barr_lo);
 
-      // z = prod_lo - (p * q_hat)_lo
-      __m512i v_result =
-          _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, q_hat, v_neg_mod);
+    // z = prod_lo - (p * q_hat)_lo
+    __m512i v_result =
+        _mm512_hexl_mullo_add_lo_epi<52>(v_prod_lo, q_hat, v_neg_mod);
 
-      // Reduce result to [0, q)
-      v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
+    // Reduce result to [0, q)
+    v_result = _mm512_hexl_small_mod_epu64<2>(v_result, v_modulus);
 
-      _mm512_storeu_si512(in_vp_result, v_result);
+    _mm512_storeu_si512(vp_result, v_result);
 
-      ++in_vp_operand1;
-      ++in_vp_operand2;
-      ++in_vp_result;
-    }
-  });
+    ++vp_operand1;
+    ++vp_operand2;
+    ++vp_result;
+  }
 }
 
 template <int ProdRightShift, int InputModFactor>
@@ -488,9 +474,11 @@ void EltwiseMultModAVX512IFMAIntLoop(__m512i* vp_result,
       break;
     }
     default:
-      EltwiseMultModAVX512IFMAIntLoopDefault<ProdRightShift, InputModFactor>(
-          vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus, v_neg_mod,
-          v_twice_mod, n);
+      ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
+        EltwiseMultModAVX512IFMAIntLoopDefault<ProdRightShift, InputModFactor>(
+            vp_result + start, vp_operand1 + start, vp_operand2 + start,
+            v_barr_lo, v_modulus, v_neg_mod, v_twice_mod, start, end);
+      });
   }
 }
 
@@ -620,9 +608,13 @@ void EltwiseMultModAVX512IFMAInt(uint64_t* result, const uint64_t* operand1,
       // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(50, 1)
       // ELTWISE_MULT_MOD_AVX512_IFMA_INT_PROD_RIGHT_SHIFT_CASE(51, 1)
       default: {
-        EltwiseMultModAVX512IFMAIntLoopDefault<1>(
-            vp_result, vp_operand1, vp_operand2, v_barr_lo, v_modulus,
-            v_neg_mod, v_twice_mod, n, prod_right_shift);
+        ThreadPoolExecutor::AddParallelJobs(
+            n / 8, [=](size_t start, size_t end) {
+              EltwiseMultModAVX512IFMAIntLoopDefault<1>(
+                  vp_result + start, vp_operand1 + start, vp_operand2 + start,
+                  v_barr_lo, v_modulus, v_neg_mod, v_twice_mod,
+                  prod_right_shift, start, end);
+            });
       }
     }
   }
