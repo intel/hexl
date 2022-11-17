@@ -1,11 +1,12 @@
 // Copyright (C) 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-#ifdef HEXL_MULTI_THREADING
 
 #include "test/test-thread-pool-common.hpp"
 #include "test/test-thread-pool-util.hpp"
 #include "test/test-util.hpp"
 #include "thread-pool/thread-pool-vars-util.hpp"
+
+#ifdef HEXL_MULTI_THREADING
 
 namespace intel {
 namespace hexl {
