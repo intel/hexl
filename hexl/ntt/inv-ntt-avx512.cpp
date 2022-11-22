@@ -282,6 +282,67 @@ void InvT8_parallel(uint64_t* operand, __m512i v_neg_modulus,
       });
 }
 
+// Merge final InvNTT loop with modulus reduction baked-in
+template <int BitShift>
+void final_InvNTT_loop_mod_reduction(__m512i* v_X_pt, __m512i* v_Y_pt,
+                                     __m512i v_twice_mod, __m512i v_inv_n,
+                                     __m512i v_inv_n_prime, __m512i v_inv_n_w,
+                                     __m512i v_inv_n_w_prime, __m512i v_modulus,
+                                     __m512i v_neg_modulus,
+                                     uint64_t output_mod_factor, size_t start,
+                                     size_t end) {
+  HEXL_LOOP_UNROLL_4
+  for (size_t j = start; j < end; ++j) {
+    __m512i v_X = _mm512_loadu_si512(v_X_pt);
+    __m512i v_Y = _mm512_loadu_si512(v_Y_pt);
+
+    // Slightly different from regular InvButterfly because different W is
+    // used for X and Y
+    __m512i Y_minus_2q = _mm512_sub_epi64(v_Y, v_twice_mod);
+    __m512i X_plus_Y_mod2q =
+        _mm512_hexl_small_add_mod_epi64(v_X, v_Y, v_twice_mod);
+    // T = *X + twice_mod - *Y
+    __m512i T = _mm512_sub_epi64(v_X, Y_minus_2q);
+
+    if (BitShift == 32) {
+      __m512i Q1 = _mm512_hexl_mullo_epi<64>(v_inv_n_prime, X_plus_Y_mod2q);
+      Q1 = _mm512_srli_epi64(Q1, 32);
+      // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
+      __m512i inv_N_tx = _mm512_hexl_mullo_epi<64>(v_inv_n, X_plus_Y_mod2q);
+      v_X = _mm512_hexl_mullo_add_lo_epi<64>(inv_N_tx, Q1, v_neg_modulus);
+
+      __m512i Q2 = _mm512_hexl_mullo_epi<64>(v_inv_n_w_prime, T);
+      Q2 = _mm512_srli_epi64(Q2, 32);
+
+      // Y = inv_N_W * T - Q2 * modulus;
+      __m512i inv_N_W_T = _mm512_hexl_mullo_epi<64>(v_inv_n_w, T);
+      v_Y = _mm512_hexl_mullo_add_lo_epi<64>(inv_N_W_T, Q2, v_neg_modulus);
+    } else {
+      __m512i Q1 =
+          _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
+      // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
+      __m512i inv_N_tx =
+          _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
+      v_X = _mm512_hexl_mullo_add_lo_epi<BitShift>(inv_N_tx, Q1, v_neg_modulus);
+
+      __m512i Q2 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_w_prime, T);
+      // Y = inv_N_W * T - Q2 * modulus;
+      __m512i inv_N_W_T = _mm512_hexl_mullo_epi<BitShift>(v_inv_n_w, T);
+      v_Y =
+          _mm512_hexl_mullo_add_lo_epi<BitShift>(inv_N_W_T, Q2, v_neg_modulus);
+    }
+
+    if (output_mod_factor == 1) {
+      // Modulus reduction from [0, 2q), to [0, q)
+      v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
+      v_Y = _mm512_hexl_small_mod_epu64(v_Y, v_modulus);
+    }
+
+    _mm512_storeu_si512(v_X_pt++, v_X);
+    _mm512_storeu_si512(v_Y_pt++, v_Y);
+  }
+}
+
 template <int BitShift>
 void InverseTransformFromBitReverseAVX512(
     uint64_t* result, const uint64_t* operand, uint64_t n, uint64_t modulus,
@@ -476,60 +537,10 @@ void InverseTransformFromBitReverseAVX512(
     __m512i* v_X_pt = reinterpret_cast<__m512i*>(X);
     __m512i* v_Y_pt = reinterpret_cast<__m512i*>(Y);
     ThreadPoolExecutor::AddParallelJobs(n / 16, [=](size_t start, size_t end) {
-      auto in_v_X_pt = v_X_pt + start;
-      auto in_v_Y_pt = v_Y_pt + start;
-      // Merge final InvNTT loop with modulus reduction baked-in
-      HEXL_LOOP_UNROLL_4
-      for (size_t j = start; j < end; ++j) {
-        __m512i v_X = _mm512_loadu_si512(in_v_X_pt);
-        __m512i v_Y = _mm512_loadu_si512(in_v_Y_pt);
-
-        // Slightly different from regular InvButterfly because different W is
-        // used for X and Y
-        __m512i Y_minus_2q = _mm512_sub_epi64(v_Y, v_twice_mod);
-        __m512i X_plus_Y_mod2q =
-            _mm512_hexl_small_add_mod_epi64(v_X, v_Y, v_twice_mod);
-        // T = *X + twice_mod - *Y
-        __m512i T = _mm512_sub_epi64(v_X, Y_minus_2q);
-
-        if (BitShift == 32) {
-          __m512i Q1 = _mm512_hexl_mullo_epi<64>(v_inv_n_prime, X_plus_Y_mod2q);
-          Q1 = _mm512_srli_epi64(Q1, 32);
-          // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
-          __m512i inv_N_tx = _mm512_hexl_mullo_epi<64>(v_inv_n, X_plus_Y_mod2q);
-          v_X = _mm512_hexl_mullo_add_lo_epi<64>(inv_N_tx, Q1, v_neg_modulus);
-
-          __m512i Q2 = _mm512_hexl_mullo_epi<64>(v_inv_n_w_prime, T);
-          Q2 = _mm512_srli_epi64(Q2, 32);
-
-          // Y = inv_N_W * T - Q2 * modulus;
-          __m512i inv_N_W_T = _mm512_hexl_mullo_epi<64>(v_inv_n_w, T);
-          v_Y = _mm512_hexl_mullo_add_lo_epi<64>(inv_N_W_T, Q2, v_neg_modulus);
-        } else {
-          __m512i Q1 =
-              _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_prime, X_plus_Y_mod2q);
-          // X = inv_N * X_plus_Y_mod2q - Q1 * modulus;
-          __m512i inv_N_tx =
-              _mm512_hexl_mullo_epi<BitShift>(v_inv_n, X_plus_Y_mod2q);
-          v_X = _mm512_hexl_mullo_add_lo_epi<BitShift>(inv_N_tx, Q1,
-                                                       v_neg_modulus);
-
-          __m512i Q2 = _mm512_hexl_mulhi_epi<BitShift>(v_inv_n_w_prime, T);
-          // Y = inv_N_W * T - Q2 * modulus;
-          __m512i inv_N_W_T = _mm512_hexl_mullo_epi<BitShift>(v_inv_n_w, T);
-          v_Y = _mm512_hexl_mullo_add_lo_epi<BitShift>(inv_N_W_T, Q2,
-                                                       v_neg_modulus);
-        }
-
-        if (output_mod_factor == 1) {
-          // Modulus reduction from [0, 2q), to [0, q)
-          v_X = _mm512_hexl_small_mod_epu64(v_X, v_modulus);
-          v_Y = _mm512_hexl_small_mod_epu64(v_Y, v_modulus);
-        }
-
-        _mm512_storeu_si512(in_v_X_pt++, v_X);
-        _mm512_storeu_si512(in_v_Y_pt++, v_Y);
-      }
+      final_InvNTT_loop_mod_reduction<BitShift>(
+          v_X_pt + start, v_Y_pt + start, v_twice_mod, v_inv_n, v_inv_n_prime,
+          v_inv_n_w, v_inv_n_w_prime, v_modulus, v_neg_modulus,
+          output_mod_factor, start, end);
     });
     HEXL_VLOG(5, "AVX512 returning result "
                      << std::vector<uint64_t>(result, result + n));

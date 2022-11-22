@@ -70,6 +70,23 @@ void EltwiseSubModAVX512(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
 }
 
+void EltwiseSubModAVX512_loop(__m512i* vp_result, const __m512i* vp_operand1,
+                              __m512i v_operand2, __m512i v_modulus,
+                              size_t start, size_t end) {
+  HEXL_LOOP_UNROLL_4
+  for (size_t i = start; i < end; ++i) {
+    __m512i v_operand1 = _mm512_loadu_si512(vp_operand1);
+
+    __m512i v_result =
+        _mm512_hexl_small_sub_mod_epi64(v_operand1, v_operand2, v_modulus);
+
+    _mm512_storeu_si512(vp_result, v_result);
+
+    ++vp_result;
+    ++vp_operand1;
+  }
+}
+
 void EltwiseSubModAVX512(uint64_t* result, const uint64_t* operand1,
                          uint64_t operand2, uint64_t n, uint64_t modulus) {
   HEXL_CHECK(result != nullptr, "Require result != nullptr");
@@ -97,21 +114,8 @@ void EltwiseSubModAVX512(uint64_t* result, const uint64_t* operand1,
   ThreadPoolExecutor::AddParallelJobs(
       n / 8, [vp_result, vp_operand1, v_operand2, v_modulus](size_t start,
                                                              size_t end) {
-        auto in_vp_result = vp_result + start;
-        auto in_vp_operand1 = vp_operand1 + start;
-
-        HEXL_LOOP_UNROLL_4
-        for (size_t i = start; i < end; ++i) {
-          __m512i v_operand1 = _mm512_loadu_si512(in_vp_operand1);
-
-          __m512i v_result = _mm512_hexl_small_sub_mod_epi64(
-              v_operand1, v_operand2, v_modulus);
-
-          _mm512_storeu_si512(in_vp_result, v_result);
-
-          ++in_vp_result;
-          ++in_vp_operand1;
-        }
+        EltwiseSubModAVX512_loop(vp_result + start, vp_operand1 + start,
+                                 v_operand2, v_modulus, start, end);
       });
 
   HEXL_CHECK_BOUNDS(result, n, modulus, "result exceeds bound " << modulus);
