@@ -229,10 +229,11 @@ class ThreadPool {
       setup_done = false;
     } else {
       HEXL_VLOG(3, "Thread Pool Info:");
-      HEXL_VLOG(3, "HEXL_NUM_THREADS        = " << HEXL_NUM_THREADS);
-      HEXL_VLOG(3, "HEXL_NTT_PARALLEL_DEPTH = " << HEXL_NTT_PARALLEL_DEPTH);
-      HEXL_VLOG(3, "HW Threads              = "
-                       << std::thread::hardware_concurrency());
+      HEXL_VLOG(3, "Env num threads    = " << env_num_threads);
+      HEXL_VLOG(3, "Env parallel depth = " << env_parallel_depth);
+      HEXL_VLOG(3,
+                "HW Threads         = " << std::thread::hardware_concurrency());
+      HEXL_VLOG(3, "Setting up for " << n_threads << " threads.");
       setup_done = true;
     }
 
