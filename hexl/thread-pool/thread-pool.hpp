@@ -31,9 +31,7 @@ class ThreadPool {
   }
 
   // GetParallelDepth: Returns parallel recursive depth limit
-  size_t GetParallelDepth() const {
-    return parallel_depth;
-  }
+  size_t GetParallelDepth() const { return parallel_depth; }
 
   // AddParallelJobs: Runs the same function on a total number of threads
   void AddParallelJobs(size_t N, Task job) {
