@@ -47,8 +47,7 @@ TEST_P(ParallelNTTCalls, Stress) {
     }
   };
 
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  HEXL_NTT_PARALLEL_DEPTH = depth;
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads, depth);
 
   std::thread thread_object1(NTTCall);
   std::thread thread_object2(NTTCall);
@@ -57,7 +56,6 @@ TEST_P(ParallelNTTCalls, Stress) {
   thread_object2.join();
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
-  HEXL_NTT_PARALLEL_DEPTH = 1;
 }
 
 INSTANTIATE_TEST_SUITE_P(ThreadPool, ParallelNTTCalls,

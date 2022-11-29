@@ -4,7 +4,6 @@
 #include "test/test-thread-pool-common.hpp"
 #include "test/test-thread-pool-util.hpp"
 #include "test/test-util.hpp"
-#include "thread-pool/thread-pool-vars-util.hpp"
 
 #ifdef HEXL_MULTI_THREADING
 
@@ -15,23 +14,25 @@ namespace hexl {
 
 // Testing function that sets number of threads from env variable
 TEST(ThreadPool, setup_num_threads_env_var) {
-  // Max or default value result
-  auto max_or_default = std::min<uint64_t>(HEXL_DEFAULT_NUM_THREADS,
-                                           std::thread::hardware_concurrency());
+  int N_size = 100;
 
   // Overshooting: Max HW's value is set
   {
     char env[] = "HEXL_NUM_THREADS=999999";
     putenv(env);
-    auto value = setup_num_threads("HEXL_NUM_THREADS");
+    ThreadPool myTP;
+    myTP.AddParallelJobs(N_size, dummy_task);
+    auto value = myTP.GetNumThreads();
     ASSERT_EQ(value, std::thread::hardware_concurrency());
   }
 
-  // Wanted value is set
+  // Wanted value is set parallel jobs
   {
     char env[] = "HEXL_NUM_THREADS=2";
     putenv(env);
-    auto value = setup_num_threads("HEXL_NUM_THREADS");
+    ThreadPool myTP;
+    myTP.AddParallelJobs(N_size, dummy_task);
+    auto value = myTP.GetNumThreads();
     ASSERT_EQ(value, 2);
   }
 
@@ -39,53 +40,88 @@ TEST(ThreadPool, setup_num_threads_env_var) {
   {
     char env[] = "HEXL_NUM_THREADS=1.5";
     putenv(env);
-    auto value = setup_num_threads("HEXL_NUM_THREADS");
+    ThreadPool myTP;
+    myTP.AddParallelJobs(N_size, dummy_task);
+    auto value = myTP.GetNumThreads();
     ASSERT_EQ(value, 1);
   }
 
-  // Undefined: Default value is set
+  // Wanted value is set recursive tasks
+  {
+    char env[] = "HEXL_NUM_THREADS=2";
+    putenv(env);
+    ThreadPool myTP;
+    myTP.AddRecursiveCalls(0, 0, dummy_task, dummy_task);
+    auto value = myTP.GetNumThreads();
+    ASSERT_EQ(value, 2);
+  }
+
+  // Undefined: Some default value > 0 is set
   {
     char env[] = "HEXL_NUM_THREADS";
     putenv(env);
-    auto value = setup_num_threads("HEXL_NUM_THREADS");
-    ASSERT_EQ(value, max_or_default);
+    ThreadPool myTP;
+    myTP.AddParallelJobs(N_size, dummy_task);
+    auto value = myTP.GetNumThreads();
+    ASSERT_GT(value, 0);
+    ASSERT_LE(value, std::thread::hardware_concurrency());
+  }
+
+  // SetupThreadPool precedence over env var
+  {
+    size_t nthreads = 2;
+    char env[] = "HEXL_NUM_THREADS=1";
+    putenv(env);
+    ThreadPool myTP;
+    myTP.SetupThreadPool(nthreads);
+    auto value = myTP.GetNumThreads();
+    ASSERT_EQ(value, nthreads);
   }
 }
 
 // Testing function that sets number of parallel ntt calls from env variable
 TEST(ThreadPool, setup_ntt_calls_env_var) {
-  HEXL_NUM_THREADS = 2;
+  size_t threads = 2;
 
   // Wanted value is set
   {
     char env[] = "HEXL_NTT_PARALLEL_DEPTH=1";
     putenv(env);
-    auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
+    ThreadPool myTP;
+    myTP.SetupThreadPool(threads);
+    auto value = myTP.GetParallelDepth();
     ASSERT_EQ(value, 1);
   }
 
-  // Overshooting HEXL_NTT_PARALLEL_DEPTH: Zero is set
-  {
-    char env[] = "HEXL_NTT_PARALLEL_DEPTH=999999999";
-    putenv(env);
-    auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
-    ASSERT_EQ(value, 0);
-  }
-
-  // Undefined: Default value is set
+  // Undefined: Some default value > 0 is set
   {
     char env[] = "HEXL_NTT_PARALLEL_DEPTH";
     putenv(env);
-    auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
-    ASSERT_EQ(value, HEXL_DEFAULT_NTT_PARALLEL_DEPTH);
+    ThreadPool myTP;
+    myTP.SetupThreadPool(threads);
+    auto value = myTP.GetParallelDepth();
+    ASSERT_GT(value, 0);
   }
 
   // Floating point: Rounded value is set
   {
     char env[] = "HEXL_NTT_PARALLEL_DEPTH=1.5";
     putenv(env);
-    auto value = setup_ntt_calls("HEXL_NTT_PARALLEL_DEPTH");
+    ThreadPool myTP;
+    myTP.SetupThreadPool(threads);
+    auto value = myTP.GetParallelDepth();
     ASSERT_EQ(value, 1);
+  }
+
+  // SetupThreadPool precedence over env var
+  {
+    size_t depth = 2;
+    char env[] = "HEXL_NTT_PARALLEL_DEPTH=1";
+    putenv(env);
+    ThreadPool myTP;
+    myTP.SetupThreadPool(threads, depth);
+    auto value = myTP.GetParallelDepth();
+    ASSERT_EQ(value, depth);
   }
 }
 
@@ -122,36 +158,6 @@ TEST_P(ParallelThreads, GetNumberOfThreads_after_stop) {
   ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
 }
 
-// After running parallel jobs. Without previous setup.
-TEST(ThreadPool, GetNumberOfThreads_after_AddParallelJobs) {
-  uint64_t nthreads = 2;
-  int N_size = 100;
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-
-  HEXL_NUM_THREADS = nthreads;
-  ThreadPoolExecutor::AddParallelJobs(N_size, dummy_task);
-  auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), nthreads);
-  ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// After running AddRecursiveCalls. Without previous setup.
-TEST(ThreadPool, GetNumberOfThreads_after_AddRecursiveCalls) {
-  uint64_t nthreads = 2;
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-
-  HEXL_NUM_THREADS = nthreads;
-  ThreadPoolExecutor::AddRecursiveCalls(0, 0, dummy_task, dummy_task);
-  auto handlers = ThreadPoolExecutor::GetThreadHandlers();
-  ASSERT_EQ(handlers.size(), nthreads);
-  ASSERT_EQ(ThreadPoolExecutor::GetNumberOfThreads(), handlers.size());
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
 // After sleeping. Keep the same value.
 TEST(ThreadPool, GetNumberOfThreads_after_sleeping) {
   uint64_t nthreads = 2;
@@ -170,25 +176,11 @@ TEST(ThreadPool, GetNumberOfThreads_after_sleeping) {
 
 // Test setting number of threads programmatically *****************************
 
-// Overshooting HEXL_NUM_THREADS: Max HW's value is set
+// Overshooting: Max HW's value is set
 TEST(ThreadPool, SetNumberOfThreads_overshoot) {
   ThreadPoolExecutor::SetNumberOfThreads(999999999);
   auto value = ThreadPoolExecutor::GetNumberOfThreads();
   ASSERT_EQ(value, std::thread::hardware_concurrency());
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-}
-
-// Precedence over env variable
-TEST(ThreadPool, SetNumberOfThreads_precedence) {
-  uint64_t nthreads = 2;
-
-  ThreadPoolExecutor::SetNumberOfThreads(0);
-
-  HEXL_NUM_THREADS = nthreads >> 1;
-  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
-  auto value = ThreadPoolExecutor::GetNumberOfThreads();
-  ASSERT_EQ(value, nthreads);
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -260,6 +252,20 @@ TEST_P(ParallelThreads, SetNumberOfThreads_state_sleeping) {
     }
   }
   ASSERT_EQ(counter, ThreadPoolExecutor::GetNumberOfThreads());
+
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+}
+
+// Test setting number of threads and depth programmatically *******************
+
+// Specified value is set
+TEST(ThreadPool, SetNumberOfThreadsAndDepth) {
+  size_t nthreads = 2;
+  ThreadPoolExecutor::SetNumberOfThreads(nthreads);
+  auto current_value = ThreadPoolExecutor::GetParallelDepth();
+  ThreadPoolExecutor::SetNumberOfThreadsAndDepth(nthreads, current_value << 1);
+  auto value = ThreadPoolExecutor::GetParallelDepth();
+  ASSERT_EQ(value, current_value << 1);
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
 }
@@ -679,9 +685,11 @@ TEST(ThreadPool, thread_safety_AddRecursiveCalls) {
 
 // Add task & stop threads in parallel
 TEST(ThreadPool, thread_safety_AddJobs_n_stop) {
-  HEXL_NUM_THREADS = 2;
   sync.store(2);
   task_ids.clear();
+  ThreadPoolExecutor::SetNumberOfThreads(0);
+  ThreadPoolExecutor::AddRecursiveCalls(0, 0, dummy_task, dummy_task);
+  auto threads = ThreadPoolExecutor::GetNumberOfThreads();
   ThreadPoolExecutor::SetNumberOfThreads(0);
 
   std::thread thread_object1([]() {
@@ -701,7 +709,7 @@ TEST(ThreadPool, thread_safety_AddJobs_n_stop) {
   thread_object2.join();
 
   uint64_t pool_size = ThreadPoolExecutor::GetNumberOfThreads();
-  ASSERT_TRUE(pool_size == 0 || pool_size == HEXL_NUM_THREADS);
+  ASSERT_TRUE(pool_size == 0 || pool_size == threads);
   ASSERT_EQ(task_ids.size(), 2);
 
   ThreadPoolExecutor::SetNumberOfThreads(0);
@@ -768,7 +776,7 @@ TEST(ThreadPool, thread_safety_AddJobs_n_setup) {
 
   // *** Restore to some values in last test
   ThreadPoolExecutor::SetNumberOfThreads(2);
-  HEXL_NTT_PARALLEL_DEPTH = 1;
+  // HEXL_NTT_PARALLEL_DEPTH = 1;
 }
 
 // Test suites *****************************************************************

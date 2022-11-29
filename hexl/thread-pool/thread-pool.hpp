@@ -16,14 +16,24 @@ class ThreadPool {
  public:
   // Methods
 
-  ThreadPool() { ThreadHandler::isChildThread = false; }
+  ThreadPool() {
+    ThreadHandler::isChildThread = false;
+    env_num_threads = GetNumThreadsEnvValue("HEXL_NUM_THREADS");
+    env_parallel_depth = GetParallelDepthEnvValue("HEXL_NTT_PARALLEL_DEPTH");
+  }
 
-  ~ThreadPool() { SetupThreads(0); }
+  ~ThreadPool() { SetupThreadPool(0); }
 
   // GetNumThreads: Returns total number of threads
   size_t GetNumThreads() const {
     std::lock_guard<std::mutex> lock(pool_mutex);
     return thread_handlers.size();
+  }
+
+  // GetParallelDepth: Returns parallel recursive depth limit
+  size_t GetParallelDepth() const {
+    std::lock_guard<std::mutex> lock(pool_mutex);
+    return parallel_depth;
   }
 
   // AddParallelJobs: Runs the same function on a total number of threads
@@ -32,9 +42,9 @@ class ThreadPool {
 
     // Try using thread pool
     if (pool_mutex.try_lock()) {
-      if (!setup_done) {
-        SetupThreads_Unlocked(
-            HEXL_NUM_THREADS);  // Setup if thread pool is down
+      if (!setup_done) {  // Setup if thread pool is down
+        parallel_depth = env_parallel_depth;
+        SetupThreads_Unlocked(env_num_threads);
       }
 
       const size_t t_threads = thread_handlers.size();
@@ -92,8 +102,9 @@ class ThreadPool {
       }
     }
 
-    if (!setup_done) {
-      SetupThreads_Unlocked(HEXL_NUM_THREADS);  // Setup if thread pool down
+    if (!setup_done) {  // Setup if thread pool is down
+      parallel_depth = env_parallel_depth;
+      SetupThreads_Unlocked(env_num_threads);
     }
 
     const size_t t_threads = thread_handlers.size();
@@ -149,9 +160,19 @@ class ThreadPool {
     }
   }
 
-  // SetupThreads: Spawns new threads if necessary
-  void SetupThreads(size_t n_threads) {
+  // SetupThreads: Spawns or remove threads if necessary and sets parallel
+  // recursive depth
+  void SetupThreadPool(size_t n_threads) {
     std::lock_guard<std::mutex> lock(pool_mutex);
+    parallel_depth = env_parallel_depth;
+    SetupThreads_Unlocked(n_threads);
+  }
+
+  // SetupThreads: Spawns or remove threads if necessary and sets parallel
+  // recursive depth
+  void SetupThreadPool(size_t n_threads, size_t depth) {
+    std::lock_guard<std::mutex> lock(pool_mutex);
+    parallel_depth = depth;
     SetupThreads_Unlocked(n_threads);
   }
 
@@ -165,9 +186,14 @@ class ThreadPool {
 
  private:
   // Properties
-  std::vector<ThreadHandler*> thread_handlers;  // Thread's info
-  mutable std::mutex pool_mutex;                // Control pool's edition
-  bool setup_done = false;                      // Is thread pool initialized
+
+  // Defaults gave best results for 65K vectors on ICX machine
+  size_t env_num_threads = 8;     // Env variable value for number of threads
+  size_t env_parallel_depth = 2;  // Env variable value for parallel depth
+  size_t parallel_depth;          // Controls depth of parallel recursive calls
+  std::vector<ThreadHandler*> thread_handlers;  // Contains handlers of threads
+  mutable std::mutex pool_mutex;  // Controls Thread Pool's modifications
+  bool setup_done = false;        // True if thread pool was initialized
 
   // Methods
 
@@ -203,10 +229,11 @@ class ThreadPool {
       setup_done = false;
     } else {
       HEXL_VLOG(3, "Thread Pool Info:");
-      HEXL_VLOG(3, "HEXL_NUM_THREADS        = " << HEXL_NUM_THREADS);
-      HEXL_VLOG(3, "HEXL_NTT_PARALLEL_DEPTH = " << HEXL_NTT_PARALLEL_DEPTH);
-      HEXL_VLOG(3, "HW Threads              = "
-                       << std::thread::hardware_concurrency());
+      HEXL_VLOG(3, "Env num threads    = " << env_num_threads);
+      HEXL_VLOG(3, "Env parallel depth = " << env_parallel_depth);
+      HEXL_VLOG(3,
+                "HW Threads         = " << std::thread::hardware_concurrency());
+      HEXL_VLOG(3, "Setting up for " << n_threads << " threads.");
       setup_done = true;
     }
 
@@ -247,6 +274,61 @@ class ThreadPool {
                     thread_handlers.rend() - n_threads, kill_thread);
       thread_handlers.resize(n_threads);
     }
+  }
+
+  // Check for environment variable
+  inline int64_t EnvVarToInt(const char* var) {
+    // Get value from env variable
+    char* var_value = std::getenv(var);
+    if (var_value == nullptr) {
+      return 0;  // returns 0 if unset
+    }
+
+    errno = 0;
+    int64_t value = std::strtol(var_value, nullptr, 10);
+
+    // Checks
+    if (errno == ERANGE) {
+      std::cerr << "ERROR: Env variable '" << var << "=" << var_value
+                << "' is out of range.\n";
+      exit(1);
+    }
+
+    if (value <= 0) {
+      std::cerr << "ERROR: Env variable '" << var << "=" << var_value
+                << "' is not valid.\n";
+      exit(1);
+    }
+
+    return value;  // not negative number
+  }
+
+  // Verify for appropriate number of threads
+  inline int64_t GetNumThreadsEnvValue(const char* var) {
+    int64_t value = EnvVarToInt(var);
+
+    // Use default value in case of error
+    if (value == 0) {
+      value = env_num_threads;
+    }
+
+    // Check max threads available
+    if (int64_t hw_val = std::thread::hardware_concurrency(); value > hw_val) {
+      value = hw_val;
+    }
+    return value;
+  }
+
+  // Verify for appropriate number of recursive calls
+  inline int64_t GetParallelDepthEnvValue(const char* var) {
+    int64_t value = EnvVarToInt(var);
+
+    // Use default value in case of error
+    if (value == 0) {
+      value = env_parallel_depth;
+    }
+
+    return value;
   }
 };
 

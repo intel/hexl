@@ -10,6 +10,11 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+
+// Wait time (ms) before thread enters sleep mode
+// ~ 1000x wake up time on ICX machine
+constexpr uint64_t HEXL_THREAD_WAIT_TIME = 200;
+
 namespace intel {
 namespace hexl {
 

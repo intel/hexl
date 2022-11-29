@@ -13,7 +13,6 @@ set(NATIVE_SRC
     ntt/ntt-radix-2.cpp
     ntt/ntt-radix-4.cpp
     number-theory/number-theory.cpp
-    thread-pool/thread-pool-vars.cpp
 )
 
 if (HEXL_EXPERIMENTAL)

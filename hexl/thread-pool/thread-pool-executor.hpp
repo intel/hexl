@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "hexl/thread-pool/thread-pool-vars.hpp"
 #include "thread-pool/thread-pool.hpp"
 
 namespace intel {
@@ -16,9 +15,16 @@ class ThreadPoolExecutor {
   inline static ThreadPool pool{};
 
  public:
-  // SetNumberOfThreads: Setup/kill thread pool by specifying number of threads
-  static void SetNumberOfThreads(uint64_t n_threads) {
-    pool.SetupThreads(n_threads);
+  // SetNumberOfThreads: Sets up/down thread pool by specified number of threads
+  static void SetNumberOfThreads(size_t n_threads) {
+    pool.SetupThreadPool(n_threads);
+  }
+
+  // SetNumberOfThreads: Sets up/down threads by specified number of threads.
+  // Sets parallel recursive depth
+  static void SetNumberOfThreadsAndDepth(size_t n_threads,
+                                         size_t parallel_depth) {
+    pool.SetupThreadPool(n_threads, parallel_depth);
   }
 
   // AddParallelJobs: For parallel loops
@@ -27,13 +33,16 @@ class ThreadPoolExecutor {
   }
 
   // AddRecursiveCalls: For parallel recursion
-  static void AddRecursiveCalls(uint64_t depth, uint64_t half, Task task_a,
+  static void AddRecursiveCalls(size_t depth, size_t half, Task task_a,
                                 Task task_b) {
     pool.AddRecursiveCalls(depth, half, task_a, task_b);
   }
 
   // Return total number of threads
   static size_t GetNumberOfThreads() { return pool.GetNumThreads(); }
+
+  // Return parallel recursive depth
+  static size_t GetParallelDepth() { return pool.GetParallelDepth(); }
 
   // Return vector of constant handlers
   static std::vector<const ThreadHandler*> GetThreadHandlers() {
@@ -43,11 +52,17 @@ class ThreadPoolExecutor {
 #else
 
  public:
-  static void SetNumberOfThreads(int n_threads) { HEXL_UNUSED(n_threads); }
+  static void SetNumberOfThreads(size_t n_threads) { HEXL_UNUSED(n_threads); }
+
+  static void SetNumberOfThreadsAndDepth(size_t n_threads,
+                                         size_t parallel_depth) {
+    HEXL_UNUSED(n_threads);
+    HEXL_UNUSED(parallel_depth);
+  }
 
   static void AddParallelJobs(size_t N, Task job) { job(0, N); }
 
-  static void AddRecursiveCalls(uint64_t depth, uint64_t half, Task task_a,
+  static void AddRecursiveCalls(size_t depth, size_t half, Task task_a,
                                 Task task_b) {
     HEXL_UNUSED(depth);
     HEXL_UNUSED(half);
@@ -56,6 +71,8 @@ class ThreadPoolExecutor {
   }
 
   static size_t GetNumberOfThreads() { return 1; }
+
+  static size_t GetParallelDepth() { return 0; }
 
 #endif
 };
