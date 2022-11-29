@@ -259,9 +259,9 @@ void FwdT8_parallel(uint64_t* result, const uint64_t* operand,
 
   ThreadPoolExecutor::AddRecursiveCalls(
       depth, half,
-      [=](int id, int threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
+      [=](int s, int e) {
+        HEXL_UNUSED(s);
+        HEXL_UNUSED(e);
         auto in_v_X_op_pt = v_X_op_pt;
         auto in_v_Y_op_pt = v_Y_op_pt;
         auto in_v_X_r_pt = v_X_r_pt;
@@ -283,9 +283,9 @@ void FwdT8_parallel(uint64_t* result, const uint64_t* operand,
           in_v_Y_op_pt++;
         }
       },
-      [=](int id, int threads) {
-        HEXL_UNUSED(id);
-        HEXL_UNUSED(threads);
+      [=](int s, int e) {
+        HEXL_UNUSED(s);
+        HEXL_UNUSED(e);
         uint64_t offset = t / 8 / 2;
         const __m512i* in_v_X_op_pt = v_X_op_pt + offset;
         const __m512i* in_v_Y_op_pt = v_Y_op_pt + offset;
@@ -468,24 +468,24 @@ void ForwardTransformToBitReverseAVX512(
     const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
 
-    if (recursion_depth < HEXL_NTT_PARALLEL_DEPTH) {
+    if (recursion_depth < ThreadPoolExecutor::GetParallelDepth()) {
       FwdT8_parallel<BitShift, false>(result, operand, v_neg_modulus,
                                       v_twice_mod, t, W, W_precon,
                                       recursion_depth, recursion_half);
 
       ThreadPoolExecutor::AddRecursiveCalls(
           recursion_depth, recursion_half,
-          [=](int id, int threads) {
-            HEXL_UNUSED(id);
-            HEXL_UNUSED(threads);
+          [=](int s, int e) {
+            HEXL_UNUSED(s);
+            HEXL_UNUSED(e);
             ForwardTransformToBitReverseAVX512<BitShift>(
                 result, result, n / 2, modulus, root_of_unity_powers,
                 precon_root_of_unity_powers, input_mod_factor,
                 output_mod_factor, recursion_depth + 1, recursion_half * 2);
           },
-          [=](int id, int threads) {
-            HEXL_UNUSED(id);
-            HEXL_UNUSED(threads);
+          [=](int s, int e) {
+            HEXL_UNUSED(s);
+            HEXL_UNUSED(e);
             ForwardTransformToBitReverseAVX512<BitShift>(
                 &result[n / 2], &result[n / 2], n / 2, modulus,
                 root_of_unity_powers, precon_root_of_unity_powers,

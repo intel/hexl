@@ -438,20 +438,20 @@ void InverseTransformFromBitReverseAVX512(
       }
     }
   } else {
-    if (recursion_depth < HEXL_NTT_PARALLEL_DEPTH) {
+    if (recursion_depth < ThreadPoolExecutor::GetParallelDepth()) {
       ThreadPoolExecutor::AddRecursiveCalls(
           recursion_depth, recursion_half,
-          [=](int id, int threads) {
-            HEXL_UNUSED(id);
-            HEXL_UNUSED(threads);
+          [=](int s, int e) {
+            HEXL_UNUSED(s);
+            HEXL_UNUSED(e);
             InverseTransformFromBitReverseAVX512<BitShift>(
                 result, operand, n / 2, modulus, inv_root_of_unity_powers,
                 precon_inv_root_of_unity_powers, input_mod_factor,
                 output_mod_factor, recursion_depth + 1, 2 * recursion_half);
           },
-          [=](int id, int threads) {
-            HEXL_UNUSED(id);
-            HEXL_UNUSED(threads);
+          [=](int s, int e) {
+            HEXL_UNUSED(s);
+            HEXL_UNUSED(e);
             InverseTransformFromBitReverseAVX512<BitShift>(
                 &result[n / 2], &operand[n / 2], n / 2, modulus,
                 inv_root_of_unity_powers, precon_inv_root_of_unity_powers,
