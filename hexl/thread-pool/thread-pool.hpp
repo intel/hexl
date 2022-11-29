@@ -31,10 +31,7 @@ class ThreadPool {
   }
 
   // GetParallelDepth: Returns parallel recursive depth limit
-  size_t GetParallelDepth() const {
-    std::lock_guard<std::mutex> lock(pool_mutex);
-    return parallel_depth;
-  }
+  size_t GetParallelDepth() const { return parallel_depth; }
 
   // AddParallelJobs: Runs the same function on a total number of threads
   void AddParallelJobs(size_t N, Task job) {
@@ -107,8 +104,8 @@ class ThreadPool {
       SetupThreads_Unlocked(env_num_threads);
     }
 
-    const size_t t_threads = thread_handlers.size();
-    size_t next = (1 << (depth + 1)) - 2 + 2 * half;
+    const int64_t t_threads = thread_handlers.size();
+    int64_t next = (1 << (depth + 1)) - 2 + 2 * half;
     if (next <= t_threads - 2) {
       ThreadHandler* handler = thread_handlers.at(next++);
       switch (handler->state.load()) {
@@ -147,7 +144,7 @@ class ThreadPool {
       }
 
       // Implicit barrier
-      for (size_t i = next - 2; i < next; i++) {
+      for (int64_t i = next - 2; i < next; i++) {
         WaitThread(thread_handlers.at(i));
       }
     } else {
