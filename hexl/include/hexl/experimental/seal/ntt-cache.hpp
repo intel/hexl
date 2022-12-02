@@ -1,5 +1,6 @@
 // Copyright (C) 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include "hexl/experimental/seal/locks.hpp"
@@ -16,6 +17,7 @@ struct HashPair {
     return hash_combine(hash1, hash2);
   }
 
+  // Golden Ratio Hashing with seeds
   static std::size_t hash_combine(std::size_t lhs, std::size_t rhs) {
     lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
     return lhs;
