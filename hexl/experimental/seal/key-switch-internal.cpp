@@ -11,8 +11,8 @@
 #include "hexl/eltwise/eltwise-fma-mod.hpp"
 #include "hexl/eltwise/eltwise-mult-mod.hpp"
 #include "hexl/eltwise/eltwise-reduce-mod.hpp"
+#include "hexl/experimental/seal/ntt-cache.hpp"
 #include "hexl/logging/logging.hpp"
-#include "hexl/ntt/ntt.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/aligned-allocator.hpp"
 #include "hexl/util/check.hpp"
@@ -36,22 +36,20 @@ void KeySwitch(uint64_t* result, const uint64_t* t_target_iter_ptr, uint64_t n,
   uint64_t coeff_count = n;
 
   // Create a copy of target_iter
-  std::vector<uint64_t> t_target(coeff_count * decomp_modulus_size, 0);
-  for (size_t i = 0; i < coeff_count * decomp_modulus_size; ++i) {
-    t_target[i] = t_target_iter_ptr[i];
-  }
-
-  uint64_t* t_target_ptr = &t_target[0];
+  std::vector<uint64_t> t_target(
+      t_target_iter_ptr,
+      t_target_iter_ptr + (coeff_count * decomp_modulus_size));
+  uint64_t* t_target_ptr = t_target.data();
 
   // Simplified implementation, where we assume no modular reduction is required
   // for intermediate additions
   std::vector<uint64_t> t_ntt(coeff_count, 0);
-  uint64_t* t_ntt_ptr = &t_ntt[0];
+  uint64_t* t_ntt_ptr = t_ntt.data();
 
   // In CKKS t_target is in NTT form; switch
   // back to normal form
   for (size_t j = 0; j < decomp_modulus_size; ++j) {
-    NTT(n, moduli[j])
+    GetNTT(n, moduli[j])
         .ComputeInverse(&t_target_ptr[j * coeff_count],
                         &t_target_ptr[j * coeff_count], 2, 1);
   }
@@ -87,8 +85,7 @@ void KeySwitch(uint64_t* result, const uint64_t* t_target_iter_ptr, uint64_t n,
         }
 
         // NTT conversion lazy outputs in [0, 4q)
-        NTT(n, moduli[key_index]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
-
+        GetNTT(n, moduli[key_index]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
         t_operand = t_ntt_ptr;
       }
 
@@ -141,7 +138,8 @@ void KeySwitch(uint64_t* result, const uint64_t* t_target_iter_ptr, uint64_t n,
         &t_poly_prod[key_component * coeff_count * rns_modulus_size];
     uint64_t* t_last = &t_poly_prod_it[decomp_modulus_size * coeff_count];
 
-    NTT(n, moduli[key_modulus_size - 1]).ComputeInverse(t_last, t_last, 2, 2);
+    GetNTT(n, moduli[key_modulus_size - 1])
+        .ComputeInverse(t_last, t_last, 2, 2);
 
     uint64_t qk = moduli[key_modulus_size - 1];
     uint64_t qk_half = qk >> 1;
@@ -178,8 +176,7 @@ void KeySwitch(uint64_t* result, const uint64_t* t_target_iter_ptr, uint64_t n,
       }
 
       uint64_t qi_lazy = qi << 1;  // some multiples of qi
-
-      NTT(n, moduli[i]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
+      GetNTT(n, moduli[i]).ComputeForward(t_ntt_ptr, t_ntt_ptr, 4, 4);
       // Since SEAL uses at most 60bit moduli, 8*qi < 2^63.
       qi_lazy = qi << 2;
 
