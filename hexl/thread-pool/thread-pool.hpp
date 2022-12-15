@@ -83,8 +83,7 @@ class ThreadPool {
   }
 
   // AddRecursiveCalls: Runs a task on next thread available
-  void AddRecursiveCalls(uint64_t depth, uint64_t half, Task task_a,
-                         Task task_b) {
+  void AddRecursiveCalls(size_t depth, size_t half, Task task_a, Task task_b) {
     HEXL_CHECK(task_a, "task_a: Require non empty task");
     HEXL_CHECK(task_b, "task_b: Require non empty task");
     bool locked = false;

@@ -177,7 +177,7 @@ void EltwiseReduceModAVX512(uint64_t* result, const uint64_t* operand,
 /// @param[in] n number of elements in input vector.
 /// @param[out] result unsigned long int vector in the range [0, q − 1] such
 /// that S ≡ TR^−1 mod q
-template <int BitShift, int r>
+template <int BitShift, uint r>
 void EltwiseMontReduceModAVX512(uint64_t* result, const uint64_t* a,
                                 const uint64_t* b, uint64_t n, uint64_t modulus,
                                 uint64_t neg_inv_mod) {

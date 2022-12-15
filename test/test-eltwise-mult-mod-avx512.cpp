@@ -129,8 +129,6 @@ TEST(EltwiseMultMod, avx512dqint_big) {
   }
 
   for (size_t length = 1024; length <= 32768; length *= 2) {
-    std::vector<uint64_t> op1(length, 0);
-    std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> rs1(length, 0);
     std::vector<uint64_t> rs2(length, 0);
     std::vector<uint64_t> rs3(length, 0);

@@ -5,12 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include <atomic>
-#include <chrono>
-#include <list>
-#include <mutex>
-#include <thread>
-
 #include "hexl/util/check.hpp"
 #include "thread-pool/thread-pool-executor.hpp"
 

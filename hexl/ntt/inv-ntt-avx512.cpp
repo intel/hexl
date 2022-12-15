@@ -229,7 +229,7 @@ void InvT8_parallel(uint64_t* operand, __m512i v_neg_modulus,
                     const uint64_t half) {
   ThreadPoolExecutor::AddRecursiveCalls(
       depth, half,
-      [=](int s, int e) {
+      [=](size_t s, size_t e) {
         HEXL_UNUSED(s);
         HEXL_UNUSED(e);
         uint64_t* X = operand;
@@ -441,7 +441,7 @@ void InverseTransformFromBitReverseAVX512(
     if (recursion_depth < ThreadPoolExecutor::GetParallelDepth()) {
       ThreadPoolExecutor::AddRecursiveCalls(
           recursion_depth, recursion_half,
-          [=](int s, int e) {
+          [=](size_t s, size_t e) {
             HEXL_UNUSED(s);
             HEXL_UNUSED(e);
             InverseTransformFromBitReverseAVX512<BitShift>(
@@ -449,7 +449,7 @@ void InverseTransformFromBitReverseAVX512(
                 precon_inv_root_of_unity_powers, input_mod_factor,
                 output_mod_factor, recursion_depth + 1, 2 * recursion_half);
           },
-          [=](int s, int e) {
+          [=](size_t s, size_t e) {
             HEXL_UNUSED(s);
             HEXL_UNUSED(e);
             InverseTransformFromBitReverseAVX512<BitShift>(

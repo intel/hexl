@@ -259,7 +259,7 @@ void FwdT8_parallel(uint64_t* result, const uint64_t* operand,
 
   ThreadPoolExecutor::AddRecursiveCalls(
       depth, half,
-      [=](int s, int e) {
+      [=](size_t s, size_t e) {
         HEXL_UNUSED(s);
         HEXL_UNUSED(e);
         auto in_v_X_op_pt = v_X_op_pt;
@@ -283,7 +283,7 @@ void FwdT8_parallel(uint64_t* result, const uint64_t* operand,
           in_v_Y_op_pt++;
         }
       },
-      [=](int s, int e) {
+      [=](size_t s, size_t e) {
         HEXL_UNUSED(s);
         HEXL_UNUSED(e);
         uint64_t offset = t / 8 / 2;
@@ -475,7 +475,7 @@ void ForwardTransformToBitReverseAVX512(
 
       ThreadPoolExecutor::AddRecursiveCalls(
           recursion_depth, recursion_half,
-          [=](int s, int e) {
+          [=](size_t s, size_t e) {
             HEXL_UNUSED(s);
             HEXL_UNUSED(e);
             ForwardTransformToBitReverseAVX512<BitShift>(
@@ -483,7 +483,7 @@ void ForwardTransformToBitReverseAVX512(
                 precon_root_of_unity_powers, input_mod_factor,
                 output_mod_factor, recursion_depth + 1, recursion_half * 2);
           },
-          [=](int s, int e) {
+          [=](size_t s, size_t e) {
             HEXL_UNUSED(s);
             HEXL_UNUSED(e);
             ForwardTransformToBitReverseAVX512<BitShift>(
