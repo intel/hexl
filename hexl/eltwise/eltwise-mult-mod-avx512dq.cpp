@@ -48,6 +48,8 @@ template void EltwiseMultModAVX512DQInt<4>(uint64_t* result,
                                            const uint64_t* operand2, uint64_t n,
                                            uint64_t modulus);
 
+#define round_mode (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC)
+
 #endif
 
 #ifdef HEXL_HAS_AVX512DQ
@@ -587,8 +589,6 @@ inline void EltwiseMultModAVX512FloatLoopDefault(
     uint64_t n) {
   HEXL_UNUSED(v_twice_mod);
 
-  constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
-
   ThreadPoolExecutor::AddParallelJobs(n / 8, [=](size_t start, size_t end) {
     auto in_vp_operand1 = vp_operand1 + start;
     auto in_vp_operand2 = vp_operand2 + start;
@@ -641,8 +641,6 @@ inline void EltwiseMultModAVX512FloatLoopUnroll(
   static_assert(CoeffCount % (manual_unroll_factor * avx512_64bit_count) == 0,
                 "CoeffCount must be a factor of manual_unroll_factor * "
                 "avx512_64bit_count");
-
-  constexpr int round_mode = (_MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 
   ThreadPoolExecutor::AddParallelJobs(loop_count, [=](size_t start,
                                                       size_t end) {
