@@ -22,5 +22,10 @@ if(${CMAKE_VERSION} VERSION_LESS "3.15.0" AND ${HEXL_LINK_LIBRARIES} MATCHES "de
   set_target_properties(PkgConfig::HEXL PROPERTIES INTERFACE_COMPILE_OPTIONS "-fsanitize=address")
 endif()
 
+if(NOT TARGET Threads::Threads)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif()
+find_package(Threads REQUIRED)
+
 add_executable(example ../example.cpp)
-target_link_libraries(example PkgConfig::HEXL)
+target_link_libraries(example PkgConfig::HEXL Threads::Threads)
