@@ -266,8 +266,6 @@ TEST(EltwiseMultMod, avx512ifma_big) {
   }
 
   for (size_t length = 8; length <= 8; length *= 2) {
-    std::vector<uint64_t> op1(length, 0);
-    std::vector<uint64_t> op2(length, 0);
     std::vector<uint64_t> result_native(length, 0);
     std::vector<uint64_t> result_ifma(length, 0);
 
