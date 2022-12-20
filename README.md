@@ -127,6 +127,7 @@ For convenience, they are listed below:
 | HEXL_DOCS                     | ON / OFF | OFF     | Set to ON to enable building of documentation               |
 | HEXL_TESTING                  | ON / OFF | ON      | Set to ON to enable building of unit-tests                  |
 | HEXL_TREAT_WARNING_AS_ERROR   | ON / OFF | OFF     | Set to ON to treat all warnings as error                    |
+| HEXL_MULTI_THREADING          | ON / OFF | ON      | Set to ON to enable multithreading                          |
 
 ### Compiling Intel HE Acceleration Library
 To compile Intel HE Acceleration Library from source code, first clone the
@@ -262,7 +263,41 @@ documentation](https://github.com/amrayn/easyloggingpp#application-arguments)
 for more details.
 
 ## Threading
-Intel HE Acceleration Library is single-threaded and thread-safe.
+Intel HE Acceleration Library is multi-threaded and thread-safe. 
+`-DHEXL_MULTI_THREADING=OFF` can be used to disable multithreading. 
+
+**Note**, when using the Intel HE Acceleration Library from a multi-threaded
+application only one top level thread at the time will have access to the 
+thread pool. For any other top level thread the use of the thread pool will
+be bypassed to be executed sequentially.
+
+By default, the thread pool will consist of 8 threads, but a different number 
+of threads can be set by using the following environment variable.
+
+Example (in bash):
+```bash
+export HEXL_NUM_THREADS=<integer>
+```
+
+If the default value or `HEXL_NUM_THREADS` are bigger than C++'s
+`N = hardware_concurrency()` then the thread pool will consist of
+`N` threads only. In the case CMake's `ProcessorCount` is less than 2 then 
+the thread pool will be automatically disabled.
+
+### NTT's recursive parallelization
+By default, the NTT will run two levels of parallel recursion. A different
+number of levels can be set by using the following environment variable.
+
+Example (in bash):
+```bash
+export HEXL_NTT_PARALLEL_DEPTH=<integer>
+```
+
+Independently of the parallel depth value the recursive parallelization
+will be limited by the total number of threads in the thread pool.
+
+**Note**, NTT's recursive parallelization is controlled differently than 
+loop parallelization as the performance of both do not scale the same.
 
 # Community Adoption
 
