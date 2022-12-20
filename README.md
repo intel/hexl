@@ -263,15 +263,15 @@ documentation](https://github.com/amrayn/easyloggingpp#application-arguments)
 for more details.
 
 ## Threading
-Intel HE Acceleration Library is multi-threaded and thread-safe. 
-`-DHEXL_MULTI_THREADING=OFF` can be used to disable multithreading. 
+Intel HE Acceleration Library is multi-threaded and thread-safe.
+`-DHEXL_MULTI_THREADING=OFF` can be used to disable multithreading.
 
 **Note**, when using the Intel HE Acceleration Library from a multi-threaded
-application only one top level thread at the time will have access to the 
+application only one top level thread at the time will have access to the
 thread pool. For any other top level thread the use of the thread pool will
 be bypassed to be executed sequentially.
 
-By default, the thread pool will consist of 8 threads, but a different number 
+By default, the thread pool will consist of 8 threads, but a different number
 of threads can be set by using the following environment variable.
 
 Example (in bash):
@@ -281,7 +281,7 @@ export HEXL_NUM_THREADS=<integer>
 
 If the default value or `HEXL_NUM_THREADS` are bigger than C++'s
 `N = hardware_concurrency()` then the thread pool will consist of
-`N` threads only. In the case CMake's `ProcessorCount` is less than 2 then 
+`N` threads only. In the case CMake's `ProcessorCount` is less than 2 then
 the thread pool will be automatically disabled.
 
 ### NTT's recursive parallelization
@@ -296,7 +296,7 @@ export HEXL_NTT_PARALLEL_DEPTH=<integer>
 Independently of the parallel depth value the recursive parallelization
 will be limited by the total number of threads in the thread pool.
 
-**Note**, NTT's recursive parallelization is controlled separately of 
+**Note**, NTT's recursive parallelization is controlled separately of
 loop parallelization as the performance of both methods do not scale the same.
 
 # Community Adoption
