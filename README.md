@@ -281,7 +281,7 @@ export HEXL_NUM_THREADS=<integer>
 
 If the default value or `HEXL_NUM_THREADS` are bigger than C++'s
 `N = hardware_concurrency()` then the thread pool will consist of
-`N` threads only. In the case CMake's `ProcessorCount` is less than 2 then
+`N` threads only. In the case CMake's `ProcessorCount` is less than 3 then
 the thread pool will be automatically disabled.
 
 ### NTT's recursive parallelization

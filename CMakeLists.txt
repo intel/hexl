@@ -74,7 +74,7 @@ if (HEXL_MULTI_THREADING STREQUAL "ON")
   include(ProcessorCount)
   ProcessorCount(N)
   if(NOT N EQUAL 0)
-    if(N GREATER 1)
+    if(N GREATER 2)  # Minimum for testing
       message(STATUS "ProcessorCount: ${N}")
     else()
       message(WARNING "Small Processor Count.")
