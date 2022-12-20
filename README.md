@@ -296,8 +296,8 @@ export HEXL_NTT_PARALLEL_DEPTH=<integer>
 Independently of the parallel depth value the recursive parallelization
 will be limited by the total number of threads in the thread pool.
 
-**Note**, NTT's recursive parallelization is controlled differently than 
-loop parallelization as the performance of both do not scale the same.
+**Note**, NTT's recursive parallelization is controlled separately of 
+loop parallelization as the performance of both methods do not scale the same.
 
 # Community Adoption
 
