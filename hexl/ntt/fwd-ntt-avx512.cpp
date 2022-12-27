@@ -467,7 +467,6 @@ void ForwardTransformToBitReverseAVX512(
     size_t W_idx = (1ULL << recursion_depth) + recursion_half;
     const uint64_t* W = &root_of_unity_powers[W_idx];
     const uint64_t* W_precon = &precon_root_of_unity_powers[W_idx];
-
     if (recursion_depth < ThreadPoolExecutor::GetParallelDepth()) {
       FwdT8_parallel<BitShift, false>(result, operand, v_neg_modulus,
                                       v_twice_mod, t, W, W_precon,

@@ -19,7 +19,7 @@ class ThreadPool {
   ThreadPool() {
     ThreadHandler::isChildThread = false;
     env_num_threads = GetNumThreadsEnvValue("HEXL_NUM_THREADS");
-    env_parallel_depth = GetParallelDepthEnvValue("HEXL_NTT_PARALLEL_DEPTH");
+    parallel_depth = GetParallelDepthEnvValue("HEXL_NTT_PARALLEL_DEPTH");
   }
 
   ~ThreadPool() { SetupThreadPool(0); }
@@ -40,7 +40,6 @@ class ThreadPool {
     // Try using thread pool
     if (pool_mutex.try_lock()) {
       if (!setup_done) {  // Setup if thread pool is down
-        parallel_depth = env_parallel_depth;
         SetupThreads_Unlocked(env_num_threads);
       }
 
@@ -99,7 +98,6 @@ class ThreadPool {
     }
 
     if (!setup_done) {  // Setup if thread pool is down
-      parallel_depth = env_parallel_depth;
       SetupThreads_Unlocked(env_num_threads);
     }
 
@@ -160,7 +158,6 @@ class ThreadPool {
   // recursive depth
   void SetupThreadPool(size_t n_threads) {
     std::lock_guard<std::mutex> lock(pool_mutex);
-    parallel_depth = env_parallel_depth;
     SetupThreads_Unlocked(n_threads);
   }
 
@@ -184,9 +181,8 @@ class ThreadPool {
   // Properties
 
   // Defaults gave best results for 65K vectors on ICX machine
-  size_t env_num_threads = 8;     // Env variable value for number of threads
-  size_t env_parallel_depth = 2;  // Env variable value for parallel depth
-  size_t parallel_depth;          // Controls depth of parallel recursive calls
+  size_t env_num_threads = 8;  // Env variable value for number of threads
+  size_t parallel_depth = 2;   // Variable value for parallel depth
   std::vector<ThreadHandler*> thread_handlers;  // Contains handlers of threads
   mutable std::mutex pool_mutex;  // Controls Thread Pool's modifications
   bool setup_done = false;        // True if thread pool was initialized
@@ -226,7 +222,7 @@ class ThreadPool {
     } else {
       HEXL_VLOG(3, "Thread Pool Info:");
       HEXL_VLOG(3, "Env num threads    = " << env_num_threads);
-      HEXL_VLOG(3, "Env parallel depth = " << env_parallel_depth);
+      HEXL_VLOG(3, "Env parallel depth = " << parallel_depth);
       HEXL_VLOG(3,
                 "HW Threads         = " << std::thread::hardware_concurrency());
       HEXL_VLOG(3, "Setting up for " << n_threads << " threads.");
@@ -318,10 +314,9 @@ class ThreadPool {
   // Verify for appropriate number of recursive calls
   inline int64_t GetParallelDepthEnvValue(const char* var) {
     int64_t value = EnvVarToInt(var);
-
     // Use default value in case of error
     if (value == 0) {
-      value = env_parallel_depth;
+      value = parallel_depth;
     }
 
     return value;
