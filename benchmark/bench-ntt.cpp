@@ -40,7 +40,11 @@ BENCHMARK(BM_FwdNTTNativeRadix2InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 static void BM_FwdNTTNativeRadix2Copy(benchmark::State& state) {  //  NOLINT
@@ -63,7 +67,11 @@ BENCHMARK(BM_FwdNTTNativeRadix2Copy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 static void BM_FwdNTTNativeRadix4InPlace(benchmark::State& state) {  //  NOLINT
@@ -85,7 +93,11 @@ BENCHMARK(BM_FwdNTTNativeRadix4InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 //=================================================================
 
 static void BM_FwdNTTNativeRadix4Copy(benchmark::State& state) {  //  NOLINT
@@ -108,7 +120,11 @@ BENCHMARK(BM_FwdNTTNativeRadix4Copy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -138,7 +154,11 @@ BENCHMARK(BM_FwdNTT_AVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -167,7 +187,11 @@ BENCHMARK(BM_FwdNTT_AVX512IFMALazy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -205,7 +229,15 @@ BENCHMARK(BM_FwdNTT_AVX512DQ_32)
     ->Args({4096, 1})
     ->Args({4096, 4})
     ->Args({16384, 1})
-    ->Args({16384, 4});
+    ->Args({16384, 4})
+    ->Args({32768, 1})
+    ->Args({32768, 4})
+    ->Args({65536, 1})
+    ->Args({65536, 4})
+    ->Args({131072, 1})
+    ->Args({131072, 4})
+    ->Args({262144, 1})
+    ->Args({262144, 4});
 
 // state[0] is the degree
 // state[1] is the output modulus factor
@@ -236,7 +268,15 @@ BENCHMARK(BM_FwdNTT_AVX512DQ_64)
     ->Args({4096, 1})
     ->Args({4096, 4})
     ->Args({16384, 1})
-    ->Args({16384, 4});
+    ->Args({16384, 4})
+    ->Args({32768, 1})
+    ->Args({32768, 4})
+    ->Args({65536, 1})
+    ->Args({65536, 4})
+    ->Args({131072, 1})
+    ->Args({131072, 4})
+    ->Args({262144, 1})
+    ->Args({262144, 4});
 
 #endif
 
@@ -259,7 +299,11 @@ BENCHMARK(BM_FwdNTTInPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -281,7 +325,11 @@ BENCHMARK(BM_FwdNTTCopy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -301,7 +349,11 @@ BENCHMARK(BM_InvNTTInPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -323,7 +375,11 @@ BENCHMARK(BM_InvNTTCopy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -350,7 +406,11 @@ BENCHMARK(BM_InvNTTNativeRadix2InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -376,7 +436,11 @@ BENCHMARK(BM_InvNTTNativeRadix2Copy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -401,7 +465,11 @@ BENCHMARK(BM_InvNTTNativeRadix4InPlace)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -427,7 +495,11 @@ BENCHMARK(BM_InvNTTNativeRadix4Copy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -454,7 +526,11 @@ BENCHMARK(BM_InvNTT_AVX512IFMA)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -480,7 +556,11 @@ BENCHMARK(BM_InvNTT_AVX512IFMALazy)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 #endif
 
@@ -514,7 +594,15 @@ BENCHMARK(BM_InvNTT_AVX512DQ_32)
     ->Args({4096, 1})
     ->Args({4096, 2})
     ->Args({16384, 1})
-    ->Args({16384, 2});
+    ->Args({16384, 2})
+    ->Args({32768, 1})
+    ->Args({32768, 2})
+    ->Args({65536, 1})
+    ->Args({65536, 2})
+    ->Args({131072, 1})
+    ->Args({131072, 2})
+    ->Args({262144, 1})
+    ->Args({262144, 2});
 
 static void BM_InvNTT_AVX512DQ_64(benchmark::State& state) {  //  NOLINT
   size_t ntt_size = state.range(0);
@@ -542,7 +630,15 @@ BENCHMARK(BM_InvNTT_AVX512DQ_64)
     ->Args({4096, 1})
     ->Args({4096, 2})
     ->Args({16384, 1})
-    ->Args({16384, 2});
+    ->Args({16384, 2})
+    ->Args({32768, 1})
+    ->Args({32768, 2})
+    ->Args({65536, 1})
+    ->Args({65536, 2})
+    ->Args({131072, 1})
+    ->Args({131072, 2})
+    ->Args({262144, 1})
+    ->Args({262144, 2});
 #endif
 
 //=================================================================

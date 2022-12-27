@@ -13,6 +13,7 @@ set(NATIVE_TEST_SRC main.cpp
     test-eltwise-sub-mod.cpp
     test-ntt.cpp
     test-util-internal.cpp
+    test-thread-pool.cpp
 )
 
 if (HEXL_EXPERIMENTAL)
@@ -36,6 +37,7 @@ set(AVX512_TEST_SRC
     test-eltwise-reduce-mod-avx512.cpp
     test-eltwise-sub-mod-avx512.cpp
     test-ntt-avx512.cpp
+    test-thread-pool-ntt-avx512.cpp
 )
 
 set(TEST_SRC "${NATIVE_TEST_SRC};${AVX512_TEST_SRC}")

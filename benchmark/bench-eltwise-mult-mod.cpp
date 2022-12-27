@@ -38,7 +38,9 @@ static void BM_EltwiseMultMod(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultMod)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {48, 60}, {1, 2, 4}});
+    ->ArgsProduct({{1024, 4096, 16384, 32768, 65536, 131072, 262144},
+                   {48, 60},
+                   {1, 2, 4}});
 
 //=================================================================
 
@@ -61,7 +63,11 @@ BENCHMARK(BM_EltwiseMultModNative)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -97,7 +103,8 @@ static void BM_EltwiseMultModAVX512Float(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512Float)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{1024, 4096, 16384, 32768, 65536, 131072, 262144},
+                   {1, 2, 4}});
 #endif
 
 //=================================================================
@@ -134,7 +141,8 @@ static void BM_EltwiseMultModAVX512DQInt(benchmark::State& state) {  //  NOLINT
 
 BENCHMARK(BM_EltwiseMultModAVX512DQInt)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{1024, 4096, 16384, 32768, 65536, 131072, 262144},
+                   {1, 2, 4}});
 #endif
 
 #ifdef HEXL_HAS_AVX512IFMA
@@ -172,7 +180,8 @@ static void BM_EltwiseMultModAVX512IFMAInt(
 
 BENCHMARK(BM_EltwiseMultModAVX512IFMAInt)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{1024, 4096, 16384, 32768, 65536, 131072, 262144},
+                   {1, 2, 4}});
 #endif
 
 //=================================================================
@@ -216,7 +225,8 @@ static void BM_EltwiseMultModMontAVX512IFMAIntEConv(
 
 BENCHMARK(BM_EltwiseMultModMontAVX512IFMAIntEConv)
     ->Unit(benchmark::kMicrosecond)
-    ->ArgsProduct({{1024, 4096, 16384}, {1, 2, 4}});
+    ->ArgsProduct({{1024, 4096, 16384, 32768, 65536, 131072, 262144},
+                   {1, 2, 4}});
 
 #endif
 

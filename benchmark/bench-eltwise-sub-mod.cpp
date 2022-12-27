@@ -36,7 +36,11 @@ BENCHMARK(BM_EltwiseVectorVectorSubModNative)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -61,7 +65,11 @@ BENCHMARK(BM_EltwiseVectorVectorSubModAVX512)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 //=================================================================
@@ -85,7 +93,11 @@ BENCHMARK(BM_EltwiseVectorScalarSubModNative)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -110,7 +122,11 @@ BENCHMARK(BM_EltwiseVectorScalarSubModAVX512)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 }  // namespace hexl

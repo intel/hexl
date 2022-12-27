@@ -36,7 +36,11 @@ BENCHMARK(BM_EltwiseCmpSubModNative)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 
 //=================================================================
 
@@ -59,7 +63,11 @@ BENCHMARK(BM_EltwiseCmpSubModAVX512_64)
     ->Unit(benchmark::kMicrosecond)
     ->Args({1024})
     ->Args({4096})
-    ->Args({16384});
+    ->Args({16384})
+    ->Args({32768})
+    ->Args({65536})
+    ->Args({131072})
+    ->Args({262144});
 #endif
 
 //=================================================================

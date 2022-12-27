@@ -20,7 +20,7 @@ namespace hexl {
 inline void CheckClose(const __m512i a, const __m512i b, uint64_t tolerance) {
   std::vector<uint64_t> as = ExtractValues(a);
   std::vector<uint64_t> bs = ExtractValues(b);
-  CheckClose(as, bs, tolerance);
+  CheckClose(as, bs, static_cast<double>(tolerance));
 }
 
 // Checks that at each index, the packed 64-bit integer values in a and b match
