@@ -11,6 +11,8 @@ Intel HE Acceleration Library, see our
 [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best
 performance, see [Performance](#performance).
 
+ _**\* Notice of Discontinuation:** We regret to inform the community that we have discontinued support for this repository. This decision is due to a reallocation of resources and priorities. We understand the value of this project, and we are grateful for your contributions and engagement thus far. However, at this time, we do not have information for when, or if, active support will resume. We encourage the open-source community to continue using this project in our absence. Thank you for your understanding._
+
 ## Contents
 - [Intel Homomorphic Encryption (HE) Acceleration Library](#intel-homomorphic-encryption-he-acceleration-library)
   - [Contents](#contents)
