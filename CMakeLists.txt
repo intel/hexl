@@ -53,18 +53,23 @@ set(CMAKE_INSTALL_RPATH "\$ORIGIN")
 #------------------------------------------------------------------------------
 # Compiler options...
 #------------------------------------------------------------------------------
+#twy
+option(MY_OPENMP "Enable multithreading" ON)
 
 option(HEXL_BENCHMARK "Enable benchmarking" ON)
 option(HEXL_COVERAGE "Enables coverage for unit tests" OFF)
 option(HEXL_DOCS "Enable documentation building" OFF)
 option(HEXL_EXPERIMENTAL "Enable experimental features" OFF)
-option(HEXL_SHARED_LIB "Generate a shared library" OFF)
+option(HEXL_SHARED_LIB "Generate a shared library" ON)
 option(HEXL_TESTING "Enables unit-tests" ON)
 option(HEXL_TREAT_WARNING_AS_ERROR "Treat all compile-time warnings as errors" OFF)
 
 if (NOT HEXL_FPGA_COMPATIBILITY)
     set(HEXL_FPGA_COMPATIBILITY "0" CACHE INTERNAL "Set FPGA compatibility mask" FORCE)
 endif()
+
+#twy
+message(STATUS "OpenMP_OPTION:                 ${MY_OPENMP}")
 
 message(STATUS "CMAKE_BUILD_TYPE:              ${CMAKE_BUILD_TYPE}")
 message(STATUS "CMAKE_C_COMPILER:              ${CMAKE_C_COMPILER}")
@@ -81,6 +86,11 @@ message(STATUS "HEXL_FPGA_COMPATIBILITY:       ${HEXL_FPGA_COMPATIBILITY}")
 
 hexl_check_compiler_version()
 hexl_add_compiler_definition()
+
+#twy
+if (OpenMP_OPTION)
+  add_compile_options(-fopenmp)
+endif()
 
 if (HEXL_COVERAGE)
   if (NOT HEXL_USE_GNU)
@@ -181,6 +191,12 @@ if (HEXL_DEBUG)
     message(STATUS "easyloggingpp: pre-installed easyloggingpp NOT found, building from source")
     add_subdirectory(cmake/third-party/easylogging)
   endif()
+endif()
+
+find_package(OpenMP)
+if (OpenMP_FOUND)
+    message(STATUS "OpenMP_CXX_INCLUDE_DIRS: ${OpenMP_CXX_INCLUDE_DIRS}")
+    message(STATUS "OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 endif()
 
 #------------------------------------------------------------------------------

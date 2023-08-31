@@ -3,6 +3,11 @@
 
 #include "hexl/eltwise/eltwise-cmp-sub-mod.hpp"
 
+#include <omp.h>
+
+#include <iomanip>
+#include <iostream>
+
 #include "eltwise/eltwise-cmp-sub-mod-avx512.hpp"
 #include "eltwise/eltwise-cmp-sub-mod-internal.hpp"
 #include "hexl/logging/logging.hpp"
@@ -53,17 +58,33 @@ void EltwiseCmpSubModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK(modulus > 1, "Require modulus > 1");
   HEXL_CHECK(diff != 0, "Require diff != 0");
   HEXL_CHECK(diff < modulus, "Diff " << diff << " >= modulus " << modulus);
+  int thread_count;
+  double start_time = omp_get_wtime();
 
-  for (size_t i = 0; i < n; ++i) {
-    uint64_t op = operand1[i];
-    bool op_cmp = Compare(cmp, op, bound);
-    op %= modulus;
-    if (op_cmp) {
-      op = SubUIntMod(op, diff, modulus);
+#pragma omp parallel
+  {
+    thread_count = omp_get_num_threads();
+    #pragma omp for
+    for (size_t i = 0; i < n; ++i) {
+      uint64_t op = operand1[i];
+      bool op_cmp = Compare(cmp, op, bound);
+      op %= modulus;
+      if (op_cmp) {
+        op = SubUIntMod(op, diff, modulus);
+      }
+      result[i] = op;
     }
-    result[i] = op;
   }
-}
+
+    // Record the end time(timer2)
+    double end_time = omp_get_wtime();
+
+    // Calculate and print the elapsed time
+    double elapsed_time = end_time - start_time;
+
+    std::cout << thread_count << "  " << std::fixed << elapsed_time
+              << std::setprecision(5) << std::endl;
+  }
 
 }  // namespace hexl
 }  // namespace intel

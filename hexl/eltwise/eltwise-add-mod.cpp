@@ -3,13 +3,17 @@
 
 #include "hexl/eltwise/eltwise-add-mod.hpp"
 
+#include <omp.h>
+
+#include <iomanip>
+#include <iostream>
+
 #include "eltwise/eltwise-add-mod-avx512.hpp"
 #include "eltwise/eltwise-add-mod-internal.hpp"
 #include "hexl/logging/logging.hpp"
 #include "hexl/number-theory/number-theory.hpp"
 #include "hexl/util/check.hpp"
 #include "util/cpu-features.hpp"
-
 namespace intel {
 namespace hexl {
 
@@ -27,19 +31,35 @@ void EltwiseAddModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand2, n, modulus,
                     "pre-add value in operand2 exceeds bound " << modulus);
 
-  HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < n; ++i) {
-    uint64_t sum = *operand1 + *operand2;
-    if (sum >= modulus) {
-      *result = sum - modulus;
-    } else {
-      *result = sum;
-    }
+  int thread_count;
 
-    ++operand1;
-    ++operand2;
-    ++result;
+  double start_time = omp_get_wtime();
+
+#pragma omp parallel
+  {
+    thread_count = omp_get_num_threads();
+
+    #pragma omp for 
+    for (size_t i = 0; i < n; ++i) {
+      uint64_t sum = operand1[i] + operand2[i];
+      if (sum >= modulus) {
+        result[i] = sum - modulus;
+      } else {
+        result[i] = sum;
+      }
+    }
   }
+  // double start_time = omp_get_wtime();
+  // Record the end time(timer2)
+  double end_time = omp_get_wtime();
+
+  // Calculate and print the elapsed time
+  double elapsed_time = end_time - start_time;
+
+  // std::cout << "EltwiseVectorVectorAddModNative Thread count: " << thread_count
+  //           << " time: " << elapsed_time << " seconds." << std::endl;
+  std::cout << thread_count << "  " << std::fixed << elapsed_time
+            << std::setprecision(5) << std::endl;
 }
 
 void EltwiseAddModNative(uint64_t* result, const uint64_t* operand1,
@@ -54,18 +74,30 @@ void EltwiseAddModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK(operand2 < modulus, "Require operand2 < modulus");
 
   uint64_t diff = modulus - operand2;
+  int thread_count;
+  // Record the start time (timer1)
+  double start_time = omp_get_wtime();
+#pragma omp parallel
+    {
+      thread_count = omp_get_num_threads();
 
-  HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < n; ++i) {
-    if (*operand1 >= diff) {
-      *result = *operand1 - diff;
-    } else {
-      *result = *operand1 + operand2;
+      #pragma omp for
+      for (size_t i = 0; i < n; ++i) {
+        if (operand1[i] >= diff) {
+          result[i] = operand1[i] - diff;
+        } else {
+          result[i] = operand1[i] + operand2;
+        }
+      }
     }
+  // Record the end time(timer2) 
+  double end_time = omp_get_wtime();
 
-    ++operand1;
-    ++result;
-  }
+  // Calculate and print the elapsed time
+  double elapsed_time = end_time - start_time;
+
+  std::cout << thread_count << "  " << std::fixed << elapsed_time
+            << std::setprecision(5) << std::endl;
 }
 
 void EltwiseAddMod(uint64_t* result, const uint64_t* operand1,
@@ -114,3 +146,4 @@ void EltwiseAddMod(uint64_t* result, const uint64_t* operand1,
 
 }  // namespace hexl
 }  // namespace intel
+

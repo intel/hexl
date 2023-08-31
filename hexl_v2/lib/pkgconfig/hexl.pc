@@ -1,0 +1,13 @@
+# Copyright (C) 2020 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+prefix=/home/eidf018/eidf018/s1820742psd/hexl/hexl_v2
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Intel HEXL
+Version: 1.2.5
+Description: Intel® HEXL is an open-source library which provides efficient implementations of integer arithmetic on Galois fields.
+
+Libs: -L${libdir}  -lhexl
+Cflags: -I${includedir} 

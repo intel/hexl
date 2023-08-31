@@ -1,0 +1,64 @@
+Input Size = 4096
+Method                                  Threads=1           Threads=2           Threads=4           Threads=6           Threads=8      
+BM_EltwiseCmpAdd                        0.00512657          0.00455576          0.00479712          0.00490144          0.00493344          
+BM_EltwiseCmpSubMod                     0.0334064           0.0227785           0.0187128           0.0185598           0.0163335           
+BM_EltwiseFMAModAdd                     0.0216051           0.0176496           0.0142812           0.0119878           0.0147407           
+BM_EltwiseMultMod                       0.0182516           0.0121492           0.0126691           0.0121201           0.178388             
+BM_EltwiseReduceModInPlace              0.0443034           0.0559384           0.0470443           0.0366166           0.032561            
+BM_EltwiseVectorScalarAddMod            0.00154469          0.00599568          0.00760386          0.00885226          0.0149704           
+BM_EltwiseVectorVectorAddMod            0.00181662          0.00735656          0.00953703          0.01136             0.0259735           
+BM_EltwiseVectorVectorSubMod            0.00220881          0.00739459          0.00978286          0.0113137           0.0199804           
+BM_NTTInPlace                           0.013323            0.0119631           0.0126235           0.0130003           0.0129615           
+
+
+Input Size = 65536
+Method                                  Threads=1           Threads=2           Threads=4           Threads=6           Threads=8      
+BM_EltwiseCmpAdd                        0.0695428           0.0705741           0.0740151           0.0758498           0.0763839           
+BM_EltwiseCmpSubMod                     0.48305             0.249345            0.126763            0.0918585           0.0757632           
+BM_EltwiseFMAModAdd                     0.395409            0.240749            0.159874            0.124983            0.134324            
+BM_EltwiseMultMod                       0.201719            0.199572            0.140779            0.151836            0.190951            
+BM_EltwiseReduceModInPlace              0.501312            0.451995            0.294307            0.244569            0.231872            
+BM_EltwiseVectorScalarAddMod            0.0193946           0.0514457           0.078022            0.0908455           0.120163            
+BM_EltwiseVectorVectorAddMod            0.0293836           0.109481            0.131305            0.141342            0.183336            
+BM_EltwiseVectorVectorSubMod            0.0293993           0.106441            0.130041            0.143904            0.216673            
+BM_NTTInPlace                           0.0205064           0.0207469           0.0215263           0.0219023           0.0220524   
+
+
+Input Size = 1048576
+Method                                  Threads=1           Threads=2           Threads=4           Threads=6           Threads=8      
+BM_EltwiseCmpAdd                        0.327546            0.618757            0.573513            0.713836            0.784873            
+BM_EltwiseCmpSubMod                     4.2913              3.82233             2.12955             1.57278             1.45903             
+BM_EltwiseFMAModAdd                     3.55693             4.14268             2.16293             1.56032             1.84955             
+BM_EltwiseMultMod                       2.37014             2.65853             1.51409             2.05329             2.14015             
+BM_EltwiseReduceModInPlace              3.02424             2.79114             1.60214             1.34462             2.15723             
+BM_EltwiseVectorScalarAddMod            0.849692            0.755491            0.874564            0.916296            1.07004             
+BM_EltwiseVectorVectorAddMod            1.4735              1.16771             5.17203             1.33028             5.18916             
+BM_EltwiseVectorVectorSubMod            0.795287            1.04016             1.42112             1.58007             1.65453             
+BM_NTTInPlace                           0.196683            0.199438            0.207158            0.213862            0.215379                      
+
+
+Input Size = 16777216
+Method                                  Threads=1           Threads=2           Threads=4           Threads=6           Threads=8      
+BM_EltwiseCmpAdd                        10.7087             8.32306             10.1689             9.18992             11.4777             
+BM_EltwiseCmpSubMod                     45.8251             54.1855             46.1839             37.9283             35.9951             
+BM_EltwiseFMAModAdd                     57.891              51.3104             29.8278             20.0244             16.8797             
+BM_EltwiseMultMod                       61.3749             54.5152             30.3268             21.6294             18.414              
+BM_EltwiseReduceModInPlace              51.7744             50.7112             27.7881             20.9143             16.6882             
+BM_EltwiseVectorScalarAddMod            17.3349             9.77281             6.80029             5.1626              5.9123              
+BM_EltwiseVectorVectorAddMod            23.29               13.8666             9.78924             13.8197             12.3682             
+BM_EltwiseVectorVectorSubMod            20.9593             13.0098             9.52602             9.52581             9.31579             
+BM_NTTInPlace                           4.06966             4.12731             4.31532             4.22544             4.10822             
+
+
+Input Size = 268435456
+Method                                  Threads=1           Threads=2           Threads=4           Threads=6           Threads=8      
+BM_EltwiseCmpAdd                        106.736             70.8016             50.8658             46.203              44.8108             
+BM_EltwiseCmpSubMod                     1092.54             1370.19             622.666             300.148             201.382             
+BM_EltwiseFMAModAdd                     900.52              791.323             479.051             260.392             172.116             
+BM_EltwiseMultMod                       1012.74             683.705             307.87              241.261             201.739             
+BM_EltwiseReduceModInPlace              669.785             621.418             284.352             209.343             159.47              
+BM_EltwiseVectorScalarAddMod            181.477             108.196             92.5808             69.1951             63.4043             
+BM_EltwiseVectorVectorAddMod            217.719             140.504             117.334             85.744              79.2764             
+BM_EltwiseVectorVectorSubMod            226.875             134.509             123.356             78.2418             74.9126             
+BM_NTTInPlace                           86.8708             90.5149             87.8874             91.6698             88.499              
+

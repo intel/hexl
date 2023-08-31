@@ -5,6 +5,9 @@ project(hexl_example LANGUAGES C CXX)
 cmake_minimum_required(VERSION 3.13)
 set(CMAKE_CXX_STANDARD 17)
 
+# Define the directory containing HEXLConfig.cmake
+set(HEXL_HINT_DIR "/home/eidf018/eidf018/s1820742psd/hexl/hexl_v1")
+
 # Example using source
 find_package(HEXL 1.2.5
     HINTS ${HEXL_HINT_DIR}

@@ -1,0 +1,10 @@
+Method                                  Input_size=4096     Input_size=65536    Input_size=1048576  Input_size=16777216 Input_size=268435456
+BM_EltwiseCmpAdd                        0.0015148           0.0183375           0.24938             10.5679             109.842             
+BM_EltwiseCmpSubMod                     0.0311302           0.342652            3.65048             44.5498             783.263             
+BM_EltwiseFMAModAdd                     0.0254424           0.381004            3.13449             52.2436             900.251             
+BM_EltwiseMultMod                       0.0198413           0.278771            2.21727             56.6321             672.338             
+BM_EltwiseReduceModInPlace              0.0202927           0.305697            2.73887             41.9916             664.917             
+BM_EltwiseVectorScalarAddMod            0.0016041           0.0354446           0.495221            16.3091             174.137             
+BM_EltwiseVectorVectorAddMod            0.0022032           0.0516952           0.801214            19.9865             227.267             
+BM_EltwiseVectorVectorSubMod            0.0021632           0.0509133           0.851897            20.7146             215.027             
+BM_NTTInPlace                           0.000456            0.0013347           0.0093004           0.097884            1.98

@@ -1,0 +1,13 @@
+// Copyright (C) 2020 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+
+#cmakedefine HEXL_USE_MSVC
+#cmakedefine HEXL_USE_GNU
+#cmakedefine HEXL_USE_CLANG
+
+#cmakedefine HEXL_DEBUG
+
+// Avoid unused variable warnings
+#define HEXL_UNUSED(x) (void)(x)
