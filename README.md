@@ -1,6 +1,6 @@
 [![Build and Test](https://github.com/intel/hexl/actions/workflows/github-ci.yml/badge.svg?branch=main)](https://github.com/intel/hexl/actions/workflows/github-ci.yml)
 
-# Intel Homomorphic Encryption (HE) Acceleration Library
+# OpenMP-enabled Intel Homomorphic Encryption (HE) Acceleration Library
 Intel:registered: HE Acceleration Library is an open-source library which
 provides efficient implementations of integer arithmetic on Galois fields. Such
 arithmetic is prevalent in cryptography, particularly in homomorphic encryption
@@ -11,6 +11,8 @@ Intel HE Acceleration Library, see our
 [whitepaper](https://arxiv.org/abs/2103.16400.pdf). For tips on best
 performance, see [Performance](#performance).
 
+The project extends HEXL's capabilities by incorporating OpenMP for multi-threaded parallelization, in order to reduce computational latency without compromising security.
+
 ## Contents
 - [Intel Homomorphic Encryption (HE) Acceleration Library](#intel-homomorphic-encryption-he-acceleration-library)
   - [Contents](#contents)
@@ -20,7 +22,7 @@ performance, see [Performance](#performance).
     - [Compile-time options](#compile-time-options)
     - [Compiling Intel HE Acceleration Library](#compiling-intel-he-acceleration-library)
       - [Linux and Mac](#linux-and-mac)
-      - [Windows](#windows)
+  - [Build the OpenMP-enabled Version](#build-the-openmp-enabled-version)
   - [Performance](#performance)
   - [Testing Intel HE Acceleration Library](#testing-intel-he-acceleration-library)
   - [Benchmarking Intel HE Acceleration Library](#benchmarking-intel-he-acceleration-library)
@@ -98,20 +100,15 @@ from source using CMake.
 ### Dependencies
 We have tested Intel HE Acceleration Library on the following operating systems:
 - Ubuntu 20.04
-- macOS 10.15 Catalina
-- Microsoft Windows 10
+- macOS 13.4.1 (22F82) Vertura
 
 Intel HE Acceleration Library requires the following dependencies:
 
 | Dependency  | Version                                      |
 |-------------|----------------------------------------------|
 | CMake       | >= 3.13 \*                                   |
-| Compiler    | gcc >= 7.0, clang++ >= 5.0, MSVC >= 2019     |
+| Compiler    | gcc >= 7.0, clang++ >= 5.0  |
 
-\* For Windows 10, you must check whether the version on CMake you have can
-generate the necessary Visual Studio project files. For example, only from
-[CMake 3.14 onwards can MSVC 2019 project files be
-generated](https://cmake.org/cmake/help/git-stage/generator/Visual%20Studio%2016%202019.html).
 
 
 ### Compile-time options
@@ -162,33 +159,151 @@ To install Intel HE Acceleration Library to the installation directory, run
 ```bash
 cmake --install build
 ```
+## Build the OpenMP-enabled Version
+1. First start from a clean project in the ‘hexl’ folder
+```bash
+	rm -rf CMakeCache.txt CMakeFiles/
+```
+2. Go to the build folder
+```bash
+	cd build
+```
+3. Repeat the first command to clean the cmake cache in the build folder
+```bash
+	rm -rf CMakeCache.txt CMakeFiles/
+```
 
-#### Windows
-To compile Intel HE Acceleration Library on Windows using Visual Studio in
-Release mode, configure the build via
+4. Now configure the build
 ```bash
-cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
+	cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install/hexl_v2 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+  ```
+		or 
+```bash
+		cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/installhexl_v1 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 ```
-adding the desired compile-time options with a `-D` flag (see [Compile-time
-options](#compile-time-options)). For instance, to use a non-standard
-installation directory, configure the build with
+			or
 ```bash
-cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install
+			cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install/hexl_v3 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+```
+Notice that, hexl_v0 is the original serial version; hexl_v1 stands for the serial but removed or unroll techniques version; hexl_v2 stands for the OpenMP-enabled multi-threading version; hexl_v3 stands for the OpenMP-enabled multi-threading and allow OpenMP region timing test version.
+```bash
+	cmake --build build
+	cmake --install build
 ```
 
-To specify the desired build configuration, pass either `--config Debug` or
-`--config Release` to the build step and install steps. For instance, to build
-Intel HE Acceleration Library in Release mode, call
+## Test the parallel performance of OpenMP-enabled Version 
+1. Go into the OpenMP enabled example test directory
 ```bash
-cmake --build build --config Release
+	cd omp_example
 ```
-This will build the Intel HE Acceleration Library library in the
-`build/hexl/lib/` or `build/hexl/Release/lib` directory.
+2. Define the directory containing HEXLConfig.cmake (save but don’t close)
+```bash
+	vim camke/CMakeLists.txt
+```
+```bash
+	set(HEXL_HINT_DIR "path/to/install/hexl_v2/lib/cmake/hexl-1.2.5")
+```
 
-To install Intel HE Acceleration Library to the installation directory, run
+3. Help to find OpenMP in the CMakeLists.txt
 ```bash
-cmake --build build --target install --config Release
+	find_package(OpenMP)
+		if (OpenMP_FOUND)
+    		message(STATUS "OpenMP_CXX_INCLUDE_DIRS: ${OpenMP_CXX_INCLUDE_DIRS}")
+    		message(STATUS "OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
+	endif()
 ```
+
+	N.B. Don’t forget to edit the execution file name!
+
+4. Build the example
+```bash
+	cmake -S cmake -B build
+  cmake --build build -j
+```
+
+5. Set the desired thread number and execute
+
+```bash
+	./build/omp_example 1000 4 1234
+	time ./build/omp_example 1000 1,2,4,8,16 16384
+```
+  or directly run the script
+  ```bash
+  cd ..
+  ./hexl_omp.sh
+  ```
+
+## Test the serial performance of OpenMP-enabled Version 
+1. Go into the serial example test directory
+```bash
+	cd ser_example
+```
+2. Define the directory containing HEXLConfig.cmake (save but don’t close)
+```bash
+	vim camke/CMakeLists.txt
+```
+```bash
+	set(HEXL_HINT_DIR "path/to/install/hexl_v1/lib/cmake/hexl-1.2.5")
+```
+	N.B. Don’t forget to edit the execution file name!
+
+3. Build the example
+```bash
+	cmake -S cmake -B build
+  cmake --build build -j
+```
+
+4. Set the desired thread number and execute
+
+```bash
+	./build/example 1000 4096,65536
+	time ./build/example 1000 4096,65536
+```
+  or directly run the script
+  ```bash
+  cd ..
+  ./hexl_serial.sh
+  ```
+
+## Test the parallel performance of OpenMP-enabled Version 
+1. Go into the OpenMP enabled example test directory
+```bash
+	cd time_example
+```
+2. Define the directory containing HEXLConfig.cmake (save but don’t close)
+```bash
+	vim camke/CMakeLists.txt
+```
+```bash
+	set(HEXL_HINT_DIR "path/to/install/hexl_v3/lib/cmake/hexl-1.2.5")
+```
+
+3. Help to find OpenMP in the CMakeLists.txt
+```bash
+	find_package(OpenMP)
+		if (OpenMP_FOUND)
+    		message(STATUS "OpenMP_CXX_INCLUDE_DIRS: ${OpenMP_CXX_INCLUDE_DIRS}")
+    		message(STATUS "OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
+	endif()
+```
+
+4. Build the example
+```bash
+	cmake -S cmake -B build
+  cmake --build build -j
+```
+
+5. Set the desired thread number and execute
+
+```bash
+	./build/time_example 100 4 1024 0
+	time ./build/omp_example 100 4 1024 0
+```
+  or directly run the script
+  ```bash
+  cd ..
+  ./hexl_time.sh
+  ```
 
 ## Performance
 For best performance, we recommend using Intel HE Acceleration Library on a
@@ -352,7 +467,7 @@ To cite Intel HE Acceleration Library, please use the following BibTeX entry.
 ```
 
 # Contributors
-The Intel contributors to this project, sorted by last name, are
+The Intel contributors to the original HEXL project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
@@ -370,5 +485,5 @@ The Intel contributors to this project, sorted by last name, are
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
 
 In addition to the Intel contributors listed, we are also grateful to
-contributions to this project that are not reflected in the Git history:
+contributions to the original HEXL project that are not reflected in the Git history:
   - [Antonis Papadimitriou](https://www.linkedin.com/in/apapadimitriou/)

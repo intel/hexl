@@ -1,0 +1,34 @@
+Method                        Input_size=65536Input_size=1048576Input_size=16777216Input_size=268435456
+BM_EltwiseCmpAdd              0.017372       0.360454       10.3044        101.545        
+BM_EltwiseCmpSubMod           0.293158       5.49905        37.7997        569.832        
+BM_EltwiseFMAModAdd           0.403343       3.77922        48.3154        736.565        
+BM_EltwiseMultMod             0.225371       2.10433        49.6537        917.409        
+BM_EltwiseReduceModInPlace    0.324567       2.90482        45.3023        708.633        
+BM_EltwiseVectorScalarAddMod  0.035236       0.67465        16.7397        157.531        
+BM_EltwiseVectorVectorAddMod  0.054301       0.941839       20.3437        221.558        
+BM_EltwiseVectorVectorSubMod  0.05375        0.946959       21.3859        216.095        
+BM_NTTInPlace                 0              0              0              0         
+
+s1820742psd@eidf018-s1820742msc:~/hexl/example$ ./build/example 1 4096,65536,1048576,16777216,268435456
+Method                        Threads=4096   Threads=65536  Threads=1048576Threads=16777216Threads=268435456
+BM_EltwiseCmpAdd              0.002144       0.01595        0.406509       10.3117        113.003        
+BM_EltwiseCmpSubMod           0.039855       0.318033       3.72818        36.4171        644.48         
+BM_EltwiseFMAModAdd           0.01605        0.248584       3.99384        57.2828        724.992        
+BM_EltwiseMultMod             0.015299       0.168785       3.30193        48.9081        728.924        
+BM_EltwiseReduceModInPlace    0.016561       0.234798       3.21797        38.945         659.401        
+BM_EltwiseVectorScalarAddMod  0.001934       0.026049       0.538125       15.2527        175.121        
+BM_EltwiseVectorVectorAddMod  0.003437       0.039815       0.918195       19.7483        212.407        
+BM_EltwiseVectorVectorSubMod  0.001643       0.039985       0.743188       20.7958        196.669        
+BM_NTTInPlace                 0              0              0              0              0            
+
+s1820742psd@eidf018-s1820742msc:~/hexl/example$ ./build/example 10 4096,65536,1048576,16777216,268435456
+Method                                  Threads=4096        Threads=65536       Threads=1048576     Threads=16777216    Threads=268435456   
+BM_EltwiseCmpAdd                        0.0013718           0.0193352           0.208849            10.9892             108.882             
+BM_EltwiseCmpSubMod                     0.0277949           0.370251            3.56102             56.7082             885.602             
+BM_EltwiseFMAModAdd                     0.0240648           0.351835            2.94638             54.911              1103.29             
+BM_EltwiseMultMod                       0.0194895           0.241749            2.1714              61.7039             793.763             
+BM_EltwiseReduceModInPlace              0.0193062           0.287436            2.48417             44.0457             660.978             
+BM_EltwiseVectorScalarAddMod            0.001593            0.0340157           0.425441            16.1058             172.764             
+BM_EltwiseVectorVectorAddMod            0.0021721           0.050867            0.720809            20.2879             224.474             
+BM_EltwiseVectorVectorSubMod            0.002193            0.0495797           0.733838            20.3605             215.544             
+BM_NTTInPlace                           0.0003798           0.0007619           0.0090708           0.171779            3.80078   

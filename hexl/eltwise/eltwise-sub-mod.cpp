@@ -1,6 +1,11 @@
 // Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include <omp.h>
+
+#include <iomanip>
+#include <iostream>
+
 #include "eltwise/eltwise-sub-mod-avx512.hpp"
 #include "eltwise/eltwise-sub-mod-internal.hpp"
 #include "hexl/eltwise/eltwise-add-mod.hpp"
@@ -25,19 +30,31 @@ void EltwiseSubModNative(uint64_t* result, const uint64_t* operand1,
                     "pre-sub value in operand1 exceeds bound " << modulus);
   HEXL_CHECK_BOUNDS(operand2, n, modulus,
                     "pre-sub value in operand2 exceeds bound " << modulus);
+  
+  int thread_count;
 
-  HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < n; ++i) {
-    if (*operand1 >= *operand2) {
-      *result = *operand1 - *operand2;
-    } else {
-      *result = *operand1 + modulus - *operand2;
-    }
+  double start_time = omp_get_wtime();
 
-    ++operand1;
-    ++operand2;
-    ++result;
+#pragma omp parallel
+  {
+    thread_count = omp_get_num_threads();
+#pragma omp for
+    for (size_t i = 0; i < n; ++i) {
+      if (operand1[i] >= operand2[i]) {
+          result[i] = operand1[i] - operand2[i];
+      } else {
+          result[i] = operand1[i] + modulus - operand2[i];
+      }
   }
+  }
+  // Record the end time(timer2)
+  double end_time = omp_get_wtime();
+
+  // Calculate and print the elapsed time
+  double elapsed_time = end_time - start_time;
+
+  std::cout << thread_count << "  " << std::fixed << elapsed_time
+            << std::setprecision(5) << std::endl;
 }
 
 void EltwiseSubModNative(uint64_t* result, const uint64_t* operand1,
@@ -50,18 +67,29 @@ void EltwiseSubModNative(uint64_t* result, const uint64_t* operand1,
   HEXL_CHECK_BOUNDS(operand1, n, modulus,
                     "pre-sub value in operand1 exceeds bound " << modulus);
   HEXL_CHECK(operand2 < modulus, "Require operand2 < modulus");
+  int thread_count;
+  double start_time = omp_get_wtime();
 
-  HEXL_LOOP_UNROLL_4
-  for (size_t i = 0; i < n; ++i) {
-    if (*operand1 >= operand2) {
-      *result = *operand1 - operand2;
+#pragma omp parallel
+  {
+    thread_count = omp_get_num_threads();
+#pragma omp for
+    for (size_t i = 0; i < n; ++i) {
+      if (operand1[i] >= operand2) {
+        result[i] = operand1[i] - operand2;
     } else {
-      *result = *operand1 + modulus - operand2;
+        result[i] = operand1[i] + modulus - operand2;
     }
-
-    ++operand1;
-    ++result;
+}
   }
+// Record the end time(timer2)
+double end_time = omp_get_wtime();
+
+// Calculate and print the elapsed time
+double elapsed_time = end_time - start_time;
+
+std::cout << thread_count << "  " << std::fixed << elapsed_time
+          << std::setprecision(5) << std::endl;
 }
 
 void EltwiseSubMod(uint64_t* result, const uint64_t* operand1,
