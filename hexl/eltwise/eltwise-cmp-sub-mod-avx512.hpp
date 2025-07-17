@@ -65,7 +65,6 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
 
   __m512i v_mu_64 = _mm512_set1_epi64(static_cast<int64_t>(mu_64));
 
-  // omp_set_num_threads(34);
 #pragma omp parallel num_threads(eltwise_num_threads) \
     firstprivate(v_op_ptr, v_result_ptr) {
   int id = omp_get_thread_num();
@@ -89,7 +88,6 @@ void EltwiseCmpSubModAVX512(uint64_t* result, const uint64_t* operand1,
     ++v_result_ptr;
   }
 }
-// omp_set_num_threads(32);
 }
 #endif
 

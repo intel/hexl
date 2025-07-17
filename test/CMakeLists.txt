@@ -55,12 +55,6 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(unit-test PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
-find_package(TBB)
-if (TBB_FOUND)
-  message(STATUS "ROCHA TBB found")
-  target_link_libraries(unit-test PUBLIC TBB::tbb)
-endif()
-
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(unit-test PRIVATE -Wall -Wextra -march=native -fopenmp)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

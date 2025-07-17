@@ -30,8 +30,8 @@ TEST(EltwiseReduceMod, avx512_64_mod_1) {
   uint64_t modulus = 769;
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512_mt<64>(result.data(), op.data(), op.size(), modulus,
-                                input_mod_factor, output_mod_factor);
+  EltwiseReduceModAVX512<64>(result.data(), op.data(), op.size(), modulus,
+                             input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
 
@@ -101,8 +101,8 @@ TEST(EltwiseReduceMod, avx512_52_mod_1) {
   uint64_t modulus = 769;
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512_mt<52>(result.data(), op.data(), op.size(), modulus,
-                                input_mod_factor, output_mod_factor);
+  EltwiseReduceModAVX512<52>(result.data(), op.data(), op.size(), modulus,
+                             input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
 
@@ -146,14 +146,9 @@ TEST(EltwiseReduceMod, avx512_52_Big_mod_1) {
   const uint64_t input_mod_factor = modulus;
   const uint64_t output_mod_factor = 1;
 
-<<<<<<< HEAD
   EltwiseReduceModAVX512<52>(result.data(), op.data(), op.size(), modulus,
                              input_mod_factor, output_mod_factor);
 
-=======
-  EltwiseReduceModAVX512_mt<52>(result.data(), op.data(), op.size(), modulus,
-                                input_mod_factor, output_mod_factor);
->>>>>>> 6e5ccb9 (Add multithreading to more eltwise functions)
   CheckEqual(result, exp_out);
 }
 
@@ -200,8 +195,8 @@ TEST(EltwiseReduceMod, avx512_2_1) {
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 2;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512_mt(result.data(), op.data(), op.size(), modulus,
-                            input_mod_factor, output_mod_factor);
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
+                         input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
 
@@ -217,8 +212,8 @@ TEST(EltwiseReduceMod, avx512_4_1) {
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 4;
   const uint64_t output_mod_factor = 1;
-  EltwiseReduceModAVX512_mt(result.data(), op.data(), op.size(), modulus,
-                            input_mod_factor, output_mod_factor);
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
+                         input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
 
@@ -234,8 +229,8 @@ TEST(EltwiseReduceMod, avx512_4_2) {
   uint64_t modulus = 101;
   const uint64_t input_mod_factor = 4;
   const uint64_t output_mod_factor = 2;
-  EltwiseReduceModAVX512_mt(result.data(), op.data(), op.size(), modulus,
-                            input_mod_factor, output_mod_factor);
+  EltwiseReduceModAVX512(result.data(), op.data(), op.size(), modulus,
+                         input_mod_factor, output_mod_factor);
   CheckEqual(result, exp_out);
 }
 
@@ -265,8 +260,8 @@ TEST(EltwiseReduceMod, AVX512Big_0_1) {
 
       EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus,
                              modulus, 1);
-      EltwiseReduceModAVX512_mt(result2.data(), op2.data(), op1.size(), modulus,
-                                modulus, 1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus,
+                             modulus, 1);
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);
@@ -297,8 +292,8 @@ TEST(EltwiseReduceMod, AVX512Big_4_1) {
 
       EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
                              1);
-      EltwiseReduceModAVX512_mt(result2.data(), op2.data(), op1.size(), modulus,
-                                4, 1);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 4,
+                             1);
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);
@@ -329,8 +324,8 @@ TEST(EltwiseReduceMod, AVX512Big_4_2) {
 
       EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
                              2);
-      EltwiseReduceModAVX512_mt(result2.data(), op2.data(), op1.size(), modulus,
-                                4, 2);
+      EltwiseReduceModAVX512(result2.data(), op2.data(), op1.size(), modulus, 4,
+                             2);
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);
@@ -427,7 +422,6 @@ TEST(EltwiseReduceMod, AVX512_52_Big_4_1) {
 
       EltwiseReduceModNative(result1.data(), op1.data(), op1.size(), modulus, 4,
                              1);
-<<<<<<< HEAD
       EltwiseReduceModAVX512<52>(result2.data(), op2.data(), op1.size(),
                                  modulus, 4, 1);
 
@@ -492,10 +486,6 @@ TEST(EltwiseReduceMod, AVX512_52_Big_2_1) {
                              1);
       EltwiseReduceModAVX512<52>(result2.data(), op2.data(), op1.size(),
                                  modulus, 2, 1);
-=======
-      EltwiseReduceModAVX512_mt(result2.data(), op2.data(), op1.size(), modulus,
-                                4, 1);
->>>>>>> 6e5ccb9 (Add multithreading to more eltwise functions)
 
       ASSERT_EQ(result1, result2);
       ASSERT_EQ(result1, result2);

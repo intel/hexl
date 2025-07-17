@@ -70,8 +70,6 @@ void EltwiseMultModNative(uint64_t* result, const uint64_t* operand1,
 
   const uint64_t twice_modulus = 2 * modulus;
 
-  // omp_set_num_threads(34);
-
 #pragma omp parallel num_threads(eltwise_num_threads) \
     firstprivate(result, operand1, operand2) {
   int id = omp_get_thread_num();
